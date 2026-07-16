@@ -1,6 +1,6 @@
 # Phase 0a: Contract Alignment
 
-Status: in progress.
+Status: complete.
 
 This plan closes the remaining machine-readable and discovery contract gaps
 before CLI acceptance fixtures or production code are added. The
@@ -22,9 +22,9 @@ behavior.
 - [x] Enforce inclusive safe-integer bounds on `unit.scale` in the document
   schema.
 - [x] Add valid boundary and invalid out-of-range language-neutral fixtures.
-- [ ] Define one portable authoring source and byte-stable installed-CLI and
+- [x] Define one portable authoring source and byte-stable installed-CLI and
   pinned-`npx` generation targets without generating the Phase 6 Agent Skill.
-- [ ] Define exact top-level and per-command help Markdown.
+- [x] Define exact top-level and per-command help Markdown through `create`.
 - [x] Add malformed, trailing-content, and duplicate-member raw inputs outside
   the document manifest, with explicit integrity checks.
 
@@ -48,13 +48,15 @@ behavior.
 
 ## Gate
 
-Every V0 artifact result is representable by aligned schemas and fixtures, and
-every discovery/help byte sequence needed by Phase 1 has an authoritative
-source.
+Passed. Every V0 artifact result is representable by aligned schemas and
+fixtures, and every guide/help byte sequence needed by Phase 1 has an
+authoritative source.
 
 ## Validation Evidence
 
 `./scripts/check-docs.sh` passes with both safe-integer scale endpoints, both
 adjacent schema failures, the invalid-snapshot diff, and all three raw-input
-classes. `git diff --check` also passes. Generated guide and help freshness
-checks remain unavailable until those assets are defined.
+classes. It also checks the closed help inventory and exact installed-guide
+rendering from the portable source. The future pinned-`npx` mode requires an
+exact package version and fixes the complete command prefix without creating a
+Phase 6 Skill. `git diff --check` also passes.

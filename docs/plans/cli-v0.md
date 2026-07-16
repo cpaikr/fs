@@ -21,7 +21,7 @@ exact-byte non-overwriting creation. It stops before Agent Skill generation,
 
 | Phase | State | Detailed plan |
 | --- | --- | --- |
-| 0a. Contract alignment | In progress | [Contract alignment](cli-v0/phase-0-contracts.md) |
+| 0a. Contract alignment | Complete | [Contract alignment](cli-v0/phase-0-contracts.md) |
 | 0b. Runtime and command seam | Complete | [Runtime integration](cli-v0/phase-0-effect.md) |
 | 1. Acceptance suite | Not started | [Acceptance suite](cli-v0/phase-1-acceptance.md) |
 | 2. Package and fail-closed validator | Not started | [Package foundation](cli-v0/phase-2-package.md) |
@@ -34,18 +34,17 @@ command.
 
 ## Current Validation
 
-`./scripts/check-docs.sh` passes for the current documentation and artifact
-tree. Implementation, acceptance, package, and cross-platform checks remain
+`./scripts/check-docs.sh` passes for the aligned contracts, schemas, fixtures,
+raw inputs, exact help inventory, and installed-guide generation. The exact
+Effect package inspection and Node 22/24 argument-token probes also pass.
+Implementation, acceptance, package, and cross-platform checks remain
 unavailable because their source and harnesses do not exist.
 
 ## Current Blockers
 
-- Portable authoring guidance and exact help do not yet have authoritative,
-  byte-stable asset sources.
 - CLI acceptance descriptors and their integrity check do not exist.
 
 ## Next Action
 
-Finish Phase 0 contract alignment by defining byte-stable portable authoring
-guidance and exact help assets. Then build the Phase 1 acceptance suite before
+Build and validate the complete Phase 1 acceptance descriptor suite before
 adding production source.

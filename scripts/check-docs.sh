@@ -21,6 +21,51 @@ done < <(
     -name '*.md' -print0
 )
 
+echo "Checking maintained CLI content"
+node scripts/render-guide.mjs --check-installed
+npx_guide="$(node scripts/render-guide.mjs --npx-version 0.1.0)"
+for expected_command in \
+  'schema document --version 0.1' \
+  'example' \
+  'example minimal' \
+  'validate candidate.json --format json' \
+  'create candidate.json --output statement.fs.json'; do
+  if [[ "$npx_guide" != *"npx -y @cpai/fs@0.1.0 $expected_command"* ]]; then
+    echo "Pinned npx guide rendering lost an expected command" >&2
+    exit 1
+  fi
+done
+if [[ "$npx_guide" == *'{{'* ]]; then
+  echo "Pinned npx guide rendering contains an unresolved placeholder" >&2
+  exit 1
+fi
+node scripts/render-guide.mjs --npx-version 1.0.0+build.1 >/dev/null
+for invalid_version in latest 1.0.0-.. 1.0.0-01; do
+  if node scripts/render-guide.mjs \
+    --npx-version "$invalid_version" >/dev/null 2>&1; then
+    echo "Pinned npx guide rendering accepted $invalid_version" >&2
+    exit 1
+  fi
+done
+if ! diff -u \
+  <(
+    printf '%s\n' \
+      'assets/help/create.md' \
+      'assets/help/example.md' \
+      'assets/help/fs.md' \
+      'assets/help/guide-authoring.md' \
+      'assets/help/guide.md' \
+      'assets/help/schema.md' \
+      'assets/help/validate.md'
+  ) \
+  <(
+    find assets/help -mindepth 1 -maxdepth 1 -print \
+      | LC_ALL=C sort
+  ); then
+  echo "Help asset inventory differs from the accepted command surface" >&2
+  exit 1
+fi
+
 echo "Parsing JSON artifacts"
 find . \
   -path './.git' -prune -o \

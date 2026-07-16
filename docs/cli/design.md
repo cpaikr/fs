@@ -41,6 +41,10 @@ Every command path supports:
 V0 does not expose global version, completions, wizard, prompt, or interactive
 surfaces. The command-local `fs schema --version` flag remains valid.
 
+The exact top-level and milestone command-path Markdown begins at the
+[top-level help asset](../../assets/help/fs.md); the neighboring help assets
+are closed and inventory-checked by `scripts/check-docs.sh`.
+
 Logging is silent by default and never changes standard output, exit status,
 ordering, or filesystem effects. When enabled, it emits bounded deterministic
 JSON Lines diagnostics without document contents, raw dependency errors,
@@ -65,6 +69,11 @@ financial decisions, and validation loop from the
 [authoring guide](../authoring.md). The installed command and Agent Skill must
 be generated or checked from one maintained source so their guidance cannot
 drift.
+
+The [portable template](../../content/guide/authoring.md.template) is that
+source. Its [installed rendering](../../assets/guide/authoring.md) uses `fs`;
+the deterministic renderer accepts an exact package version and fixes the
+`npx -y @cpai/fs@<version>` prefix for future Phase 6 Skill generation.
 
 Generated routes and commands must work outside a repository checkout. The
 guide routes to schemas, examples, and the semantic specification without
