@@ -1,6 +1,6 @@
 # Phase 2: Package and Fail-Closed Validation
 
-Status: in progress.
+Status: complete.
 
 This plan creates the package, production entry point, test harnesses, and a
 thin validator that cannot report false conformance. It implements the
@@ -19,11 +19,11 @@ Node-core command and public Effect integration seams selected in
 - [x] Use `util.parseArgs` tokens behind one command adapter that rejects
   duplicates, misplaced command-local flags, extra operands, and unsupported
   built-ins before application I/O.
-- [ ] Add type-check, build, unit, fixture-integrity, acceptance, pack, and
+- [x] Add type-check, build, unit, fixture-integrity, acceptance, pack, and
   local npm/npx smoke commands.
-- [ ] Compare bundled and unbundled ESM with retained package-size, cold local
+- [x] Compare bundled and unbundled ESM with retained package-size, cold local
   `npx`, and warm-startup measurements; retain one production layout.
-- [ ] Add Linux, macOS, and Windows CI across declared maintained Node.js LTS
+- [x] Add Linux, macOS, and Windows CI across declared maintained Node.js LTS
   majors beginning with Node 22.
 
 ## Thin Validation Path
@@ -39,7 +39,7 @@ Node-core command and public Effect integration seams selected in
   required numeric boundary and rejects duplicate members before `JSON.parse`.
 - [x] Resolve bundled Draft 2020-12 schemas offline with Ajv and normalize
   diagnostics to stable codes and JSON Pointer paths.
-- [ ] Retain adapter, logger, parsing, schema, package, asset, and I/O-order
+- [x] Retain adapter, logger, parsing, schema, package, asset, and I/O-order
   tests against the production entry point.
 - [x] Keep schema-valid input internal or fail it closed until Phase 3.
 
@@ -62,8 +62,21 @@ asset tests pass. No input can receive a false conformance success.
 ## Validation Evidence
 
 The exact lock, strict configs, Effect entry point, token grammar, bounded
-process adapter, unbundled build, installed-tarball smoke, exact assets, and
-packed harness pass. Fatal decoding, the duplicate-aware scanner, offline Ajv,
-normalized schema errors, semantic validation, deterministic logging, and all
-25 validation/logging cases pass. Acceptance-script wiring, Effect diagnostics,
-runtime measurements, complete retained I/O-order coverage, and CI remain open.
+process adapter, installed-tarball smoke, exact assets, and packed harness
+pass. Fatal decoding, the duplicate-aware scanner, offline Ajv, normalized
+schema errors, semantic validation, deterministic logging, and all validation
+and logging cases pass. Retained tests cover every log threshold, aliases,
+single-read behavior, grammar-before-I/O, output-preflight precedence, and
+logging-invariant read/write order.
+
+The retained unbundled ESM layout is 110,393 bytes with source maps versus
+137,892 bytes for an esbuild bundle with npm packages external. In a 15-run
+macOS Node 24.15.0 sample, unbundled first/median process startup was
+201.11/195.23 ms versus 213.21/205.55 ms bundled. The packed package is 32,233
+bytes compressed and 158,379 bytes unpacked across 46 files; local cold and
+warm `npx` samples were 941.09 ms and 403.15 ms median. The smaller,
+equally-fast, easier-to-audit unbundled layout remains production.
+
+`pnpm verify` passes on macOS and in isolated Linux Node 22.17.0 and 24.15.0
+environments. The repository CI matrix applies the same gate to both versions
+on Linux, macOS, and Windows, with a separate documentation-contract job.

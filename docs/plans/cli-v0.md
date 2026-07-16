@@ -1,8 +1,6 @@
 # V0 CLI Delivery Plan
 
-Status: active. Contracts and the complete process acceptance suite through
-`fs create` are settled, but no package, executable, build, or production CLI
-implementation exists.
+Status: complete through `fs create`.
 
 This file is the concise milestone index. Detailed scope, decisions, progress,
 and validation evidence live in the linked child plans. The
@@ -24,9 +22,9 @@ exact-byte non-overwriting creation. It stops before Agent Skill generation,
 | 0a. Contract alignment | Complete | [Contract alignment](cli-v0/phase-0-contracts.md) |
 | 0b. Runtime and command seam | Complete | [Runtime integration](cli-v0/phase-0-effect.md) |
 | 1. Acceptance suite | Complete | [Acceptance suite](cli-v0/phase-1-acceptance.md) |
-| 2. Package and fail-closed validator | In progress | [Package foundation](cli-v0/phase-2-package.md) |
+| 2. Package and fail-closed validator | Complete | [Package foundation](cli-v0/phase-2-package.md) |
 | 3. Complete semantic validation | Complete | [Semantic validation](cli-v0/phase-3-validation.md) |
-| 4–5. Discovery, content, and creation | In progress | [Content and creation](cli-v0/phase-4-5-content-create.md) |
+| 4–5. Discovery, content, and creation | Complete | [Content and creation](cli-v0/phase-4-5-content-create.md) |
 
 Production implementation begins only after both Phase 0 lanes and Phase 1
 pass their gates. A partial validator is never a releasable conformance
@@ -34,17 +32,17 @@ command.
 
 ## Current Validation
 
-`./scripts/check-docs.sh` passes for the aligned contracts and 76 process
-descriptors. Strict typecheck, 54 unit tests, build, installed-tarball npm/npx
-smoke, and exact packed-asset checks pass. The packed harness passes 62 cases:
-all discovery/content plus validation and logging. Create, writer fault, and
-cross-platform CI gates remain open.
+`pnpm verify` passes strict typecheck, Effect diagnostics, 83 unit and fault
+tests, all 76 packed-process cases, build, installed-tarball npm/npx smoke, and
+exact checks for 46 packed files. The same gate passes in isolated Linux
+environments on Node 22.17.0 and 24.15.0; CI enforces both versions on Linux,
+macOS, and Windows. `./scripts/check-docs.sh` and `git diff --check` pass.
 
 ## Current Blockers
 
-- None. Remaining Phase 2 work is implementation, not an external blocker.
+- None.
 
 ## Next Action
 
-Implement `create` with the complete validator and shared writer, then finish
-retained package, writer-fault, runtime-measurement, and platform gates.
+No in-milestone action remains. The next roadmap slice is Phase 6 Agent
+Guidance, which is deliberately outside this milestone.

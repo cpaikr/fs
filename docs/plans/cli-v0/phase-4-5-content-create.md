@@ -1,6 +1,6 @@
 # Phases 4–5: Discovery, Bundled Content, and Atomic Creation
 
-Status: in progress; creation remains blocked on Phase 3 validation.
+Status: complete.
 
 This plan completes the first implementation milestone after validation. It
 owns discovery and exact bundled content commands, the shared atomic writer,
@@ -16,23 +16,23 @@ and `fs create`. It excludes Agent Skill generation, `record-validation`,
 - [x] Implement all schema and example lookups with exact-byte output.
 - [x] Reject unknown names, versions, arguments, flags, and unresolved unnamed
   output behavior exactly as accepted.
-- [ ] Verify maintained guidance and packaged assets are current in CI without
+- [x] Verify maintained guidance and packaged assets are current in CI without
   generating the Phase 6 Agent Skill.
-- [ ] Add platform fault tests for the shared writer.
+- [x] Add platform fault tests for the shared writer.
 
 Phase 4 gate: discovery, help, guide, schema, and example cases pass offline
 against the packed executable, including write refusal and fault tests.
 
 ## Phase 5: Atomic Creation
 
-- [ ] Buffer candidate bytes once, fully validate them, and write those exact
+- [x] Buffer candidate bytes once, fully validate them, and write those exact
   bytes only when structurally conforming.
-- [ ] Check an existing destination before candidate validation and enforce
+- [x] Check an existing destination before candidate validation and enforce
   no-overwrite again at the atomic commit boundary.
-- [ ] Reuse the shared writer for path and standard-input cases.
-- [ ] Permit structurally conforming candidates with inconsistent
+- [x] Reuse the shared writer for path and standard-input cases.
+- [x] Permit structurally conforming candidates with inconsistent
   calculations without weakening validation output.
-- [ ] Test structural refusal, malformed input, identical and different
+- [x] Test structural refusal, malformed input, identical and different
   existing files, races, interrupted writes, and error precedence.
 
 Phase 5 gate: all `create` acceptance and fault-injection tests pass on every
@@ -48,8 +48,19 @@ supported platform without overwrite or observable partial output.
 
 ## Validation Evidence
 
-The packed executable passes all 37 discovery, exact help/guide, schema, and
-example cases. One package-root asset boundary owns exact reads, and the shared
-temporary-file plus atomic-link writer prevents ordinary overwrites. Packaged
-guidance freshness in CI, writer fault/platform tests, validation, and all
-Phase 5 creation work remain open.
+The packed executable passes all discovery, exact help/guide, schema, example,
+and 14 creation cases. One package-root asset boundary owns exact reads. The
+shared writer uses exclusive temporary creation, exact write, file sync, and
+an atomic hard-link commit so races cannot replace a destination. Directory
+entries, including dangling symlinks, are checked before candidate reads and
+again at commit.
+
+Retained fault tests cover missing and inaccessible parents, open, write,
+sync, close, non-race commit, transient and persistent cleanup, and
+competing-destination failures. After commit, persistent temp unlink failure
+retains success and may leave only a private-mode complete hard link; it never
+retracts or partially exposes the synced destination. The suite also proves
+exact bytes, no ordinary overwrite, single reads, and stable read-before-write
+ordering across logging settings. `pnpm verify` passes on macOS and isolated
+Linux Node 22.17.0 and 24.15.0; CI runs the same gate on Linux, macOS, and
+Windows.
