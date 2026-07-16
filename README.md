@@ -31,20 +31,22 @@ engine.
 
 ## Current Work
 
-The V0 artifact contract is complete and was derived from representative JSON
-examples. The [authoring guide](docs/authoring.md) now defines how people and
-agents apply that contract without turning FS into an extraction or accounting
-policy system.
+The V0 artifact semantics are defined from representative JSON examples. The
+newly confirmed invalid-snapshot result and numeric scale bound still require
+schema and fixture alignment. The [authoring guide](docs/authoring.md) defines
+how people and agents apply the contract without turning FS into an extraction
+or accounting policy system.
 The [semantic specification](docs/semantic-spec.md) defines the normative model
 and canonical JSON mapping; [`examples/`](examples/) and [`schema/`](schema/)
 contain its current evidence and machine-readable shape. Language-neutral
-[conformance and result fixtures](fixtures/) complete the language-neutral
-consumer contract. The deterministic reference CLI acceptance protocol is now
+[conformance and result fixtures](fixtures/) provide the current consumer
+evidence. The deterministic reference CLI acceptance protocol is now
 defined. The selected implementation stack is strict TypeScript on Node.js with
 Effect 4, `effect/unstable/cli`, and Effect logging, distributed as an npm
 package with a zero-global-install `npx` path. pnpm is repository tooling only;
-Bun is not required. No CLI implementation exists yet. The next phase is to
-close the remaining observable contracts, confirm the npm package identity,
-prove the Effect CLI adapter, logging, packaging, and validation boundaries in
-a bounded spike, and add acceptance fixtures starting with `fs validate`
-before beginning the thin validator.
+Bun is not required. No CLI implementation exists yet. The next phase applies
+the confirmed decisions to their remaining contract artifacts and inspects the
+exact candidate Effect CLI/runtime/logging source and public exports. It then
+adds acceptance fixtures starting with `fs validate`. Runtime and packaging
+behavior will be verified by retained tests against production code; no
+throwaway CLI implementation is required.

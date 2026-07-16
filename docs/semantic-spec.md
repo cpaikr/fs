@@ -52,7 +52,9 @@ classification taxonomy.
 
 A unit names both a `measure` and a base-ten `scale`. `measure` is an
 author-defined measurement name such as `KRW`, `shares`, or `pure`; it is not
-resolved through a core registry. `scale` is the integer exponent `s` in:
+resolved through a core registry. `scale` MUST be an integer in the inclusive
+range `-9007199254740991` through `9007199254740991`. It is the exponent `s`
+in:
 
 `displayed value × 10^s measure units`
 
@@ -279,9 +281,10 @@ Snapshot applications use the stable application key. A diff compares
 conformance status, calculation status, and applications by key, classifying
 each application as `unchanged`, `changed`, `added`, or `removed`. Diff entries
 are ordered by current application order followed by removed applications in
-their recorded order. No snapshot produces `status: "not-recorded"`; otherwise
-the status is `match` only when every compared value matches, and `mismatch`
-otherwise.
+their recorded order. No snapshot produces `status: "not-recorded"`. A present
+but structurally invalid snapshot produces `status: "not-comparable"` with
+reason `invalid-snapshot`. Otherwise the status is `match` only when every
+compared value matches, and `mismatch` otherwise.
 
 Recorded and current application keys MUST each be unique. Each diff entry
 contains the complete recorded and/or current application object, so it does

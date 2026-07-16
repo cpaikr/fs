@@ -1,8 +1,9 @@
 # CLI Acceptance Contract
 
-Status: deterministic V0 fixture protocol and the TypeScript, Effect 4, Node,
-and npm implementation direction defined; six command, parsing, and
-portability decisions, fixture manifests, and cases are pending.
+Status: deterministic V0 fixture protocol, six command, parsing, and
+portability decisions, public npm identity, and the TypeScript, Effect 4, Node,
+and npm implementation direction defined; fixture manifests and cases are
+pending.
 
 ## Purpose
 
@@ -175,7 +176,7 @@ Successful validation and structural nonconformance use one minimal envelope:
 [`snapshot-diff`](../schema/snapshot-diff.schema.json) value. The envelope does
 not repeat the command, input path, working directory, validator identity, or
 time. The case where the embedded snapshot itself is structurally unusable is
-the open result-shape decision below.
+represented by `not-comparable` with reason `invalid-snapshot`.
 
 When an invalid-document manifest entry has no complete calculation-result
 file, its CLI expectation is composed from the existing manifest: conformance
@@ -370,47 +371,44 @@ creation, malformed input, schema and semantic structural refusal, missing
 the combined invalid-input/existing-output precedence case. Successful output
 must be byte-for-byte equal to the candidate.
 
-## Open Contract Decisions
+## Confirmed Contract Decisions
 
-These decisions must be fixed in this document and the acceptance fixtures
-before reference CLI implementation begins:
+These decisions govern the remaining schema, fixture, generated-asset, and
+reference CLI work:
 
 1. **Structurally invalid embedded snapshot.**
    [`duplicate-snapshot-application-key.json`](../fixtures/invalid/duplicate-snapshot-application-key.json)
    is a nonconforming document whose attempted snapshot cannot produce a valid
-   `match`, `mismatch`, or `not-recorded` result. The recommended resolution is
-   a language-neutral `not-comparable` snapshot-diff status with stable reason
-   `invalid-snapshot`, followed by schema and fixture coverage. Reinterpreting
-   the case as `not-recorded` would hide a present but unusable snapshot.
-2. **Unnamed example output.** The current command spelling permits
-   `fs example --output <path>` syntactically even though no single example is
-   selected. The recommended resolution is to reject it as a usage error and
-   document two forms: `fs example` and
-   `fs example <name> [--output <path>]`.
+   `match`, `mismatch`, or `not-recorded` result. It produces the
+   language-neutral snapshot-diff status `not-comparable` with stable reason
+   `invalid-snapshot`. Reinterpreting the case as `not-recorded` would hide a
+   present but unusable snapshot.
+2. **Unnamed example output.** A grammar with an optional example name would
+   permit `fs example --output <path>` syntactically even though no single
+   example is selected. Reject it as a usage error with exit code `2`. The only
+   forms are `fs example` and `fs example <name> [--output <path>]`.
 3. **Portable guide payload.** The CLI and installable Agent Skill need one
    maintained source whose generated links and commands work outside a
-   repository checkout. The recommended resolution is two byte-stable targets:
-   `fs guide authoring` uses complete installed `fs` commands, while the Agent
-   Skill uses pinned `npx -y @cpaikr/fs@<version>` commands. Acceptance fixtures
-   compare CLI output byte-for-byte with the installed-CLI target; generation
-   checks keep both targets synchronized with the source.
-4. **Command help.** The command surface accepts `--help` and `-h` but does not
-   yet fix their exact top-level or per-command payloads. The recommended
-   resolution is concise Markdown on standard output with exit code `0`, empty
-   standard error, required arguments, flags with defaults, and two or three
-   non-interactive examples. Add exact acceptance cases for the top level and
+   repository checkout. Generate two byte-stable targets: `fs guide authoring`
+   uses complete installed `fs` commands, while the Agent Skill uses pinned
+   `npx -y @cpai/fs@<version>` commands. Acceptance fixtures compare CLI output
+   byte-for-byte with the installed-CLI target; generation checks keep both
+   targets synchronized with the source.
+4. **Command help.** The command surface accepts `--help` and `-h`. Help is
+   concise Markdown on standard output with exit code `0` and empty standard
+   error. It lists required arguments, flags with defaults, and two or three
+   non-interactive examples. Exact acceptance cases cover the top level and
    every subcommand, with representative alias equivalence.
 5. **Duplicate JSON members.** JSON parsers disagree about duplicate object
    member names, and a last-value-wins decoder would silently change the input
-   data model. The recommended resolution is to reject duplicates as
-   `invalid-json` before JSON Schema validation and add a deterministic raw
-   input case outside the document fixture manifest.
-6. **Numeric scale portability.** `unit.scale` is currently an unbounded JSON
-   integer, which ordinary JavaScript JSON values cannot always represent
-   exactly. The recommended resolution is to constrain it to the inclusive
-   safe-integer range `-9007199254740991` through `9007199254740991`, update the
-   semantic specification and schema, and add boundary and out-of-range
-   language-neutral fixtures before CLI cases are fixed.
+   data model. Reject duplicates as `invalid-json` before JSON Schema
+   validation and add a deterministic raw-input case outside the document
+   fixture manifest.
+6. **Numeric scale portability.** An unbounded JSON integer cannot always be
+   represented exactly by ordinary JavaScript JSON values. Constrain
+   `unit.scale` to the inclusive safe-integer range
+   `-9007199254740991` through `9007199254740991`; the schema and
+   language-neutral fixtures must cover the bounds before CLI cases are fixed.
 
 ## Implementation Gate
 

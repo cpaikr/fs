@@ -1,20 +1,24 @@
 # Roadmap
 
-Status: V0 artifact contract, document-encoding guidance, deterministic CLI
+Status: V0 artifact semantics, document-encoding guidance, deterministic CLI
 acceptance protocol, and the TypeScript, Effect 4, Node, and npm implementation
-direction complete; remaining CLI contract decisions, a bounded stack spike,
-and acceptance fixtures are next, 2026-07-16.
+direction are defined. The six remaining CLI contract decisions and public
+`@cpai/fs` identity are confirmed; contract-artifact alignment, Effect
+integration source inspection, and acceptance fixtures are next, 2026-07-16.
 
 This file records confirmed design decisions, their evidence, and the remaining
 implementation sequence. The [project proposal](docs/project-proposal.md)
 defines the product boundary.
 
-The current next slice resolves the invalid-snapshot result, unnamed example
-output, portable guide targets, command help, duplicate JSON members, and the
-numeric `unit.scale` bound. It also confirms the npm identity and proves the
-Effect CLI adapter, opt-in Effect logging, package, schema validator, asset,
-and exact-arithmetic boundaries in an isolated spike. Deterministic acceptance
-fixtures beginning with `fs validate` follow before production implementation.
+The current next slice applies the confirmed decisions to the remaining
+schemas, fixtures, exact help, and generated guidance while inspecting the
+exact candidate coordinated Effect package source and public exports. Source
+inspection must identify a viable public Effect CLI adapter seam without
+internal imports or parser duplication. Deterministic acceptance fixtures
+beginning with `fs validate` follow before production implementation. Runtime,
+packaging, parser, validator, asset, and arithmetic behavior is verified later
+by retained tests against production code rather than a throwaway
+implementation.
 
 ## V0: Standalone Financial-Statement Document
 
@@ -189,9 +193,9 @@ handoff.
 Confirmed CLI acceptance direction:
 
 - The reference CLI uses TypeScript on supported Node.js LTS lines beginning
-  with Node 22 and is distributed as one npm package with executable name `fs`.
-  A pinned `npx -y` command is the zero-global-install path used by generated
-  Agent Skill guidance.
+  with Node 22 and is distributed as `@cpai/fs` with executable name `fs`. A
+  pinned `npx -y @cpai/fs@<version>` command is the zero-global-install path
+  used by generated Agent Skill guidance.
 - Effect 4 is the application runtime, `effect/unstable/cli` owns typed command
   definitions and dispatch, and `@effect/platform-node` supplies Node services.
   Coordinated Effect packages are pinned exactly while V4 remains prerelease
@@ -199,9 +203,20 @@ Confirmed CLI acceptance direction:
 - A public-API adapter around Effect CLI owns help rendering, maps `CliError`
   values to stable FS errors, buffers process output, and prevents framework
   help, raw causes, or stack traces from escaping the accepted stream contract.
+  Inspection of the exact candidate coordinated Effect package source,
+  declarations, tests, and exports must establish the public integration seam
+  before implementation.
 - Effect logging records structured decision events. It is disabled by default;
   explicit `--log-level` values emit deterministic JSON Lines to standard
   error without changing standard output, exit status, or filesystem effects.
+- A present but invalid snapshot produces snapshot-diff status
+  `not-comparable` with reason `invalid-snapshot`; it is not treated as absent.
+- `fs example` lists examples, while only
+  `fs example <name> [--output <path>]` may write an example payload.
+- Authoring guidance has one source and byte-stable installed-CLI and pinned
+  `npx` targets. Top-level and per-command help is exact concise Markdown.
+- Duplicate JSON object members fail as `invalid-json`, and `unit.scale` is
+  bounded to the inclusive JavaScript safe-integer range.
 - pnpm will be pinned for repository development only. It is not a user
   prerequisite, and Bun remains an optional compatibility or future
   binary-distribution path.
@@ -223,10 +238,13 @@ Confirmed CLI acceptance direction:
   checks prevent schema-valid but semantically invalid documents from being
   reported as conforming.
 
-The current CLI planning documentation passes repository Markdown lint; all
-new local links resolve, and every embedded JSON example parses. The next
-action is to close the remaining contracts, run the bounded Effect 4/npm
-spike, and then add the `fs validate` fixture manifest and cases.
+The changed CLI planning documents pass targeted Markdown lint; all local links
+resolve, every embedded JSON example parses, and the working diff has no
+whitespace errors. Full-repository Markdown lint retains 15 pre-existing
+line-length violations in `examples/README.md` and `fixtures/README.md`. The
+next action is to inspect the exact candidate coordinated Effect package source
+and public exports while applying the confirmed decisions to their remaining
+artifacts, then add the `fs validate` fixture manifest and cases.
 
 Release sequence:
 
@@ -237,23 +255,20 @@ Release sequence:
    refusal to infer missing financial decisions.
 4. [x] Define the deterministic CLI fixture protocol and shared result, error,
    channel, exit-code, and filesystem contracts.
-5. Close the remaining CLI and numeric-portability decisions, confirm the npm
-   package identity, and prove Effect 4 CLI adaptation, structured Effect
-   logging, npm package execution, strict lossless JSON parsing, Draft 2020-12
-   validation, exact assets, and exact decimal arithmetic in an isolated
-   spike.
+5. Apply the confirmed decisions to their remaining contract artifacts and
+   inspect exact candidate coordinated Effect package source, declarations,
+   tests, and public exports. Record a viable public Effect CLI adapter seam and
+   assign every source-opaque Effect claim to a retained production test.
 6. Add CLI acceptance fixtures, starting with `fs validate`, then no-argument
    discovery, `guide`, `schema`, `example`, and `create`. Reuse the existing FS
-   documents and expected results for path and standard-input cases. Before
-   adding the affected cases, resolve the fixture-blocking decisions in
-   the [CLI acceptance contract](docs/cli-acceptance.md): invalid embedded
-   snapshots, unnamed example output, portable generated guidance, command
-   help, duplicate JSON member handling, and the numeric `unit.scale` bound.
-   Follow the detailed
+   documents and expected results for path and standard-input cases. Follow the
+   confirmed [CLI acceptance contract](docs/cli-acceptance.md) and detailed
    [V0 CLI delivery plan](docs/plans/cli-v0.md).
 7. Build the thin `fs validate` path for argument handling, input reading, JSON
-   parsing, and JSON Schema conformance. Do not expose partial validation as a
-   full conformance result.
+   parsing, and JSON Schema conformance. Retain the adapter, logging, strict
+   parsing, schema validation, packaging, asset, and build-layout tests used to
+   prove the production path. Do not expose partial validation as a full
+   conformance result.
 8. Complete `fs validate` with semantic conformance, exact calculations, and
    snapshot diffs, including differences between stored and expected fact
    values. When its input contains a recorded snapshot, recompute and diff

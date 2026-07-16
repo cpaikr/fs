@@ -1,9 +1,8 @@
 # CLI Design
 
 Status: core agent-first command contracts, deterministic acceptance protocol,
-and the TypeScript, Effect 4, Node, and npm implementation direction defined;
-remaining contract decisions, acceptance fixtures, and implementation are
-pending.
+public npm identity, and the TypeScript, Effect 4, Node, and npm implementation
+direction defined; acceptance fixtures and implementation are pending.
 
 ## Design Boundary
 
@@ -37,11 +36,11 @@ Implement the reference CLI in strict TypeScript for supported Node.js LTS
 lines beginning with Node 22. Use Effect 4 as the application runtime,
 `effect/unstable/cli` for typed command definitions and dispatch, and
 `@effect/platform-node` for Node services. Publish one standard npm package,
-provisionally `@cpaikr/fs`, with the executable name `fs`. The primary
-zero-global-install form is:
+`@cpai/fs`, with the executable name `fs`. The primary zero-global-install form
+is:
 
 ```sh
-npx -y @cpaikr/fs@<version> <command>
+npx -y @cpai/fs@<version> <command>
 ```
 
 Global npm installation remains optional. pnpm will be pinned as the repository
@@ -56,17 +55,19 @@ change that reruns the complete unit, process, package, and cross-platform
 suite.
 
 Effect CLI owns tokenization, subcommand selection, argument and flag parsing,
-and the command help model. `Command.runWith` is the Phase 0 runner candidate.
-A narrow adapter built only from public Effect CLI and console APIs owns the
-process contract. It buffers framework output, renders exact Markdown help,
-maps `CliError` values to stable FS error objects, and converts every command
-into one final stdout payload and exit code. Raw Effect causes, default help,
-dependency output, and runtime stack traces must not reach the process streams.
+and the command help model. `Command.runWith` is the current runner candidate.
+Inspection of the exact candidate Effect CLI source, declarations, tests, and
+public exports must establish whether a narrow adapter can own the process
+contract without importing internals or duplicating parsing. The production
+adapter buffers framework output, renders exact Markdown help, maps `CliError`
+values to stable FS error objects, and converts every command into one final
+stdout payload and exit code. Raw Effect causes, default help, dependency
+output, and runtime stack traces must not reach the process streams.
 
-Use strict `tsc` checking and evaluate a bundled ESM entry point in the Phase 0
-spike because cold `npx` installation is a product requirement. Schemas,
-examples, and generated guidance remain exact package files outside the
-JavaScript bundle and come from one owned asset boundary.
+Use strict `tsc` checking. Select bundled or unbundled ESM during production
+scaffolding from retained packed-package size, cold local `npx`, and warm
+startup tests. Schemas, examples, and generated guidance remain exact package
+files outside the JavaScript bundle and come from one owned asset boundary.
 
 This choice optimizes one-command, zero-global-install use for people and
 agents that already have a supported Node/npm installation. It does not remove
@@ -102,9 +103,11 @@ completions, and log-level built-ins. The FS contract exposes only help and
 log-level. The process adapter must reject version and completions in their
 global scopes without rejecting the command-local schema `--version` flag.
 Wizard mode, prompts, and any other framework surface are also outside V0. The
-Phase 0 spike must prove this boundary using public APIs without duplicating
-Effect CLI parsing; otherwise the runner integration must be revised before
-fixtures or production code proceed.
+source inspection must establish a public integration path for controlling
+these built-ins without duplicating Effect CLI parsing. Retained production
+process tests verify the accepted and rejected flags, local schema `--version`
+precedence, exact help, stream contents, and exit codes. If the public seam is
+not viable, revise the runner integration before production implementation.
 
 Use Effect's logging APIs and log annotations at meaningful decision points,
 including command dispatch, input selection, decode and validation outcomes,
@@ -170,12 +173,17 @@ writes those bytes to exactly the requested path, reports file creation as a
 structured result on standard output, and fails rather than overwriting an
 existing file.
 
-### `fs example [<name>] [--output <path>]`
+### `fs example`
 
-With no name, list the bundled examples with their purpose and expected
-calculation status. With a name and no output path, return that exact bundled
-JSON on standard output. With a name and an output path, write the exact
-bundled bytes and report file creation as a structured result.
+List the bundled examples with their purpose and expected calculation status.
+This form does not accept `--output`; `fs example --output <path>` is a usage
+error with exit code `2` because it does not select one payload to write.
+
+### `fs example <name> [--output <path>]`
+
+With no output path, return the named example's exact bundled JSON on standard
+output. With an output path, write the exact bundled bytes and report file
+creation as a structured result.
 
 Examples contain illustrative facts and are not partially completed documents
 or prescribed statement templates. In particular, `manufacturing-group` is
@@ -206,11 +214,10 @@ discovers snapshots through filenames or neighboring files.
 
 Standard output is a minimal object containing `validation`, `snapshotDiff`,
 and `help`. The result values preserve the existing language-neutral objects
-exactly when the embedded snapshot is comparable. The structurally invalid
-snapshot case remains an explicit pre-fixture decision in the
-[acceptance contract](cli-acceptance.md). Parsing, usage, and operational
-failures use a structured error object instead; structural nonconformance
-remains a validation result.
+exactly when the embedded snapshot is comparable. A present but structurally
+invalid snapshot produces snapshot-diff status `not-comparable` with reason
+`invalid-snapshot`. Parsing, usage, and operational failures use a structured
+error object instead; structural nonconformance remains a validation result.
 
 ### `fs create <candidate|-> --output <document>`
 
@@ -317,7 +324,7 @@ inputs without supplying them, invoke the reference validator, and route
 structured diagnostics back into an encoding repair loop. Static skill
 guidance and `fs guide authoring` share one maintained source. The installed CLI
 guide renders commands with `fs`; the generated Skill pins the released npm
-package and renders commands as `npx -y @cpaikr/fs@<version> ...` so it does not
+package and renders commands as `npx -y @cpai/fs@<version> ...` so it does not
 assume a global installation.
 
 ## Implementation Order
@@ -325,15 +332,17 @@ assume a global installation.
 The detailed phase gates and implementation handoff are maintained in the
 [V0 CLI delivery plan](plans/cli-v0.md).
 
-1. Close the remaining observable contracts and prove the Effect CLI adapter,
-   structured logging, selected npm package, strict JSON, Draft 2020-12, exact
-   arithmetic, and asset boundaries in an isolated TypeScript spike.
+1. Apply the confirmed decisions to their remaining contract artifacts and
+   inspect exact candidate coordinated Effect package source and public
+   exports. Record the public integration seam and assign source-opaque Effect
+   behavior to retained production tests.
 2. Add deterministic acceptance fixtures using the
    [acceptance protocol](cli-acceptance.md), starting with `validate`, then
    no-argument discovery, `guide`, `schema`, `example`, and `create`.
-3. Build a thin `validate` path for argument handling, input reading, parsing,
-   and JSON Schema conformance without claiming full conformance for documents
-   that have not passed semantic validation.
+3. Build the production adapter and a thin `validate` path directly. Retain
+   the process, logging, package, parsing, schema, asset, and build-layout tests
+   used to verify it, and do not claim full conformance for documents that have
+   not passed semantic validation.
 4. Add every semantic conformance check, exact calculation evaluation, and
    snapshot diff required by the language-neutral fixtures.
 5. Add the read-only discovery commands: no-argument output, `guide`, `schema`,

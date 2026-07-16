@@ -2,9 +2,11 @@
 
 Status: TypeScript, Effect 4, `effect/unstable/cli`, Effect logging, Node, npm
 distribution, and pnpm development are the confirmed implementation direction;
-no CLI source, build, package, or executable exists. Contract decisions and a
-bounded adapter and packaging spike remain before acceptance fixtures and
-production implementation.
+the six CLI contract decisions and `@cpai/fs` package identity are confirmed.
+No CLI source, build, package, or executable exists. Contract-artifact
+alignment and exact candidate Effect integration source inspection are next,
+followed by acceptance fixtures and production implementation with retained
+tests.
 
 This is the detailed delivery plan for the reference `fs` CLI. The root
 [roadmap](../../ROADMAP.md) remains the strategic product sequence. The
@@ -39,27 +41,32 @@ Completed foundations:
 - [x] TypeScript/Node implementation direction, npm/npx distribution, and pnpm
   development tooling selected.
 - [x] Effect 4 runtime, `effect/unstable/cli`, and Effect logging selected.
+- [x] Six remaining CLI contract decisions and the public `@cpai/fs` package
+  identity confirmed.
 
 Missing implementation foundations:
 
-- [ ] Final decisions for invalid snapshots, unnamed example output, portable
-  guidance, command help, duplicate JSON members, and the numeric `scale`
-  portability bound.
+- [ ] Confirmed snapshot, example, guide, help, duplicate-member, and numeric
+  scale decisions applied to schemas, fixtures, and exact generated assets.
+- [ ] Exact candidate coordinated Effect package source and public API seam
+  inspected, with source-opaque behavior allocated to retained production
+  tests.
 - [ ] Deterministic CLI fixture schema, manifest, cases, and runner contract.
 - [ ] Proven Effect CLI process adapter, deterministic logging layer, package
-  identity, TypeScript source tree, dependency lock, build, and packed-package
+  execution, TypeScript source tree, dependency lock, build, and packed-package
   verification.
 - [ ] CLI executable and every command implementation.
 - [ ] Continuous integration and npm release packaging.
 
 There is currently nothing to install or invoke as `fs`.
 
-## Confirmed Direction and Recommended Defaults
+## Confirmed Direction
 
-The implementation and distribution direction below is confirmed. Contract
-defaults still require Phase 0 fixture and specification work.
+The contract, implementation, and distribution direction below is confirmed.
+The contract decisions still require Phase 0 schema, fixture, and generated
+asset work.
 
-### Contract defaults
+### Contract decisions
 
 1. Extend snapshot-diff results with status `not-comparable` and reason
    `invalid-snapshot` when a present snapshot is structurally unusable.
@@ -67,7 +74,7 @@ defaults still require Phase 0 fixture and specification work.
    `fs example` and `fs example <name> [--output <path>]`.
 3. Maintain one portable authoring source and generate two byte-stable targets.
    `fs guide authoring` uses installed `fs` commands; the Agent Skill uses a
-   pinned `npx -y @cpaikr/fs@<version>` prefix. Replace repository-relative
+   pinned `npx -y @cpai/fs@<version>` prefix. Replace repository-relative
    routes with complete commands in both targets.
 4. Support `fs --help` and `--help` on every subcommand. Help is concise
    Markdown on standard output, exits `0`, leaves standard error empty, lists
@@ -89,18 +96,17 @@ defaults still require Phase 0 fixture and specification work.
    definitions and dispatch, and `@effect/platform-node` for Node services.
    Pin coordinated Effect packages exactly while V4 remains prerelease; do not
    use the Effect 3 `@effect/cli` package or mix Effect family versions.
-3. Publish one standard npm package, provisionally `@cpaikr/fs`, with one
-   executable named `fs`. The zero-global-install path is
-   `npx -y @cpaikr/fs@<version>`, while `npm install --global @cpaikr/fs`
-   remains optional. Confirm ownership of the npm scope and final package name
-   before fixtures freeze generated Skill commands.
+3. Publish one standard npm package, `@cpai/fs`, with one executable named
+   `fs`. The zero-global-install path is `npx -y @cpai/fs@<version>`, while
+   `npm install --global @cpai/fs` remains optional. The `cpai` npm organization
+   is controlled by the project owner.
 4. Use pnpm for repository development only. Pin its exact version in the
    `packageManager` field and commit `pnpm-lock.yaml`; users invoking the npm
    package do not need pnpm.
-5. Use strict `tsc` checking and select a bundled ESM build in Phase 0 if it
-   materially improves cold `npx` installation without compromising runtime
-   behavior or package provenance. Ship schemas, examples, and generated
-   guidance as exact package files from one owned asset boundary.
+5. Use strict `tsc` checking and select a bundled or unbundled ESM build during
+   production scaffolding from retained package-size, cold local `npx`, and
+   warm-startup tests. Ship schemas, examples, and generated guidance as exact
+   package files from one owned asset boundary.
 6. Use the compatible Effect language service and `@effect/vitest` as
    development-only tooling. They must not add install scripts or runtime
    dependencies to the published package.
@@ -129,10 +135,10 @@ Keep the runtime dependency boundary narrow:
   completions built into the current `Command.runWith` runner without blocking
   the command-local schema `--version` flag, and exclude wizard and interactive
   behavior;
-- use `Command.runWith`, `CliOutput`, `CliError`, and Effect console services as
-  the Phase 0 public-runner candidate; buffer framework output, translate usage
-  failures, and emit one final process result without importing Effect internals
-  or duplicating its parser;
+- inspect `Command.runWith`, `CliOutput`, `CliError`, and Effect console
+  services as the public-runner candidate; the production adapter buffers
+  framework output, translates usage failures, and emits one final process
+  result without importing Effect internals or duplicating its parser;
 - model expected operational failures as tagged Effect errors, convert all
   command effects and unexpected defects into a handled process outcome before
   `NodeRuntime.runMain({ disableErrorReporting: true })`, and never permit raw
@@ -164,7 +170,7 @@ Keep the runtime dependency boundary narrow:
   and all runtime dependency versions when the package is created.
 
 Compile with `NodeNext` module semantics. Use `tsc` for type checking and the
-Phase 0-selected build path for the published ESM entry point; publish source
+Phase 2-selected build path for the published ESM entry point; publish source
 maps, type declarations where useful, and the exact content assets. Effect CLI
 owns parsing and dispatch, while the FS adapter remains authoritative for help,
 structured stdout, diagnostic stderr, exit codes, and result ordering.
@@ -187,7 +193,7 @@ model.
 
 | Phase | Outcome | Completion gate |
 | --- | --- | --- |
-| 0 | Close contracts and prove stack | Specs and stack spike pass |
+| 0 | Close contracts and inspect Effect | Contracts and public seam recorded |
 | 1 | Fix all CLI acceptance cases | Fixture data validates without a binary |
 | 2 | Scaffold TypeScript | Packed npm CLI runs; thin validation fails closed |
 | 3 | Complete full validation | All semantic and `validate` cases pass |
@@ -200,70 +206,49 @@ model.
 Implementation begins only after Phases 0 and 1. Phases 2 and 3 are development
 milestones, not separately releasable validators.
 
-## Phase 0: Close Contracts and Prove the Stack
+## Phase 0: Close Contracts and Inspect the Effect Boundary
 
-- [ ] Confirm or replace the six contract defaults above.
+- [x] Confirm the six contract decisions above.
 - [ ] Add `not-comparable` and `invalid-snapshot` to the snapshot-diff schema.
 - [ ] Add the matching language-neutral expected result and pairing for
   `duplicate-snapshot-application-key.json`.
-- [ ] Update the semantic specification and fixture guide for that result.
-- [ ] Split `fs example` documentation into list and named-example forms.
+- [x] Update the semantic specification for invalid snapshots and the numeric
+  scale bound.
+- [ ] Update the fixture guide for the invalid-snapshot result.
+- [x] Split `fs example` documentation into list and named-example forms.
 - [ ] Define the portable guide source, target-specific command rendering, and
   the exact CLI-guide and Agent Skill assets.
 - [ ] Define exact top-level and per-command help output.
 - [ ] Define duplicate JSON members as a parsing failure and add raw-input
   coverage outside the document fixture manifest.
-- [ ] Add the safe-integer `unit.scale` bounds to the schema and semantic
-  specification, plus boundary and out-of-range fixtures.
-- [ ] Confirm ownership and public use of the provisional npm package name
-  `@cpaikr/fs`; replace it everywhere before fixtures if unavailable.
-- [ ] Run an isolated TypeScript spike that proves:
-  - Effect 4 `Command`, `Argument`, and `Flag` definitions express the accepted
-    command grammar, including documented positional-then-flag invocations,
-    and reject every unsupported argument, flag, and built-in;
-  - a public-API adapter around `Command.runWith` can buffer Effect CLI output,
-    render the exact accepted help, map `CliError` values to FS usage errors,
-    and produce only exit codes `0`, `1`, or `2` without raw causes or stacks;
-  - only help and log-level global flags are exposed; the adapter rejects the
-    runner's version and completions built-ins without blocking the local
-    schema `--version` flag, with no wizard, prompt, or other interactive
-    behavior;
-  - that built-in gating uses public APIs without importing Effect internals or
-    recreating its command parser; otherwise stop and revise the runner
-    integration before acceptance fixtures proceed;
-  - `--help` and `-h` produce the same accepted help, while global `--version`,
-    `-v`, and `--completions` are rejected;
-  - expected failures and unexpected defects become owned process outcomes, and
-    `NodeRuntime.runMain({ disableErrorReporting: true })` cannot append Effect's
-    default cause rendering to standard error;
-  - the custom Effect logger is silent by default, emits canonical JSON Lines,
-    applies every accepted threshold, and passes one exact transcript smoke case
-    without changing stdout, exit codes, dependency reads, or filesystem
-    effects;
-  - a packed package exposes `fs` and runs through npm/npx without a global
-    install;
-  - the selected bundled or unbundled ESM layout has an acceptable packed
-    install size, cold local `npx` execution time, and warm startup time;
-  - exact schema, example, and generated Markdown bytes survive packing;
-  - fatal UTF-8 decoding, malformed JSON, trailing content, duplicate members,
-    and unsafe numbers are distinguished deterministically;
-  - Ajv resolves all three Draft 2020-12 schemas offline and yields stable
-    diagnostic inputs; and
-  - Effect `BigDecimal` reproduces every exact-arithmetic fixture, or a private
-    native-`BigInt` decimal boundary does so when `BigDecimal` cannot.
-- [ ] Record the exact Node, pnpm, TypeScript, coordinated Effect family, and
-  other dependency versions exercised by the spike. While Effect 4 is
-  prerelease, accept no version ranges for Effect family packages; upgrade the
-  exact set together through the complete suite.
-- [ ] Discard the spike after recording its evidence and decisions; do not grow
-  it into an unreviewed production scaffold.
-- [ ] Remove the resolved items from the acceptance contract's open decisions.
+- [ ] Add the safe-integer `unit.scale` bounds to the schema, plus boundary and
+  out-of-range fixtures.
+- [x] Confirm ownership and public use of `@cpai/fs`; replace the provisional
+  package name everywhere before fixtures.
+- [ ] Identify exact candidate versions for the coordinated Effect
+  CLI/runtime/logging packages. Inspect source, declarations, package exports,
+  and relevant upstream tests corresponding to those versions, not an unpinned
+  development branch.
+- [ ] Establish from that evidence whether public Effect APIs expose a viable
+  seam for command grammar, runner-added built-in gating, help ownership,
+  `CliError` translation, stream control, runtime error suppression, and logger
+  replacement without internal imports or parser duplication.
+- [ ] Record the inspected Effect versions, source references, public APIs,
+  constraints, rejected approaches, and the Phase 2 retained tests assigned to
+  every source-opaque Effect claim. Repeat this inspection whenever an exact
+  coordinated Effect version changes.
+- [ ] Revise the dependency or runner choice before production implementation
+  if satisfying the accepted contract would require internal imports or parser
+  recreation. Do not write a throwaway CLI or treat source inspection as
+  runtime proof.
+- [x] Record the resolved items as confirmed acceptance-contract decisions.
 
 Gate: the semantic specification, schemas, fixture indexes, CLI design, and
 acceptance contract describe every required V0 result without an undefined
-state. The selected Effect CLI adapter, logging layer, package layout, strict
-parser, schema validator, asset boundary, and exact-decimal implementation pass
-the isolated spike using only public APIs.
+state. Exact candidate Effect source inspection records a viable public
+integration seam and assigns every source-opaque Effect claim to a retained
+production test. No production package, executable, or throwaway implementation
+is required.
 
 ## Phase 1: Build the Acceptance Suite
 
@@ -330,11 +315,12 @@ the implementation language influences it.
 
 ### Foundation
 
-- [ ] Create `package.json` only after Phase 0 confirms the npm identity. Set
-  `type`, `bin`, `engines`, `packageManager`, and published `files` explicitly.
+- [ ] Create `package.json` after the Phase 1 fixture gate. Set `type`, `bin`,
+  `engines`, `packageManager`, and published `files` explicitly.
 - [ ] Commit `pnpm-lock.yaml` and strict TypeScript configuration using ESM and
-  `NodeNext`; pin the toolchain and every coordinated Effect family package to
-  the exact Phase 0 versions.
+  `NodeNext`; pin the toolchain and coordinated Effect family packages to the
+  exact inspected candidate versions. Repeat source inspection before using a
+  different Effect version.
 - [ ] Configure the compatible Effect language service and `@effect/vitest` as
   development-only tooling without package install scripts or published
   runtime baggage.
@@ -342,14 +328,24 @@ the implementation language influences it.
   process adapter, deterministic Effect logger, strict document decoding,
   validation, result encoding, exact decimals, and the single owned asset
   boundary.
+- [ ] Add retained adapter tests for accepted positional and flag grammar,
+  rejected built-ins, wizard and prompt paths, unsupported input, exact help,
+  `CliError` translation, expected failures, unexpected defects, default
+  runtime cause suppression, standard streams, and exit codes.
+- [ ] Add retained logging tests for the silent default, level thresholds,
+  canonical JSON Lines, bounded context, and invariance of results and I/O.
 - [ ] Package schemas, examples, and generated guidance from their canonical
   sources or checked generated staging; do not create a second hand-edited
   asset tree.
-- [ ] Add type-check, selected ESM build, unit-test, and acceptance-runner
+- [ ] Add type-check, candidate ESM builds, unit-test, and acceptance-runner
   commands; wire the existing Phase 1 fixture-integrity command into package
   scripts and CI.
 - [ ] Pack the npm tarball and run its `fs` binary through npm/npx in tests so
-  source-tree resolution cannot mask missing published files.
+  source-tree resolution cannot mask missing published files. Assert exact
+  asset bytes, executable mapping, and packed inventory.
+- [ ] Compare bundled and unbundled production layouts using retained packed
+  install-size, cold local `npx`, and warm-startup measurements; select and
+  retain one build path.
 - [ ] Start the Linux, macOS, and Windows CI matrix with documentation, fixture
   integrity, build, unit, and packed-package checks; expand it with each later
   phase's gate.
@@ -372,10 +368,14 @@ the implementation language influences it.
 - [ ] Distinguish missing/unreadable input from malformed JSON.
 - [ ] Decode UTF-8 fatally and reject malformed syntax, trailing content, and
   duplicate object members before JSON Schema validation.
+- [ ] Retain unit and process cases that distinguish fatal UTF-8, malformed
+  syntax, trailing content, duplicate members, and unsafe numeric lexemes.
 - [ ] Preserve JSON numeric lexemes until the safe `unit.scale` boundary is
   enforced; do not silently round through JavaScript `number`.
 - [ ] Validate JSON shape with bundled Draft 2020-12 schemas and translate
   diagnostics to stable code and JSON Pointer paths.
+- [ ] Retain Ajv tests that resolve all bundled schemas offline and normalize
+  every schema-layer fixture from stable diagnostic inputs.
 - [ ] Produce final structured usage, operational, and schema-failure output.
 - [ ] Instrument bounded decision points through Effect logging and prove that
   the silent default and every enabled threshold preserve command behavior.
@@ -386,8 +386,9 @@ the implementation language influences it.
   validation is complete; never report partial validation as conforming.
 
 Gate: CLI adapter, logging, argument, input, parsing, and schema-failure cases
-pass against the packed executable. No distributable artifact is published,
-and schema-valid input cannot receive a false success.
+pass against the packed executable. Retained adapter, logging, npm/npx, asset,
+and build-layout tests also pass. No distributable artifact is published, and
+schema-valid input cannot receive a false success.
 
 ## Phase 3: Complete Validation
 
@@ -405,12 +406,13 @@ Implement semantic checks as pure deterministic stages over a typed document:
   and
 - [ ] complete validation envelope and contextual help.
 
-Use Effect `BigDecimal` when the Phase 0 proof shows that it reproduces every
-required parse, arithmetic, comparison, and output fixture. Otherwise use an
-exact private decimal value backed by a native `BigInt` coefficient and an
-explicit base-ten scale. In either case, keep parsing, arithmetic, comparison,
-and normalized formatting behind one boundary so callers cannot accidentally
-use floating point or expose an implementation type to JSON serialization.
+Test Effect `BigDecimal` against every required parse, arithmetic, comparison,
+and output fixture in the retained Phase 3 suite. Use it only if every case
+passes; otherwise implement an exact private decimal value backed by a native
+`BigInt` coefficient and an explicit base-ten scale. In either case, keep
+parsing, arithmetic, comparison, and normalized formatting behind one boundary
+so callers cannot accidentally use floating point or expose an implementation
+type to JSON serialization.
 
 Gate:
 
@@ -464,7 +466,7 @@ macOS, and Windows, with no overwrite or observable partial destination.
   Skill from the same maintained source as `fs guide authoring`.
 - [ ] Strip repository-only and live-state content from the generated skill.
 - [ ] Render every Skill command with the pinned
-  `npx -y @cpaikr/fs@<version>` prefix while the CLI guide uses `fs`.
+  `npx -y @cpai/fs@<version>` prefix while the CLI guide uses `fs`.
 - [ ] Add a check that fails when either generated artifact is stale.
 
 Gate: generation is reproducible and byte-stable, and CLI guidance cannot drift
@@ -487,7 +489,7 @@ process, output, and filesystem suite.
 - [ ] Replace placeholder schema identifiers with immutable public URLs.
 - [ ] Decide whether V0 permits the optional constant `$schema` pointer.
 - [ ] Confirm the public product, npm package, executable, and release names
-  remain compatible with the identity selected in Phase 0.
+  remain compatible with the confirmed `@cpai/fs` identity.
 - [ ] Run unit, conformance, acceptance, fault, and generated-file checks in CI.
 - [ ] Test the packed package on Linux, macOS, and Windows using every maintained
   Node.js LTS major supported by the package.
@@ -504,6 +506,9 @@ separately with network access.
 
 - **Documentation:** Markdown lint, local-link resolution, and JSON example
   parsing.
+- **Source inspection:** exact candidate coordinated Effect package source,
+  declarations, exports, and relevant upstream tests, with the public seam and
+  source-opaque Effect claims recorded before production implementation.
 - **Fixture integrity:** descriptor-schema validation, reference resolution,
   unique identifiers, and complete expected-output coverage.
 - **Unit:** exact decimals, dates, coordinates, rule binding, diagnostics, and
@@ -544,21 +549,28 @@ Keep this file as the implementation handoff:
 
 ## Current Validation
 
-As of 2026-07-16, the CLI planning documents pass repository Markdown lint;
-all local links resolve; embedded JSON examples parse; and the working diff has
-no whitespace errors. A disposable `effect@4.0.0-beta.98` probe confirmed both
-documented positional-then-flag parsing and command-local schema `--version`
-precedence; it also confirmed that the candidate runner exposes global version,
-completions, log-level, `--help`, and `-h` behavior that the adapter must own.
-This is not the Phase 0 adapter or package gate. Implementation, conformance,
-acceptance, and build checks remain unavailable because no CLI source or fixture
-runner exists.
+As of 2026-07-16, the changed planning and specification documents pass
+targeted Markdown lint; all local links resolve; all embedded JSON examples
+parse; and the working diff has no whitespace errors. Full-repository Markdown
+lint still reports 15 pre-existing line-length violations in
+`examples/README.md` and `fixtures/README.md`. A prior minimal
+`effect@4.0.0-beta.98` API probe confirmed documented positional-then-flag
+parsing and command-local schema `--version` precedence; it also showed that
+the candidate runner exposes global version, completions, log-level, `--help`,
+and `-h` behavior that the adapter must own. This preliminary evidence guides
+exact-version Effect source inspection but does not replace it or retained
+production tests. Implementation, conformance, acceptance, and build checks
+remain unavailable because no CLI source or fixture runner exists. The six
+fixture-blocking contract decisions are confirmed, and the project owner
+confirmed `@cpai/fs` under the controlled `cpai` npm organization as the public
+package identity.
 
 ## Next Action
 
-Execute Phase 0 as one bounded contract-and-stack slice: fix the six contract
-defaults, confirm the npm identity, and prove the Effect CLI adapter,
-deterministic Effect logger, selected ESM package layout, strict parser, Ajv,
-asset, and exact-arithmetic boundaries in an isolated spike. Then build the
-Phase 1 acceptance suite. Do not create the production CLI scaffold until
-Phase 1 fixes every required acceptance case.
+Finish Phase 0 in two lanes: inspect exact candidate coordinated Effect package
+source and public exports, and apply the confirmed decisions to the remaining
+schemas, fixtures, help, and generated guidance. Record the viable public seam
+and assign every source-opaque Effect claim to its retained Phase 2 test. Then
+build the Phase 1 acceptance suite. Begin production implementation only after
+Phase 1; every executable proof written from that point remains in the
+repository.
