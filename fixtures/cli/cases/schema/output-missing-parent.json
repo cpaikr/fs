@@ -1,0 +1,33 @@
+{
+  "id": "schema-output-missing-parent",
+  "command": "fs",
+  "arguments": ["schema", "document", "--output", "missing/document.schema.json"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "schema" },
+        { "pointer": "/error/code", "equals": "output-parent-not-found" },
+        { "pointer": "/error/path", "equals": "missing/document.schema.json" },
+        { "pointer": "/help", "equals": ["fs schema document --output <new-path>"] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": [],
+        "absent": ["missing/document.schema.json"]
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

@@ -134,6 +134,19 @@ without adding a duplicate calculation-result fixture.
 - Unknown and extra guide operands: `guide-unknown-topic`,
   `guide-extra-argument`.
 
+### Schemas
+
+- Every bundled schema with default and explicit version selection:
+  `schema-document-default`, `help-schema-local-version`,
+  `schema-validation-result-default`,
+  `schema-validation-result-explicit-version`, `schema-snapshot-diff-default`,
+  `schema-snapshot-diff-explicit-version`.
+- Exact new-file creation: `schema-output-create`.
+- Missing or unsupported selection: `schema-missing-name`,
+  `schema-unknown-name`, `schema-unsupported-version`.
+- Missing parent and overwrite refusal: `schema-output-missing-parent`,
+  `schema-output-exists`.
+
 Instrumented Phase 2 tests retain input-read/write-call invariance and the
 complete threshold matrix; process fixtures fix the observable representative
 seams.

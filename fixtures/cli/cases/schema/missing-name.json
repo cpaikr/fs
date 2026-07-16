@@ -1,0 +1,31 @@
+{
+  "id": "schema-missing-name",
+  "command": "fs",
+  "arguments": ["schema"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "schema" },
+        { "pointer": "/error/code", "equals": "missing-argument" },
+        {
+          "pointer": "/help",
+          "equals": ["fs schema <document|validation-result|snapshot-diff>"]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

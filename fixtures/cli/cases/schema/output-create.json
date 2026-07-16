@@ -1,0 +1,33 @@
+{
+  "id": "schema-output-create",
+  "command": "fs",
+  "arguments": ["schema", "document", "--output", "document.schema.json"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["output"] },
+        { "pointer": "/output", "equals": ["status", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/output/status", "equals": "created" },
+        { "pointer": "/output/path", "equals": "document.schema.json" }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": {
+        "created": [
+          { "path": "document.schema.json", "equalsFile": "../../schema/fs-document.schema.json" }
+        ],
+        "unchanged": [],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

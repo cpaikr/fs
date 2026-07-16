@@ -1,0 +1,31 @@
+{
+  "id": "schema-output-exists",
+  "command": "fs",
+  "arguments": ["schema", "document", "--output", "existing.json"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "existing.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "schema" },
+        { "pointer": "/error/code", "equals": "output-exists" },
+        { "pointer": "/error/path", "equals": "existing.json" },
+        { "pointer": "/help", "equals": ["fs schema document --output <new-path>"] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["existing.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

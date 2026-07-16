@@ -1,0 +1,16 @@
+{
+  "id": "schema-snapshot-diff-default",
+  "command": "fs",
+  "arguments": ["schema", "snapshot-diff"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": { "encoding": "bytes", "equalsFile": "../../schema/snapshot-diff.schema.json" },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}
