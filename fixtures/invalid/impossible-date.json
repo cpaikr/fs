@@ -1,0 +1,10 @@
+{
+  "formatVersion": "0.1",
+  "entity": { "name": "Impossible Date" },
+  "scope": { "id": "separate", "label": "Separate" },
+  "items": [{ "id": "cash", "label": "Cash" }],
+  "units": [{ "id": "usd", "label": "USD", "measure": "USD", "scale": 0 }],
+  "periods": [{ "id": "year-end", "kind": "instant", "date": "2025-02-30" }],
+  "facts": [{ "item": "cash", "period": "year-end", "unit": "usd", "value": "10" }],
+  "statements": [{ "id": "position", "label": "Position", "unit": "usd", "periods": ["year-end"], "entries": [{ "type": "item", "item": "cash" }] }]
+}

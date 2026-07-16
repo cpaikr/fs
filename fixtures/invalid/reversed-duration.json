@@ -1,0 +1,10 @@
+{
+  "formatVersion": "0.1",
+  "entity": { "name": "Reversed Duration" },
+  "scope": { "id": "separate", "label": "Separate" },
+  "items": [{ "id": "revenue", "label": "Revenue" }],
+  "units": [{ "id": "usd", "label": "USD", "measure": "USD", "scale": 0 }],
+  "periods": [{ "id": "fy2025", "kind": "duration", "start": "2025-12-31", "end": "2025-01-01" }],
+  "facts": [{ "item": "revenue", "period": "fy2025", "unit": "usd", "value": "10" }],
+  "statements": [{ "id": "income", "label": "Income", "unit": "usd", "periods": ["fy2025"], "entries": [{ "type": "item", "item": "revenue" }] }]
+}

@@ -1,0 +1,24 @@
+{
+  "formatVersion": "0.1",
+  "entity": { "name": "Unit Mismatch" },
+  "scope": { "id": "separate", "label": "Separate" },
+  "items": [{ "id": "assets", "label": "Assets" }, { "id": "assets-copy", "label": "Assets copy" }],
+  "units": [
+    { "id": "usd", "label": "USD", "measure": "USD", "scale": 0 },
+    { "id": "usd-thousands", "label": "USD thousands", "measure": "USD", "scale": 3 }
+  ],
+  "periods": [{ "id": "year-end", "kind": "instant", "date": "2025-12-31" }],
+  "facts": [
+    { "item": "assets", "period": "year-end", "unit": "usd", "value": "1000" },
+    { "item": "assets-copy", "period": "year-end", "unit": "usd-thousands", "value": "1" }
+  ],
+  "statements": [{ "id": "position", "label": "Position", "unit": "usd", "periods": ["year-end"], "entries": [{ "type": "item", "item": "assets" }] }],
+  "calculationRules": [
+    {
+      "id": "bad-reconciliation",
+      "kind": "assertion",
+      "target": { "item": "assets", "period": "year-end", "unit": "usd" },
+      "terms": [{ "coefficient": "1", "fact": { "item": "assets-copy", "period": "year-end", "unit": "usd-thousands" } }]
+    }
+  ]
+}

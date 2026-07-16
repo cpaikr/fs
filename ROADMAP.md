@@ -77,8 +77,9 @@ every fact.
 Current state: the normative [semantic specification](docs/semantic-spec.md),
 canonical [examples](examples/), and draft 2020-12 [JSON Schemas](schema/) now
 fix the artifact shape and resolve the decisions below. Language-neutral
-conformance, calculation-result, and snapshot-diff fixtures remain to complete
-this phase before CLI implementation.
+[conformance fixtures](fixtures/) now distinguish schema failures from
+semantic-invariant failures. Calculation-result and snapshot-diff fixtures
+remain to complete this phase before CLI implementation.
 
 Before fixing the JSON schema, build reviewed examples that exercise:
 
