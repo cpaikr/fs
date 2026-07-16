@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fs.example/schema/0.1/snapshot-diff.schema.json",
+  "title": "FS V0 validation snapshot diff",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formatVersion", "status"],
+      "properties": {
+        "formatVersion": { "const": "0.1" },
+        "status": { "const": "not-recorded" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formatVersion", "status", "conformance", "calculations", "applications"],
+      "properties": {
+        "formatVersion": { "const": "0.1" },
+        "status": { "enum": ["match", "mismatch"] },
+        "conformance": { "$ref": "#/$defs/statusComparison" },
+        "calculations": { "$ref": "#/$defs/calculationComparison" },
+        "applications": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/applicationChange" }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "statusComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recorded", "current", "changed"],
+      "properties": {
+        "recorded": { "enum": ["conforming", "nonconforming"] },
+        "current": { "enum": ["conforming", "nonconforming"] },
+        "changed": { "type": "boolean" }
+      }
+    },
+    "calculationComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recorded", "current", "changed"],
+      "properties": {
+        "recorded": { "enum": ["not-defined", "not-evaluated", "consistent", "inconsistent"] },
+        "current": { "enum": ["not-defined", "not-evaluated", "consistent", "inconsistent"] },
+        "changed": { "type": "boolean" }
+      }
+    },
+    "unchangedOrChanged": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "change", "recorded", "current"],
+      "properties": {
+        "key": { "$ref": "fs-document.schema.json#/$defs/applicationKey" },
+        "change": { "enum": ["unchanged", "changed"] },
+        "recorded": { "$ref": "fs-document.schema.json#/$defs/applicationResult" },
+        "current": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }
+      }
+    },
+    "added": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "change", "current"],
+      "properties": {
+        "key": { "$ref": "fs-document.schema.json#/$defs/applicationKey" },
+        "change": { "const": "added" },
+        "current": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }
+      }
+    },
+    "removed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "change", "recorded"],
+      "properties": {
+        "key": { "$ref": "fs-document.schema.json#/$defs/applicationKey" },
+        "change": { "const": "removed" },
+        "recorded": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }
+      }
+    },
+    "applicationChange": {
+      "oneOf": [
+        { "$ref": "#/$defs/unchangedOrChanged" },
+        { "$ref": "#/$defs/added" },
+        { "$ref": "#/$defs/removed" }
+      ]
+    }
+  }
+}

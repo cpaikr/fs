@@ -23,6 +23,9 @@ engine.
 
 ## Current Work
 
-The next milestone is a reviewed set of representative JSON examples. Those
-examples will establish the semantic model before the JSON Schema and reference
-CLI are fixed.
+The V0 artifact contract is being completed from representative JSON examples.
+The [semantic specification](docs/semantic-spec.md) defines the normative model
+and canonical JSON mapping; [`examples/`](examples/) and [`schema/`](schema/)
+contain its current evidence and machine-readable shape. Language-neutral
+conformance and validation-result fixtures are the remaining contract work
+before reference CLI implementation begins.

@@ -1,6 +1,6 @@
 # Roadmap
 
-Status: working design direction, 2026-07-16.
+Status: V0 artifact contract in progress, 2026-07-16.
 
 This file records confirmed design decisions and the unresolved work needed to
 prove them. The [project proposal](docs/project-proposal.md) defines the product
@@ -73,6 +73,12 @@ and presentations unambiguous and avoids repeating an entity coordinate on
 every fact.
 
 ## Evidence and Semantic Model
+
+Current state: the normative [semantic specification](docs/semantic-spec.md),
+canonical [examples](examples/), and draft 2020-12 [JSON Schemas](schema/) now
+fix the artifact shape and resolve the decisions below. Language-neutral
+conformance, calculation-result, and snapshot-diff fixtures remain to complete
+this phase before CLI implementation.
 
 Before fixing the JSON schema, build reviewed examples that exercise:
 

@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fs.example/schema/0.1/fs-document.schema.json",
+  "title": "FS V0 document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["formatVersion", "entity", "scope", "items", "units", "periods", "facts", "statements"],
+  "properties": {
+    "formatVersion": { "const": "0.1" },
+    "documentId": { "$ref": "#/$defs/id" },
+    "entity": { "$ref": "#/$defs/entity" },
+    "scope": { "$ref": "#/$defs/scope" },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/item" }
+    },
+    "units": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/unit" }
+    },
+    "periods": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/period" }
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/dimension" }
+    },
+    "facts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/fact" }
+    },
+    "statements": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/statement" }
+    },
+    "calculationRules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/calculationRule" }
+    },
+    "validationSnapshot": { "$ref": "#/$defs/validationSnapshot" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+    },
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "decimal": {
+      "type": "string",
+      "pattern": "^(?:0|-?(?:[1-9][0-9]*)(?:\\.[0-9]*[1-9])?|-?0\\.[0-9]*[1-9])$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "description": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "unit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "measure", "scale"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "measure": { "$ref": "#/$defs/nonEmptyString" },
+        "scale": { "type": "integer" },
+        "defaultTolerance": { "$ref": "#/$defs/decimal" }
+      }
+    },
+    "instantPeriod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "date"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "const": "instant" },
+        "date": { "$ref": "#/$defs/date" }
+      }
+    },
+    "durationPeriod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "start", "end"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "const": "duration" },
+        "start": { "$ref": "#/$defs/date" },
+        "end": { "$ref": "#/$defs/date" }
+      }
+    },
+    "period": {
+      "oneOf": [
+        { "$ref": "#/$defs/instantPeriod" },
+        { "$ref": "#/$defs/durationPeriod" }
+      ]
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "members"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/member" }
+        }
+      }
+    },
+    "dimensionCoordinate": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/id" },
+      "additionalProperties": { "$ref": "#/$defs/id" }
+    },
+    "factCoordinate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item", "period", "unit"],
+      "properties": {
+        "item": { "$ref": "#/$defs/id" },
+        "period": { "$ref": "#/$defs/id" },
+        "unit": { "$ref": "#/$defs/id" },
+        "dimensions": { "$ref": "#/$defs/dimensionCoordinate" }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item", "period", "unit"],
+      "properties": {
+        "item": { "$ref": "#/$defs/id" },
+        "period": { "$ref": "#/$defs/id" },
+        "unit": { "$ref": "#/$defs/id" },
+        "dimensions": { "$ref": "#/$defs/dimensionCoordinate" },
+        "value": { "$ref": "#/$defs/decimal" },
+        "unavailable": { "const": true }
+      },
+      "oneOf": [
+        { "required": ["value"] },
+        { "required": ["unavailable"] }
+      ]
+    },
+    "headingEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "label"],
+      "properties": {
+        "type": { "const": "heading" },
+        "label": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "itemEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "item"],
+      "properties": {
+        "type": { "const": "item" },
+        "item": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "statementDimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dimension", "members"],
+      "properties": {
+        "dimension": { "$ref": "#/$defs/id" },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "unit", "periods", "entries"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "unit": { "$ref": "#/$defs/id" },
+        "periods": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/statementDimension" }
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/headingEntry" },
+              { "$ref": "#/$defs/itemEntry" }
+            ]
+          }
+        }
+      }
+    },
+    "itemSelector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item"],
+      "properties": { "item": { "$ref": "#/$defs/id" } }
+    },
+    "itemTerm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coefficient", "item"],
+      "properties": {
+        "coefficient": { "$ref": "#/$defs/decimal" },
+        "item": { "$ref": "#/$defs/id" }
+      }
+    },
+    "factTerm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coefficient", "fact"],
+      "properties": {
+        "coefficient": { "$ref": "#/$defs/decimal" },
+        "fact": { "$ref": "#/$defs/factCoordinate" }
+      }
+    },
+    "ruleScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["periods"],
+      "properties": {
+        "periods": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/dimensionCoordinate" }
+        }
+      }
+    },
+    "samePeriodRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "unit", "target", "terms", "scope"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "const": "samePeriod" },
+        "unit": { "$ref": "#/$defs/id" },
+        "target": { "$ref": "#/$defs/itemSelector" },
+        "terms": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/itemTerm" }
+        },
+        "scope": { "$ref": "#/$defs/ruleScope" },
+        "tolerance": { "$ref": "#/$defs/decimal" }
+      }
+    },
+    "rollForwardRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "unit", "balance", "movements", "scope"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "const": "rollForward" },
+        "unit": { "$ref": "#/$defs/id" },
+        "balance": { "$ref": "#/$defs/itemSelector" },
+        "movements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/itemTerm" }
+        },
+        "scope": { "$ref": "#/$defs/ruleScope" },
+        "tolerance": { "$ref": "#/$defs/decimal" }
+      }
+    },
+    "assertionRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "target", "terms"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "const": "assertion" },
+        "target": { "$ref": "#/$defs/factCoordinate" },
+        "terms": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/factTerm" }
+        },
+        "tolerance": { "$ref": "#/$defs/decimal" }
+      }
+    },
+    "calculationRule": {
+      "oneOf": [
+        { "$ref": "#/$defs/samePeriodRule" },
+        { "$ref": "#/$defs/rollForwardRule" },
+        { "$ref": "#/$defs/assertionRule" }
+      ]
+    },
+    "applicationKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule"],
+      "properties": {
+        "rule": { "$ref": "#/$defs/id" },
+        "period": { "$ref": "#/$defs/id" },
+        "dimensions": { "$ref": "#/$defs/dimensionCoordinate" }
+      }
+    },
+    "numericApplication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "status", "actual", "expected", "difference", "tolerance"],
+      "properties": {
+        "key": { "$ref": "#/$defs/applicationKey" },
+        "status": { "enum": ["satisfied", "unsatisfied"] },
+        "actual": { "$ref": "#/$defs/decimal" },
+        "expected": { "$ref": "#/$defs/decimal" },
+        "difference": { "$ref": "#/$defs/decimal" },
+        "tolerance": { "$ref": "#/$defs/decimal" }
+      }
+    },
+    "errorApplication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "status", "reason"],
+      "properties": {
+        "key": { "$ref": "#/$defs/applicationKey" },
+        "status": { "const": "error" },
+        "reason": {
+          "enum": ["missing-fact", "unavailable-fact", "missing-boundary-period", "ambiguous-boundary-period", "unit-mismatch"]
+        }
+      }
+    },
+    "skippedApplication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "status", "reason"],
+      "properties": {
+        "key": { "$ref": "#/$defs/applicationKey" },
+        "status": { "const": "skipped" },
+        "reason": { "enum": ["no-predecessor", "gap", "ambiguous-predecessor"] }
+      }
+    },
+    "applicationResult": {
+      "oneOf": [
+        { "$ref": "#/$defs/numericApplication" },
+        { "$ref": "#/$defs/errorApplication" },
+        { "$ref": "#/$defs/skippedApplication" }
+      ]
+    },
+    "validationSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conformance", "calculations", "applications"],
+      "properties": {
+        "conformance": { "enum": ["conforming", "nonconforming"] },
+        "calculations": { "enum": ["not-defined", "not-evaluated", "consistent", "inconsistent"] },
+        "applications": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/applicationResult" }
+        }
+      }
+    }
+  }
+}
