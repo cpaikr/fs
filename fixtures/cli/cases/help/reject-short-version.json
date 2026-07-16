@@ -1,0 +1,28 @@
+{
+  "id": "help-reject-short-version",
+  "command": "fs",
+  "arguments": ["-v"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "fs" },
+        { "pointer": "/error/code", "equals": "unknown-flag" },
+        { "pointer": "/help", "equals": ["fs --help"] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

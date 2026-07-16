@@ -1,0 +1,16 @@
+{
+  "id": "help-create",
+  "command": "fs",
+  "arguments": ["create", "--help"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": { "encoding": "bytes", "equalsFile": "../../assets/help/create.md" },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

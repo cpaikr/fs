@@ -1,0 +1,16 @@
+{
+  "id": "help-validate",
+  "command": "fs",
+  "arguments": ["validate", "--help"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": { "encoding": "bytes", "equalsFile": "../../assets/help/validate.md" },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "help-root",
+  "command": "fs",
+  "arguments": ["--help"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": { "encoding": "bytes", "equalsFile": "../../assets/help/fs.md" },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

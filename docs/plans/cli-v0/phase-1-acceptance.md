@@ -26,7 +26,7 @@ than a second prose definition.
   snapshot match and mismatch, structural failures, invalid snapshots,
   malformed input, trailing content, duplicate members, unsafe scale, missing
   input, and usage.
-- [ ] Cover top-level and per-command help, representative `-h` aliases,
+- [x] Cover top-level and per-command help, representative `-h` aliases,
   rejected global version/completion built-ins, and command-local schema
   version selection.
 - [ ] Cover silent and enabled logging, thresholds, the `warning` alias,
@@ -73,5 +73,7 @@ mismatch. Four composed structural cases cover schema and semantic failures,
 an invalid embedded snapshot, and unsafe scale without duplicating artifact
 results. Nine process-boundary cases cover malformed syntax, trailing content,
 duplicate members, missing input, missing/extra operands, unknown flags,
-unsupported format, and usage precedence. Other command families remain
+unsupported format, and usage precedence. Thirteen help/grammar cases cover
+every milestone help asset, representative aliases, forbidden built-ins, and
+the command-local schema version. Logging and other command families remain
 unencoded.

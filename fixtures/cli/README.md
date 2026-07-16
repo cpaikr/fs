@@ -100,3 +100,13 @@ without adding a duplicate calculation-result fixture.
 - Unknown flag and format: `validate-unknown-flag`,
   `validate-unsupported-format`.
 - Grammar before input I/O: `validate-usage-precedence`.
+
+### Help and built-ins
+
+- Exact milestone help: `help-root`, `help-guide`, `help-guide-authoring`,
+  `help-schema`, `help-example`, `help-validate`, `help-create`.
+- Representative aliases and help precedence: `help-root-alias`,
+  `help-validate-alias`.
+- Rejected global built-ins: `help-reject-version`,
+  `help-reject-short-version`, `help-reject-completions`.
+- Accepted command-local version: `help-schema-local-version`.
