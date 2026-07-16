@@ -1,6 +1,6 @@
 # Phase 2: Package and Fail-Closed Validation
 
-Status: not started; ready.
+Status: in progress.
 
 This plan creates the package, production entry point, test harnesses, and a
 thin validator that cannot report false conformance. It implements the
@@ -10,13 +10,13 @@ Node-core command and public Effect integration seams selected in
 
 ## Package Foundation
 
-- [ ] Add `package.json`, an exact pnpm lock, strict TypeScript configuration,
+- [x] Add `package.json`, an exact pnpm lock, strict TypeScript configuration,
   and explicit `type`, `bin`, `engines`, `packageManager`, and published files.
 - [ ] Pin the inspected Effect stack, TypeScript, Ajv, parser, test tools,
   Effect language service, and `@effect/vitest` without install scripts.
 - [ ] Separate command model, process adapter, logger, decoding, validation,
   result encoding, exact decimals, and packaged assets into focused modules.
-- [ ] Use `util.parseArgs` tokens behind one command adapter that rejects
+- [x] Use `util.parseArgs` tokens behind one command adapter that rejects
   duplicates, misplaced command-local flags, extra operands, and unsupported
   built-ins before application I/O.
 - [ ] Add type-check, build, unit, fixture-integrity, acceptance, pack, and
@@ -28,8 +28,8 @@ Node-core command and public Effect integration seams selected in
 
 ## Thin Validation Path
 
-- [ ] Validate command grammar before reading input or touching output paths.
-- [ ] Translate expected failures to tagged outcomes and unexpected defects to
+- [x] Validate command grammar before reading input or touching output paths.
+- [x] Translate expected failures to tagged outcomes and unexpected defects to
   bounded `internal-error` output before running Node with default defect
   reporting disabled.
 - [ ] Read exact path or standard-input bytes once and decode UTF-8 fatally.
@@ -41,7 +41,7 @@ Node-core command and public Effect integration seams selected in
   diagnostics to stable codes and JSON Pointer paths.
 - [ ] Retain adapter, logger, parsing, schema, package, asset, and I/O-order
   tests against the production entry point.
-- [ ] Keep schema-valid input internal or fail it closed until Phase 3.
+- [x] Keep schema-valid input internal or fail it closed until Phase 3.
 
 ## Delivery Constraints
 
@@ -61,5 +61,9 @@ asset tests pass. No input can receive a false conformance success.
 
 ## Validation Evidence
 
-No package manifest, source, lockfile, CI, build, or implementation tests
-exist.
+The exact lock, strict configs, Effect entry point, token grammar, bounded
+process adapter, unit tests, unbundled build, installed-tarball smoke, exact
+asset verification, and packed acceptance harness exist. Thirty-seven
+read-only content cases pass from the installed tarball. Input decoding, JSON
+and schema validation, acceptance-script wiring, runtime measurements, and CI
+remain open.

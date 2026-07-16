@@ -1,6 +1,6 @@
 # Phases 4–5: Discovery, Bundled Content, and Atomic Creation
 
-Status: not started; blocked on Phase 3.
+Status: in progress; creation remains blocked on Phase 3 validation.
 
 This plan completes the first implementation milestone after validation. It
 owns discovery and exact bundled content commands, the shared atomic writer,
@@ -9,12 +9,12 @@ and `fs create`. It excludes Agent Skill generation, `record-validation`,
 
 ## Phase 4: Discovery and Bundled Content
 
-- [ ] Implement deterministic no-argument discovery without directory scans.
-- [ ] Implement exact top-level and per-command help and installed-CLI
+- [x] Implement deterministic no-argument discovery without directory scans.
+- [x] Implement exact top-level and per-command help and installed-CLI
   authoring guidance.
-- [ ] Add one atomic no-replace writer shared by every output command.
-- [ ] Implement all schema and example lookups with exact-byte output.
-- [ ] Reject unknown names, versions, arguments, flags, and unresolved unnamed
+- [x] Add one atomic no-replace writer shared by every output command.
+- [x] Implement all schema and example lookups with exact-byte output.
+- [x] Reject unknown names, versions, arguments, flags, and unresolved unnamed
   output behavior exactly as accepted.
 - [ ] Verify maintained guidance and packaged assets are current in CI without
   generating the Phase 6 Agent Skill.
@@ -48,5 +48,8 @@ supported platform without overwrite or observable partial output.
 
 ## Validation Evidence
 
-The CLI contracts define the expected behavior, but no shared writer, content
-asset boundary, packed executable, acceptance harness, or fault suite exists.
+The packed executable passes all 37 discovery, exact help/guide, schema, and
+example cases. One package-root asset boundary owns exact reads, and the shared
+temporary-file plus atomic-link writer prevents ordinary overwrites. Packaged
+guidance freshness in CI, writer fault/platform tests, validation, and all
+Phase 5 creation work remain open.

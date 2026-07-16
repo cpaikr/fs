@@ -4,10 +4,11 @@ import { join } from "node:path"
 import { spawnSync } from "node:child_process"
 
 const temporaryDirectory = mkdtempSync(join(tmpdir(), "fs-pack-"))
+const npm = process.platform === "win32" ? "npm.cmd" : "npm"
 
 try {
   const packed = spawnSync(
-    "npm",
+    npm,
     ["pack", "--ignore-scripts", "--json", "--pack-destination", temporaryDirectory],
     { encoding: "utf8" }
   )
@@ -53,7 +54,7 @@ try {
   const tarball = join(temporaryDirectory, filename)
   const installDirectory = join(temporaryDirectory, "install")
   const installed = spawnSync(
-    "npm",
+    npm,
     ["install", "--ignore-scripts", "--no-audit", "--no-fund", "--prefix", installDirectory, tarball],
     { encoding: "utf8" }
   )
