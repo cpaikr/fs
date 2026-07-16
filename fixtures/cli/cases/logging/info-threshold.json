@@ -1,0 +1,41 @@
+{
+  "id": "logging-info-threshold",
+  "command": "fs",
+  "arguments": ["validate", "input.json", "--log-level", "info"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "input.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "help"] }
+      ],
+      "equalities": [
+        {
+          "pointer": "/validation",
+          "equalsFile": { "file": "../calculation-results/no-rules.json" }
+        },
+        {
+          "pointer": "/snapshotDiff",
+          "equalsFile": { "file": "../snapshot-diffs/not-recorded.json" }
+        },
+        {
+          "pointer": "/help",
+          "equals": ["fs record-validation input.json --output <new-document>"]
+        }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": {
+      "encoding": "json-lines",
+      "equalsFile": "expected/logs/validate-info.jsonl"
+    },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["input.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

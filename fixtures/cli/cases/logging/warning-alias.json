@@ -1,0 +1,47 @@
+{
+  "id": "logging-warning-alias",
+  "command": "fs",
+  "arguments": ["validate", "missing.json", "--log-level", "warning"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        {
+          "pointer": "/error",
+          "equals": ["operation", "code", "message", "path"]
+        }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "validate" },
+        { "pointer": "/error/code", "equals": "input-not-found" },
+        { "pointer": "/error/path", "equals": "missing.json" },
+        {
+          "pointer": "/help",
+          "equals": ["fs validate <existing-document> --format json"]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": {
+      "encoding": "json-lines",
+      "contains": [
+        {
+          "level": "error",
+          "event": "input-failed",
+          "operation": "validate",
+          "code": "input-not-found",
+          "source": "path"
+        }
+      ],
+      "allowAdditional": false
+    },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": ["missing.json"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

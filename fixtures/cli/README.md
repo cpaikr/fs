@@ -37,7 +37,11 @@ JSON stdout uses three generic assertion types:
 Every JSON matcher declares the root object member set. Exact content commands
 use `bytes` instead. Ordinary standard error is exact bytes, normally empty;
 logging cases either name an exact JSON Lines file or require structural
-records with an explicit additional-record policy.
+records with an explicit additional-record policy. A `contains` record is an
+exact JSON value; `allowAdditional` controls only additional log records. All
+records require the stable `level`, `event`, and `operation` fields and reject
+the diagnostic fields forbidden by the acceptance contract. Additional
+context is flat and scalar so nested raw payloads cannot be accepted.
 
 Filesystem expectations are exhaustive for both workspace and home. Staged
 files are `unchanged`, newly written regular files are `created` with exact
@@ -110,3 +114,17 @@ without adding a duplicate calculation-result fixture.
 - Rejected global built-ins: `help-reject-version`,
   `help-reject-short-version`, `help-reject-completions`.
 - Accepted command-local version: `help-schema-local-version`.
+
+### Diagnostic logging
+
+- Omitted versus explicit silence: `validate-path-no-rules`,
+  `logging-explicit-none`.
+- Canonical debug order and higher threshold: `logging-debug`,
+  `logging-info-threshold`.
+- Bounded failure logging and warning alias: `logging-warn-failure`,
+  `logging-warning-alias`.
+- Invalid level remains a silent usage error: `logging-invalid-level`.
+
+Instrumented Phase 2 tests retain input-read/write-call invariance and the
+complete threshold matrix; process fixtures fix the observable representative
+seams.

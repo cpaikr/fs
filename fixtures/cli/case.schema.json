@@ -174,7 +174,39 @@
     },
     "jsonLineRecord": {
       "type": "object",
-      "minProperties": 1
+      "required": ["level", "event", "operation"],
+      "properties": {
+        "level": {
+          "enum": ["trace", "debug", "info", "warn", "error", "fatal"]
+        },
+        "event": { "type": "string", "minLength": 1 },
+        "operation": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "number" },
+          { "type": "boolean" }
+        ]
+      },
+      "propertyNames": {
+        "not": {
+          "enum": [
+            "timestamp",
+            "time",
+            "fiberId",
+            "runtimeId",
+            "span",
+            "spans",
+            "document",
+            "documentContents",
+            "rawMessage",
+            "dependencyMessage",
+            "cause",
+            "stack"
+          ]
+        }
+      }
     },
     "jsonLinesMatcher": {
       "type": "object",

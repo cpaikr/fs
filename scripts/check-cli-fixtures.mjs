@@ -218,6 +218,71 @@ const validateByteReference = (value, context) => {
   }
 };
 
+const logLevels = new Set(["trace", "debug", "info", "warn", "error", "fatal"]);
+const forbiddenLogFields = new Set([
+  "timestamp",
+  "time",
+  "fiberId",
+  "runtimeId",
+  "span",
+  "spans",
+  "document",
+  "documentContents",
+  "rawMessage",
+  "dependencyMessage",
+  "cause",
+  "stack",
+]);
+
+const validateLogRecord = (record, context) => {
+  if (
+    record === null ||
+    Array.isArray(record) ||
+    typeof record !== "object" ||
+    !logLevels.has(record.level) ||
+    typeof record.event !== "string" ||
+    record.event.length === 0 ||
+    typeof record.operation !== "string" ||
+    record.operation.length === 0
+  ) {
+    fail(`${context}: log record is missing its stable fields`);
+  }
+  for (const field of Object.keys(record)) {
+    if (forbiddenLogFields.has(field)) {
+      fail(`${context}: forbidden log field ${field}`);
+    }
+  }
+  for (const [field, value] of Object.entries(record)) {
+    if (
+      !["level", "event", "operation"].includes(field) &&
+      !["string", "number", "boolean"].includes(typeof value)
+    ) {
+      fail(`${context}: log context field ${field} must be a bounded scalar`);
+    }
+  }
+};
+
+const validateJsonLinesFile = (reference, context) => {
+  const path = normalizeRepositoryFile(reference, context);
+  const contents = readFileSync(path, "utf8");
+  if (!contents.endsWith("\n")) {
+    fail(`${context}: exact JSON Lines must end with LF`);
+  }
+  const lines = contents.slice(0, -1).split("\n");
+  if (lines.length === 0 || lines.some((line) => line.length === 0)) {
+    fail(`${context}: exact JSON Lines cannot contain empty records`);
+  }
+  for (const line of lines) {
+    const record = JSON.parse(line);
+    validateLogRecord(record, context);
+    if (
+      JSON.stringify(record) !== line
+    ) {
+      fail(`${context}: JSON Lines records must be compact objects`);
+    }
+  }
+};
+
 const validateTree = (tree, context) => {
   const created = tree.created.map(({ path }) => path);
   const all = [...created, ...tree.unchanged, ...tree.absent];
@@ -271,7 +336,7 @@ for (const caseReference of manifest.cases) {
   validateByteReference(descriptor.expect.stderr, `${context} stderr`);
   if (descriptor.expect.stderr.encoding === "json-lines") {
     if (descriptor.expect.stderr.equalsFile !== undefined) {
-      normalizeRepositoryFile(
+      validateJsonLinesFile(
         descriptor.expect.stderr.equalsFile,
         `${context} stderr`,
       );
@@ -282,6 +347,10 @@ for (const caseReference of manifest.cases) {
       )
     ) {
       fail(`${context}: JSON Lines matcher records cannot be empty`);
+    } else {
+      descriptor.expect.stderr.contains.forEach((record) =>
+        validateLogRecord(record, `${context} stderr`),
+      );
     }
   }
 

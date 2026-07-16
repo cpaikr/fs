@@ -204,8 +204,8 @@ object instead of a validation envelope:
 Fixtures fix the exact fields appropriate to each error. Stable V0 usage codes
 include `missing-argument`, `unexpected-argument`, `unknown-command`,
 `unknown-flag`, `unknown-schema`, `unknown-example`, `unsupported-version`,
-and `unsupported-format`. Stable operational codes include `input-not-found`,
-`input-unreadable`, `invalid-json`, `output-exists`,
+`unsupported-format`, and `unsupported-log-level`. Stable operational codes
+include `input-not-found`, `input-unreadable`, `invalid-json`, `output-exists`,
 `output-parent-not-found`, `write-failed`, and `internal-error`.
 
 Malformed syntax, trailing content, and duplicate object members all produce

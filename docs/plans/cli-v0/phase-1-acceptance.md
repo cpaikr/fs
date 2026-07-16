@@ -29,7 +29,7 @@ than a second prose definition.
 - [x] Cover top-level and per-command help, representative `-h` aliases,
   rejected global version/completion built-ins, and command-local schema
   version selection.
-- [ ] Cover silent and enabled logging, thresholds, the `warning` alias,
+- [x] Cover silent and enabled logging, thresholds, the `warning` alias,
   bounded failure context, and logging invariance.
 - [ ] Cover no-argument discovery and exact `guide`, `schema`, and `example`
   payloads, names, versions, outputs, missing parents, and overwrite refusal.
@@ -75,5 +75,6 @@ results. Nine process-boundary cases cover malformed syntax, trailing content,
 duplicate members, missing input, missing/extra operands, unknown flags,
 unsupported format, and usage precedence. Thirteen help/grammar cases cover
 every milestone help asset, representative aliases, forbidden built-ins, and
-the command-local schema version. Logging and other command families remain
-unencoded.
+the command-local schema version. Six logging cases cover silence, canonical
+debug order, threshold filtering, the warning alias, bounded failure context,
+and invalid levels. Discovery, content, and create remain unencoded.
