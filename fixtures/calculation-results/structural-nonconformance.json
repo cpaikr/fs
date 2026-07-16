@@ -1,0 +1,17 @@
+{
+  "formatVersion": "0.1",
+  "conformance": {
+    "status": "nonconforming",
+    "errors": [
+      {
+        "code": "unresolved-reference",
+        "path": "/facts/0/item",
+        "message": "Item 'unknown-item' is not defined in this document."
+      }
+    ]
+  },
+  "calculations": {
+    "status": "not-run",
+    "applications": []
+  }
+}

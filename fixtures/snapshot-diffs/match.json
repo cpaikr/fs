@@ -3,17 +3,14 @@
   "status": "match",
   "conformance": {
     "recorded": "conforming",
-    "current": "conforming",
-    "changed": false
+    "current": "conforming"
   },
   "calculations": {
     "recorded": "consistent",
-    "current": "consistent",
-    "changed": false
+    "current": "consistent"
   },
   "applications": [
     {
-      "key": { "rule": "accounting-equation", "period": "at-2025", "dimensions": {} },
       "change": "unchanged",
       "recorded": {
         "key": { "rule": "accounting-equation", "period": "at-2025", "dimensions": {} },

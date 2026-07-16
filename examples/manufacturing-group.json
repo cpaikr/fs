@@ -15,7 +15,6 @@
     { "id": "gross-profit", "label": "Gross profit" },
     { "id": "operating-expenses", "label": "Operating expenses" },
     { "id": "net-income", "label": "Net income" },
-    { "id": "net-income-equity", "label": "Net income transferred to equity" },
     { "id": "cash", "label": "Cash and cash equivalents" },
     { "id": "inventory", "label": "Inventory" },
     { "id": "other-assets", "label": "Other assets" },
@@ -91,7 +90,6 @@
     { "item": "gross-profit", "period": "fy2025", "unit": "krw-millions", "value": "410" },
     { "item": "operating-expenses", "period": "fy2025", "unit": "krw-millions", "value": "-260" },
     { "item": "net-income", "period": "fy2025", "unit": "krw-millions", "value": "150" },
-    { "item": "net-income-equity", "period": "fy2025", "unit": "krw-millions", "value": "150" },
 
     { "item": "cash", "period": "at-2023-12-31", "unit": "krw-millions", "value": "100" },
     { "item": "cash", "period": "at-2024-12-31", "unit": "krw-millions", "value": "130" },
@@ -112,6 +110,9 @@
     { "item": "liabilities-and-equity", "period": "at-2024-12-31", "unit": "krw-millions", "value": "1000" },
     { "item": "liabilities-and-equity", "period": "at-2025-12-31", "unit": "krw-millions", "value": "1050" },
 
+    { "item": "operating-cash-flow", "period": "fy2024", "unit": "krw-millions", "value": "160" },
+    { "item": "investing-cash-flow", "period": "fy2024", "unit": "krw-millions", "value": "-100" },
+    { "item": "financing-cash-flow", "period": "fy2024", "unit": "krw-millions", "value": "-30" },
     { "item": "operating-cash-flow", "period": "fy2025", "unit": "krw-millions", "value": "180" },
     { "item": "investing-cash-flow", "period": "fy2025", "unit": "krw-millions", "value": "-120" },
     { "item": "financing-cash-flow", "period": "fy2025", "unit": "krw-millions", "value": "-40" },
@@ -129,6 +130,16 @@
     { "item": "factory-overhead", "period": "fy2025", "unit": "krw-millions", "value": "0" },
     { "item": "manufacturing-cost", "period": "fy2025", "unit": "krw-millions", "value": "630" },
 
+    { "item": "opening-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "180" },
+    { "item": "owner-contributions", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "20" },
+    { "item": "equity-profit", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "0" },
+    { "item": "dividends", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "0" },
+    { "item": "closing-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "200" },
+    { "item": "opening-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "200" },
+    { "item": "owner-contributions", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "0" },
+    { "item": "equity-profit", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "149.75" },
+    { "item": "dividends", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "-99.75" },
+    { "item": "closing-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "250" },
     { "item": "opening-equity", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "200" },
     { "item": "owner-contributions", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "30" },
     { "item": "equity-profit", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "0" },
@@ -177,7 +188,7 @@
       "id": "cash-flow-statement",
       "label": "Cash flow statement",
       "unit": "krw-millions",
-      "periods": ["fy2025"],
+      "periods": ["fy2025", "fy2024"],
       "entries": [
         { "type": "item", "item": "net-income", "label": "Net income (shared fact)" },
         { "type": "item", "item": "operating-cash-flow" },
@@ -202,7 +213,7 @@
       "id": "changes-in-equity",
       "label": "Statement of changes in equity",
       "unit": "krw-millions",
-      "periods": ["fy2025"],
+      "periods": ["fy2025", "fy2024"],
       "dimensions": [
         {
           "dimension": "equity-component",
@@ -266,12 +277,24 @@
         { "coefficient": "1", "item": "dividends" }
       ],
       "scope": {
-        "periods": ["fy2025"],
+        "periods": ["fy2024", "fy2025"],
         "dimensions": [
           { "equity-component": "share-capital" },
           { "equity-component": "retained-earnings" }
         ]
       }
+    },
+    {
+      "id": "cash-flow-subtotal",
+      "kind": "samePeriod",
+      "unit": "krw-millions",
+      "target": { "item": "net-cash-movement" },
+      "terms": [
+        { "coefficient": "1", "item": "operating-cash-flow" },
+        { "coefficient": "1", "item": "investing-cash-flow" },
+        { "coefficient": "1", "item": "financing-cash-flow" }
+      ],
+      "scope": { "periods": ["fy2024", "fy2025"] }
     },
     {
       "id": "cash-roll-forward",
@@ -289,7 +312,7 @@
       "id": "net-income-reconciliation",
       "kind": "assertion",
       "target": {
-        "item": "net-income-equity",
+        "item": "net-income",
         "period": "fy2025",
         "unit": "krw-millions"
       },
@@ -297,9 +320,19 @@
         {
           "coefficient": "1",
           "fact": {
-            "item": "net-income",
+            "item": "equity-profit",
             "period": "fy2025",
-            "unit": "krw-millions"
+            "unit": "krw-millions",
+            "dimensions": { "equity-component": "share-capital" }
+          }
+        },
+        {
+          "coefficient": "1",
+          "fact": {
+            "item": "equity-profit",
+            "period": "fy2025",
+            "unit": "krw-millions",
+            "dimensions": { "equity-component": "retained-earnings" }
           }
         }
       ]

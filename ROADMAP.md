@@ -1,10 +1,10 @@
 # Roadmap
 
-Status: V0 artifact contract in progress, 2026-07-16.
+Status: V0 artifact contract complete, 2026-07-16.
 
-This file records confirmed design decisions and the unresolved work needed to
-prove them. The [project proposal](docs/project-proposal.md) defines the product
-boundary; this roadmap defines the current design and implementation sequence.
+This file records confirmed design decisions, their evidence, and the remaining
+implementation sequence. The [project proposal](docs/project-proposal.md)
+defines the product boundary.
 
 ## V0: Standalone Financial-Statement Document
 
@@ -35,8 +35,8 @@ Confirmed direction:
 - Periods are semantic fact coordinates, not columns. A default renderer may
   present items as rows and periods as columns, but those table positions are
   not part of fact identity.
-- Statements have no indentation or nesting semantics in V0. The examples must
-  still determine whether a flat, label-only heading entry is necessary.
+- Statements have no indentation or nesting semantics in V0. Their only
+  non-item entry is a flat, label-only heading.
 - Source and provenance metadata are outside the specification.
 - Calculation rules must support relationships within a period and across
   periods.
@@ -74,67 +74,67 @@ every fact.
 
 ## Evidence and Semantic Model
 
-Current state: the normative [semantic specification](docs/semantic-spec.md),
-canonical [examples](examples/), and draft 2020-12 [JSON Schemas](schema/) now
-fix the artifact shape and resolve the decisions below. Language-neutral
-[conformance fixtures](fixtures/) now distinguish schema failures from
-semantic-invariant failures. The calculation-result and snapshot-diff fixtures
-also fix application ordering, status aggregation, evaluation errors,
-tolerances, stable application keys, and deterministic diff behavior. The
-remaining work in this phase is the completion audit and review before CLI
-implementation.
+The normative [semantic specification](docs/semantic-spec.md), canonical
+[examples](examples/), draft 2020-12 [JSON Schemas](schema/), and
+language-neutral [fixtures](fixtures/) complete this phase.
 
-Before fixing the JSON schema, build reviewed examples that exercise:
+Evidence coverage:
 
-- multi-period income, balance-sheet, cash-flow, equity, and manufacturing
-  statements;
-- supplied subtotals that reconcile and fail to reconcile;
-- the same fact presented in more than one statement;
-- explicit cross-statement checks when two distinct facts are expected to
-  agree;
-- opening balance, movements, and closing balance across periods;
-- a period series with no predecessor, consecutive periods, and an internal
-  gap;
-- overlapping annual, quarterly, and year-to-date periods for which automatic
-  temporal binding is both unambiguous and ambiguous;
-- exact decimals, scales, units, missing facts, zero, and unavailable values;
-  and
-- an equity statement whose presentation has a non-period axis.
+- `examples/manufacturing-group.json` covers multi-period income, balance
+  sheet, cash flow, equity, and manufacturing presentations; passing and
+  failing subtotals; fact reuse and explicit reconciliation; roll-forwards;
+  first, consecutive, gapped, annual, quarterly, and YTD durations; exact
+  decimals, scales, units, zero, missing and unavailable facts; and a
+  non-period equity axis.
+- `examples/minimal.json` proves optional document/entity/scope identity and a
+  conforming document with no calculation rules.
+- `fixtures/valid/` covers stored snapshots, all-skipped automatic rules,
+  calculation evaluation errors, and snapshot drift.
+- `fixtures/invalid/` separates JSON Schema failures from referential,
+  uniqueness, coordinate, calendar, and unit semantic failures.
+- `fixtures/calculation-results/` and `fixtures/snapshot-diffs/` fix exact
+  arithmetic, application order and identity, aggregate statuses, tolerances,
+  skip/error reasons, and deterministic comparison.
 
-Use the examples to decide:
+Resolved semantic decisions:
 
-- how the format version, reporting entity, reporting scope, and any optional
-  document identity are represented;
-- whether canonical JSON encodes individual facts or groups them into compact
-  fact series by item and period;
-- how instant and duration periods are identified;
-- how named dimensions extend fact coordinates and statement presentation;
-- how exact decimals, units, scales, missing facts, and unavailable facts map
-  into JSON;
-- whether a general classification mechanism is needed in V0 or should remain
-  outside the core until real examples earn it;
-- how calculation rules select facts at the same or different coordinates;
-- the narrow temporal selectors needed for automatic consecutive-period rules
-  without introducing a general temporal expression language;
-- whether reusable calculation rules and explicit reconciliation assertions
-  are distinct concepts;
-- the minimum snapshot fields needed to identify rule applications and produce
-  a deterministic diff without turning recorded results into current status;
-  and
-- the minimum flat presentation entries needed beyond item references, such as
-  label-only headings and explicit period ordering.
+- `formatVersion` is `"0.1"`; the entity and scope have required human labels
+  and optional author identities; `documentId` is optional.
+- Canonical JSON stores individual facts. Compact series remain future work.
+- Periods are explicitly discriminated as instant or inclusive duration
+  definitions and referenced by local identifier.
+- Named dimensions add complete unordered maps to fact coordinates and
+  explicit ordered axes to presentations.
+- Exact values are normalized decimal strings. Units contain author-defined
+  measures and base-ten scales. Missing means absent; unavailable is an
+  explicit fact state; zero is `"0"`.
+- V0 has no classification mechanism, hierarchy, default dimension member,
+  unit conversion, or inferred arithmetic.
+- Same-period rules reuse an item relationship over explicit periods and
+  dimension coordinates. Assertions bind exact coordinates. Roll-forwards are
+  the sole automatic temporal rule and bind only a unique immediately
+  preceding duration; first periods, gaps, and ambiguity have distinct skips.
+- Snapshots contain only historical conformance/calculation statuses and
+  ordered application results. Structured `(rule, period, dimensions)` keys
+  identify applications; current results are always recomputed.
+- Snapshot diffs compare status pairs and classify complete application
+  objects as unchanged, changed, added, or removed in deterministic order.
+- Statement periods, dimension members, and entries use array order. Flat item
+  references and label-only headings are the complete V0 presentation entry
+  set.
 
 ## Reference Tooling
 
 The [CLI design](docs/cli.md) fixes command scenarios and safety properties
-upfront while leaving schema-dependent result fields to the evidence phase.
-Implementation should proceed as a thin vertical slice rather than waiting for
-the entire schema or building the complete CLI in the abstract.
+upfront. Schema-dependent result fields, application identities, snapshot
+contents, and presentation semantics are now fixed by the artifact contract.
+Implementation should proceed as a thin vertical slice.
 
 After the relevant semantic model and JSON mapping are proven:
 
-1. Publish a JSON Schema for structural validation.
-2. Publish language-neutral valid and invalid fixtures.
+1. [x] Publish JSON Schemas for documents and language-neutral results.
+2. [x] Publish language-neutral valid, invalid, calculation-result, and
+   snapshot-diff fixtures.
 3. Provide `fs validate` with structured conformance and calculation results,
    including differences between stored and expected fact values. When its
    input contains a recorded snapshot, recompute and diff against it; otherwise

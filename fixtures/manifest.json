@@ -1,74 +1,105 @@
 {
   "formatVersion": "0.1",
   "validDocuments": [
-    { "path": "../examples/minimal.json", "calculationStatus": "not-defined" },
-    { "path": "../examples/manufacturing-group.json", "calculationStatus": "inconsistent" },
-    { "path": "valid/no-calculation-rules.json", "calculationStatus": "not-defined" },
-    { "path": "valid/recorded-snapshot.json", "calculationStatus": "consistent" },
-    { "path": "valid/all-rules-skipped.json", "calculationStatus": "not-evaluated" },
-    { "path": "valid/calculation-errors.json", "calculationStatus": "inconsistent" },
-    { "path": "valid/snapshot-mismatch-source.json", "calculationStatus": "inconsistent" }
+    { "document": "../examples/minimal.json", "calculationStatus": "not-defined" },
+    { "document": "../examples/manufacturing-group.json", "calculationStatus": "inconsistent" },
+    { "document": "valid/no-calculation-rules.json", "calculationStatus": "not-defined" },
+    { "document": "valid/recorded-snapshot.json", "calculationStatus": "consistent" },
+    { "document": "valid/all-rules-skipped.json", "calculationStatus": "not-evaluated" },
+    { "document": "valid/calculation-errors.json", "calculationStatus": "inconsistent" },
+    { "document": "valid/exact-arithmetic.json", "calculationStatus": "consistent" },
+    { "document": "valid/snapshot-mismatch-source.json", "calculationStatus": "inconsistent" }
   ],
   "invalidDocuments": [
     {
-      "path": "invalid/decimal-number.json",
+      "document": "invalid/decimal-number.json",
       "layer": "schema",
       "code": "decimal-string-required",
-      "instancePath": "/facts/0/value"
+      "path": "/facts/0/value"
     },
     {
-      "path": "invalid/value-and-unavailable.json",
+      "document": "invalid/value-and-unavailable.json",
       "layer": "schema",
       "code": "fact-value-exclusive",
-      "instancePath": "/facts/0"
+      "path": "/facts/0"
     },
     {
-      "path": "invalid/provenance-property.json",
+      "document": "invalid/provenance-property.json",
       "layer": "schema",
       "code": "unknown-property",
-      "instancePath": "/facts/0/source"
+      "path": "/facts/0/source"
     },
     {
-      "path": "invalid/duplicate-item-id.json",
+      "document": "invalid/negative-tolerance.json",
+      "layer": "schema",
+      "code": "invalid-tolerance",
+      "path": "/units/0/defaultTolerance"
+    },
+    {
+      "document": "invalid/duplicate-item-id.json",
       "layer": "semantic",
       "code": "duplicate-id",
-      "instancePath": "/items/1/id"
+      "path": "/items/1/id"
     },
     {
-      "path": "invalid/unresolved-item.json",
+      "document": "invalid/unresolved-item.json",
       "layer": "semantic",
       "code": "unresolved-reference",
-      "instancePath": "/facts/0/item"
+      "path": "/facts/0/item"
     },
     {
-      "path": "invalid/duplicate-fact-coordinate.json",
+      "document": "invalid/duplicate-fact-coordinate.json",
       "layer": "semantic",
       "code": "duplicate-fact-coordinate",
-      "instancePath": "/facts/1"
+      "path": "/facts/1"
     },
     {
-      "path": "invalid/impossible-date.json",
+      "document": "invalid/impossible-date.json",
       "layer": "semantic",
       "code": "invalid-date",
-      "instancePath": "/periods/0/date"
+      "path": "/periods/0/date"
     },
     {
-      "path": "invalid/reversed-duration.json",
+      "document": "invalid/reversed-duration.json",
       "layer": "semantic",
       "code": "invalid-duration",
-      "instancePath": "/periods/0"
+      "path": "/periods/0"
     },
     {
-      "path": "invalid/unresolved-dimension-member.json",
+      "document": "invalid/unresolved-dimension-member.json",
       "layer": "semantic",
       "code": "unresolved-reference",
-      "instancePath": "/facts/0/dimensions/component"
+      "path": "/facts/0/dimensions/component"
     },
     {
-      "path": "invalid/assertion-unit-mismatch.json",
+      "document": "invalid/assertion-unit-mismatch.json",
       "layer": "semantic",
       "code": "unit-mismatch",
-      "instancePath": "/calculationRules/0/terms/0/fact/unit"
+      "path": "/calculationRules/0/terms/0/fact/unit"
+    },
+    {
+      "document": "invalid/duplicate-statement-axis.json",
+      "layer": "semantic",
+      "code": "duplicate-statement-axis",
+      "path": "/statements/0/dimensions/1/dimension"
+    },
+    {
+      "document": "invalid/duplicate-period-definition.json",
+      "layer": "semantic",
+      "code": "duplicate-period-definition",
+      "path": "/periods/1"
+    },
+    {
+      "document": "invalid/roll-forward-instant-scope.json",
+      "layer": "semantic",
+      "code": "invalid-period-kind",
+      "path": "/calculationRules/0/scope/periods/0"
+    },
+    {
+      "document": "invalid/duplicate-snapshot-application-key.json",
+      "layer": "semantic",
+      "code": "duplicate-application-key",
+      "path": "/validationSnapshot/applications/1/key"
     }
   ]
 }

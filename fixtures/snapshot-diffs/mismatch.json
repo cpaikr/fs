@@ -3,17 +3,14 @@
   "status": "mismatch",
   "conformance": {
     "recorded": "conforming",
-    "current": "conforming",
-    "changed": false
+    "current": "conforming"
   },
   "calculations": {
     "recorded": "consistent",
-    "current": "inconsistent",
-    "changed": true
+    "current": "inconsistent"
   },
   "applications": [
     {
-      "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
       "change": "changed",
       "recorded": {
         "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
@@ -33,7 +30,6 @@
       }
     },
     {
-      "key": { "rule": "parts-agree", "period": "fy2025", "dimensions": {} },
       "change": "added",
       "current": {
         "key": { "rule": "parts-agree", "period": "fy2025", "dimensions": {} },
@@ -45,7 +41,6 @@
       }
     },
     {
-      "key": { "rule": "retired-rule", "period": "fy2025", "dimensions": {} },
       "change": "removed",
       "recorded": {
         "key": { "rule": "retired-rule", "period": "fy2025", "dimensions": {} },

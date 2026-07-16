@@ -1,7 +1,8 @@
 # Project Proposal
 
 Status: current product definition, 2026-07-16. `fs` is a working title. The
-[roadmap](../ROADMAP.md) records detailed decisions and unresolved design work.
+[roadmap](../ROADMAP.md) records detailed decisions, evidence, and remaining
+implementation work.
 
 ## Summary
 
@@ -82,10 +83,10 @@ cross-statement checks, roll-forwards, overlapping period types, unavailable
 values, calculation inconsistencies, and an equity statement with a non-period
 axis.
 
-Command scenarios may be designed before the schema to expose required
-behaviors. Schema-dependent CLI fields and options will be fixed only as thin
-vertical slices are exercised against those examples. See the provisional
-[CLI design](cli.md).
+Command scenarios were designed before the schema to expose required behavior.
+The examples and language-neutral fixtures now fix artifact-dependent result
+fields and identities; command-only options remain for implementation slices.
+See the [CLI design](cli.md).
 
 ## Success Criteria
 

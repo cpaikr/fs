@@ -33,7 +33,7 @@
       "additionalProperties": false,
       "required": ["status", "applications"],
       "properties": {
-        "status": { "enum": ["not-defined", "not-evaluated", "consistent", "inconsistent"] },
+        "status": { "enum": ["not-run", "not-defined", "not-evaluated", "consistent", "inconsistent"] },
         "applications": {
           "type": "array",
           "items": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }

@@ -4,17 +4,22 @@
   "scope": { "id": "separate", "label": "Separate" },
   "items": [
     { "id": "total", "label": "Total" },
-    { "id": "component", "label": "Component" }
+    { "id": "component", "label": "Component" },
+    { "id": "cash", "label": "Cash" },
+    { "id": "cash-movement", "label": "Cash movement" }
   ],
   "units": [{ "id": "usd", "label": "USD", "measure": "USD", "scale": 0 }],
   "periods": [
+    { "id": "at-2025", "kind": "instant", "date": "2025-12-31" },
     { "id": "fy2024", "kind": "duration", "start": "2024-01-01", "end": "2024-12-31" },
     { "id": "fy2025", "kind": "duration", "start": "2025-01-01", "end": "2025-12-31" }
   ],
   "facts": [
     { "item": "component", "period": "fy2024", "unit": "usd", "value": "5" },
     { "item": "total", "period": "fy2025", "unit": "usd", "value": "7" },
-    { "item": "component", "period": "fy2025", "unit": "usd", "unavailable": true }
+    { "item": "component", "period": "fy2025", "unit": "usd", "unavailable": true },
+    { "item": "cash", "period": "at-2025", "unit": "usd", "value": "12" },
+    { "item": "cash-movement", "period": "fy2025", "unit": "usd", "value": "2" }
   ],
   "statements": [
     {
@@ -35,6 +40,14 @@
       "unit": "usd",
       "target": { "item": "total" },
       "terms": [{ "coefficient": "1", "item": "component" }],
+      "scope": { "periods": ["fy2024", "fy2025"] }
+    },
+    {
+      "id": "missing-opening-boundary",
+      "kind": "rollForward",
+      "unit": "usd",
+      "balance": { "item": "cash" },
+      "movements": [{ "coefficient": "1", "item": "cash-movement" }],
       "scope": { "periods": ["fy2024", "fy2025"] }
     }
   ]

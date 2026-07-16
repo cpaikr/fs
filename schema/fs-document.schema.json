@@ -57,6 +57,10 @@
       "type": "string",
       "pattern": "^(?:0|-?(?:[1-9][0-9]*)(?:\\.[0-9]*[1-9])?|-?0\\.[0-9]*[1-9])$"
     },
+    "nonNegativeDecimal": {
+      "type": "string",
+      "pattern": "^(?:0|(?:[1-9][0-9]*)(?:\\.[0-9]*[1-9])?|0\\.[0-9]*[1-9])$"
+    },
     "date": {
       "type": "string",
       "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
@@ -73,7 +77,7 @@
     "scope": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "label"],
+      "required": ["label"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "label": { "$ref": "#/$defs/nonEmptyString" }
@@ -98,7 +102,7 @@
         "label": { "$ref": "#/$defs/nonEmptyString" },
         "measure": { "$ref": "#/$defs/nonEmptyString" },
         "scale": { "type": "integer" },
-        "defaultTolerance": { "$ref": "#/$defs/decimal" }
+        "defaultTolerance": { "$ref": "#/$defs/nonNegativeDecimal" }
       }
     },
     "instantPeriod": {
@@ -160,6 +164,17 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["item", "period", "unit"],
+      "properties": {
+        "item": { "$ref": "#/$defs/id" },
+        "period": { "$ref": "#/$defs/id" },
+        "unit": { "$ref": "#/$defs/id" },
+        "dimensions": { "$ref": "#/$defs/dimensionCoordinate" }
+      }
+    },
+    "completeFactCoordinate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item", "period", "unit", "dimensions"],
       "properties": {
         "item": { "$ref": "#/$defs/id" },
         "period": { "$ref": "#/$defs/id" },
@@ -306,7 +321,7 @@
           "items": { "$ref": "#/$defs/itemTerm" }
         },
         "scope": { "$ref": "#/$defs/ruleScope" },
-        "tolerance": { "$ref": "#/$defs/decimal" }
+        "tolerance": { "$ref": "#/$defs/nonNegativeDecimal" }
       }
     },
     "rollForwardRule": {
@@ -324,7 +339,7 @@
           "items": { "$ref": "#/$defs/itemTerm" }
         },
         "scope": { "$ref": "#/$defs/ruleScope" },
-        "tolerance": { "$ref": "#/$defs/decimal" }
+        "tolerance": { "$ref": "#/$defs/nonNegativeDecimal" }
       }
     },
     "assertionRule": {
@@ -340,7 +355,7 @@
           "minItems": 1,
           "items": { "$ref": "#/$defs/factTerm" }
         },
-        "tolerance": { "$ref": "#/$defs/decimal" }
+        "tolerance": { "$ref": "#/$defs/nonNegativeDecimal" }
       }
     },
     "calculationRule": {
@@ -353,7 +368,7 @@
     "applicationKey": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rule"],
+      "required": ["rule", "period", "dimensions"],
       "properties": {
         "rule": { "$ref": "#/$defs/id" },
         "period": { "$ref": "#/$defs/id" },
@@ -370,19 +385,30 @@
         "actual": { "$ref": "#/$defs/decimal" },
         "expected": { "$ref": "#/$defs/decimal" },
         "difference": { "$ref": "#/$defs/decimal" },
-        "tolerance": { "$ref": "#/$defs/decimal" }
+        "tolerance": { "$ref": "#/$defs/nonNegativeDecimal" }
       }
     },
-    "errorApplication": {
+    "factErrorApplication": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "status", "reason"],
+      "required": ["key", "status", "reason", "coordinate"],
       "properties": {
         "key": { "$ref": "#/$defs/applicationKey" },
         "status": { "const": "error" },
-        "reason": {
-          "enum": ["missing-fact", "unavailable-fact", "missing-boundary-period", "ambiguous-boundary-period", "unit-mismatch"]
-        }
+        "reason": { "enum": ["missing-fact", "unavailable-fact"] },
+        "coordinate": { "$ref": "#/$defs/completeFactCoordinate" }
+      }
+    },
+    "boundaryErrorApplication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "status", "reason", "boundary", "date"],
+      "properties": {
+        "key": { "$ref": "#/$defs/applicationKey" },
+        "status": { "const": "error" },
+        "reason": { "const": "missing-boundary-period" },
+        "boundary": { "enum": ["opening", "closing"] },
+        "date": { "$ref": "#/$defs/date" }
       }
     },
     "skippedApplication": {
@@ -398,7 +424,8 @@
     "applicationResult": {
       "oneOf": [
         { "$ref": "#/$defs/numericApplication" },
-        { "$ref": "#/$defs/errorApplication" },
+        { "$ref": "#/$defs/factErrorApplication" },
+        { "$ref": "#/$defs/boundaryErrorApplication" },
         { "$ref": "#/$defs/skippedApplication" }
       ]
     },
@@ -408,7 +435,7 @@
       "required": ["conformance", "calculations", "applications"],
       "properties": {
         "conformance": { "enum": ["conforming", "nonconforming"] },
-        "calculations": { "enum": ["not-defined", "not-evaluated", "consistent", "inconsistent"] },
+        "calculations": { "enum": ["not-run", "not-defined", "not-evaluated", "consistent", "inconsistent"] },
         "applications": {
           "type": "array",
           "items": { "$ref": "#/$defs/applicationResult" }

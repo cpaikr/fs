@@ -1,7 +1,7 @@
 {
   "formatVersion": "0.1",
   "entity": { "name": "Example Entity" },
-  "scope": { "id": "separate", "label": "Separate financial statements" },
+  "scope": { "label": "Separate financial statements" },
   "items": [
     { "id": "cash", "label": "Cash" }
   ],

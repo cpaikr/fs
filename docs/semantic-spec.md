@@ -24,8 +24,8 @@ policy, or multi-entity alignment. Filenames have no semantic meaning.
 `formatVersion` MUST be `"0.1"`. A future incompatible artifact contract will
 use a different value. `documentId` is an optional author-controlled stable
 identity; omitting it has no effect on conformance or calculation semantics.
-`entity.id` and `scope.id` are likewise author-controlled identifiers, while
-their `name` and `label` fields are human-readable.
+Optional `entity.id` and `scope.id` are likewise author-controlled stable
+identifiers, while their required `name` and `label` fields are human-readable.
 
 ## 2. Identifiers and references
 
@@ -62,9 +62,9 @@ Thus a value of `"1250"` in a KRW unit with scale `6` means KRW
 Arithmetic combines facts only when their unit identifiers are identical.
 V0 does not convert units, scales, currencies, or measures.
 
-`defaultTolerance`, when present, is an absolute tolerance expressed in the
-unit's scaled values. Its implicit value is exact zero. A rule's `tolerance`
-overrides the unit default for that rule.
+`defaultTolerance`, when present, is a nonnegative absolute tolerance expressed
+in the unit's scaled values. Its implicit value is exact zero. A rule's
+nonnegative `tolerance` overrides the unit default for that rule.
 
 ### 3.3 Periods
 
@@ -125,7 +125,8 @@ materialize missing facts, or imply calculations.
 
 `periods` explicitly lists displayed periods in display order. `dimensions`
 MAY list non-period presentation axes and their displayed members in display
-order. A statement cell is found by combining an item entry, one listed
+order. A statement MUST NOT list one dimension axis more than once. A statement
+cell is found by combining an item entry, one listed
 period, all listed dimension members for the applicable axis product, and the
 statement's `unit`. Absence remains missing; an unavailable fact remains
 unavailable.
@@ -155,7 +156,8 @@ The application is satisfied when `abs(difference) <= tolerance`.
 Every target and operand selected by one application MUST use the rule's
 `unit`. If an applicable required coordinate is missing or unavailable, the
 application has an evaluation error; it is not skipped and not treated as
-zero.
+zero. Using different units within a rule is structural nonconformance, not an
+evaluation-time conversion or error.
 
 ### 6.1 Same-period rules
 
@@ -186,10 +188,14 @@ instant period whose date equals the predecessor's `end`. The closing
 coordinate is the balance item at the unique instant period whose date equals
 the current duration's `end`. Movement coordinates use their declared items
 and the current duration. All use the rule unit and scoped dimensions.
+The closing fact is the target and its expected value is the opening fact with
+coefficient `1` plus the sum of each declared movement coefficient multiplied
+by its movement fact.
 
-Once a unique predecessor exists, absent or non-unique boundary instant
-periods, missing facts, and unavailable facts are evaluation errors. They are
-not reasons to skip. Earlier means a duration whose end is before
+Once a unique predecessor exists, an absent boundary instant period, missing
+fact, or unavailable fact is an evaluation error. A duplicate boundary instant
+is structural nonconformance under Section 3.3, so calculations do not run.
+These are not reasons to skip. Earlier means a duration whose end is before
 `current.start`; overlap alone does not establish precedence.
 
 The rule applies for every listed dimension coordinate, or the empty object
@@ -201,6 +207,8 @@ irregular temporal relationship.
 
 An `assertion` binds one exact target coordinate and exact operand coordinates.
 It has exactly one application and no automatic scope or temporal binding.
+Its target unit is the assertion's calculation unit, supplies the applicable
+unit default tolerance, and MUST match every operand unit.
 Assertions are appropriate for cross-statement reconciliations, irregular
 periods, and relationships between differing dimensions. They are distinct
 from reusable rules so an exact exception cannot silently broaden its scope.
@@ -210,31 +218,48 @@ from reusable rules so an exact exception cannot silently broaden its scope.
 Structural conformance includes JSON Schema conformance and all normative
 referential, uniqueness, date, coordinate, and rule invariants in this
 specification. Calculation inconsistency does not affect structural
-conformance.
+conformance. Calculation rules MUST NOT be evaluated for a structurally
+nonconforming document because its coordinates and rule preconditions are not
+reliable.
 
 Each rule application has one status:
 
 - `satisfied`: evaluated within tolerance;
 - `unsatisfied`: evaluated outside tolerance;
-- `error`: applicable but a required coordinate was missing or unavailable,
-  a boundary instant was absent/non-unique, or another evaluation precondition
-  failed; or
+- `error`: applicable but a required coordinate was missing or unavailable, or
+  a required boundary instant was absent; or
 - `skipped`: automatic temporal binding did not apply, with reason
   `no-predecessor`, `gap`, or `ambiguous-predecessor`.
 
+An error identifies the failing complete fact `coordinate`, or the `opening`
+or `closing` boundary and its required date. If more than one precondition
+fails, report the first in this order: opening boundary, closing boundary,
+target coordinate, then operands in their declared order. A boundary is
+`missing-boundary-period` when no matching instant exists.
+
 The document calculation status is:
 
+- `not-run` when structural nonconformance prevents calculation evaluation;
 - `not-defined` when no calculation rules exist;
 - `not-evaluated` when rules exist but every application is skipped;
 - `consistent` when at least one application is satisfied, any others are
   skipped, and none is unsatisfied or error; or
 - `inconsistent` when any application is unsatisfied or error.
 
+`not-run` requires structural status `nonconforming` and an empty application
+array. Every other calculation status requires `conforming`. `not-defined` has
+an empty application array; `not-evaluated` has one or more applications and
+all are skipped. The `consistent` and `inconsistent` statuses follow the
+evaluated-application rules above. A snapshot MUST be internally consistent by
+the same rules for its recorded statuses and applications.
+
 Application order is calculation-rule array order, then each rule's period
-array order, then dimension-coordinate array order. An application key is the
-structured object `{"rule": id}` plus `period` and `dimensions` when the rule
-has those bindings. Empty dimensions are recorded as `{}`. This key is stable
-across stored/current results and is the identity used by snapshot diffs.
+array order, then dimension-coordinate array order. Every application key is
+the structured object `{"rule": id, "period": id, "dimensions": {...}}`.
+For an assertion, `period` and `dimensions` come from its target. Empty
+dimensions are always recorded as `{}`. Keys MUST be unique within one result.
+This key is stable across stored/current results and is the identity used by
+snapshot diffs.
 
 The language-neutral result shape is specified by
 [`validation-result.schema.json`](../schema/validation-result.schema.json).
@@ -258,6 +283,15 @@ their recorded order. No snapshot produces `status: "not-recorded"`; otherwise
 the status is `match` only when every compared value matches, and `mismatch`
 otherwise.
 
+Recorded and current application keys MUST each be unique. Each diff entry
+contains the complete recorded and/or current application object, so it does
+not duplicate the application key at the diff-entry level. Status comparisons
+likewise contain their recorded and current values without a redundant derived
+boolean. A `changed` or `unchanged` entry's recorded and current objects MUST
+have the same key; an `added` entry contains only current, and a `removed`
+entry contains only recorded. Each application key appears in exactly one diff
+entry.
+
 A recorded key MAY refer to a rule no longer present in the current document;
 that is how a removed application is represented. Snapshot contents are not
 current document references and therefore do not participate in current
@@ -265,9 +299,28 @@ referential conformance.
 
 For `satisfied` and `unsatisfied`, comparison includes status, actual,
 expected, difference, and tolerance. For `error` and `skipped`, it includes
-status and reason. Human messages are not snapshot fields and are not compared.
+status and reason; error comparison also includes its complete coordinate or
+boundary and date. Human messages are not snapshot fields and are not compared.
 The normative diff shape is specified by
 [`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json).
+
+### 8.1 Structural diagnostics
+
+A validation result identifies each structural error with a stable `code`, a
+JSON Pointer `path`, and a human-readable `message`. The V0 fixture vocabulary
+includes `decimal-string-required`, `fact-value-exclusive`,
+`unknown-property`, `invalid-tolerance`, `duplicate-id`, `unresolved-reference`,
+`duplicate-fact-coordinate`, `invalid-date`, `invalid-duration`,
+`unit-mismatch`, `duplicate-statement-axis`, `duplicate-period-definition`,
+`invalid-period-kind`, and `duplicate-application-key`. Validators MAY report
+additional precise codes for other schema or semantic failures, but MUST use
+the fixture code when the named condition applies. Multiple errors are ordered
+by instance path, then code.
+
+Language-neutral result equality compares conformance status plus each error's
+code and path. `message` MUST be nonempty for users but its wording is not
+normative and is ignored when comparing an implementation with a fixture; this
+permits clear wording and localization without changing artifact semantics.
 
 ## 9. Canonical JSON mapping and determinism
 

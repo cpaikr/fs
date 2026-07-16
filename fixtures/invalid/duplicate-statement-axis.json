@@ -1,0 +1,11 @@
+{
+  "formatVersion": "0.1",
+  "entity": { "name": "Duplicate Statement Axis" },
+  "scope": { "label": "Separate" },
+  "items": [{ "id": "equity", "label": "Equity" }],
+  "units": [{ "id": "usd", "label": "USD", "measure": "USD", "scale": 0 }],
+  "periods": [{ "id": "year-end", "kind": "instant", "date": "2025-12-31" }],
+  "dimensions": [{ "id": "component", "label": "Component", "members": [{ "id": "capital", "label": "Capital" }, { "id": "reserves", "label": "Reserves" }] }],
+  "facts": [{ "item": "equity", "period": "year-end", "unit": "usd", "dimensions": { "component": "capital" }, "value": "10" }],
+  "statements": [{ "id": "equity", "label": "Equity", "unit": "usd", "periods": ["year-end"], "dimensions": [{ "dimension": "component", "members": ["capital"] }, { "dimension": "component", "members": ["reserves"] }], "entries": [{ "type": "item", "item": "equity" }] }]
+}

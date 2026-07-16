@@ -1,0 +1,41 @@
+{
+  "formatVersion": "0.1",
+  "entity": { "name": "Exact Arithmetic Co" },
+  "scope": { "label": "Separate" },
+  "items": [
+    { "id": "target", "label": "Target" },
+    { "id": "operand", "label": "Operand" }
+  ],
+  "units": [
+    { "id": "units", "label": "Units", "measure": "pure", "scale": 0, "defaultTolerance": "0.5" }
+  ],
+  "periods": [
+    { "id": "fy2025", "kind": "duration", "start": "2025-01-01", "end": "2025-12-31" }
+  ],
+  "facts": [
+    { "item": "target", "period": "fy2025", "unit": "units", "value": "-1.5" },
+    { "item": "operand", "period": "fy2025", "unit": "units", "value": "2" }
+  ],
+  "statements": [
+    {
+      "id": "values",
+      "label": "Values",
+      "unit": "units",
+      "periods": ["fy2025"],
+      "entries": [
+        { "type": "item", "item": "operand" },
+        { "type": "item", "item": "target" }
+      ]
+    }
+  ],
+  "calculationRules": [
+    {
+      "id": "absolute-tolerance-boundary",
+      "kind": "assertion",
+      "target": { "item": "target", "period": "fy2025", "unit": "units" },
+      "terms": [
+        { "coefficient": "-0.5", "fact": { "item": "operand", "period": "fy2025", "unit": "units" } }
+      ]
+    }
+  ]
+}

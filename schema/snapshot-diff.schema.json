@@ -32,29 +32,26 @@
     "statusComparison": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["recorded", "current", "changed"],
+      "required": ["recorded", "current"],
       "properties": {
         "recorded": { "enum": ["conforming", "nonconforming"] },
-        "current": { "enum": ["conforming", "nonconforming"] },
-        "changed": { "type": "boolean" }
+        "current": { "enum": ["conforming", "nonconforming"] }
       }
     },
     "calculationComparison": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["recorded", "current", "changed"],
+      "required": ["recorded", "current"],
       "properties": {
-        "recorded": { "enum": ["not-defined", "not-evaluated", "consistent", "inconsistent"] },
-        "current": { "enum": ["not-defined", "not-evaluated", "consistent", "inconsistent"] },
-        "changed": { "type": "boolean" }
+        "recorded": { "enum": ["not-run", "not-defined", "not-evaluated", "consistent", "inconsistent"] },
+        "current": { "enum": ["not-run", "not-defined", "not-evaluated", "consistent", "inconsistent"] }
       }
     },
     "unchangedOrChanged": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "change", "recorded", "current"],
+      "required": ["change", "recorded", "current"],
       "properties": {
-        "key": { "$ref": "fs-document.schema.json#/$defs/applicationKey" },
         "change": { "enum": ["unchanged", "changed"] },
         "recorded": { "$ref": "fs-document.schema.json#/$defs/applicationResult" },
         "current": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }
@@ -63,9 +60,8 @@
     "added": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "change", "current"],
+      "required": ["change", "current"],
       "properties": {
-        "key": { "$ref": "fs-document.schema.json#/$defs/applicationKey" },
         "change": { "const": "added" },
         "current": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }
       }
@@ -73,9 +69,8 @@
     "removed": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "change", "recorded"],
+      "required": ["change", "recorded"],
       "properties": {
-        "key": { "$ref": "fs-document.schema.json#/$defs/applicationKey" },
         "change": { "const": "removed" },
         "recorded": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }
       }

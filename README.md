@@ -16,17 +16,19 @@ engine.
 - [Domain language](CONTEXT.md) defines the project's canonical terms.
 - [Project proposal](docs/project-proposal.md) defines the product and its
   boundaries.
-- [Roadmap](ROADMAP.md) records confirmed decisions, unresolved design work,
-  and implementation order.
-- [CLI design](docs/cli.md) defines provisional command scenarios without
-  prematurely fixing schema-dependent output fields.
+- [Semantic specification](docs/semantic-spec.md) is the normative V0 artifact
+  and calculation contract.
+- [Roadmap](ROADMAP.md) records confirmed decisions, evidence, and
+  implementation order.
+- [CLI design](docs/cli.md) defines command scenarios whose artifact-dependent
+  outputs are fixed by the language-neutral fixtures.
 
 ## Current Work
 
-The V0 artifact contract is being completed from representative JSON examples.
+The V0 artifact contract is complete and was derived from representative JSON
+examples.
 The [semantic specification](docs/semantic-spec.md) defines the normative model
 and canonical JSON mapping; [`examples/`](examples/) and [`schema/`](schema/)
 contain its current evidence and machine-readable shape. Language-neutral
 [conformance and result fixtures](fixtures/) complete the language-neutral
-consumer contract. The contract is under final audit before reference CLI
-implementation begins.
+consumer contract. The next phase is reference CLI implementation.

@@ -1,7 +1,7 @@
 # CLI Design
 
-Status: scenario-level design. Command intent is provisional until exercised
-against the V0 examples and schema.
+Status: scenario-level design with artifact contracts fixed; implementation is
+pending.
 
 ## Design Boundary
 
@@ -9,7 +9,7 @@ The CLI is a reference consumer and authoring aid for FS documents. It should
 pressure-test the semantic model, but it must not become the place where
 undocumented document semantics live.
 
-Design these aspects before the schema is final:
+The pre-schema design fixed:
 
 - command responsibilities and whether they read or write;
 - non-interactive operation and overwrite safety;
@@ -17,12 +17,13 @@ Design these aspects before the schema is final:
   snapshot comparison; and
 - representative success, empty, skipped, inconsistent, and error scenarios.
 
-Derive these aspects from working fixtures rather than fixing them upfront:
+The working [semantic specification](semantic-spec.md),
+[schemas](../schema/), and [fixtures](../fixtures/) now fix:
 
 - schema-dependent result fields and identifiers;
 - calculation and period selectors;
 - snapshot contents and diff keys; and
-- rendering options implied by the presentation model.
+- the flat presentation model consumed by rendering.
 
 The canonical artifact remains JSON. CLI result encoding is a separate output
 boundary and must have a lossless JSON form even if an agent-oriented format is
@@ -43,6 +44,8 @@ A document with no calculation rules is a definitive successful result that
 states that no calculation rules were defined. If rules exist but none apply,
 the calculation status is `not-evaluated`. Calculation inconsistency does not
 turn a structurally conforming document into a structurally invalid one.
+Structural nonconformance produces calculation status `not-run` because facts
+and rule references are not reliable enough to evaluate.
 
 When no validation snapshot is present, the command says so explicitly and
 suggests a complete `fs record-validation` command with a placeholder output
@@ -82,13 +85,12 @@ has been proven by examples, especially the equity-statement case.
   without exposing internal stack traces.
 - Output ordering is deterministic so results and snapshots can be diffed.
 
-## Contracts to Resolve with Fixtures
+## Remaining Command Contracts
 
 - Exit-code behavior for structural failure, calculation inconsistency, and a
   snapshot mismatch.
 - The default terminal encoding and explicit JSON output option.
 - Whether document input from standard input is valuable in V0.
-- The minimum stable identity for a rule application and snapshot diff.
 
 ## Implementation Order
 

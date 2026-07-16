@@ -53,6 +53,22 @@
         "tolerance": "0"
       },
       {
+        "key": { "rule": "equity-component-rollup", "period": "fy2024", "dimensions": { "equity-component": "share-capital" } },
+        "status": "satisfied",
+        "actual": "200",
+        "expected": "200",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": { "rule": "equity-component-rollup", "period": "fy2024", "dimensions": { "equity-component": "retained-earnings" } },
+        "status": "satisfied",
+        "actual": "250",
+        "expected": "250",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
         "key": { "rule": "equity-component-rollup", "period": "fy2025", "dimensions": { "equity-component": "share-capital" } },
         "status": "satisfied",
         "actual": "230",
@@ -65,6 +81,22 @@
         "status": "satisfied",
         "actual": "280",
         "expected": "280",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": { "rule": "cash-flow-subtotal", "period": "fy2024", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "30",
+        "expected": "30",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": { "rule": "cash-flow-subtotal", "period": "fy2025", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "20",
+        "expected": "20",
         "difference": "0",
         "tolerance": "0"
       },

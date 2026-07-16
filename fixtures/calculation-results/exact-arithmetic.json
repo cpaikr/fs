@@ -1,0 +1,17 @@
+{
+  "formatVersion": "0.1",
+  "conformance": { "status": "conforming", "errors": [] },
+  "calculations": {
+    "status": "consistent",
+    "applications": [
+      {
+        "key": { "rule": "absolute-tolerance-boundary", "period": "fy2025", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "-1.5",
+        "expected": "-1",
+        "difference": "-0.5",
+        "tolerance": "0.5"
+      }
+    ]
+  }
+}

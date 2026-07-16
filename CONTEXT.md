@@ -78,12 +78,20 @@ duration, and a closing fact.
 **Rule application**:
 One evaluation of a calculation rule against concrete fact coordinates.
 
+**Application key**:
+The stable rule, period, and dimension coordinate that identifies one rule
+application in current results, recorded snapshots, and snapshot diffs.
+
 **Structural conformance**:
 Whether an FS document follows the format and its referential invariants.
 
 **Calculation consistency**:
 Whether evaluated calculation-rule applications agree within their applicable
 tolerances. It is independent of structural conformance.
+
+**Calculation status**:
+The derived aggregate outcome: not run, not defined, not evaluated, consistent,
+or inconsistent. It is never stored as current document state.
 
 **Validation result**:
 The current outcome produced by evaluating structural conformance and any
@@ -93,3 +101,7 @@ calculation rules.
 A recorded historical validation result embedded in an ordinary FS document
 for comparison with a later computation. It is not the document's current
 status.
+
+**Snapshot diff**:
+A deterministic comparison of a recorded validation snapshot with a newly
+computed validation result, matched by application key.
