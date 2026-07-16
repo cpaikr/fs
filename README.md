@@ -13,6 +13,8 @@ engine.
 
 ## Documentation
 
+- [Authoring guide](docs/authoring.md) defines the source-to-document workflow
+  for people and agents.
 - [Domain language](CONTEXT.md) defines the project's canonical terms.
 - [Project proposal](docs/project-proposal.md) defines the product and its
   boundaries.
@@ -26,9 +28,12 @@ engine.
 ## Current Work
 
 The V0 artifact contract is complete and was derived from representative JSON
-examples.
+examples. The [authoring guide](docs/authoring.md) now defines how people and
+agents apply that contract without turning FS into an extraction or accounting
+policy system.
 The [semantic specification](docs/semantic-spec.md) defines the normative model
 and canonical JSON mapping; [`examples/`](examples/) and [`schema/`](schema/)
 contain its current evidence and machine-readable shape. Language-neutral
 [conformance and result fixtures](fixtures/) complete the language-neutral
-consumer contract. The next phase is reference CLI implementation.
+consumer contract. The next phase is a worked source-to-FS example followed by
+reference CLI acceptance fixtures and implementation.

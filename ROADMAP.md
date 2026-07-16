@@ -1,10 +1,16 @@
 # Roadmap
 
-Status: V0 artifact contract complete, 2026-07-16.
+Status: V0 artifact contract complete and authoring workflow defined,
+2026-07-16.
 
 This file records confirmed design decisions, their evidence, and the remaining
 implementation sequence. The [project proposal](docs/project-proposal.md)
 defines the product boundary.
+
+The current next slice is a worked source-to-FS example followed by CLI
+acceptance fixtures for discovery, validation, and atomic creation. The
+reference implementation begins only after those user-visible scenarios fix
+the command contract.
 
 ## V0: Standalone Financial-Statement Document
 
@@ -123,6 +129,48 @@ Resolved semantic decisions:
   references and label-only headings are the complete V0 presentation entry
   set.
 
+## Authoring Experience
+
+The [authoring guide](docs/authoring.md) is the human and agent entry point. It
+projects the normative artifact contract into a source-to-document workflow
+without supplying extraction, taxonomy, or financial-policy decisions.
+
+Confirmed direction:
+
+- Authoring is file-first. A person or upstream agent produces a complete
+  candidate JSON document; reference tooling validates the whole document
+  before a requested write.
+- An authoring task includes source data plus explicit decisions about entity,
+  scope, periods, units, signs, item identity, dimensions, missing values, and
+  confirmed calculations. When those decisions are absent, guidance uses
+  conservative source-faithful defaults and reports ambiguity instead of
+  guessing.
+- Reviewable authoring output includes the FS document, its structured
+  validation result, and a separate decision or source ledger. That ledger is
+  workflow evidence outside the FS artifact and does not affect conformance.
+- Examples demonstrate artifact behavior rather than prescribe statement
+  contents. `minimal.json` is the smallest complete example, not a partially
+  filled template; `manufacturing-group.json` is deliberately calculation-
+  inconsistent.
+- The semantic specification remains the normative authority. A full reference
+  validator, not JSON Schema alone, is the operational conformance check because
+  schema validation cannot enforce every reference, uniqueness, calendar,
+  coordinate, unit, or calculation invariant.
+- Agent guidance is a first-class V0 deliverable. An installable Agent Skill
+  and `fs guide authoring` share maintained guidance and invoke the same
+  validator.
+- The CLI does not expose field-by-field `add-account`, `add-row`, `set-cell`,
+  `add-item`, or `add-fact` mutations. It also does not auto-repair, normalize,
+  infer, or materialize financial values.
+- `fs init` does not create a blank FS document because the canonical contract
+  requires meaningful nonempty content. A separate authoring-workspace
+  scaffold may be considered later only after real workflows justify it.
+- The current document contract does not permit a top-level `$schema`
+  property. Before public release, the project must publish immutable schema
+  identifiers and then decide whether an optional constant `$schema` pointer
+  materially improves standalone discovery without implying full semantic
+  validation.
+
 ## Reference Tooling
 
 The [CLI design](docs/cli.md) fixes command scenarios and safety properties
@@ -130,26 +178,46 @@ upfront. Schema-dependent result fields, application identities, snapshot
 contents, and presentation semantics are now fixed by the artifact contract.
 Implementation should proceed as a thin vertical slice.
 
-After the relevant semantic model and JSON mapping are proven:
+Release sequence:
 
 1. [x] Publish JSON Schemas for documents and language-neutral results.
 2. [x] Publish language-neutral valid, invalid, calculation-result, and
    snapshot-diff fixtures.
-3. Provide `fs validate` with structured conformance and calculation results,
+3. [x] Publish concise authoring guidance with conservative agent defaults and
+   a reusable instruction contract.
+4. Add one worked source-to-FS example containing a small raw source, explicit
+   authoring decisions, the resulting FS document, a separate source ledger,
+   and expected validation output.
+5. Fix CLI acceptance scenarios for no-argument discovery, `guide`, `schema`,
+   `example`, `validate`, and `create`, including standard input, output safety,
+   structured errors, exit codes, and result encodings.
+6. Provide `fs validate` with structured conformance and calculation results,
    including differences between stored and expected fact values. When its
    input contains a recorded snapshot, recompute and diff against it; otherwise
    report that no snapshot is recorded.
-4. Provide `fs record-validation <document> --output <new-document>` to write a
-   new ordinary `fs` document containing the current snapshot at the exact path
-   requested by the author. The command never modifies its input and fails if
-   the output path already exists.
-5. Provide `fs render` for a simple standalone HTML presentation.
-6. Consider an optional Agent Skill that teaches agents to author the format
-   and invokes the same validator.
+7. Provide read-only contract discovery through concise no-argument output,
+   `fs guide authoring`, `fs schema`, and `fs example`.
+8. Provide `fs create <candidate|-> --output <document>` as an atomic validated
+   write. It accepts only complete candidates, never overwrites, writes only
+   structurally conforming documents, and never changes financial meaning.
+9. Ship an installable Agent Skill generated or checked from the maintained
+   authoring guidance and non-interactive CLI examples.
+10. Provide `fs record-validation <document|-> --output <new-document>` to
+   write a new ordinary `fs` document containing the current snapshot at the
+   exact path requested by the author. The command never modifies its input
+   and fails if the output path already exists.
+11. Provide `fs render` for a simple standalone HTML presentation.
+12. Replace placeholder schema identifiers with immutable public versioned
+    URLs and resolve whether V0 permits an optional top-level `$schema` pointer.
 
-A compact serialization such as TOON may be evaluated later as a lossless
-mapping. JSON remains normative unless evidence shows that its repetition is a
-material problem.
+A compact result encoding such as TOON may be provided for agent-facing CLI
+output after its specification version and acceptance fixtures are pinned. A
+lossless JSON result form remains required, and FS artifacts, schemas, and
+examples remain JSON.
+
+Human-oriented spreadsheet or fact-table adapters may be explored after the
+V0 release. They compile into canonical FS JSON and remain separate from the
+core format and its extraction non-goal.
 
 ## Future: Multi-Entity Datasets
 
