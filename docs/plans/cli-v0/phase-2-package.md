@@ -3,9 +3,10 @@
 Status: not started; blocked on Phases 0 and 1.
 
 This plan creates the package, production entry point, test harnesses, and a
-thin validator that cannot report false conformance. It implements the public
-integration seam selected in [Phase 0b](phase-0-effect.md) against the complete
-fixture protocol fixed in [Phase 1](phase-1-acceptance.md).
+thin validator that cannot report false conformance. It implements the
+Node-core command and public Effect integration seams selected in
+[Phase 0b](phase-0-effect.md) against the complete fixture protocol fixed in
+[Phase 1](phase-1-acceptance.md).
 
 ## Package Foundation
 
@@ -15,6 +16,9 @@ fixture protocol fixed in [Phase 1](phase-1-acceptance.md).
   Effect language service, and `@effect/vitest` without install scripts.
 - [ ] Separate command model, process adapter, logger, decoding, validation,
   result encoding, exact decimals, and packaged assets into focused modules.
+- [ ] Use `util.parseArgs` tokens behind one command adapter that rejects
+  duplicates, misplaced command-local flags, extra operands, and unsupported
+  built-ins before application I/O.
 - [ ] Add type-check, build, unit, fixture-integrity, acceptance, pack, and
   local npm/npx smoke commands.
 - [ ] Compare bundled and unbundled ESM with retained package-size, cold local

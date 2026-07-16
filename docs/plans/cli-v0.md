@@ -22,7 +22,7 @@ exact-byte non-overwriting creation. It stops before Agent Skill generation,
 | Phase | State | Detailed plan |
 | --- | --- | --- |
 | 0a. Contract alignment | In progress | [Contract alignment](cli-v0/phase-0-contracts.md) |
-| 0b. Effect integration seam | Not started | [Effect integration](cli-v0/phase-0-effect.md) |
+| 0b. Runtime and command seam | Complete | [Runtime integration](cli-v0/phase-0-effect.md) |
 | 1. Acceptance suite | Not started | [Acceptance suite](cli-v0/phase-1-acceptance.md) |
 | 2. Package and fail-closed validator | Not started | [Package foundation](cli-v0/phase-2-package.md) |
 | 3. Complete semantic validation | Not started | [Semantic validation](cli-v0/phase-3-validation.md) |
@@ -42,13 +42,10 @@ unavailable because their source and harnesses do not exist.
 
 - Portable authoring guidance and exact help do not yet have authoritative,
   byte-stable asset sources.
-- Exact candidate Effect package source and public exports have not been
-  inspected.
 - CLI acceptance descriptors and their integrity check do not exist.
 
 ## Next Action
 
-Complete both Phase 0 lanes: align schemas, fixtures, help, and the portable
-authoring-source contract; inspect the exact Effect package set and prove a
-public integration seam. Then build the Phase 1 acceptance suite before adding
-production source.
+Finish Phase 0 contract alignment by defining byte-stable portable authoring
+guidance and exact help assets. Then build the Phase 1 acceptance suite before
+adding production source.
