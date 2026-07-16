@@ -15,7 +15,7 @@ import { commandHelp, parseArguments, type CommandName, type LogLevel, type Usag
 import { decodeJson } from "./json.js"
 import { DiagnosticLogger } from "./logger.js"
 import { validateDocument } from "./validation/validate.js"
-import { writeNewFile, type WriteFailure } from "./writer.js"
+import { outputEntryExists, writeNewFile, type WriteFailure } from "./writer.js"
 
 export interface ProcessResult {
   readonly stdout: Buffer
@@ -26,6 +26,8 @@ export interface ProcessResult {
 export interface ProcessContext {
   readonly cwd: string
   readonly readStdin: () => Buffer
+  readonly outputExists?: (path: string) => boolean
+  readonly writeFile?: typeof writeNewFile
 }
 
 const empty = Buffer.alloc(0)
@@ -88,7 +90,7 @@ const discovery = {
 } as const
 
 const writeFailure = (
-  operation: "schema" | "example",
+  operation: "schema" | "example" | "create",
   failure: WriteFailure,
   path: string,
   help: ReadonlyArray<string>
@@ -126,7 +128,7 @@ const runSchema = (
   }
   const bytes = schemaAsset(name as SchemaName)
   if (output === undefined) return bytesResult(bytes)
-  const failure = writeNewFile(resolve(context.cwd, output), bytes)
+  const failure = (context.writeFile ?? writeNewFile)(resolve(context.cwd, output), bytes)
   if (failure !== null) return writeFailure("schema", failure, output, ["fs schema document --output <new-path>"])
   return jsonResult({ output: { status: "created", path: output } }, 0)
 }
@@ -172,20 +174,21 @@ const runExample = (
   }
   const bytes = exampleAsset(name as ExampleName)
   if (output === undefined) return bytesResult(bytes)
-  const failure = writeNewFile(resolve(context.cwd, output), bytes)
+  const failure = (context.writeFile ?? writeNewFile)(resolve(context.cwd, output), bytes)
   if (failure !== null) return writeFailure("example", failure, output, ["fs example minimal --output <new-path>"])
   return jsonResult({ output: { status: "created", path: output } }, 0)
 }
 
 const readInput = (
   input: string,
+  operation: "validate" | "create",
   context: ProcessContext
 ): { readonly ok: true; readonly bytes: Buffer; readonly source: "path" | "stdin" } | ProcessResult => {
   if (input === "-") {
     try {
       return { ok: true, bytes: context.readStdin(), source: "stdin" }
     } catch {
-      return commandError("validate", "input-unreadable", [], 1, "-")
+      return commandError(operation, "input-unreadable", [], 1, "-")
     }
   }
   try {
@@ -196,9 +199,13 @@ const readInput = (
         ? "input-not-found"
         : "input-unreadable"
     return commandError(
-      "validate",
+      operation,
       code,
-      code === "input-not-found" ? ["fs validate <existing-document> --format json"] : [],
+      code === "input-not-found"
+        ? operation === "validate"
+          ? ["fs validate <existing-document> --format json"]
+          : ["fs create <existing-candidate> --output <new-document>"]
+        : [],
       1,
       input
     )
@@ -219,7 +226,7 @@ const runValidate = (
   const input = operands[0]
   if (input === undefined) throw new Error("Validated operand disappeared")
   const logger = new DiagnosticLogger(logLevel)
-  const read = readInput(input, context)
+  const read = readInput(input, "validate", context)
   if (!("ok" in read)) {
     const error = JSON.parse(read.stdout.toString("utf8")) as { readonly error: { readonly code: string } }
     logger.emit("error", "input-failed", "validate", {
@@ -251,6 +258,62 @@ const runValidate = (
   )
 }
 
+const runCreate = (
+  operands: ReadonlyArray<string>,
+  output: string | undefined,
+  context: ProcessContext
+): ProcessResult => {
+  if (operands.length === 0) {
+    return commandError("create", "missing-argument", ["fs create <candidate|-> --output <new-document>"], 2)
+  }
+  const input = operands[0]
+  if (input === undefined) throw new Error("Validated candidate disappeared")
+  if (operands.length > 1) {
+    return commandError("create", "unexpected-argument", [`fs create ${input} --output <new-document>`], 2)
+  }
+  if (output === undefined) {
+    return commandError("create", "missing-argument", [`fs create ${input} --output <new-document>`], 2)
+  }
+  const destination = resolve(context.cwd, output)
+  const outputHelp = [`fs create ${input} --output <new-document>`]
+  try {
+    if ((context.outputExists ?? outputEntryExists)(destination)) {
+      return commandError("create", "output-exists", outputHelp, 1, output)
+    }
+  } catch {
+    return commandError("create", "write-failed", outputHelp, 1, output)
+  }
+
+  const read = readInput(input, "create", context)
+  if (!("ok" in read)) return read
+  const decoded = decodeJson(read.bytes)
+  if (!decoded.ok) return commandError("create", "invalid-json", [], 1, input, decoded.message)
+  const result = validateDocument(decoded.value)
+  if (result.validation.conformance.status === "nonconforming") {
+    return jsonResult(
+      {
+        validation: result.validation,
+        snapshotDiff: result.snapshotDiff,
+        output: { status: "not-created", path: output, reason: "structural-nonconformance" },
+        help: []
+      },
+      1
+    )
+  }
+
+  const failure = (context.writeFile ?? writeNewFile)(destination, read.bytes)
+  if (failure !== null) return writeFailure("create", failure, output, outputHelp)
+  return jsonResult(
+    {
+      validation: result.validation,
+      snapshotDiff: result.snapshotDiff,
+      output: { status: "created", path: output },
+      help: []
+    },
+    0
+  )
+}
+
 const run = (
   parsed: Extract<ReturnType<typeof parseArguments>, { readonly ok: true }>["value"],
   context: ProcessContext
@@ -270,6 +333,7 @@ const run = (
     return commandError(command, "unsupported-format", commandHelp(command, operands[0]), 2)
   }
   if (command === "validate") return runValidate(operands, logLevel, context)
+  if (command === "create") return runCreate(operands, output, context)
   return commandError(
     command,
     "internal-error",

@@ -21,10 +21,12 @@
     "build": "tsc -p tsconfig.build.json",
     "check": "pnpm check:docs && pnpm verify",
     "check:docs": "./scripts/check-docs.sh",
+    "check:effect": "effect-language-service diagnostics --project tsconfig.json --format text --strict",
     "pack:check": "node scripts/check-pack.mjs",
     "test": "vitest run",
+    "test:acceptance": "pnpm build && node scripts/run-cli-acceptance.mjs",
     "typecheck": "tsc -p tsconfig.json",
-    "verify": "pnpm typecheck && pnpm test && pnpm build && pnpm pack:check",
+    "verify": "pnpm typecheck && pnpm check:effect && pnpm test && pnpm test:acceptance && pnpm pack:check",
     "prepack": "pnpm build"
   },
   "dependencies": {
