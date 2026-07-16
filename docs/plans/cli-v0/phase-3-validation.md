@@ -1,6 +1,6 @@
 # Phase 3: Complete Semantic Validation
 
-Status: not started; blocked on Phase 2.
+Status: complete.
 
 This plan completes the pure semantic pipeline required by the
 [semantic specification](../../semantic-spec.md) and its language-neutral
@@ -8,27 +8,27 @@ fixtures. It turns the Phase 2 fail-closed path into a complete validator.
 
 ## Structural Semantics
 
-- [ ] Validate identifiers, uniqueness, references, Gregorian dates, and
+- [x] Validate identifiers, uniqueness, references, Gregorian dates, and
   period definitions.
-- [ ] Validate fact coordinates, dimensions, units, and duplicates.
-- [ ] Validate statement axes and presentation references.
-- [ ] Validate rule scopes, assertion coordinates, roll-forward constraints,
+- [x] Validate fact coordinates, dimensions, units, and duplicates.
+- [x] Validate statement axes and presentation references.
+- [x] Validate rule scopes, assertion coordinates, roll-forward constraints,
   and unit invariants.
-- [ ] Validate embedded snapshot structure and application-key uniqueness.
-- [ ] Produce deterministic structural diagnostics ordered by path then code.
+- [x] Validate embedded snapshot structure and application-key uniqueness.
+- [x] Produce deterministic structural diagnostics ordered by path then code.
 
 ## Calculation and Snapshot Semantics
 
-- [ ] Implement one exact-decimal boundary for parsing, arithmetic,
+- [x] Implement one exact-decimal boundary for parsing, arithmetic,
   comparison, and formatting. Use Effect `BigDecimal` only if it passes every
   fixture; otherwise use a private `BigInt`-backed representation.
-- [ ] Implement tolerances, rule binding, application skips, and evaluation
+- [x] Implement tolerances, rule binding, application skips, and evaluation
   errors with deterministic precedence and ordering.
-- [ ] Derive every aggregate calculation status without evaluating
+- [x] Derive every aggregate calculation status without evaluating
   structurally nonconforming input.
-- [ ] Implement snapshot match, mismatch, additions, changes, removals, and
+- [x] Implement snapshot match, mismatch, additions, changes, removals, and
   `not-comparable` for invalid snapshots.
-- [ ] Encode the complete validation envelope and contextual help.
+- [x] Encode the complete validation envelope and contextual help.
 
 ## Gate
 
@@ -38,5 +38,8 @@ acceptance cases pass for path and standard input.
 
 ## Validation Evidence
 
-Language-neutral fixtures exist, but no validator or implementation test suite
-exists.
+The pure suite matches every valid document, named schema/semantic failure,
+calculation result, and snapshot diff. Additional tests retain complete
+diagnostic ordering, malformed snapshot handling, numeric-lexeme limits,
+exact decimal operations, and Gregorian early-year/leap-century binding. All
+25 packed validation and logging cases pass from the installed tarball.

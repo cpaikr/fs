@@ -12,9 +12,9 @@ Node-core command and public Effect integration seams selected in
 
 - [x] Add `package.json`, an exact pnpm lock, strict TypeScript configuration,
   and explicit `type`, `bin`, `engines`, `packageManager`, and published files.
-- [ ] Pin the inspected Effect stack, TypeScript, Ajv, parser, test tools,
+- [x] Pin the inspected Effect stack, TypeScript, Ajv, test tools,
   Effect language service, and `@effect/vitest` without install scripts.
-- [ ] Separate command model, process adapter, logger, decoding, validation,
+- [x] Separate command model, process adapter, logger, decoding, validation,
   result encoding, exact decimals, and packaged assets into focused modules.
 - [x] Use `util.parseArgs` tokens behind one command adapter that rejects
   duplicates, misplaced command-local flags, extra operands, and unsupported
@@ -32,12 +32,12 @@ Node-core command and public Effect integration seams selected in
 - [x] Translate expected failures to tagged outcomes and unexpected defects to
   bounded `internal-error` output before running Node with default defect
   reporting disabled.
-- [ ] Read exact path or standard-input bytes once and decode UTF-8 fatally.
-- [ ] Reject malformed syntax, trailing content, duplicate members, and unsafe
+- [x] Read exact path or standard-input bytes once and decode UTF-8 fatally.
+- [x] Reject malformed syntax, trailing content, duplicate members, and unsafe
   numeric lexemes before JSON Schema validation.
-- [ ] Evaluate `lossless-json` only if it preserves numeric lexemes, rejects
-  duplicate members, and exposes a narrow typed conversion boundary.
-- [ ] Resolve bundled Draft 2020-12 schemas offline with Ajv and normalize
+- [x] Retain the smaller private scanner after proving it preserves the
+  required numeric boundary and rejects duplicate members before `JSON.parse`.
+- [x] Resolve bundled Draft 2020-12 schemas offline with Ajv and normalize
   diagnostics to stable codes and JSON Pointer paths.
 - [ ] Retain adapter, logger, parsing, schema, package, asset, and I/O-order
   tests against the production entry point.
@@ -62,8 +62,8 @@ asset tests pass. No input can receive a false conformance success.
 ## Validation Evidence
 
 The exact lock, strict configs, Effect entry point, token grammar, bounded
-process adapter, unit tests, unbundled build, installed-tarball smoke, exact
-asset verification, and packed acceptance harness exist. Thirty-seven
-read-only content cases pass from the installed tarball. Input decoding, JSON
-and schema validation, acceptance-script wiring, runtime measurements, and CI
-remain open.
+process adapter, unbundled build, installed-tarball smoke, exact assets, and
+packed harness pass. Fatal decoding, the duplicate-aware scanner, offline Ajv,
+normalized schema errors, semantic validation, deterministic logging, and all
+25 validation/logging cases pass. Acceptance-script wiring, Effect diagnostics,
+runtime measurements, complete retained I/O-order coverage, and CI remain open.

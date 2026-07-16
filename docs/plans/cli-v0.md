@@ -25,7 +25,7 @@ exact-byte non-overwriting creation. It stops before Agent Skill generation,
 | 0b. Runtime and command seam | Complete | [Runtime integration](cli-v0/phase-0-effect.md) |
 | 1. Acceptance suite | Complete | [Acceptance suite](cli-v0/phase-1-acceptance.md) |
 | 2. Package and fail-closed validator | In progress | [Package foundation](cli-v0/phase-2-package.md) |
-| 3. Complete semantic validation | Not started | [Semantic validation](cli-v0/phase-3-validation.md) |
+| 3. Complete semantic validation | Complete | [Semantic validation](cli-v0/phase-3-validation.md) |
 | 4–5. Discovery, content, and creation | In progress | [Content and creation](cli-v0/phase-4-5-content-create.md) |
 
 Production implementation begins only after both Phase 0 lanes and Phase 1
@@ -35,10 +35,10 @@ command.
 ## Current Validation
 
 `./scripts/check-docs.sh` passes for the aligned contracts and 76 process
-descriptors. Strict typecheck, unit tests, build, installed-tarball npm/npx
-smoke, and exact packed-asset checks pass. The packed harness passes all 37
-discovery, help, guide, schema, and example cases. Validation, create, writer
-fault, and cross-platform CI gates remain open.
+descriptors. Strict typecheck, 54 unit tests, build, installed-tarball npm/npx
+smoke, and exact packed-asset checks pass. The packed harness passes 62 cases:
+all discovery/content plus validation and logging. Create, writer fault, and
+cross-platform CI gates remain open.
 
 ## Current Blockers
 
@@ -46,5 +46,5 @@ fault, and cross-platform CI gates remain open.
 
 ## Next Action
 
-Implement fatal decoding, duplicate-aware JSON parsing, offline schema
-validation, and normalized diagnostics; then wire the retained Phase 2 tests.
+Implement `create` with the complete validator and shared writer, then finish
+retained package, writer-fault, runtime-measurement, and platform gates.

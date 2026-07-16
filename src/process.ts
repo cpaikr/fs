@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 
 import {
@@ -10,7 +11,10 @@ import {
   type ExampleName,
   type SchemaName
 } from "./assets.js"
-import { commandHelp, parseArguments, type CommandName, type UsageFailure } from "./arguments.js"
+import { commandHelp, parseArguments, type CommandName, type LogLevel, type UsageFailure } from "./arguments.js"
+import { decodeJson } from "./json.js"
+import { DiagnosticLogger } from "./logger.js"
+import { validateDocument } from "./validation/validate.js"
 import { writeNewFile, type WriteFailure } from "./writer.js"
 
 export interface ProcessResult {
@@ -40,7 +44,8 @@ const commandError = (
   help: ReadonlyArray<string>,
   exitCode: 1 | 2,
   path?: string,
-  message = "The requested operation could not be completed."
+  message = "The requested operation could not be completed.",
+  stderr: Buffer = empty
 ): ProcessResult =>
   jsonResult(
     {
@@ -52,7 +57,8 @@ const commandError = (
       },
       help
     },
-    exitCode
+    exitCode,
+    stderr
   )
 
 const usageFailure = (failure: UsageFailure): ProcessResult =>
@@ -171,11 +177,85 @@ const runExample = (
   return jsonResult({ output: { status: "created", path: output } }, 0)
 }
 
+const readInput = (
+  input: string,
+  context: ProcessContext
+): { readonly ok: true; readonly bytes: Buffer; readonly source: "path" | "stdin" } | ProcessResult => {
+  if (input === "-") {
+    try {
+      return { ok: true, bytes: context.readStdin(), source: "stdin" }
+    } catch {
+      return commandError("validate", "input-unreadable", [], 1, "-")
+    }
+  }
+  try {
+    return { ok: true, bytes: readFileSync(resolve(context.cwd, input)), source: "path" }
+  } catch (error) {
+    const code =
+      typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT"
+        ? "input-not-found"
+        : "input-unreadable"
+    return commandError(
+      "validate",
+      code,
+      code === "input-not-found" ? ["fs validate <existing-document> --format json"] : [],
+      1,
+      input
+    )
+  }
+}
+
+const runValidate = (
+  operands: ReadonlyArray<string>,
+  logLevel: LogLevel,
+  context: ProcessContext
+): ProcessResult => {
+  if (operands.length === 0) {
+    return commandError("validate", "missing-argument", ["fs validate <existing-document> --format json"], 2)
+  }
+  if (operands.length > 1) {
+    return commandError("validate", "unexpected-argument", [`fs validate ${operands[0]} --format json`], 2)
+  }
+  const input = operands[0]
+  if (input === undefined) throw new Error("Validated operand disappeared")
+  const logger = new DiagnosticLogger(logLevel)
+  const read = readInput(input, context)
+  if (!("ok" in read)) {
+    const error = JSON.parse(read.stdout.toString("utf8")) as { readonly error: { readonly code: string } }
+    logger.emit("error", "input-failed", "validate", {
+      code: error.error.code,
+      source: input === "-" ? "stdin" : "path"
+    })
+    return { ...read, stderr: logger.bytes() }
+  }
+  logger.emit("debug", "input-read", "validate", { source: read.source })
+  const decoded = decodeJson(read.bytes)
+  if (!decoded.ok) {
+    logger.emit("error", "input-failed", "validate", { code: "invalid-json", source: read.source })
+    return commandError("validate", "invalid-json", [], 1, input, decoded.message, logger.bytes())
+  }
+  const result = validateDocument(decoded.value)
+  logger.emit("info", "validation-completed", "validate", {
+    conformance: result.validation.conformance.status,
+    calculations: result.validation.calculations.status,
+    snapshot: result.snapshotDiff.status
+  })
+  const help =
+    result.validation.conformance.status === "conforming" && result.snapshotDiff.status === "not-recorded"
+      ? [`fs record-validation ${input} --output <new-document>`]
+      : []
+  return jsonResult(
+    { validation: result.validation, snapshotDiff: result.snapshotDiff, help },
+    result.validation.conformance.status === "conforming" ? 0 : 1,
+    logger.bytes()
+  )
+}
+
 const run = (
   parsed: Extract<ReturnType<typeof parseArguments>, { readonly ok: true }>["value"],
   context: ProcessContext
 ): ProcessResult => {
-  const { command, operands, help, version, output, format } = parsed
+  const { command, operands, help, logLevel, version, output, format } = parsed
 
   if (command === null) {
     if (help) return bytesResult(helpAsset("fs"))
@@ -189,6 +269,7 @@ const run = (
   if (format !== undefined && format !== "json") {
     return commandError(command, "unsupported-format", commandHelp(command, operands[0]), 2)
   }
+  if (command === "validate") return runValidate(operands, logLevel, context)
   return commandError(
     command,
     "internal-error",
