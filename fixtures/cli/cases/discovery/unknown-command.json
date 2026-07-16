@@ -1,0 +1,30 @@
+{
+  "id": "discovery-unknown-command",
+  "command": "fs",
+  "arguments": ["unknown"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "unknown" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "fs" },
+        { "pointer": "/error/code", "equals": "unknown-command" },
+        { "pointer": "/help", "equals": ["fs --help"] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["unknown"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

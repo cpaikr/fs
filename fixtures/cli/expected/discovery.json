@@ -1,0 +1,22 @@
+{
+  "executable": "fs",
+  "package": "@cpai/fs",
+  "input": null,
+  "artifact": {
+    "versions": ["0.1"],
+    "serializations": ["json"]
+  },
+  "commands": [
+    { "name": "guide", "access": "read" },
+    { "name": "schema", "access": "read-write" },
+    { "name": "example", "access": "read-write" },
+    { "name": "validate", "access": "read" },
+    { "name": "create", "access": "write" }
+  ],
+  "help": [
+    "fs guide authoring",
+    "fs schema document --version 0.1",
+    "fs example",
+    "fs validate <document|-> --format json"
+  ]
+}

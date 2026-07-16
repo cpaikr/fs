@@ -1,0 +1,57 @@
+{
+  "id": "discovery-no-arguments",
+  "command": "fs",
+  "arguments": [],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "statement.fs.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        {
+          "pointer": "",
+          "equals": ["executable", "package", "input", "artifact", "commands", "help"]
+        }
+      ],
+      "equalities": [
+        {
+          "pointer": "/executable",
+          "equalsFile": { "file": "expected/discovery.json", "pointer": "/executable" }
+        },
+        {
+          "pointer": "/package",
+          "equalsFile": { "file": "expected/discovery.json", "pointer": "/package" }
+        },
+        {
+          "pointer": "/input",
+          "equalsFile": { "file": "expected/discovery.json", "pointer": "/input" }
+        },
+        {
+          "pointer": "/artifact",
+          "equalsFile": { "file": "expected/discovery.json", "pointer": "/artifact" }
+        },
+        {
+          "pointer": "/commands",
+          "equalsFile": { "file": "expected/discovery.json", "pointer": "/commands" }
+        },
+        {
+          "pointer": "/help",
+          "equalsFile": { "file": "expected/discovery.json", "pointer": "/help" }
+        }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["statement.fs.json"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

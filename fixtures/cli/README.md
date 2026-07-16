@@ -125,6 +125,15 @@ without adding a duplicate calculation-result fixture.
   `logging-warning-alias`.
 - Invalid level remains a silent usage error: `logging-invalid-level`.
 
+### Discovery and guide
+
+- No-argument discovery, including no inferred nearby input:
+  `discovery-no-arguments`.
+- Unknown top-level command: `discovery-unknown-command`.
+- Exact installed authoring guide: `guide-authoring`.
+- Unknown and extra guide operands: `guide-unknown-topic`,
+  `guide-extra-argument`.
+
 Instrumented Phase 2 tests retain input-read/write-call invariance and the
 complete threshold matrix; process fixtures fix the observable representative
 seams.
