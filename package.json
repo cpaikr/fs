@@ -1,0 +1,48 @@
+{
+  "name": "@cpai/fs",
+  "version": "0.1.0",
+  "description": "Reference CLI for the FS financial statement artifact format",
+  "type": "module",
+  "bin": {
+    "fs": "dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "assets",
+    "examples/*.json",
+    "schema/*.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": "^22.17.0 || ^24.15.0"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "pnpm check:docs && pnpm verify",
+    "check:docs": "./scripts/check-docs.sh",
+    "pack:check": "node scripts/check-pack.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json",
+    "verify": "pnpm typecheck && pnpm test && pnpm build && pnpm pack:check",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@effect/platform-node": "4.0.0-beta.98",
+    "ajv": "8.20.0",
+    "effect": "4.0.0-beta.98",
+    "ioredis": "5.11.1"
+  },
+  "devDependencies": {
+    "@effect/language-service": "0.87.0",
+    "@effect/vitest": "4.0.0-beta.98",
+    "@types/node": "24.10.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  },
+  "pnpm": {
+    "overrides": {
+      "@effect/platform-node-shared": "4.0.0-beta.98"
+    }
+  }
+}

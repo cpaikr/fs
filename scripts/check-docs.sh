@@ -6,7 +6,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 echo "Linting Markdown"
-npx --yes markdownlint-cli2@0.18.1 '**/*.md'
+npx --yes markdownlint-cli2@0.18.1 '**/*.md' '#node_modules' '#dist'
 
 echo "Checking Markdown links"
 while IFS= read -r -d '' document; do
