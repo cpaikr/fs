@@ -3,9 +3,13 @@
   "cases": [
     "cases/validate/all-rules-skipped.json",
     "cases/validate/calculation-inconsistent.json",
+    "cases/validate/invalid-snapshot.json",
     "cases/validate/path-no-rules.json",
+    "cases/validate/schema-failure.json",
+    "cases/validate/semantic-failure.json",
     "cases/validate/snapshot-match.json",
     "cases/validate/snapshot-mismatch.json",
-    "cases/validate/stdin-no-rules.json"
+    "cases/validate/stdin-no-rules.json",
+    "cases/validate/unsafe-scale.json"
   ]
 }

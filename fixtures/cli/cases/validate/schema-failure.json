@@ -1,0 +1,100 @@
+{
+  "id": "validate-schema-failure",
+  "command": "fs",
+  "arguments": ["validate", "input.json"],
+  "workspace": [
+    {
+      "copy": "../invalid/decimal-number.json",
+      "to": "input.json"
+    }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        {
+          "pointer": "",
+          "equals": ["validation", "snapshotDiff", "help"]
+        },
+        {
+          "pointer": "/validation",
+          "equals": ["formatVersion", "conformance", "calculations"]
+        },
+        {
+          "pointer": "/validation/conformance",
+          "equals": ["status", "errors"]
+        },
+        {
+          "pointer": "/validation/conformance/errors/0",
+          "equals": ["code", "path", "message"]
+        },
+        {
+          "pointer": "/validation/calculations",
+          "equals": ["status", "applications"]
+        }
+      ],
+      "arrays": [
+        {
+          "pointer": "/validation/conformance/errors",
+          "minimum": 1
+        }
+      ],
+      "equalities": [
+        { "pointer": "/validation/formatVersion", "equals": "0.1" },
+        {
+          "pointer": "/validation/conformance/status",
+          "equals": "nonconforming"
+        },
+        {
+          "pointer": "/validation/conformance/errors/0/code",
+          "equalsSelected": {
+            "file": "../manifest.json",
+            "arrayPointer": "/invalidDocuments",
+            "wherePointer": "/document",
+            "whereEquals": "invalid/decimal-number.json",
+            "valuePointer": "/code"
+          }
+        },
+        {
+          "pointer": "/validation/conformance/errors/0/path",
+          "equalsSelected": {
+            "file": "../manifest.json",
+            "arrayPointer": "/invalidDocuments",
+            "wherePointer": "/document",
+            "whereEquals": "invalid/decimal-number.json",
+            "valuePointer": "/path"
+          }
+        },
+        {
+          "pointer": "/validation/calculations/status",
+          "equals": "not-run"
+        },
+        {
+          "pointer": "/validation/calculations/applications",
+          "equals": []
+        },
+        {
+          "pointer": "/snapshotDiff",
+          "equalsFile": {
+            "file": "../snapshot-diffs/not-recorded.json"
+          }
+        },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": [
+        "/validation/conformance/errors/0/message"
+      ]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

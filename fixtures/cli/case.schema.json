@@ -119,6 +119,20 @@
         }
       }
     },
+    "arrayLength": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointer"],
+      "properties": {
+        "pointer": { "$ref": "#/$defs/jsonPointer" },
+        "equals": { "type": "integer", "minimum": 0 },
+        "minimum": { "type": "integer", "minimum": 0 }
+      },
+      "oneOf": [
+        { "required": ["equals"] },
+        { "required": ["minimum"] }
+      ]
+    },
     "jsonMatcher": {
       "type": "object",
       "additionalProperties": false,
@@ -128,6 +142,10 @@
         "members": {
           "type": "array",
           "items": { "$ref": "#/$defs/objectMembers" }
+        },
+        "arrays": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/arrayLength" }
         },
         "equalities": {
           "type": "array",

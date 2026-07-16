@@ -123,13 +123,20 @@ const pointerForMember = (pointer, member) => {
 };
 
 const validateJsonMatcher = (matcher, context) => {
+  const arrays = matcher.arrays ?? [];
   const memberPointers = matcher.members.map(({ pointer }) => pointer);
   const equalityPointers = matcher.equalities.map(({ pointer }) => pointer);
-  const valuePointers = [...equalityPointers, ...matcher.nonemptyStrings];
+  const arrayPointers = arrays.map(({ pointer }) => pointer);
+  const valuePointers = [
+    ...arrayPointers,
+    ...equalityPointers,
+    ...matcher.nonemptyStrings,
+  ];
   [...memberPointers, ...valuePointers].forEach((pointer) =>
     validatePointerSyntax(pointer, context),
   );
   assertUnique(memberPointers, `${context} members`);
+  assertUnique(arrayPointers, `${context} arrays`);
   assertUnique(equalityPointers, `${context} equalities`);
   assertUnique(matcher.nonemptyStrings, `${context} nonempty strings`);
   if (!memberPointers.includes("")) {

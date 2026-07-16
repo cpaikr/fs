@@ -28,6 +28,8 @@ terminal behavior.
 JSON stdout uses three generic assertion types:
 
 - `members` fixes the complete member set at an object JSON Pointer;
+- `arrays` fixes an exact or minimum array length without constraining
+  unrelated additional values;
 - `equalities` compares a pointer with a literal, another JSON file/pointer,
   or one selected entry in a JSON array; and
 - `nonemptyStrings` requires actionable messages without fixing prose.
@@ -76,3 +78,14 @@ item is encoded and this guide maps each required clause to case identifiers.
   `validate-snapshot-match`, `validate-calculation-inconsistent`.
 - Snapshot comparison outcomes: `validate-path-no-rules`,
   `validate-snapshot-match`, `validate-snapshot-mismatch`.
+
+### Validation structural failures
+
+- JSON Schema and semantic layers: `validate-schema-failure`,
+  `validate-semantic-failure`.
+- Present invalid embedded snapshot: `validate-invalid-snapshot`.
+- Out-of-range safe-integer scale: `validate-unsafe-scale`.
+
+Each structural case composes its stable diagnostic code/path from the artifact
+manifest, requires a nonempty message, and fixes calculations as `not-run`
+without adding a duplicate calculation-result fixture.

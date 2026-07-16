@@ -69,5 +69,7 @@ integrity checker pass through `./scripts/check-docs.sh`. The initial
 JSON results, exact ordinary stderr, and exhaustive workspace/home state. Six
 successful validation cases now cover path and standard input, every
 conforming calculation aggregate status, and snapshot not-recorded, match, and
-mismatch. Validation failures, usage, and other behavior families remain
-unencoded.
+mismatch. Four composed structural cases cover schema and semantic failures,
+an invalid embedded snapshot, and unsafe scale without duplicating artifact
+results. Parsing, operational failure, usage, and other behavior families
+remain unencoded.
