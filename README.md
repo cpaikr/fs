@@ -24,6 +24,10 @@ engine.
   implementation order.
 - [CLI design](docs/cli.md) defines command scenarios whose artifact-dependent
   outputs are fixed by the language-neutral fixtures.
+- [CLI acceptance contract](docs/cli-acceptance.md) defines deterministic
+  process fixtures, result encoding, exit codes, and filesystem effects.
+- [V0 CLI delivery plan](docs/plans/cli-v0.md) defines the selected runtime and
+  distribution, phases, gates, validation, and next implementation action.
 
 ## Current Work
 
@@ -35,5 +39,12 @@ The [semantic specification](docs/semantic-spec.md) defines the normative model
 and canonical JSON mapping; [`examples/`](examples/) and [`schema/`](schema/)
 contain its current evidence and machine-readable shape. Language-neutral
 [conformance and result fixtures](fixtures/) complete the language-neutral
-consumer contract. The next phase is defining reference CLI acceptance
-fixtures, followed by implementation.
+consumer contract. The deterministic reference CLI acceptance protocol is now
+defined. The selected implementation stack is strict TypeScript on Node.js with
+Effect 4, `effect/unstable/cli`, and Effect logging, distributed as an npm
+package with a zero-global-install `npx` path. pnpm is repository tooling only;
+Bun is not required. No CLI implementation exists yet. The next phase is to
+close the remaining observable contracts, confirm the npm package identity,
+prove the Effect CLI adapter, logging, packaging, and validation boundaries in
+a bounded spike, and add acceptance fixtures starting with `fs validate`
+before beginning the thin validator.

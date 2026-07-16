@@ -1,15 +1,20 @@
 # Roadmap
 
-Status: V0 artifact contract and document-encoding guidance complete,
-2026-07-16.
+Status: V0 artifact contract, document-encoding guidance, deterministic CLI
+acceptance protocol, and the TypeScript, Effect 4, Node, and npm implementation
+direction complete; remaining CLI contract decisions, a bounded stack spike,
+and acceptance fixtures are next, 2026-07-16.
 
 This file records confirmed design decisions, their evidence, and the remaining
 implementation sequence. The [project proposal](docs/project-proposal.md)
 defines the product boundary.
 
-The current next slice is CLI acceptance fixtures for discovery, validation,
-and atomic creation. The reference implementation begins only after those
-user-visible scenarios fix the command contract.
+The current next slice resolves the invalid-snapshot result, unnamed example
+output, portable guide targets, command help, duplicate JSON members, and the
+numeric `unit.scale` bound. It also confirms the npm identity and proves the
+Effect CLI adapter, opt-in Effect logging, package, schema validator, asset,
+and exact-arithmetic boundaries in an isolated spike. Deterministic acceptance
+fixtures beginning with `fs validate` follow before production implementation.
 
 ## V0: Standalone Financial-Statement Document
 
@@ -172,9 +177,56 @@ Confirmed direction:
 ## Reference Tooling
 
 The [CLI design](docs/cli.md) fixes command scenarios and safety properties
-upfront. Schema-dependent result fields, application identities, snapshot
-contents, and presentation semantics are now fixed by the artifact contract.
-Implementation should proceed as a thin vertical slice.
+upfront. The [CLI acceptance contract](docs/cli-acceptance.md) now fixes the
+language-neutral process-fixture protocol, result boundary, standard streams,
+exit codes, and filesystem effects. Schema-dependent result fields,
+application identities, snapshot contents, and presentation semantics remain
+fixed by the artifact contract. The detailed
+[V0 CLI delivery plan](docs/plans/cli-v0.md) records the selected runtime and
+distribution, phase gates, validation strategy, and current implementation
+handoff.
+
+Confirmed CLI acceptance direction:
+
+- The reference CLI uses TypeScript on supported Node.js LTS lines beginning
+  with Node 22 and is distributed as one npm package with executable name `fs`.
+  A pinned `npx -y` command is the zero-global-install path used by generated
+  Agent Skill guidance.
+- Effect 4 is the application runtime, `effect/unstable/cli` owns typed command
+  definitions and dispatch, and `@effect/platform-node` supplies Node services.
+  Coordinated Effect packages are pinned exactly while V4 remains prerelease
+  and are upgraded only through the complete stack and acceptance suite.
+- A public-API adapter around Effect CLI owns help rendering, maps `CliError`
+  values to stable FS errors, buffers process output, and prevents framework
+  help, raw causes, or stack traces from escaping the accepted stream contract.
+- Effect logging records structured decision events. It is disabled by default;
+  explicit `--log-level` values emit deterministic JSON Lines to standard
+  error without changing standard output, exit status, or filesystem effects.
+- pnpm will be pinned for repository development only. It is not a user
+  prerequisite, and Bun remains an optional compatibility or future
+  binary-distribution path.
+- Fixtures execute a local process in a hermetic workspace and make exact,
+  deterministic assertions; they are not AI evaluations.
+- Existing FS documents, validation results, and snapshot diffs are referenced
+  rather than duplicated as a second semantic test matrix.
+- JSON is the default V0 result and error encoding. Schemas and examples remain
+  exact JSON payloads, while authoring guidance remains maintained Markdown.
+- `fs validate` wraps the existing validation and snapshot-diff objects without
+  adding timestamps, validator identity, or redundant input metadata.
+- Structured errors use standard output. Standard error is empty unless
+  diagnostic logging is explicitly enabled, and exit codes distinguish
+  success, operational or structural failure, and invalid usage.
+- All cases assert filesystem postconditions. `fs create` preserves candidate
+  bytes, never overwrites, and gives an existing destination precedence over
+  candidate validation.
+- An incremental validator must remain internal or fail closed until semantic
+  checks prevent schema-valid but semantically invalid documents from being
+  reported as conforming.
+
+The current CLI planning documentation passes repository Markdown lint; all
+new local links resolve, and every embedded JSON example parses. The next
+action is to close the remaining contracts, run the bounded Effect 4/npm
+spike, and then add the `fs validate` fixture manifest and cases.
 
 Release sequence:
 
@@ -183,26 +235,44 @@ Release sequence:
    snapshot-diff fixtures.
 3. [x] Publish concise guidance for encoding an author-resolved model, including
    refusal to infer missing financial decisions.
-4. Fix CLI acceptance scenarios for no-argument discovery, `guide`, `schema`,
-   `example`, `validate`, and `create`, including standard input, output safety,
-   structured errors, exit codes, and result encodings.
-5. Provide `fs validate` with structured conformance and calculation results,
-   including differences between stored and expected fact values. When its
-   input contains a recorded snapshot, recompute and diff against it; otherwise
-   report that no snapshot is recorded.
-6. Provide read-only contract discovery through concise no-argument output,
+4. [x] Define the deterministic CLI fixture protocol and shared result, error,
+   channel, exit-code, and filesystem contracts.
+5. Close the remaining CLI and numeric-portability decisions, confirm the npm
+   package identity, and prove Effect 4 CLI adaptation, structured Effect
+   logging, npm package execution, strict lossless JSON parsing, Draft 2020-12
+   validation, exact assets, and exact decimal arithmetic in an isolated
+   spike.
+6. Add CLI acceptance fixtures, starting with `fs validate`, then no-argument
+   discovery, `guide`, `schema`, `example`, and `create`. Reuse the existing FS
+   documents and expected results for path and standard-input cases. Before
+   adding the affected cases, resolve the fixture-blocking decisions in
+   the [CLI acceptance contract](docs/cli-acceptance.md): invalid embedded
+   snapshots, unnamed example output, portable generated guidance, command
+   help, duplicate JSON member handling, and the numeric `unit.scale` bound.
+   Follow the detailed
+   [V0 CLI delivery plan](docs/plans/cli-v0.md).
+7. Build the thin `fs validate` path for argument handling, input reading, JSON
+   parsing, and JSON Schema conformance. Do not expose partial validation as a
+   full conformance result.
+8. Complete `fs validate` with semantic conformance, exact calculations, and
+   snapshot diffs, including differences between stored and expected fact
+   values. When its input contains a recorded snapshot, recompute and diff
+   against it; otherwise report that no snapshot is recorded.
+9. Provide read-only contract discovery through concise no-argument output,
    `fs guide authoring`, `fs schema`, and `fs example`.
-7. Provide `fs create <candidate|-> --output <document>` as an atomic validated
+10. Provide `fs create <candidate|-> --output <document>` as an atomic validated
    write. It accepts only complete candidates, never overwrites, writes only
-   structurally conforming documents, and never changes financial meaning.
-8. Ship an installable Agent Skill generated or checked from the maintained
-   authoring guidance and non-interactive CLI examples.
-9. Provide `fs record-validation <document|-> --output <new-document>` to
+   structurally conforming documents, preserves candidate bytes, and never
+   changes financial meaning.
+11. Ship an installable Agent Skill generated or checked from the maintained
+    authoring guidance. Render its non-interactive commands with the pinned npm
+    package version so a global `fs` installation is unnecessary.
+12. Provide `fs record-validation <document|-> --output <new-document>` to
    write a new ordinary `fs` document containing the current snapshot at the
    exact path requested by the author. The command never modifies its input
    and fails if the output path already exists.
-10. Provide `fs render` for a simple standalone HTML presentation.
-11. Replace placeholder schema identifiers with immutable public versioned
+13. Provide `fs render` for a simple standalone HTML presentation.
+14. Replace placeholder schema identifiers with immutable public versioned
     URLs and resolve whether V0 permits an optional top-level `$schema` pointer.
 
 A compact result encoding such as TOON may be provided for agent-facing CLI

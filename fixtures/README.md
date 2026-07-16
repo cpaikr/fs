@@ -1,5 +1,10 @@
 # Language-neutral fixtures
 
+These fixtures define artifact and validator semantics. Deterministic CLI
+process fixtures will live under `cli/` and follow the
+[CLI acceptance contract](../docs/cli-acceptance.md). They reference the inputs
+and expected results here instead of duplicating this semantic matrix.
+
 [`manifest.json`](manifest.json) is the fixture index. `document` paths are
 relative to this directory. It separates failures enforced directly by JSON
 Schema from normative semantic failures that require reference resolution,

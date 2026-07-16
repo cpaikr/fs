@@ -1,7 +1,9 @@
 # CLI Design
 
-Status: agent-first command contracts defined; implementation and acceptance
-fixtures are pending.
+Status: core agent-first command contracts, deterministic acceptance protocol,
+and the TypeScript, Effect 4, Node, and npm implementation direction defined;
+remaining contract decisions, acceptance fixtures, and implementation are
+pending.
 
 ## Design Boundary
 
@@ -20,12 +22,113 @@ The [semantic specification](semantic-spec.md),
 [schemas](../schema/), and [fixtures](../fixtures/) fix the artifact-dependent
 result fields, calculation identities, snapshot contents, and presentation
 semantics. The [authoring guide](authoring.md) owns the document-encoding
-workflow.
+workflow. The [CLI acceptance contract](cli-acceptance.md) fixes invocation,
+result encoding, standard streams, exit codes, and filesystem effects.
 
 Canonical FS documents, schemas, and examples remain JSON. CLI result encoding
-is a separate output boundary and must always have a lossless JSON form. A
-compact agent-oriented encoding such as TOON may also be provided after its
-supported specification version and exact output contract are pinned.
+is a separate output boundary. JSON is the default V0 result and error
+encoding, and `fs validate --format json` selects it explicitly. A compact
+agent-oriented encoding such as TOON may be added only after its supported
+specification version and exact acceptance contract are pinned.
+
+## Runtime and Distribution
+
+Implement the reference CLI in strict TypeScript for supported Node.js LTS
+lines beginning with Node 22. Use Effect 4 as the application runtime,
+`effect/unstable/cli` for typed command definitions and dispatch, and
+`@effect/platform-node` for Node services. Publish one standard npm package,
+provisionally `@cpaikr/fs`, with the executable name `fs`. The primary
+zero-global-install form is:
+
+```sh
+npx -y @cpaikr/fs@<version> <command>
+```
+
+Global npm installation remains optional. pnpm will be pinned as the repository
+package manager, not a user prerequisite. Bun is neither a required runtime nor
+a separate implementation; `bunx` compatibility and compiled executables may
+be evaluated later as additive distribution options.
+
+Pin the coordinated Effect 4 packages to exact versions while V4 remains
+prerelease. Do not mix Effect family versions or use the stable Effect 3
+`@effect/cli` package. Upgrade Effect only through a deliberate dependency
+change that reruns the complete unit, process, package, and cross-platform
+suite.
+
+Effect CLI owns tokenization, subcommand selection, argument and flag parsing,
+and the command help model. `Command.runWith` is the Phase 0 runner candidate.
+A narrow adapter built only from public Effect CLI and console APIs owns the
+process contract. It buffers framework output, renders exact Markdown help,
+maps `CliError` values to stable FS error objects, and converts every command
+into one final stdout payload and exit code. Raw Effect causes, default help,
+dependency output, and runtime stack traces must not reach the process streams.
+
+Use strict `tsc` checking and evaluate a bundled ESM entry point in the Phase 0
+spike because cold `npx` installation is a product requirement. Schemas,
+examples, and generated guidance remain exact package files outside the
+JavaScript bundle and come from one owned asset boundary.
+
+This choice optimizes one-command, zero-global-install use for people and
+agents that already have a supported Node/npm installation. It does not remove
+the Node runtime prerequisite. If release evidence shows that prerequisite is
+a material adoption barrier, add signed standalone executables as another
+distribution form without changing the CLI contract or maintaining a second
+implementation.
+
+Package choice does not change the process contract. Acceptance fixtures invoke
+the staged `fs` executable directly, and an installed package invokes the same
+entry point with the same stdout, stderr, and exit-code behavior. Package-manager
+download and cache effects are outside the child CLI process contract and are
+tested separately. Schemas, examples, and generated guidance are published as
+exact package assets and remain usable offline after installation.
+
+Effect Schema may model internal command results and tagged errors, but the
+published JSON Schemas and semantic specification remain authoritative for FS
+documents. Ajv still validates those bundled Draft 2020-12 schemas; adopting
+Effect must not create a second document contract.
+
+## Global Flags
+
+Every command path supports:
+
+- `--help` and its `-h` alias, which write the exact accepted Markdown help to
+  standard output and exit `0`; and
+- `--log-level <all|trace|debug|info|warn|warning|error|fatal|none>`, which
+  enables Effect logging at the requested threshold. `warning` is an alias for
+  `warn`, and omitting the flag is equivalent to `none`.
+
+Effect CLI's current `Command.runWith` runner includes help, version,
+completions, and log-level built-ins. The FS contract exposes only help and
+log-level. The process adapter must reject version and completions in their
+global scopes without rejecting the command-local schema `--version` flag.
+Wizard mode, prompts, and any other framework surface are also outside V0. The
+Phase 0 spike must prove this boundary using public APIs without duplicating
+Effect CLI parsing; otherwise the runner integration must be revised before
+fixtures or production code proceed.
+
+Use Effect's logging APIs and log annotations at meaningful decision points,
+including command dispatch, input selection, decode and validation outcomes,
+snapshot comparison, and output preflight and commit. A custom Effect logger
+emits one canonical JSON object per line to standard error when logging is
+enabled. Entries contain level, event, and operation fields plus only the
+bounded context needed to diagnose the decision. They omit wall-clock time,
+fiber identifiers, spans, document contents, raw dependency errors, and stack
+traces. The record schema, thresholds, and redaction rules are stable; one
+canonical smoke transcript is exact, while other logging tests make structural
+assertions so internal event sequencing can evolve.
+
+Application modules do not call the global `console` directly. Final result
+output goes through the process adapter, and every diagnostic event goes
+through Effect logging and the custom logger sink.
+
+Logging is silent by default and never writes to standard output. Enabling it
+must not change the command result, exit code, ordering, or filesystem effects.
+Help and usage-error paths do not emit diagnostic logs.
+
+The top-level Effect is converted to an owned process outcome before execution.
+The Node runtime disables its default error reporting, and any unexpected defect
+becomes a bounded `internal-error` result with exit code `1`; no pretty cause or
+stack trace may bypass the adapter.
 
 ## Command Surface
 
@@ -34,7 +137,7 @@ supported specification version and exact output contract are pinned.
 With no arguments, report concise machine-readable discovery rather than a
 full manual. The result identifies:
 
-- the resolved executable path and one-sentence purpose;
+- the stable executable name, npm package identity, and one-sentence purpose;
 - supported FS artifact versions and canonical serialization;
 - available commands and whether each command reads or writes; and
 - complete next commands for authoring guidance, schema discovery, examples,
@@ -49,6 +152,8 @@ Present the encoding prerequisites, artifact workflow, refusal to infer missing
 financial decisions, and validation loop from the
 [authoring guide](authoring.md). The command and installable Agent Skill must be
 generated or checked from the same source so their instructions cannot drift.
+The command writes that maintained guidance as Markdown rather than escaping it
+inside a result object.
 
 The guide routes to the schema, examples, and deeper semantic references; it
 does not embed the complete schema or fixture suite in default agent context.
@@ -60,20 +165,23 @@ Return an exact bundled JSON Schema. V0 schema names are `document`,
 that is the only supported artifact version.
 
 Without `--output`, the schema itself is written to standard output as JSON.
-With `--output`, the CLI writes exactly the requested path, reports the result
-on standard output, and fails rather than overwriting an existing file.
+That direct payload preserves the exact bundled bytes. With `--output`, the CLI
+writes those bytes to exactly the requested path, reports file creation as a
+structured result on standard output, and fails rather than overwriting an
+existing file.
 
 ### `fs example [<name>] [--output <path>]`
 
 With no name, list the bundled examples with their purpose and expected
-calculation status. With a name, return that exact example as JSON or write it
-to the requested new path.
+calculation status. With a name and no output path, return that exact bundled
+JSON on standard output. With a name and an output path, write the exact
+bundled bytes and report file creation as a structured result.
 
 Examples contain illustrative facts and are not partially completed documents
 or prescribed statement templates. In particular, `manufacturing-group` is
 structurally conforming but intentionally calculation-inconsistent.
 
-### `fs validate <document|-> [--format <format>]`
+### `fs validate <document|-> [--format json]`
 
 Read a path or standard input (`-`) without modifying it and report:
 
@@ -89,10 +197,20 @@ turn a structurally conforming document into a structurally invalid one.
 Structural nonconformance produces calculation status `not-run` because facts
 and rule references are not reliable enough to evaluate.
 
-When no validation snapshot is present, the command says so explicitly and
-suggests a complete `fs record-validation` command. When a snapshot is
-present, it reports either an exact match or a deterministic diff. It never
+When no validation snapshot is present, the command says so explicitly. If the
+document is structurally conforming, it suggests a complete
+`fs record-validation` command template. Structural nonconformance does not
+suggest an operation that must refuse to write. When a snapshot is present,
+validation reports either an exact match or a deterministic diff. It never
 discovers snapshots through filenames or neighboring files.
+
+Standard output is a minimal object containing `validation`, `snapshotDiff`,
+and `help`. The result values preserve the existing language-neutral objects
+exactly when the embedded snapshot is comparable. The structurally invalid
+snapshot case remains an explicit pre-fixture decision in the
+[acceptance contract](cli-acceptance.md). Parsing, usage, and operational
+failures use a structured error object instead; structural nonconformance
+remains a validation result.
 
 ### `fs create <candidate|-> --output <document>`
 
@@ -105,12 +223,16 @@ command:
 - writes only a structurally conforming FS document;
 - may write a calculation-inconsistent document because it remains
   structurally consumable;
-- never modifies the candidate or overwrites an existing output; and
+- never modifies the candidate or overwrites an existing output;
+- preserves the candidate bytes exactly rather than reserializing or
+  normalizing them; and
 - never coerces decimals, infers facts, fills totals, changes values, or
   performs financial repairs.
 
 Its structured result includes the same current validation information as
-`fs validate` and identifies the output path when a document is written.
+`fs validate` and identifies whether the requested output path was created.
+An existing destination is rejected before candidate validation and is also
+protected at the atomic commit boundary.
 
 ### `fs record-validation <document|-> --output <new-document>`
 
@@ -159,15 +281,17 @@ with validated, non-overwriting output over a sequence of stateful commands.
 - All document-reading commands accept a path or standard input where shown.
 - Unknown arguments and flags are rejected rather than ignored.
 - Structured results, errors, and actionable corrections are written to
-  standard output; progress and debug diagnostics go to standard error.
+  standard output. Opt-in Effect diagnostic logs go to standard error.
+- Standard error is empty when `--log-level` is omitted or `none`. Enabled
+  logging is deterministic JSON Lines and never includes progress text.
 - Structural errors use stable codes and JSON Pointer paths.
 - Errors identify the failed operation and suggest a concrete correction
   without exposing internal stack traces or dependency output.
 - Result ordering is deterministic so outputs and snapshots can be diffed.
 - Commands that write files require an explicit output path, write atomically,
   and never overwrite.
-- Artifact, schema, and example payloads are JSON. Results and errors support
-  an explicit lossless JSON encoding even if a compact default is added.
+- Artifact, schema, and example payloads are JSON. Structured V0 results and
+  errors default to JSON; unsupported formats are usage errors.
 - Default output is concise but definitive about empty or absent states and
   includes only next commands relevant to the result.
 
@@ -191,20 +315,31 @@ Ship an on-demand Agent Skill for FS authoring. It should teach the authoring
 contract for an already-resolved financial model, identify missing prerequisite
 inputs without supplying them, invoke the reference validator, and route
 structured diagnostics back into an encoding repair loop. Static skill
-guidance and `fs guide authoring` share one maintained source.
+guidance and `fs guide authoring` share one maintained source. The installed CLI
+guide renders commands with `fs`; the generated Skill pins the released npm
+package and renders commands as `npx -y @cpaikr/fs@<version> ...` so it does not
+assume a global installation.
 
 ## Implementation Order
 
-1. Add acceptance fixtures for no-argument discovery, `guide`, `schema`,
-   `example`, `validate`, and `create`, including standard input, output safety,
-   exit codes, errors, and result encodings.
-2. Build a thin `validate` path for parsing and JSON Schema conformance.
-3. Add every semantic conformance check, exact calculation evaluation, and
+The detailed phase gates and implementation handoff are maintained in the
+[V0 CLI delivery plan](plans/cli-v0.md).
+
+1. Close the remaining observable contracts and prove the Effect CLI adapter,
+   structured logging, selected npm package, strict JSON, Draft 2020-12, exact
+   arithmetic, and asset boundaries in an isolated TypeScript spike.
+2. Add deterministic acceptance fixtures using the
+   [acceptance protocol](cli-acceptance.md), starting with `validate`, then
+   no-argument discovery, `guide`, `schema`, `example`, and `create`.
+3. Build a thin `validate` path for argument handling, input reading, parsing,
+   and JSON Schema conformance without claiming full conformance for documents
+   that have not passed semantic validation.
+4. Add every semantic conformance check, exact calculation evaluation, and
    snapshot diff required by the language-neutral fixtures.
-4. Add the read-only discovery commands: no-argument output, `guide`, `schema`,
+5. Add the read-only discovery commands: no-argument output, `guide`, `schema`,
    and `example`.
-5. Add `create` as an atomic validated write over the complete validator.
-6. Generate or verify the installable Agent Skill from the maintained
+6. Add `create` as an atomic validated write over the complete validator.
+7. Generate or verify the installable Agent Skill from the maintained
    authoring guidance and command examples.
-7. Add snapshot recording only after result identities are stable.
-8. Add rendering over the proven flat statement model.
+8. Add snapshot recording only after result identities are stable.
+9. Add rendering over the proven flat statement model.
