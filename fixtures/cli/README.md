@@ -147,6 +147,16 @@ without adding a duplicate calculation-result fixture.
 - Missing parent and overwrite refusal: `schema-output-missing-parent`,
   `schema-output-exists`.
 
+### Examples
+
+- Exact ordered listing and named payloads: `example-list`, `example-minimal`,
+  `example-manufacturing-group`.
+- Exact new-file creation: `example-output-create`.
+- Output without a selected name and unknown selection:
+  `example-missing-name-for-output`, `example-unknown-name`.
+- Missing parent and overwrite refusal: `example-output-missing-parent`,
+  `example-output-exists`.
+
 Instrumented Phase 2 tests retain input-read/write-call invariance and the
 complete threshold matrix; process fixtures fix the observable representative
 seams.

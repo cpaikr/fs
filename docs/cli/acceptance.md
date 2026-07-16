@@ -358,6 +358,10 @@ After validation, add cases in this order:
    unnamed-output behavior, output creation, unknown name, missing parent, and
    overwrite refusal.
 
+The list form does not accept `--output`. Supplying `--output` without an
+example name is a `missing-argument` usage error, exits `2`, and does not touch
+the requested path.
+
 ### `fs create`
 
 Cover valid path and standard-input creation, calculation-inconsistent

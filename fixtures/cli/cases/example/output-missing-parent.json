@@ -1,0 +1,29 @@
+{
+  "id": "example-output-missing-parent",
+  "command": "fs",
+  "arguments": ["example", "minimal", "--output", "missing/minimal.json"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "example" },
+        { "pointer": "/error/code", "equals": "output-parent-not-found" },
+        { "pointer": "/error/path", "equals": "missing/minimal.json" },
+        { "pointer": "/help", "equals": ["fs example minimal --output <new-path>"] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": ["missing/minimal.json"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

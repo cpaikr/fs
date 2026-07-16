@@ -1,0 +1,32 @@
+{
+  "id": "example-list",
+  "command": "fs",
+  "arguments": ["example"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["examples", "help"] }
+      ],
+      "equalities": [
+        {
+          "pointer": "/examples",
+          "equalsFile": { "file": "expected/examples.json", "pointer": "/examples" }
+        },
+        {
+          "pointer": "/help",
+          "equalsFile": { "file": "expected/examples.json", "pointer": "/help" }
+        }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

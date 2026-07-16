@@ -1,0 +1,18 @@
+{
+  "examples": [
+    {
+      "name": "minimal",
+      "purpose": "Smallest complete document with no calculation rules.",
+      "calculationStatus": "not-defined"
+    },
+    {
+      "name": "manufacturing-group",
+      "purpose": "Representative multi-statement document with a deliberate calculation inconsistency.",
+      "calculationStatus": "inconsistent"
+    }
+  ],
+  "help": [
+    "fs example minimal",
+    "fs example manufacturing-group"
+  ]
+}

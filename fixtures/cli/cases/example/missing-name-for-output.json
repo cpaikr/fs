@@ -1,0 +1,33 @@
+{
+  "id": "example-missing-name-for-output",
+  "command": "fs",
+  "arguments": ["example", "--output", "result.json"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "result.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "example" },
+        { "pointer": "/error/code", "equals": "missing-argument" },
+        {
+          "pointer": "/help",
+          "equals": ["fs example <minimal|manufacturing-group> --output result.json"]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["result.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}
