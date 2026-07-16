@@ -1,0 +1,34 @@
+{
+  "id": "validate-trailing-content",
+  "command": "fs",
+  "arguments": ["validate", "input.json"],
+  "workspace": [
+    { "copy": "../raw-input/trailing-content.json.txt", "to": "input.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        {
+          "pointer": "/error",
+          "equals": ["operation", "code", "message", "path"]
+        }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "validate" },
+        { "pointer": "/error/code", "equals": "invalid-json" },
+        { "pointer": "/error/path", "equals": "input.json" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["input.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

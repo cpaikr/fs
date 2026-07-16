@@ -89,3 +89,14 @@ item is encoded and this guide maps each required clause to case identifiers.
 Each structural case composes its stable diagnostic code/path from the artifact
 manifest, requires a nonempty message, and fixes calculations as `not-run`
 without adding a duplicate calculation-result fixture.
+
+### Validation process failures and usage
+
+- Invalid JSON classes: `validate-malformed-json`,
+  `validate-trailing-content`, `validate-duplicate-members`.
+- Missing input: `validate-missing-path`.
+- Missing/extra operands: `validate-missing-argument`,
+  `validate-extra-argument`.
+- Unknown flag and format: `validate-unknown-flag`,
+  `validate-unsupported-format`.
+- Grammar before input I/O: `validate-usage-precedence`.

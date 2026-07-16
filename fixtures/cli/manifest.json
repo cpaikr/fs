@@ -3,13 +3,22 @@
   "cases": [
     "cases/validate/all-rules-skipped.json",
     "cases/validate/calculation-inconsistent.json",
+    "cases/validate/duplicate-members.json",
+    "cases/validate/extra-argument.json",
     "cases/validate/invalid-snapshot.json",
+    "cases/validate/malformed-json.json",
+    "cases/validate/missing-argument.json",
+    "cases/validate/missing-path.json",
     "cases/validate/path-no-rules.json",
     "cases/validate/schema-failure.json",
     "cases/validate/semantic-failure.json",
     "cases/validate/snapshot-match.json",
     "cases/validate/snapshot-mismatch.json",
     "cases/validate/stdin-no-rules.json",
-    "cases/validate/unsafe-scale.json"
+    "cases/validate/trailing-content.json",
+    "cases/validate/unknown-flag.json",
+    "cases/validate/unsafe-scale.json",
+    "cases/validate/unsupported-format.json",
+    "cases/validate/usage-precedence.json"
   ]
 }

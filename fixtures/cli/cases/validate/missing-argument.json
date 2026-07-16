@@ -1,0 +1,31 @@
+{
+  "id": "validate-missing-argument",
+  "command": "fs",
+  "arguments": ["validate"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "validate" },
+        { "pointer": "/error/code", "equals": "missing-argument" },
+        {
+          "pointer": "/help",
+          "equals": ["fs validate <existing-document> --format json"]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

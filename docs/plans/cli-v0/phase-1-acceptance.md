@@ -22,7 +22,7 @@ than a second prose definition.
 
 ## Required Behavior Matrix
 
-- [ ] Cover `validate` by path and standard input, every aggregate status,
+- [x] Cover `validate` by path and standard input, every aggregate status,
   snapshot match and mismatch, structural failures, invalid snapshots,
   malformed input, trailing content, duplicate members, unsafe scale, missing
   input, and usage.
@@ -71,5 +71,7 @@ successful validation cases now cover path and standard input, every
 conforming calculation aggregate status, and snapshot not-recorded, match, and
 mismatch. Four composed structural cases cover schema and semantic failures,
 an invalid embedded snapshot, and unsafe scale without duplicating artifact
-results. Parsing, operational failure, usage, and other behavior families
-remain unencoded.
+results. Nine process-boundary cases cover malformed syntax, trailing content,
+duplicate members, missing input, missing/extra operands, unknown flags,
+unsupported format, and usage precedence. Other command families remain
+unencoded.
