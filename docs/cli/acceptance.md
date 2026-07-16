@@ -1,10 +1,5 @@
 # CLI Acceptance Contract
 
-Status: deterministic V0 fixture protocol, six command, parsing, and
-portability decisions, public npm identity, and the TypeScript, Effect 4, Node,
-and npm implementation direction defined; fixture manifests and cases are
-pending.
-
 ## Purpose
 
 CLI acceptance fixtures fix the observable process contract of the reference
@@ -12,10 +7,10 @@ CLI acceptance fixtures fix the observable process contract of the reference
 standard streams, exit code, and filesystem effects. They do not invoke an AI
 model, score prose, or make fuzzy judgments.
 
-The existing [language-neutral fixtures](../fixtures/) remain the source of
-truth for document conformance, calculation results, and validation snapshot
-diffs. CLI fixtures reference those documents and results rather than copying
-their semantic test matrix. The planned location is `fixtures/cli/`.
+The [semantic specification](../semantic-spec.md) defines artifact behavior.
+Existing [language-neutral fixtures](../../fixtures/) provide authoritative
+expected artifact results. CLI cases reuse them instead of copying their
+semantic matrix. The planned location is `fixtures/cli/`.
 
 ## Fixture Protocol
 
@@ -108,7 +103,7 @@ CLI behavior.
 JSON is the default V0 encoding for structured CLI results and errors. For
 `fs validate`, `--format json` selects the same encoding explicitly and any
 other value is a usage error with exit code `2`. Other commands accept only the
-flags shown in the [CLI design](cli.md). A compact encoding such as TOON is
+flags shown in the [CLI design](design.md). A compact encoding such as TOON is
 future, additive work that requires a pinned specification version and its own
 acceptance cases.
 
@@ -132,12 +127,11 @@ flag is equivalent to `none`, and `warning` is an alias for `warn`. An invalid
 value is a usage error with exit code `2`, structured standard output, and
 empty standard error.
 
-The implementation uses Effect logging with machine-readable event names and log
-annotations. When enabled, a custom Effect logger writes one canonical JSON
-object plus LF per event to standard error. Each object contains `level`,
-`event`, `operation`, and only allowlisted bounded context. JSON member order is
-canonical. Entries omit wall-clock timestamps, fiber identifiers, spans,
-document contents, raw dependency messages, causes, and stack traces.
+When enabled, the logger writes one canonical JSON object plus LF per event to
+standard error. Each object contains `level`, `event`, `operation`, and only
+allowlisted bounded context. JSON member order is canonical. Entries omit
+wall-clock timestamps, runtime identifiers, spans, document contents, raw
+dependency messages, causes, and stack traces.
 
 The log record shape, levels, threshold behavior, and redaction rules are the
 stable V0 contract. Individual event catalogs and unrelated event order are
@@ -145,18 +139,13 @@ internal observability details. One canonical validation smoke case compares an
 exact ordered transcript; other logging cases parse JSON Lines and make
 structural assertions only over the events relevant to that behavior.
 
-Application code does not write diagnostic messages through the global
-`console` or a second logging library. Only the final process adapter may emit
-accepted result output, and only the Effect logger sink may emit diagnostic
-standard error.
-
-The requested threshold filters events using Effect log levels. Help and usage
-errors do not emit diagnostic events. Logging may observe command decisions but
-must not change the command result, standard output, exit code, or final
-filesystem effects. Instrumented boundary tests separately prove that logging
-does not change input reads or write ordering; black-box process fixtures cannot
-observe those calls. The ordinary fixture matrix runs without logging so its
-exact standard error remains the empty string.
+The requested threshold filters events by level. Help and usage errors do not
+emit diagnostic events. Logging may observe command decisions but must not
+change the command result, standard output, exit code, or final filesystem
+effects. Instrumented boundary tests separately prove that logging does not
+change input reads or write ordering; black-box process fixtures cannot observe
+those calls. The ordinary fixture matrix runs without logging, so its exact
+standard error remains empty.
 
 ### Validation results
 
@@ -171,9 +160,9 @@ Successful validation and structural nonconformance use one minimal envelope:
 ```
 
 `validation` is exactly the applicable
-[`validation-result`](../schema/validation-result.schema.json) value.
+[`validation-result`](../../schema/validation-result.schema.json) value.
 `snapshotDiff` is exactly the applicable
-[`snapshot-diff`](../schema/snapshot-diff.schema.json) value. The envelope does
+[`snapshot-diff`](../../schema/snapshot-diff.schema.json) value. The envelope does
 not repeat the command, input path, working directory, validator identity, or
 time. The case where the embedded snapshot itself is structurally unusable is
 represented by `not-comparable` with reason `invalid-snapshot`.
@@ -218,6 +207,10 @@ include `missing-argument`, `unexpected-argument`, `unknown-command`,
 and `unsupported-format`. Stable operational codes include `input-not-found`,
 `input-unreadable`, `invalid-json`, `output-exists`,
 `output-parent-not-found`, `write-failed`, and `internal-error`.
+
+Malformed syntax, trailing content, and duplicate object members all produce
+`invalid-json` before JSON Schema validation. Duplicate members are never
+resolved with first-value-wins or last-value-wins behavior.
 
 An unexpected implementation defect is translated at the outermost process
 boundary to `internal-error`, exit code `1`, and a bounded generic message. The
@@ -324,8 +317,8 @@ Every validation case asserts an unchanged workspace and no created path.
 
 Add exact cases for top-level and per-command `--help` and representative `-h`
 aliases; the accepted Markdown lists both help spellings and `--log-level` but
-does not expose Effect's wizard, completions, version, or other unaccepted
-built-ins. Add logging cases that prove:
+does not expose wizard, completions, version, or other unaccepted built-ins.
+Add logging cases that prove:
 
 - omitted and explicit `none` logging produce identical standard output and
   empty standard error;
@@ -335,7 +328,7 @@ built-ins. Add logging cases that prove:
   context; and
 - an unknown log level fails as usage and leaves the workspace unchanged.
 
-Instrument the Effect services in integration tests to prove that omitted,
+Instrument the I/O boundaries in integration tests to prove that omitted,
 `none`, and enabled logging preserve the same input-read and write-call order,
 and that invalid global flags invoke neither boundary.
 
@@ -343,8 +336,8 @@ Add explicit rejection cases for global `--version`, `-v`, and `--completions`,
 plus a success case proving that
 `fs schema <name> --version <artifact-version>` still selects the command-local
 schema version flag. This also locks a documented positional-then-flag
-invocation so an Effect CLI prerelease upgrade cannot silently narrow the
-accepted grammar.
+invocation so a dependency upgrade cannot silently narrow the accepted
+grammar.
 
 ### Discovery and read-only content
 
@@ -371,45 +364,6 @@ creation, malformed input, schema and semantic structural refusal, missing
 the combined invalid-input/existing-output precedence case. Successful output
 must be byte-for-byte equal to the candidate.
 
-## Confirmed Contract Decisions
-
-These decisions govern the remaining schema, fixture, generated-asset, and
-reference CLI work:
-
-1. **Structurally invalid embedded snapshot.**
-   [`duplicate-snapshot-application-key.json`](../fixtures/invalid/duplicate-snapshot-application-key.json)
-   is a nonconforming document whose attempted snapshot cannot produce a valid
-   `match`, `mismatch`, or `not-recorded` result. It produces the
-   language-neutral snapshot-diff status `not-comparable` with stable reason
-   `invalid-snapshot`. Reinterpreting the case as `not-recorded` would hide a
-   present but unusable snapshot.
-2. **Unnamed example output.** A grammar with an optional example name would
-   permit `fs example --output <path>` syntactically even though no single
-   example is selected. Reject it as a usage error with exit code `2`. The only
-   forms are `fs example` and `fs example <name> [--output <path>]`.
-3. **Portable guide payload.** The CLI and installable Agent Skill need one
-   maintained source whose generated links and commands work outside a
-   repository checkout. Generate two byte-stable targets: `fs guide authoring`
-   uses complete installed `fs` commands, while the Agent Skill uses pinned
-   `npx -y @cpai/fs@<version>` commands. Acceptance fixtures compare CLI output
-   byte-for-byte with the installed-CLI target; generation checks keep both
-   targets synchronized with the source.
-4. **Command help.** The command surface accepts `--help` and `-h`. Help is
-   concise Markdown on standard output with exit code `0` and empty standard
-   error. It lists required arguments, flags with defaults, and two or three
-   non-interactive examples. Exact acceptance cases cover the top level and
-   every subcommand, with representative alias equivalence.
-5. **Duplicate JSON members.** JSON parsers disagree about duplicate object
-   member names, and a last-value-wins decoder would silently change the input
-   data model. Reject duplicates as `invalid-json` before JSON Schema
-   validation and add a deterministic raw-input case outside the document
-   fixture manifest.
-6. **Numeric scale portability.** An unbounded JSON integer cannot always be
-   represented exactly by ordinary JavaScript JSON values. Constrain
-   `unit.scale` to the inclusive safe-integer range
-   `-9007199254740991` through `9007199254740991`; the schema and
-   language-neutral fixtures must cover the bounds before CLI cases are fixed.
-
 ## Implementation Gate
 
 These fixtures describe the final V0 contract even while implementation is
@@ -419,9 +373,7 @@ as a full validator while schema-valid documents can bypass semantic checks.
 
 Intermediate work either remains internal or fails closed after the checks it
 can perform. It must not label an arbitrary schema-valid document as
-`conforming`. The Effect CLI adapter must also fail closed until it can suppress
-framework output, translate every accepted `CliError`, convert unexpected
-defects to `internal-error`, and prevent raw runtime causes from reaching either
-stream with Node runtime error reporting disabled. Test selection may run the
-implemented deterministic subset, but pending cases remain visible and no
-temporary output shape becomes part of the acceptance contract.
+`conforming`. The process adapter must also fail closed until it can own every
+accepted output and translate unexpected defects to `internal-error` without
+leaking raw causes. Pending cases remain visible, and no temporary output shape
+becomes part of the acceptance contract.

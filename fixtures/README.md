@@ -1,43 +1,57 @@
-# Language-neutral fixtures
+# Language-Neutral Fixtures
 
-These fixtures define artifact and validator semantics. Deterministic CLI
-process fixtures will live under `cli/` and follow the
-[CLI acceptance contract](../docs/cli-acceptance.md). They reference the inputs
-and expected results here instead of duplicating this semantic matrix.
+These fixtures provide machine-readable evidence for the normative
+[semantic specification](../docs/semantic-spec.md). Future deterministic CLI
+process fixtures belong under `cli/` and follow the
+[CLI acceptance contract](../docs/cli/acceptance.md); they should reference the
+artifact inputs and results here instead of duplicating this matrix.
 
-[`manifest.json`](manifest.json) is the fixture index. `document` paths are
-relative to this directory. It separates failures enforced directly by JSON
-Schema from normative semantic failures that require reference resolution,
-exact coordinate comparison, or calendar logic.
+[`manifest.json`](manifest.json) is the fixture index. Its `document` paths are
+relative to this directory. It separates JSON Schema failures from semantic
+failures that require reference resolution, exact coordinate comparison, or
+calendar logic.
 
 A conforming validator must:
 
 1. accept every `validDocuments` entry structurally;
 2. derive its named `calculationStatus`;
-3. reject every `invalidDocuments` entry at the named validation layer, with
-   the stable `code` and JSON Pointer `path`; and
-4. compare its validation and snapshot results with the objects in
-   `calculation-results/` and `snapshot-diffs/`.
+3. reject every `invalidDocuments` entry at the named layer with the stable
+   `code` and JSON Pointer `path`; and
+4. match the named calculation and snapshot results.
 
-Expected-result pairings:
+## Expected Results
 
-| Input document | Calculation result | Snapshot diff |
-| --- | --- | --- |
-| `valid/no-calculation-rules.json` | `calculation-results/no-rules.json` | `snapshot-diffs/not-recorded.json` |
-| `valid/all-rules-skipped.json` | `calculation-results/all-skipped.json` | `snapshot-diffs/not-recorded.json` |
-| `valid/calculation-errors.json` | `calculation-results/required-fact-errors.json` | `snapshot-diffs/not-recorded.json` |
-| `valid/exact-arithmetic.json` | `calculation-results/exact-arithmetic.json` | `snapshot-diffs/not-recorded.json` |
-| `valid/recorded-snapshot.json` | `calculation-results/recorded-snapshot-current.json` | `snapshot-diffs/match.json` |
-| `valid/snapshot-mismatch-source.json` | `calculation-results/snapshot-mismatch-current.json` | `snapshot-diffs/mismatch.json` |
-| `../examples/manufacturing-group.json` | `calculation-results/manufacturing-group.json` | `snapshot-diffs/not-recorded.json` |
+- `valid/no-calculation-rules.json` maps to
+  `calculation-results/no-rules.json` and
+  `snapshot-diffs/not-recorded.json`.
+- `valid/all-rules-skipped.json` maps to
+  `calculation-results/all-skipped.json` and
+  `snapshot-diffs/not-recorded.json`.
+- `valid/calculation-errors.json` maps to
+  `calculation-results/required-fact-errors.json` and
+  `snapshot-diffs/not-recorded.json`.
+- `valid/exact-arithmetic.json` maps to
+  `calculation-results/exact-arithmetic.json` and
+  `snapshot-diffs/not-recorded.json`.
+- `valid/recorded-snapshot.json` maps to
+  `calculation-results/recorded-snapshot-current.json` and
+  `snapshot-diffs/match.json`.
+- `valid/snapshot-mismatch-source.json` maps to
+  `calculation-results/snapshot-mismatch-current.json` and
+  `snapshot-diffs/mismatch.json`.
+- `../examples/manufacturing-group.json` maps to
+  `calculation-results/manufacturing-group.json` and
+  `snapshot-diffs/not-recorded.json`.
 
-`invalid/unresolved-item.json` pairs with
+`invalid/unresolved-item.json` maps to
 `calculation-results/structural-nonconformance.json`. It proves that a
 nonconforming document receives calculation status `not-run`; validators do
 not attempt arithmetic against unreliable references.
 
-Schema validation can be run with any draft 2020-12 implementation. For
-example, without adding a project runtime or choosing a CLI language:
+## Shape Validation
+
+Run these commands from the repository root with any draft 2020-12
+implementation. For example:
 
 ```sh
 npx --yes ajv-cli@5 validate --spec=draft2020 \
@@ -46,7 +60,7 @@ npx --yes ajv-cli@5 validate --spec=draft2020 \
   -s schema/fs-document.schema.json -d 'fixtures/valid/*.json'
 ```
 
-Manifest entries whose layer is `schema` must fail that schema. The remaining
-invalid fixtures must pass JSON Schema first and then fail the named
-semantic invariant. This distinction prevents an implementation from hiding
-missing semantic validation behind a coincidental shape error.
+Manifest entries with layer `schema` must fail that schema. The remaining
+invalid fixtures must pass JSON Schema before failing their named semantic
+invariant. This distinction prevents an implementation from hiding missing
+semantic validation behind a coincidental shape error.

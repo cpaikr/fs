@@ -1,7 +1,5 @@
 # FS V0 Semantic Specification
 
-Status: normative V0 artifact contract, 2026-07-16.
-
 This specification defines the meaning of an FS document independently of any
 implementation language. The [JSON Schema](../schema/fs-document.schema.json)
 checks its JSON shape. Requirements in this document that concern uniqueness,

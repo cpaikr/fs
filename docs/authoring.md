@@ -1,8 +1,5 @@
 # Authoring FS Documents
 
-Status: current V0 authoring guidance; reference CLI commands are not yet
-implemented.
-
 This guide is the entry point for a person or agent encoding an already-resolved
 financial-statement model as an FS document. The
 [semantic specification](semantic-spec.md) remains normative. The
@@ -125,33 +122,14 @@ FS does not provide balance-sheet, income-statement, or industry templates
 because those would prescribe meanings and contents that remain
 author-controlled.
 
-## Reusable Agent Instruction
+## Agent Use
 
-The following instruction can accompany an author-resolved financial model:
+Agents should follow this guide directly rather than copy a second maintained
+prompt. They must stop when the prerequisite financial model is incomplete and
+must not claim full semantic conformance until the reference validator exists
+and has run.
 
-```text
-Encode the supplied, author-resolved financial model as one FS document with
-formatVersion "0.1". Use the FS semantic specification as normative, the
-document JSON Schema for shape, and minimal.json only as a structural example.
-
-Treat the supplied entity, scope, item meanings, units, scales, periods,
-dimensions, facts, presentations, and calculation rules as inputs. Do not
-extract, map, classify, aggregate, choose signs, infer relationships, or invent
-values. If any required input is missing, contradictory, or ambiguous, stop
-and identify exactly what the author must decide.
-
-Use stable document-local identifiers. Store supplied values as independent
-facts and statements as presentations over those facts. Distinguish zero,
-missing, and explicitly unavailable values. Never alter a value to satisfy a
-check or put provenance in the FS JSON.
-
-Run the full reference validator, repair only structural encoding errors that
-do not require a financial decision, and report calculation inconsistency
-separately. Deliver the FS JSON and its structured validation result.
-```
-
-An installable Agent Skill should teach this encoding workflow, recognize when
-the prerequisite financial model is incomplete, and invoke the same reference
-validator. It must not add extraction or mapping instructions. It should route
-to focused references rather than embedding the complete schema or fixture
-suite in agent context.
+The planned CLI guide and installable Agent Skill will be generated from one
+portable source derived from this workflow. They must not add extraction or
+mapping instructions and should route to focused references rather than embed
+the complete schema or fixture suite in default context.

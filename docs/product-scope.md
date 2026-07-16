@@ -1,8 +1,7 @@
-# Project Proposal
+# Product Scope
 
-Status: current product definition, 2026-07-16. `fs` is a working title. The
-[roadmap](../ROADMAP.md) records detailed decisions, evidence, and remaining
-implementation work.
+`fs` is a working title. The [roadmap](../ROADMAP.md) records strategic
+delivery milestones.
 
 ## Summary
 
@@ -51,7 +50,7 @@ write this same contract. They begin from author-resolved financial meanings
 and values; they do not define a conversion method or introduce semantics
 absent from the artifact specification.
 
-The [domain language](../CONTEXT.md) defines these terms precisely.
+The [domain glossary](glossary.md) defines these terms precisely.
 
 ## Non-Goals
 
@@ -94,7 +93,7 @@ Core validation and snapshot command scenarios were designed before the schema
 to expose required behavior. The examples and language-neutral fixtures now
 fix artifact-dependent result fields and identities. Document-encoding and
 contract-discovery commands project that completed model without adding new
-semantics. See the [CLI design](cli.md).
+semantics. See the [CLI design](cli/design.md).
 
 ## Success Criteria
 

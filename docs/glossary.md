@@ -1,7 +1,8 @@
-# Financial Statement Documents
+# Domain Glossary
 
-This context defines the language for representing financial statements as
-structured facts, presentations, and optional arithmetic checks.
+This glossary defines the canonical language for representing financial
+statements as structured facts, presentations, and optional arithmetic checks.
+The [semantic specification](semantic-spec.md) owns normative behavior.
 
 ## Artifact
 

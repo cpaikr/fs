@@ -1,34 +1,43 @@
-# V0 examples
+# V0 Examples
 
-The examples are conforming FS documents and are normative evidence for the
-[semantic specification](../docs/semantic-spec.md).
+These examples provide conformance evidence for the normative
+[semantic specification](../docs/semantic-spec.md). They demonstrate artifact
+behavior; they do not define statement contents or act as partially completed
+documents. See the [authoring guide](../docs/authoring.md) for the encoding
+workflow.
 
-They demonstrate artifact behavior rather than prescribe statement contents.
-They contain illustrative facts and must not be used as partially completed
-documents. See the [authoring guide](../docs/authoring.md) for the
-document-encoding workflow.
+## Files
 
-`minimal.json` proves that document, entity, and scope identifiers, dimensions,
-and calculation rules are optional. A document with no calculation rules has
-calculation status `not-defined`.
+- `minimal.json` proves that document, entity, and scope identifiers,
+  dimensions, and calculation rules are optional. Its calculation status is
+  `not-defined`.
+- `manufacturing-group.json` combines materially different presentations over
+  one entity rather than treating each statement as a separate artifact. It is
+  structurally conforming and deliberately calculation-inconsistent.
 
-`manufacturing-group.json` deliberately combines materially different views
-over one entity rather than treating each statement as a separate artifact:
+## Manufacturing Example Evidence
 
-| Required evidence | Location |
-| --- | --- |
-| Multi-period income, balance sheet, cash flow, manufacturing statements | `statements` |
-| Non-period equity axis | `changes-in-equity.dimensions` |
-| Passing and failing supplied subtotals | `gross-profit-subtotal` and `manufacturing-cost-subtotal` |
-| One fact in two statements | `net-income` in income and cash-flow presentations |
-| Two distinct facts expected to agree | `net-income-reconciliation` assertion |
-| Opening, movement, and closing balances | `cash-roll-forward` |
-| First period, consecutive periods, internal gap | `fy2023`, `fy2024`, `fy2028` |
-| Annual, quarterly, and YTD overlap | `fy2025`, `q1-2025`, `ytd-h1-2025` |
-| Unambiguous and ambiguous temporal binding | `fy2024`/`q2-2025` and `fy2025`/`q1-2025` |
-| Exact decimals, scales, units, zero, unavailable | facts and unit definitions |
-| Missing and unavailable facts | 2025 treasury-share statement coordinates are absent; the separate 2024 treasury-share and 2025 inventory coordinates are explicitly unavailable |
-| Flat heading and explicit period order | income and balance-sheet presentations |
+- **Multiple statements:** income, balance sheet, cash flow, equity, and
+  manufacturing presentations.
+- **Non-period axis:** `changes-in-equity.dimensions` presents equity
+  components.
+- **Passing and failing totals:** `gross-profit-subtotal` and
+  `manufacturing-cost-subtotal`.
+- **Shared fact:** `net-income` appears in income and cash-flow presentations.
+- **Distinct facts reconciled explicitly:** `net-income-reconciliation`.
+- **Roll-forward:** `cash-roll-forward` relates opening, movement, and closing
+  balances.
+- **First, consecutive, and gapped periods:** `fy2023`, `fy2024`, and `fy2028`.
+- **Overlapping durations:** `fy2025`, `q1-2025`, and `ytd-h1-2025`.
+- **Temporal binding:** `fy2024` and `q2-2025` are unambiguous, while `fy2025`
+  and `q1-2025` demonstrate ambiguity.
+- **Exact values:** facts and units cover decimals, scales, measures, zero, and
+  explicit unavailability.
+- **Missing versus unavailable:** 2025 treasury-share statement coordinates
+  are absent; separate 2024 treasury-share and 2025 inventory coordinates are
+  explicitly unavailable.
+- **Flat presentation:** income and balance-sheet statements demonstrate
+  headings and explicit period order.
 
-The intentionally inconsistent 2025 gross-profit value demonstrates that a
-structurally conforming document can have calculation status `inconsistent`.
+The intentionally incorrect 2025 gross-profit value proves that structural
+conformance and calculation consistency are separate outcomes.
