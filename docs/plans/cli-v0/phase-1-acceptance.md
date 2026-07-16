@@ -66,5 +66,8 @@ executable, and every observable process field and filesystem effect through
 The closed case schema, ordered manifest, generic matchers, and stdlib-only
 integrity checker pass through `./scripts/check-docs.sh`. The initial
 `validate-path-no-rules` case proves the complete descriptor path, referenced
-JSON results, exact ordinary stderr, and exhaustive workspace/home state.
-Required behavior families beyond that starter case remain unencoded.
+JSON results, exact ordinary stderr, and exhaustive workspace/home state. Six
+successful validation cases now cover path and standard input, every
+conforming calculation aggregate status, and snapshot not-recorded, match, and
+mismatch. Validation failures, usage, and other behavior families remain
+unencoded.

@@ -1,0 +1,61 @@
+{
+  "id": "validate-calculation-inconsistent",
+  "command": "fs",
+  "arguments": ["validate", "input.json"],
+  "workspace": [
+    {
+      "copy": "../../examples/manufacturing-group.json",
+      "to": "input.json"
+    }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        {
+          "pointer": "",
+          "equals": ["validation", "snapshotDiff", "help"]
+        }
+      ],
+      "equalities": [
+        {
+          "pointer": "/validation",
+          "equalsFile": {
+            "file": "../calculation-results/manufacturing-group.json"
+          }
+        },
+        {
+          "pointer": "/snapshotDiff",
+          "equalsFile": {
+            "file": "../snapshot-diffs/not-recorded.json"
+          }
+        },
+        {
+          "pointer": "/help",
+          "equals": [
+            "fs record-validation input.json --output <new-document>"
+          ]
+        }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": {
+      "encoding": "bytes",
+      "equalsUtf8": ""
+    },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json"],
+        "absent": []
+      },
+      "home": {
+        "created": [],
+        "unchanged": [],
+        "absent": []
+      }
+    }
+  }
+}

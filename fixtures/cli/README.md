@@ -66,3 +66,13 @@ The suite is populated in the same order as the acceptance contract:
 
 The current manifest is intentionally incomplete until every Phase 1 checklist
 item is encoded and this guide maps each required clause to case identifiers.
+
+### Validation success
+
+- Path and standard input with no rules:
+  `validate-path-no-rules`, `validate-stdin-no-rules`.
+- Every conforming calculation aggregate status:
+  `validate-path-no-rules`, `validate-all-rules-skipped`,
+  `validate-snapshot-match`, `validate-calculation-inconsistent`.
+- Snapshot comparison outcomes: `validate-path-no-rules`,
+  `validate-snapshot-match`, `validate-snapshot-mismatch`.

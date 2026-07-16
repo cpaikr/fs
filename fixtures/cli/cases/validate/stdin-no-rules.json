@@ -1,0 +1,58 @@
+{
+  "id": "validate-stdin-no-rules",
+  "command": "fs",
+  "arguments": ["validate", "-", "--format", "json"],
+  "workspace": [],
+  "stdin": {
+    "file": "../valid/no-calculation-rules.json"
+  },
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        {
+          "pointer": "",
+          "equals": ["validation", "snapshotDiff", "help"]
+        }
+      ],
+      "equalities": [
+        {
+          "pointer": "/validation",
+          "equalsFile": {
+            "file": "../calculation-results/no-rules.json"
+          }
+        },
+        {
+          "pointer": "/snapshotDiff",
+          "equalsFile": {
+            "file": "../snapshot-diffs/not-recorded.json"
+          }
+        },
+        {
+          "pointer": "/help",
+          "equals": [
+            "fs record-validation - --output <new-document>"
+          ]
+        }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": {
+      "encoding": "bytes",
+      "equalsUtf8": ""
+    },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": [],
+        "absent": []
+      },
+      "home": {
+        "created": [],
+        "unchanged": [],
+        "absent": []
+      }
+    }
+  }
+}
