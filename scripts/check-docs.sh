@@ -111,6 +111,7 @@ find fixtures/raw-input -type f -print \
 printf '%s\n' \
   'fixtures/raw-input/duplicate-members.json.txt' \
   'fixtures/raw-input/malformed-json.json.txt' \
+  'fixtures/raw-input/noncanonical-valid.json' \
   'fixtures/raw-input/trailing-content.json.txt' \
   >"$temporary_directory/expected-raw-inputs"
 if ! cmp -s \
@@ -145,6 +146,17 @@ duplicate_format_versions="$(
 )"
 if [[ "$duplicate_format_versions" != '2' ]]; then
   echo "Duplicate-member raw input no longer contains its duplicate key" >&2
+  exit 1
+fi
+if ! "${ajv[@]}" \
+  -s schema/fs-document.schema.json \
+  -d fixtures/raw-input/noncanonical-valid.json >/dev/null; then
+  echo "Noncanonical raw input must remain a conforming document" >&2
+  exit 1
+fi
+if [[ "$(head -n 1 fixtures/raw-input/noncanonical-valid.json)" != '' ]] ||
+  [[ "$(wc -l <fixtures/raw-input/noncanonical-valid.json | tr -d '[:space:]')" != '2' ]]; then
+  echo "Noncanonical raw input must retain leading whitespace and compact JSON" >&2
   exit 1
 fi
 

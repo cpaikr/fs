@@ -1,6 +1,6 @@
 # Phase 2: Package and Fail-Closed Validation
 
-Status: not started; blocked on Phases 0 and 1.
+Status: not started; ready.
 
 This plan creates the package, production entry point, test harnesses, and a
 thin validator that cannot report false conformance. It implements the

@@ -1,0 +1,39 @@
+{
+  "id": "create-existing-different",
+  "command": "fs",
+  "arguments": ["create", "candidate.json", "--output", "result.json"],
+  "workspace": [
+    { "copy": "../raw-input/noncanonical-valid.json", "to": "candidate.json" },
+    { "copy": "../valid/no-calculation-rules.json", "to": "result.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "create" },
+        { "pointer": "/error/code", "equals": "output-exists" },
+        { "pointer": "/error/path", "equals": "result.json" },
+        {
+          "pointer": "/help",
+          "equals": ["fs create candidate.json --output <new-document>"]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["candidate.json", "result.json"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

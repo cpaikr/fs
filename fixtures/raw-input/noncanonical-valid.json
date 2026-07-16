@@ -1,0 +1,2 @@
+
+{"formatVersion":"0.1","entity":{"name":"Example Entity"},"scope":{"label":"Separate financial statements"},"items":[{"id":"cash","label":"Cash"}],"units":[{"id":"usd","label":"US dollars","measure":"USD","scale":0}],"periods":[{"id":"year-end","kind":"instant","date":"2025-12-31"}],"facts":[{"item":"cash","period":"year-end","unit":"usd","value":"0"}],"statements":[{"id":"financial-position","label":"Statement of financial position","unit":"usd","periods":["year-end"],"entries":[{"type":"item","item":"cash"}]}]}

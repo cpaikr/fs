@@ -1,6 +1,6 @@
 # Phase 1: CLI Acceptance Suite
 
-Status: not started.
+Status: complete.
 
 This plan encodes the complete observable CLI contract before production
 implementation. The [acceptance contract](../../cli/acceptance.md) is
@@ -31,14 +31,14 @@ than a second prose definition.
   version selection.
 - [x] Cover silent and enabled logging, thresholds, the `warning` alias,
   bounded failure context, and logging invariance.
-- [ ] Cover no-argument discovery and exact `guide`, `schema`, and `example`
+- [x] Cover no-argument discovery and exact `guide`, `schema`, and `example`
   payloads, names, versions, outputs, missing parents, and overwrite refusal.
-- [ ] Cover `create` for path and standard input, calculation inconsistency,
+- [x] Cover `create` for path and standard input, calculation inconsistency,
   structural refusal, malformed input, usage, missing parents, existing
   outputs, and error precedence.
-- [ ] Use a conforming deliberately noncanonical candidate so exact-copy cases
+- [x] Use a conforming deliberately noncanonical candidate so exact-copy cases
   can detect reserialization rather than merely compare equivalent JSON.
-- [ ] Keep fault-only guarantees such as write-call order, commit races, and
+- [x] Keep fault-only guarantees such as write-call order, commit races, and
   crash atomicity visible as retained Phase 2, 4, or 5 integration tests rather
   than pretending black-box fixtures can prove them.
 
@@ -63,18 +63,14 @@ executable, and every observable process field and filesystem effect through
 
 ## Validation Evidence
 
-The closed case schema, ordered manifest, generic matchers, and stdlib-only
-integrity checker pass through `./scripts/check-docs.sh`. The initial
-`validate-path-no-rules` case proves the complete descriptor path, referenced
-JSON results, exact ordinary stderr, and exhaustive workspace/home state. Six
-successful validation cases now cover path and standard input, every
-conforming calculation aggregate status, and snapshot not-recorded, match, and
-mismatch. Four composed structural cases cover schema and semantic failures,
-an invalid embedded snapshot, and unsafe scale without duplicating artifact
-results. Nine process-boundary cases cover malformed syntax, trailing content,
-duplicate members, missing input, missing/extra operands, unknown flags,
-unsupported format, and usage precedence. Thirteen help/grammar cases cover
-every milestone help asset, representative aliases, forbidden built-ins, and
-the command-local schema version. Six logging cases cover silence, canonical
-debug order, threshold filtering, the warning alias, bounded failure context,
-and invalid levels. Discovery, content, and create remain unencoded.
+`./scripts/check-docs.sh` validates all 76 closed descriptors, their referenced
+values and byte sources, ordered manifest coverage, unique selectors, JSON
+Pointer exhaustiveness, log bounds, and complete workspace/home effects. The
+suite covers every validation aggregate and failure layer, exact help and
+installed guidance, deterministic discovery, all schema and example payloads,
+and non-overwriting output behavior. Fourteen `create` cases fix exact
+noncanonical path/stdin copies, calculation-inconsistent success, malformed
+and structural refusals, usage precedence, missing parents, identical and
+different existing outputs, and invalid-input/existing-output precedence.
+Phase 2 retains boundary-order tests; Phases 4–5 retain writer fault, race, and
+crash-atomicity tests that black-box fixtures cannot prove.

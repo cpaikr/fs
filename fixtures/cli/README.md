@@ -70,8 +70,8 @@ The suite is populated in the same order as the acceptance contract:
 3. discovery, guide, schema, and example content; and
 4. exact-byte non-overwriting `create`.
 
-The current manifest is intentionally incomplete until every Phase 1 checklist
-item is encoded and this guide maps each required clause to case identifiers.
+The manifest is the complete Phase 1 process contract through `fs create`.
+The sections below map every required clause to case identifiers.
 
 ### Validation success
 
@@ -156,6 +156,24 @@ without adding a duplicate calculation-result fixture.
   `example-missing-name-for-output`, `example-unknown-name`.
 - Missing parent and overwrite refusal: `example-output-missing-parent`,
   `example-output-exists`.
+
+### Creation
+
+- Exact noncanonical bytes from path and standard input: `create-path`,
+  `create-stdin`.
+- Calculation inconsistency remains writable:
+  `create-calculation-inconsistent`.
+- Malformed, schema-invalid, and semantically invalid refusal:
+  `create-malformed-json`, `create-schema-failure`,
+  `create-semantic-failure`.
+- Missing operands, extra operands, and unknown flags:
+  `create-missing-candidate`, `create-missing-output`,
+  `create-extra-argument`, `create-unknown-flag`.
+- Missing parent and identical or different existing destinations:
+  `create-output-missing-parent`, `create-existing-identical`,
+  `create-existing-different`.
+- Existing destination before invalid candidate:
+  `create-invalid-existing-precedence`.
 
 Instrumented Phase 2 tests retain input-read/write-call invariance and the
 complete threshold matrix; process fixtures fix the observable representative

@@ -59,6 +59,10 @@ validation. They are intentionally outside `manifest.json`: malformed syntax,
 trailing content, and duplicate object members all become the CLI
 `invalid-json` operational error rather than document conformance results.
 
+The same directory contains `noncanonical-valid.json`, a conforming
+document with leading whitespace and compact JSON. Exact-copy CLI cases use it
+to detect reserialization even when parsed JSON values would compare equal.
+
 ## Shape Validation
 
 Run these commands from the repository root with any draft 2020-12

@@ -1,8 +1,8 @@
 # V0 CLI Delivery Plan
 
-Status: active. The repository contains the settled artifact and CLI contracts,
-schemas, examples, and language-neutral fixtures, but no package, executable,
-build, or CLI acceptance suite.
+Status: active. Contracts and the complete process acceptance suite through
+`fs create` are settled, but no package, executable, build, or production CLI
+implementation exists.
 
 This file is the concise milestone index. Detailed scope, decisions, progress,
 and validation evidence live in the linked child plans. The
@@ -23,7 +23,7 @@ exact-byte non-overwriting creation. It stops before Agent Skill generation,
 | --- | --- | --- |
 | 0a. Contract alignment | Complete | [Contract alignment](cli-v0/phase-0-contracts.md) |
 | 0b. Runtime and command seam | Complete | [Runtime integration](cli-v0/phase-0-effect.md) |
-| 1. Acceptance suite | Not started | [Acceptance suite](cli-v0/phase-1-acceptance.md) |
+| 1. Acceptance suite | Complete | [Acceptance suite](cli-v0/phase-1-acceptance.md) |
 | 2. Package and fail-closed validator | Not started | [Package foundation](cli-v0/phase-2-package.md) |
 | 3. Complete semantic validation | Not started | [Semantic validation](cli-v0/phase-3-validation.md) |
 | 4–5. Discovery, content, and creation | Not started | [Content and creation](cli-v0/phase-4-5-content-create.md) |
@@ -34,18 +34,17 @@ command.
 
 ## Current Validation
 
-`./scripts/check-docs.sh` passes for the aligned contracts, schemas, fixtures,
-raw inputs, exact help inventory, and installed-guide generation. The exact
-Effect package inspection and Node 22/24 argument-token probes also pass.
-Implementation, acceptance, package, and cross-platform checks remain
+`./scripts/check-docs.sh` passes for the aligned contracts, schemas, artifact
+fixtures, raw inputs, maintained content, and all 76 CLI process descriptors.
+The exact Effect package inspection and Node 22/24 argument-token probes also
+pass. Package, implementation, packed-process, and cross-platform checks remain
 unavailable because their source and harnesses do not exist.
 
 ## Current Blockers
 
-- The Phase 1 descriptor foundation passes, but the required behavior matrix
-  beyond the initial path-validation case is not yet encoded.
+- None. Phase 2 is ready to begin.
 
 ## Next Action
 
-Populate and validate the remaining Phase 1 validate, help, logging,
-discovery, content, and create cases before adding production source.
+Create the pinned package and test harness, then implement the fail-closed
+Phase 2 validation path against the fixed descriptors.
