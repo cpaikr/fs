@@ -1,0 +1,60 @@
+{
+  "formatVersion": "0.1",
+  "status": "mismatch",
+  "conformance": {
+    "recorded": "conforming",
+    "current": "conforming",
+    "changed": false
+  },
+  "calculations": {
+    "recorded": "consistent",
+    "current": "inconsistent",
+    "changed": true
+  },
+  "applications": [
+    {
+      "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
+      "change": "changed",
+      "recorded": {
+        "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "10",
+        "expected": "10",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      "current": {
+        "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
+        "status": "unsatisfied",
+        "actual": "11",
+        "expected": "10",
+        "difference": "1",
+        "tolerance": "0"
+      }
+    },
+    {
+      "key": { "rule": "parts-agree", "period": "fy2025", "dimensions": {} },
+      "change": "added",
+      "current": {
+        "key": { "rule": "parts-agree", "period": "fy2025", "dimensions": {} },
+        "status": "unsatisfied",
+        "actual": "6",
+        "expected": "4",
+        "difference": "2",
+        "tolerance": "0"
+      }
+    },
+    {
+      "key": { "rule": "retired-rule", "period": "fy2025", "dimensions": {} },
+      "change": "removed",
+      "recorded": {
+        "key": { "rule": "retired-rule", "period": "fy2025", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "1",
+        "expected": "1",
+        "difference": "0",
+        "tolerance": "0"
+      }
+    }
+  ]
+}

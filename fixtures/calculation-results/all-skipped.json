@@ -1,0 +1,19 @@
+{
+  "formatVersion": "0.1",
+  "conformance": { "status": "conforming", "errors": [] },
+  "calculations": {
+    "status": "not-evaluated",
+    "applications": [
+      {
+        "key": { "rule": "cash-roll-forward", "period": "fy2024", "dimensions": {} },
+        "status": "skipped",
+        "reason": "no-predecessor"
+      },
+      {
+        "key": { "rule": "cash-roll-forward", "period": "fy2026", "dimensions": {} },
+        "status": "skipped",
+        "reason": "gap"
+      }
+    ]
+  }
+}

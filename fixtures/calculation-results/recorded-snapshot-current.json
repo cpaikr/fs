@@ -1,0 +1,17 @@
+{
+  "formatVersion": "0.1",
+  "conformance": { "status": "conforming", "errors": [] },
+  "calculations": {
+    "status": "consistent",
+    "applications": [
+      {
+        "key": { "rule": "accounting-equation", "period": "at-2025", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "100",
+        "expected": "100",
+        "difference": "0",
+        "tolerance": "0.01"
+      }
+    ]
+  }
+}

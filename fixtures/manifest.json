@@ -5,7 +5,9 @@
     { "path": "../examples/manufacturing-group.json", "calculationStatus": "inconsistent" },
     { "path": "valid/no-calculation-rules.json", "calculationStatus": "not-defined" },
     { "path": "valid/recorded-snapshot.json", "calculationStatus": "consistent" },
-    { "path": "valid/all-rules-skipped.json", "calculationStatus": "not-evaluated" }
+    { "path": "valid/all-rules-skipped.json", "calculationStatus": "not-evaluated" },
+    { "path": "valid/calculation-errors.json", "calculationStatus": "inconsistent" },
+    { "path": "valid/snapshot-mismatch-source.json", "calculationStatus": "inconsistent" }
   ],
   "invalidDocuments": [
     {

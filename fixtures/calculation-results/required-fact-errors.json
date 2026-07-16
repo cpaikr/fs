@@ -1,0 +1,19 @@
+{
+  "formatVersion": "0.1",
+  "conformance": { "status": "conforming", "errors": [] },
+  "calculations": {
+    "status": "inconsistent",
+    "applications": [
+      {
+        "key": { "rule": "required-facts", "period": "fy2024", "dimensions": {} },
+        "status": "error",
+        "reason": "missing-fact"
+      },
+      {
+        "key": { "rule": "required-facts", "period": "fy2025", "dimensions": {} },
+        "status": "error",
+        "reason": "unavailable-fact"
+      }
+    ]
+  }
+}

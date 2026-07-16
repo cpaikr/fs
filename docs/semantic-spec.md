@@ -258,6 +258,11 @@ their recorded order. No snapshot produces `status: "not-recorded"`; otherwise
 the status is `match` only when every compared value matches, and `mismatch`
 otherwise.
 
+A recorded key MAY refer to a rule no longer present in the current document;
+that is how a removed application is represented. Snapshot contents are not
+current document references and therefore do not participate in current
+referential conformance.
+
 For `satisfied` and `unsatisfied`, comparison includes status, actual,
 expected, difference, and tolerance. For `error` and `skipped`, it includes
 status and reason. Human messages are not snapshot fields and are not compared.

@@ -14,6 +14,17 @@ A conforming validator must:
 4. compare its validation and snapshot results with the objects in
    `calculation-results/` and `snapshot-diffs/`.
 
+Expected-result pairings:
+
+| Input document | Calculation result | Snapshot diff |
+| --- | --- | --- |
+| `valid/no-calculation-rules.json` | `calculation-results/no-rules.json` | `snapshot-diffs/not-recorded.json` |
+| `valid/all-rules-skipped.json` | `calculation-results/all-skipped.json` | `snapshot-diffs/not-recorded.json` |
+| `valid/calculation-errors.json` | `calculation-results/required-fact-errors.json` | `snapshot-diffs/not-recorded.json` |
+| `valid/recorded-snapshot.json` | `calculation-results/recorded-snapshot-current.json` | `snapshot-diffs/match.json` |
+| `valid/snapshot-mismatch-source.json` | `calculation-results/snapshot-mismatch-current.json` | `snapshot-diffs/mismatch.json` |
+| `../examples/manufacturing-group.json` | `calculation-results/manufacturing-group.json` | `snapshot-diffs/not-recorded.json` |
+
 Schema validation can be run with any draft 2020-12 implementation. For
 example, without adding a project runtime or choosing a CLI language:
 

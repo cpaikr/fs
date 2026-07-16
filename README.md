@@ -27,5 +27,6 @@ The V0 artifact contract is being completed from representative JSON examples.
 The [semantic specification](docs/semantic-spec.md) defines the normative model
 and canonical JSON mapping; [`examples/`](examples/) and [`schema/`](schema/)
 contain its current evidence and machine-readable shape. Language-neutral
-conformance and validation-result fixtures are the remaining contract work
-before reference CLI implementation begins.
+[conformance and result fixtures](fixtures/) complete the language-neutral
+consumer contract. The contract is under final audit before reference CLI
+implementation begins.

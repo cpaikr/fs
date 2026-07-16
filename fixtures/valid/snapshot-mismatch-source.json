@@ -1,0 +1,74 @@
+{
+  "formatVersion": "0.1",
+  "documentId": "snapshot-mismatch",
+  "entity": { "name": "Changed Validation Co" },
+  "scope": { "id": "separate", "label": "Separate" },
+  "items": [
+    { "id": "total", "label": "Total" },
+    { "id": "part-a", "label": "Part A" },
+    { "id": "part-b", "label": "Part B" }
+  ],
+  "units": [{ "id": "usd", "label": "USD", "measure": "USD", "scale": 0 }],
+  "periods": [{ "id": "fy2025", "kind": "duration", "start": "2025-01-01", "end": "2025-12-31" }],
+  "facts": [
+    { "item": "total", "period": "fy2025", "unit": "usd", "value": "11" },
+    { "item": "part-a", "period": "fy2025", "unit": "usd", "value": "6" },
+    { "item": "part-b", "period": "fy2025", "unit": "usd", "value": "4" }
+  ],
+  "statements": [
+    {
+      "id": "total-view",
+      "label": "Total view",
+      "unit": "usd",
+      "periods": ["fy2025"],
+      "entries": [
+        { "type": "item", "item": "part-a" },
+        { "type": "item", "item": "part-b" },
+        { "type": "item", "item": "total" }
+      ]
+    }
+  ],
+  "calculationRules": [
+    {
+      "id": "subtotal",
+      "kind": "samePeriod",
+      "unit": "usd",
+      "target": { "item": "total" },
+      "terms": [
+        { "coefficient": "1", "item": "part-a" },
+        { "coefficient": "1", "item": "part-b" }
+      ],
+      "scope": { "periods": ["fy2025"] }
+    },
+    {
+      "id": "parts-agree",
+      "kind": "assertion",
+      "target": { "item": "part-a", "period": "fy2025", "unit": "usd" },
+      "terms": [
+        { "coefficient": "1", "fact": { "item": "part-b", "period": "fy2025", "unit": "usd" } }
+      ]
+    }
+  ],
+  "validationSnapshot": {
+    "conformance": "conforming",
+    "calculations": "consistent",
+    "applications": [
+      {
+        "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "10",
+        "expected": "10",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": { "rule": "retired-rule", "period": "fy2025", "dimensions": {} },
+        "status": "satisfied",
+        "actual": "1",
+        "expected": "1",
+        "difference": "0",
+        "tolerance": "0"
+      }
+    ]
+  }
+}
