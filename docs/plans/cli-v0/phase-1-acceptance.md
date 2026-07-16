@@ -24,7 +24,8 @@ than a second prose definition.
 
 - [ ] Cover `validate` by path and standard input, every aggregate status,
   snapshot match and mismatch, structural failures, invalid snapshots,
-  malformed input, duplicate members, unsafe scale, missing input, and usage.
+  malformed input, trailing content, duplicate members, unsafe scale, missing
+  input, and usage.
 - [ ] Cover top-level and per-command help, representative `-h` aliases,
   rejected global version/completion built-ins, and command-local schema
   version selection.
@@ -35,6 +36,8 @@ than a second prose definition.
 - [ ] Cover `create` for path and standard input, calculation inconsistency,
   structural refusal, malformed input, usage, missing parents, existing
   outputs, and error precedence.
+- [ ] Use a conforming deliberately noncanonical candidate so exact-copy cases
+  can detect reserialization rather than merely compare equivalent JSON.
 - [ ] Keep fault-only guarantees such as write-call order, commit races, and
   crash atomicity visible as retained Phase 2, 4, or 5 integration tests rather
   than pretending black-box fixtures can prove them.

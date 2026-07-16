@@ -1,0 +1,19 @@
+{
+  "formatVersion": "0.1",
+  "entity": { "name": "Scale Boundaries" },
+  "scope": { "label": "Separate" },
+  "items": [{ "id": "value", "label": "Value" }],
+  "units": [
+    { "id": "minimum-scale", "label": "Minimum scale", "measure": "pure", "scale": -9007199254740991 },
+    { "id": "maximum-scale", "label": "Maximum scale", "measure": "pure", "scale": 9007199254740991 }
+  ],
+  "periods": [{ "id": "year-end", "kind": "instant", "date": "2025-12-31" }],
+  "facts": [
+    { "item": "value", "period": "year-end", "unit": "minimum-scale", "value": "1" },
+    { "item": "value", "period": "year-end", "unit": "maximum-scale", "value": "1" }
+  ],
+  "statements": [
+    { "id": "minimum", "label": "Minimum", "unit": "minimum-scale", "periods": ["year-end"], "entries": [{ "type": "item", "item": "value" }] },
+    { "id": "maximum", "label": "Maximum", "unit": "maximum-scale", "periods": ["year-end"], "entries": [{ "type": "item", "item": "value" }] }
+  ]
+}

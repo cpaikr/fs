@@ -292,7 +292,8 @@ error shape instead.
 ### `fs validate`
 
 Start the suite with these integration seams rather than repeating every
-language-neutral semantic fixture:
+language-neutral semantic fixture. Paths in the table are relative to
+`fixtures/`; a bare filename resolves by its unique basename under that tree.
 
 | Case | Reused input | Exit |
 | --- | --- | ---: |
@@ -303,10 +304,11 @@ language-neutral semantic fixture:
 | Recorded snapshot mismatch | `valid/snapshot-mismatch-source.json` | 0 |
 | JSON Schema failure | `invalid/decimal-number.json` | 1 |
 | Semantic structural failure | `invalid/unresolved-item.json` | 1 |
-| Invalid embedded snapshot | duplicate snapshot application key | 1 |
-| Out-of-range unit scale | one new language-neutral invalid fixture | 1 |
-| Malformed JSON | one new raw-input fixture | 1 |
-| Duplicate JSON members | one new raw-input fixture | 1 |
+| Invalid embedded snapshot | `duplicate-snapshot-application-key.json` | 1 |
+| Out-of-range unit scale | `invalid/scale-above-maximum.json` | 1 |
+| Malformed JSON | `raw-input/malformed-json.json.txt` | 1 |
+| Trailing content | `raw-input/trailing-content.json.txt` | 1 |
+| Duplicate JSON members | `raw-input/duplicate-members.json.txt` | 1 |
 | Missing path | staged absent path | 1 |
 | Missing or extra argument | none | 2 |
 | Unknown flag or unsupported format | any valid staged input | 2 |

@@ -33,6 +33,8 @@ A conforming validator must:
 - `valid/exact-arithmetic.json` maps to
   `calculation-results/exact-arithmetic.json` and
   `snapshot-diffs/not-recorded.json`.
+- `valid/scale-boundaries.json` maps to `snapshot-diffs/not-recorded.json` and
+  proves that both inclusive `unit.scale` endpoints are schema-valid.
 - `valid/recorded-snapshot.json` maps to
   `calculation-results/recorded-snapshot-current.json` and
   `snapshot-diffs/match.json`.
@@ -47,6 +49,15 @@ A conforming validator must:
 `calculation-results/structural-nonconformance.json`. It proves that a
 nonconforming document receives calculation status `not-run`; validators do
 not attempt arithmetic against unreliable references.
+
+`invalid/duplicate-snapshot-application-key.json` maps to
+`snapshot-diffs/invalid-snapshot.json`. It proves that a present but
+structurally unusable snapshot is `not-comparable`, not `not-recorded`.
+
+`raw-input/` contains exact process inputs that fail before document-schema
+validation. They are intentionally outside `manifest.json`: malformed syntax,
+trailing content, and duplicate object members all become the CLI
+`invalid-json` operational error rather than document conformance results.
 
 ## Shape Validation
 

@@ -40,10 +40,8 @@ unavailable because their source and harnesses do not exist.
 
 ## Current Blockers
 
-- The document schema does not enforce the normative safe-integer `unit.scale`
-  range, and boundary fixtures are missing.
-- The snapshot-diff schema and fixtures do not represent normative
-  `not-comparable` / `invalid-snapshot` output.
+- Portable authoring guidance and exact help do not yet have authoritative,
+  byte-stable asset sources.
 - Exact candidate Effect package source and public exports have not been
   inspected.
 - CLI acceptance descriptors and their integrity check do not exist.

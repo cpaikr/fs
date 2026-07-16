@@ -101,7 +101,11 @@
         "id": { "$ref": "#/$defs/id" },
         "label": { "$ref": "#/$defs/nonEmptyString" },
         "measure": { "$ref": "#/$defs/nonEmptyString" },
-        "scale": { "type": "integer" },
+        "scale": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
         "defaultTolerance": { "$ref": "#/$defs/nonNegativeDecimal" }
       }
     },

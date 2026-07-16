@@ -312,11 +312,12 @@ JSON Pointer `path`, and a human-readable `message`. The V0 fixture vocabulary
 includes `decimal-string-required`, `fact-value-exclusive`,
 `unknown-property`, `invalid-tolerance`, `duplicate-id`, `unresolved-reference`,
 `duplicate-fact-coordinate`, `invalid-date`, `invalid-duration`,
-`unit-mismatch`, `duplicate-statement-axis`, `duplicate-period-definition`,
-`invalid-period-kind`, and `duplicate-application-key`. Validators MAY report
-additional precise codes for other schema or semantic failures, but MUST use
-the fixture code when the named condition applies. Multiple errors are ordered
-by instance path, then code.
+`scale-out-of-range`, `unit-mismatch`, `duplicate-statement-axis`,
+`duplicate-period-definition`, `invalid-period-kind`, and
+`duplicate-application-key`. Validators MAY report additional precise codes
+for other schema or semantic failures, but MUST use the fixture code when the
+named condition applies. Multiple errors are ordered by instance path, then
+code.
 
 Language-neutral result equality compares conformance status plus each error's
 code and path. `message` MUST be nonempty for users but its wording is not

@@ -15,6 +15,16 @@
     {
       "type": "object",
       "additionalProperties": false,
+      "required": ["formatVersion", "status", "reason"],
+      "properties": {
+        "formatVersion": { "const": "0.1" },
+        "status": { "const": "not-comparable" },
+        "reason": { "const": "invalid-snapshot" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
       "required": ["formatVersion", "status", "conformance", "calculations", "applications"],
       "properties": {
         "formatVersion": { "const": "0.1" },

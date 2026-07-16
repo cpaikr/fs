@@ -8,6 +8,7 @@
     { "document": "valid/all-rules-skipped.json", "calculationStatus": "not-evaluated" },
     { "document": "valid/calculation-errors.json", "calculationStatus": "inconsistent" },
     { "document": "valid/exact-arithmetic.json", "calculationStatus": "consistent" },
+    { "document": "valid/scale-boundaries.json", "calculationStatus": "not-defined" },
     { "document": "valid/snapshot-mismatch-source.json", "calculationStatus": "inconsistent" }
   ],
   "invalidDocuments": [
@@ -34,6 +35,18 @@
       "layer": "schema",
       "code": "invalid-tolerance",
       "path": "/units/0/defaultTolerance"
+    },
+    {
+      "document": "invalid/scale-below-minimum.json",
+      "layer": "schema",
+      "code": "scale-out-of-range",
+      "path": "/units/0/scale"
+    },
+    {
+      "document": "invalid/scale-above-maximum.json",
+      "layer": "schema",
+      "code": "scale-out-of-range",
+      "path": "/units/0/scale"
     },
     {
       "document": "invalid/duplicate-item-id.json",

@@ -14,19 +14,19 @@ behavior.
 
 - [x] Settle invalid-snapshot, example-output, portable-guide, help,
   duplicate-member, and numeric-scale decisions in the normative documents.
-- [ ] Add `not-comparable` with reason `invalid-snapshot` to the snapshot-diff
+- [x] Add `not-comparable` with reason `invalid-snapshot` to the snapshot-diff
   schema.
-- [ ] Add the expected invalid-snapshot diff and associate it with
+- [x] Add the expected invalid-snapshot diff and associate it with
   `fixtures/invalid/duplicate-snapshot-application-key.json`.
-- [ ] Update the fixture guide for the invalid-snapshot result.
-- [ ] Enforce inclusive safe-integer bounds on `unit.scale` in the document
+- [x] Update the fixture guide for the invalid-snapshot result.
+- [x] Enforce inclusive safe-integer bounds on `unit.scale` in the document
   schema.
-- [ ] Add valid boundary and invalid out-of-range language-neutral fixtures.
+- [x] Add valid boundary and invalid out-of-range language-neutral fixtures.
 - [ ] Define one portable authoring source and byte-stable installed-CLI and
   pinned-`npx` generation targets without generating the Phase 6 Agent Skill.
 - [ ] Define exact top-level and per-command help Markdown.
-- [ ] Add malformed and duplicate-member raw inputs outside the document
-  manifest.
+- [x] Add malformed, trailing-content, and duplicate-member raw inputs outside
+  the document manifest, with explicit integrity checks.
 
 ## Decisions
 
@@ -54,6 +54,7 @@ source.
 
 ## Validation Evidence
 
-The pre-change artifact tree passes `./scripts/check-docs.sh`. Re-run it after
-every schema, fixture, example, or documentation change and add explicit checks
-for raw-input and generated-content coverage as those assets are introduced.
+`./scripts/check-docs.sh` passes with both safe-integer scale endpoints, both
+adjacent schema failures, the invalid-snapshot diff, and all three raw-input
+classes. `git diff --check` also passes. Generated guide and help freshness
+checks remain unavailable until those assets are defined.

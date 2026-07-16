@@ -25,6 +25,7 @@ echo "Parsing JSON artifacts"
 find . \
   -path './.git' -prune -o \
   -path './node_modules' -prune -o \
+  -path './fixtures/raw-input' -prune -o \
   -name '*.json' -print0 \
   | xargs -0 jq empty
 
@@ -58,6 +59,49 @@ jq -e '
 
 temporary_directory="$(mktemp -d "${TMPDIR:-/tmp}/fs-docs.XXXXXX")"
 trap 'rm -rf "$temporary_directory"' EXIT
+
+echo "Checking raw process inputs"
+find fixtures/raw-input -type f -print \
+  | LC_ALL=C sort >"$temporary_directory/actual-raw-inputs"
+printf '%s\n' \
+  'fixtures/raw-input/duplicate-members.json.txt' \
+  'fixtures/raw-input/malformed-json.json.txt' \
+  'fixtures/raw-input/trailing-content.json.txt' \
+  >"$temporary_directory/expected-raw-inputs"
+if ! cmp -s \
+  "$temporary_directory/expected-raw-inputs" \
+  "$temporary_directory/actual-raw-inputs"; then
+  echo "Raw process input inventory differs from the expected contract" >&2
+  diff -u \
+    "$temporary_directory/expected-raw-inputs" \
+    "$temporary_directory/actual-raw-inputs" >&2 || true
+  exit 1
+fi
+
+if jq -s empty fixtures/raw-input/malformed-json.json.txt >/dev/null 2>&1; then
+  echo "Malformed raw input unexpectedly parses as a JSON value stream" >&2
+  exit 1
+fi
+if ! jq -s -e 'length == 2' \
+  fixtures/raw-input/trailing-content.json.txt >/dev/null 2>&1; then
+  echo "Trailing-content raw input must contain two complete JSON values" >&2
+  exit 1
+fi
+if ! jq empty fixtures/raw-input/duplicate-members.json.txt >/dev/null 2>&1; then
+  echo "Duplicate-member raw input must otherwise be valid JSON" >&2
+  exit 1
+fi
+duplicate_format_versions="$(
+  jq --stream -c \
+    'select(length == 2 and .[0] == ["formatVersion"])' \
+    fixtures/raw-input/duplicate-members.json.txt \
+    | wc -l \
+    | tr -d '[:space:]'
+)"
+if [[ "$duplicate_format_versions" != '2' ]]; then
+  echo "Duplicate-member raw input no longer contains its duplicate key" >&2
+  exit 1
+fi
 
 jq -r '.validDocuments[].document' fixtures/manifest.json \
   | LC_ALL=C sort >"$temporary_directory/manifest-valid"
