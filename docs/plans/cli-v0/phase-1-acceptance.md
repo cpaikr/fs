@@ -9,15 +9,15 @@ than a second prose definition.
 
 ## Fixture Foundation
 
-- [ ] Add `fixtures/cli/case.schema.json` and `fixtures/cli/manifest.json`.
-- [ ] Model shell-free process invocation, isolated workspace staging,
+- [x] Add `fixtures/cli/case.schema.json` and `fixtures/cli/manifest.json`.
+- [x] Model shell-free process invocation, isolated workspace staging,
   optional standard input, expected streams and exit code, and exhaustive
   filesystem state.
-- [ ] Support exact bytes, JSON Pointer equality, nonempty-string assertions,
+- [x] Support exact bytes, JSON Pointer equality, nonempty-string assertions,
   exact ordinary standard error, and structured JSON Lines matching.
-- [ ] Validate every referenced path and reject duplicate case identifiers
+- [x] Validate every referenced path and reject duplicate case identifiers
   without requiring a CLI executable.
-- [ ] Extend `scripts/check-docs.sh` or add a focused integrity command that
+- [x] Extend `scripts/check-docs.sh` with a focused integrity command that
   runs before package installation.
 
 ## Required Behavior Matrix
@@ -63,4 +63,8 @@ executable, and every observable process field and filesystem effect through
 
 ## Validation Evidence
 
-No `fixtures/cli/` tree or CLI fixture integrity check exists.
+The closed case schema, ordered manifest, generic matchers, and stdlib-only
+integrity checker pass through `./scripts/check-docs.sh`. The initial
+`validate-path-no-rules` case proves the complete descriptor path, referenced
+JSON results, exact ordinary stderr, and exhaustive workspace/home state.
+Required behavior families beyond that starter case remain unencoded.

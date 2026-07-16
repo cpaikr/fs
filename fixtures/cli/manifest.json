@@ -1,0 +1,6 @@
+{
+  "formatVersion": "0.1",
+  "cases": [
+    "cases/validate/path-no-rules.json"
+  ]
+}

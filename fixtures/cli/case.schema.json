@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fs.example/fixtures/cli/0.1/case.schema.json",
+  "title": "FS V0 CLI acceptance case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "command", "arguments", "workspace", "stdin", "expect"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "command": { "const": "fs" },
+    "arguments": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "workspace": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/stagedFile" }
+    },
+    "stdin": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/byteSource" }
+      ]
+    },
+    "expect": { "$ref": "#/$defs/expectation" }
+  },
+  "$defs": {
+    "repositoryFile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspacePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*(?:/[A-Za-z0-9_-][A-Za-z0-9._-]*)*$"
+    },
+    "jsonPointer": {
+      "type": "string",
+      "pattern": "^(?:$|/)"
+    },
+    "byteSource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file"],
+          "properties": {
+            "file": { "$ref": "#/$defs/repositoryFile" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["utf8"],
+          "properties": {
+            "utf8": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "stagedFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["copy", "to"],
+      "properties": {
+        "copy": { "$ref": "#/$defs/repositoryFile" },
+        "to": { "$ref": "#/$defs/workspacePath" }
+      }
+    },
+    "jsonFileSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "arrayPointer", "wherePointer", "whereEquals", "valuePointer"],
+      "properties": {
+        "file": { "$ref": "#/$defs/repositoryFile" },
+        "arrayPointer": { "$ref": "#/$defs/jsonPointer" },
+        "wherePointer": { "$ref": "#/$defs/jsonPointer" },
+        "whereEquals": true,
+        "valuePointer": { "$ref": "#/$defs/jsonPointer" }
+      }
+    },
+    "jsonEquality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointer"],
+      "properties": {
+        "pointer": { "$ref": "#/$defs/jsonPointer" },
+        "equals": true,
+        "equalsFile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file"],
+          "properties": {
+            "file": { "$ref": "#/$defs/repositoryFile" },
+            "pointer": { "$ref": "#/$defs/jsonPointer" }
+          }
+        },
+        "equalsSelected": { "$ref": "#/$defs/jsonFileSelection" }
+      },
+      "oneOf": [
+        { "required": ["equals"] },
+        { "required": ["equalsFile"] },
+        { "required": ["equalsSelected"] }
+      ]
+    },
+    "objectMembers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointer", "equals"],
+      "properties": {
+        "pointer": { "$ref": "#/$defs/jsonPointer" },
+        "equals": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "jsonMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "members", "equalities", "nonemptyStrings"],
+      "properties": {
+        "encoding": { "const": "json" },
+        "members": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/objectMembers" }
+        },
+        "equalities": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/jsonEquality" }
+        },
+        "nonemptyStrings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/jsonPointer" }
+        }
+      }
+    },
+    "byteMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding"],
+      "properties": {
+        "encoding": { "const": "bytes" },
+        "equalsFile": { "$ref": "#/$defs/repositoryFile" },
+        "equalsUtf8": { "type": "string" }
+      },
+      "oneOf": [
+        { "required": ["equalsFile"] },
+        { "required": ["equalsUtf8"] }
+      ]
+    },
+    "jsonLineRecord": {
+      "type": "object",
+      "minProperties": 1
+    },
+    "jsonLinesMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding"],
+      "properties": {
+        "encoding": { "const": "json-lines" },
+        "equalsFile": { "$ref": "#/$defs/repositoryFile" },
+        "contains": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/jsonLineRecord" }
+        },
+        "allowAdditional": { "type": "boolean" }
+      },
+      "oneOf": [
+        { "required": ["equalsFile"] },
+        { "required": ["contains", "allowAdditional"] }
+      ]
+    },
+    "stderrMatcher": {
+      "oneOf": [
+        { "$ref": "#/$defs/byteMatcher" },
+        { "$ref": "#/$defs/jsonLinesMatcher" }
+      ]
+    },
+    "createdFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "$ref": "#/$defs/workspacePath" },
+        "equalsFile": { "$ref": "#/$defs/repositoryFile" },
+        "equalsStdin": { "const": true }
+      },
+      "oneOf": [
+        { "required": ["equalsFile"] },
+        { "required": ["equalsStdin"] }
+      ]
+    },
+    "treeState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created", "unchanged", "absent"],
+      "properties": {
+        "created": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/createdFile" }
+        },
+        "unchanged": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/workspacePath" }
+        },
+        "absent": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/workspacePath" }
+        }
+      }
+    },
+    "filesystemExpectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspace", "home"],
+      "properties": {
+        "workspace": { "$ref": "#/$defs/treeState" },
+        "home": { "$ref": "#/$defs/treeState" }
+      }
+    },
+    "expectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stdout", "stderr", "exitCode", "filesystem"],
+      "properties": {
+        "stdout": {
+          "oneOf": [
+            { "$ref": "#/$defs/jsonMatcher" },
+            { "$ref": "#/$defs/byteMatcher" }
+          ]
+        },
+        "stderr": { "$ref": "#/$defs/stderrMatcher" },
+        "exitCode": { "enum": [0, 1, 2] },
+        "filesystem": { "$ref": "#/$defs/filesystemExpectation" }
+      }
+    }
+  }
+}

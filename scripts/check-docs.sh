@@ -148,6 +148,12 @@ if [[ "$duplicate_format_versions" != '2' ]]; then
   exit 1
 fi
 
+echo "Checking CLI acceptance fixtures"
+"${ajv[@]}" \
+  -s fixtures/cli/case.schema.json \
+  -d 'fixtures/cli/cases/**/*.json'
+node scripts/check-cli-fixtures.mjs
+
 jq -r '.validDocuments[].document' fixtures/manifest.json \
   | LC_ALL=C sort >"$temporary_directory/manifest-valid"
 {

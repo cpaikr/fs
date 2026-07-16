@@ -42,9 +42,10 @@ unavailable because their source and harnesses do not exist.
 
 ## Current Blockers
 
-- CLI acceptance descriptors and their integrity check do not exist.
+- The Phase 1 descriptor foundation passes, but the required behavior matrix
+  beyond the initial path-validation case is not yet encoded.
 
 ## Next Action
 
-Build and validate the complete Phase 1 acceptance descriptor suite before
-adding production source.
+Populate and validate the remaining Phase 1 validate, help, logging,
+discovery, content, and create cases before adding production source.
