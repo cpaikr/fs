@@ -19,7 +19,7 @@ convert units, or repair financial ambiguity.
 The [semantic specification](semantic-spec.md),
 [schemas](../schema/), and [fixtures](../fixtures/) fix the artifact-dependent
 result fields, calculation identities, snapshot contents, and presentation
-semantics. The [authoring guide](authoring.md) owns the source-to-document
+semantics. The [authoring guide](authoring.md) owns the document-encoding
 workflow.
 
 Canonical FS documents, schemas, and examples remain JSON. CLI result encoding
@@ -45,10 +45,10 @@ does not scan the current directory or infer document identity from filenames.
 
 ### `fs guide authoring`
 
-Present the concise authoring workflow, conservative defaults, required author
-decisions, and validation loop from the [authoring guide](authoring.md). The
-command and installable Agent Skill must be generated or checked from the same
-source so their instructions cannot drift.
+Present the encoding prerequisites, artifact workflow, refusal to infer missing
+financial decisions, and validation loop from the
+[authoring guide](authoring.md). The command and installable Agent Skill must be
+generated or checked from the same source so their instructions cannot drift.
 
 The guide routes to the schema, examples, and deeper semantic references; it
 does not embed the complete schema or fixture suite in default agent context.
@@ -138,15 +138,14 @@ infer statement hierarchy, calculations, or missing facts.
 
 - `fs init` does not create a blank FS document. The V0 contract requires
   nonempty definitions, facts, and statements; illustrative placeholders can
-  be mistaken for financial data. A later `init` command may scaffold a
-  separate authoring workspace if evidence justifies that layer.
+  be mistaken for financial data.
 - `add-account`, `add-row`, `set-cell`, `add-item`, and `add-fact` are not V0
   commands. `Item`, not account, row, or cell, is the format's financial term,
   and field-by-field mutation creates inefficient, transiently invalid state.
 - Statement-type templates are not provided because FS does not prescribe a
   taxonomy or statement contents.
-- `import-xbrl`, `import-sec`, `from-csv`, and source mapping are upstream
-  adapters, not core format commands.
+- `import-xbrl`, `import-sec`, `from-csv`, and source mapping are outside the
+  project boundary, not core format commands.
 - `repair`, `fix`, `normalize`, `calculate`, and `fill-totals` are omitted
   because apparent corrections commonly require author judgment and rules
   never materialize values.
@@ -189,9 +188,10 @@ fixtures before implementation.
 ## Agent Integration
 
 Ship an on-demand Agent Skill for FS authoring. It should teach the authoring
-contract, collect or identify missing author decisions, invoke the reference
-validator, and route structured diagnostics back into a repair loop. Static
-skill guidance and `fs guide authoring` share one maintained source.
+contract for an already-resolved financial model, identify missing prerequisite
+inputs without supplying them, invoke the reference validator, and route
+structured diagnostics back into an encoding repair loop. Static skill
+guidance and `fs guide authoring` share one maintained source.
 
 ## Implementation Order
 

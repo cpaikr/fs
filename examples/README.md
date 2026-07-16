@@ -6,7 +6,7 @@ The examples are conforming FS documents and are normative evidence for the
 They demonstrate artifact behavior rather than prescribe statement contents.
 They contain illustrative facts and must not be used as partially completed
 documents. See the [authoring guide](../docs/authoring.md) for the
-source-to-document workflow.
+document-encoding workflow.
 
 `minimal.json` proves that document, entity, and scope identifiers, dimensions,
 and calculation rules are optional. A document with no calculation rules has

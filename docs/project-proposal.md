@@ -46,10 +46,10 @@ Its central boundaries are:
 - A validation snapshot may be embedded for later comparison without creating
   a special document type or filename convention.
 
-Authoring guidance and reference tools project this same contract into a
-repeatable workflow. They may teach, discover, validate, and safely write
-complete documents, but they do not supply financial meaning or introduce
-semantics absent from the artifact specification.
+Authoring guidance and reference tools teach, discover, validate, and safely
+write this same contract. They begin from author-resolved financial meanings
+and values; they do not define a conversion method or introduce semantics
+absent from the artifact specification.
 
 The [domain language](../CONTEXT.md) defines these terms precisely.
 
@@ -77,11 +77,9 @@ The first usable release should contain:
 2. A JSON Schema and language-neutral conformance fixtures.
 3. Representative balance-sheet, income-statement, cash-flow, equity, and
    manufacturing-statement examples.
-4. A worked source-to-FS example with explicit authoring decisions and expected
-   validation output.
-5. A reference CLI for contract discovery, validation, safe creation,
+4. A reference CLI for contract discovery, validation, safe creation,
    recording validation snapshots, and simple HTML rendering.
-6. Authoring guidance and an installable Agent Skill that invoke the same
+5. Authoring guidance and an installable Agent Skill that invoke the same
    reference validator.
 
 ## Design Method
@@ -94,9 +92,9 @@ axis.
 
 Core validation and snapshot command scenarios were designed before the schema
 to expose required behavior. The examples and language-neutral fixtures now
-fix artifact-dependent result fields and identities. File-first authoring and
+fix artifact-dependent result fields and identities. Document-encoding and
 contract-discovery commands project that completed model without adding new
-document semantics. See the [CLI design](cli.md).
+semantics. See the [CLI design](cli.md).
 
 ## Success Criteria
 
@@ -111,8 +109,9 @@ V0 succeeds when:
 - inconsistent calculations remain visible and consumable;
 - documents with no calculation rules remain valid and straightforward to use;
 - documents and validation results are deterministic to inspect and diff;
-- an author or agent can discover the contract, produce a complete candidate,
-  and act on validation diagnostics without reading the whole repository; and
+- given author-resolved definitions and facts, a person or agent can discover
+  the contract, encode a complete candidate, and act on validation diagnostics
+  without reading the whole repository; and
 - new user-defined items or statement layouts do not require a core release.
 
 ## Future Direction

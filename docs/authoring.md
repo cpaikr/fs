@@ -3,42 +3,32 @@
 Status: current V0 authoring guidance; reference CLI commands are not yet
 implemented.
 
-This guide is the entry point for a person or agent turning already-acquired
-financial data into an FS document. The
+This guide is the entry point for a person or agent encoding an already-resolved
+financial-statement model as an FS document. The
 [semantic specification](semantic-spec.md) remains normative. The
 [JSON Schema](../schema/fs-document.schema.json) checks the JSON shape but does
 not enforce every reference, uniqueness, calendar, coordinate, or calculation
 invariant.
 
 FS is a file-first interchange format, not an extraction system, accounting
-taxonomy, or mutable financial database. An author decides what the source
-means; FS makes that decision explicit and consumable.
+taxonomy, conversion method, or mutable financial database. It starts after an
+author has chosen the financial meanings and values to represent.
 
 ## Authoring Contract
 
-An authoring task needs both:
-
-1. source data, such as an extracted table, spreadsheet, filing, or manual
-   transcription; and
-2. an authoring policy for the financial decisions the format deliberately
-   does not make.
-
-Before authoring, establish:
+Before encoding begins, the author must supply:
 
 - the reporting entity and exact reporting scope;
-- the statements, periods, and detail to retain;
-- units, scales, rounding, and sign interpretation;
-- when source line items share one meaning and when they remain distinct;
+- every item meaning and stable local identifier;
+- units, scales, periods, and fact values;
 - any non-period dimensions and their members;
-- what blanks, dashes, zero, and unavailable values mean; and
-- which supplied relationships should become calculation rules, including any
-  tolerance.
+- the intended distinction between zero, missing, and unavailable facts;
+- statement composition and display order; and
+- any calculation rules and tolerances the author wants checked.
 
-When the author supplies no mapping policy, use conservative, source-faithful
-defaults: preserve source meanings, labels, granularity, values, units, and
-periods; do not aggregate, invent a taxonomy, infer arithmetic from layout, or
-silently resolve an ambiguity. Record unresolved decisions outside the FS
-document.
+These are prerequisites, not questions the format answers. A person or agent
+must stop and request missing or contradictory inputs rather than infer a
+meaning, choose a sign, aggregate items, map a taxonomy, or invent a value.
 
 ## Workflow
 
@@ -100,11 +90,10 @@ A reviewable authoring result should include:
 
 1. the FS JSON document;
 2. its complete structured validation result when the reference validator is
-   available; and
-3. a separate decision or source ledger recording provenance, interpretations,
-   omissions, and unresolved questions.
+   available.
 
-The ledger is an authoring-workflow artifact, not part of the FS document or
+FS defines no source ledger, provenance sidecar, or conversion record. Other
+systems may maintain their own records, but they are outside this project and
 its conformance contract. Source and provenance properties inside FS JSON are
 nonconforming in V0.
 
@@ -138,29 +127,31 @@ author-controlled.
 
 ## Reusable Agent Instruction
 
-The following instruction can accompany the source data and authoring policy:
+The following instruction can accompany an author-resolved financial model:
 
 ```text
-Create one FS document with formatVersion "0.1" from the supplied financial
-data. Use the FS semantic specification as the normative meaning, the document
-JSON Schema for shape, and minimal.json only as a structural example.
+Encode the supplied, author-resolved financial model as one FS document with
+formatVersion "0.1". Use the FS semantic specification as normative, the
+document JSON Schema for shape, and minimal.json only as a structural example.
 
-Preserve source meanings, labels, granularity, signs, units, scales, and
-periods unless the authoring policy explicitly changes them. Use stable
-document-local identifiers. Store supplied values as independent facts and
-statements as presentations over those facts. Distinguish zero, missing, and
-explicitly unavailable values. Add only author-confirmed calculation rules.
-Never invent values, alter a value to satisfy a check, infer calculations from
-layout, or put provenance in the FS JSON.
+Treat the supplied entity, scope, item meanings, units, scales, periods,
+dimensions, facts, presentations, and calculation rules as inputs. Do not
+extract, map, classify, aggregate, choose signs, infer relationships, or invent
+values. If any required input is missing, contradictory, or ambiguous, stop
+and identify exactly what the author must decide.
 
-If a financial interpretation is ambiguous, report it instead of guessing.
-Run the full reference validator, repair structural errors using its stable
-codes and JSON Pointer paths, and report calculation inconsistency separately.
+Use stable document-local identifiers. Store supplied values as independent
+facts and statements as presentations over those facts. Distinguish zero,
+missing, and explicitly unavailable values. Never alter a value to satisfy a
+check or put provenance in the FS JSON.
 
-Deliver the FS JSON, its structured validation result, and a separate ledger
-of source references, decisions, omissions, and unresolved questions.
+Run the full reference validator, repair only structural encoding errors that
+do not require a financial decision, and report calculation inconsistency
+separately. Deliver the FS JSON and its structured validation result.
 ```
 
-An installable Agent Skill should expose this workflow on demand and invoke the
-same reference validator. It should route to focused references rather than
-embedding the complete schema or fixture suite in agent context.
+An installable Agent Skill should teach this encoding workflow, recognize when
+the prerequisite financial model is incomplete, and invoke the same reference
+validator. It must not add extraction or mapping instructions. It should route
+to focused references rather than embedding the complete schema or fixture
+suite in agent context.
