@@ -1,7 +1,7 @@
 # fs
 
-Status: contract design; no CLI implementation exists. `fs` is a working
-title.
+Status: V0 artifact semantics and the packed reference CLI through `fs create`
+exist. `fs` is a working title.
 
 `fs` is a public format for clean, structured financial statements. It gives
 people and agents one predictable artifact to produce after extracting or
@@ -25,9 +25,10 @@ engine.
 
 ## Repository State
 
-The V0 semantic contract, baseline schemas, examples, and language-neutral
-fixtures exist. Known schema and fixture gaps remain before the CLI acceptance
-suite and implementation begin.
+The V0 semantic contract, schemas, examples, language-neutral fixtures, full
+validator, bundled discovery/content commands, and exact-byte non-overwriting
+creation exist. The CLI contracts now adopt `effect/unstable/cli` as the
+next command runner; the active plan owns migration state.
 
 The [roadmap](ROADMAP.md) shows strategic milestones. The
 [V0 CLI plan](docs/plans/cli-v0.md) is the only source for current progress,

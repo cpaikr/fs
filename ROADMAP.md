@@ -1,7 +1,7 @@
 # Roadmap
 
-Status: V0 artifact and CLI contracts are designed. Contract-artifact
-alignment and CLI integration research are the current milestone.
+Status: The reference CLI through `fs create` is implemented. Effect-native
+CLI migration is the current milestone.
 
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
@@ -15,13 +15,16 @@ Completed foundations:
 - the normative V0 artifact semantics;
 - baseline document and result schemas, examples, and fixtures;
 - authoring guidance for an already-resolved financial model;
-- the planned command surface and deterministic process contract; and
-- the TypeScript, Node.js, Effect, and npm delivery direction.
+- the command surface and deterministic process contract;
+- full semantic validation, bundled discovery and content, and atomic
+  exact-byte creation; and
+- the packed TypeScript, Node.js, Effect, and npm delivery path.
 
-Before implementation begins, the project must align the remaining schema and
-fixture gaps, verify a public integration seam in the selected CLI stack, and
-encode the accepted command behavior as process fixtures. Detailed phase gates
-and known drift are maintained in the [delivery plan](docs/plans/cli-v0.md).
+The current milestone replaces the Node-core grammar adapter and static help
+with the revised Effect-native contract and `effect/unstable/cli` runner. It
+preserves artifact meaning, validation results, exact bundled content,
+logging, and filesystem safety. Detailed phase gates and known drift are
+maintained in the [delivery plan](docs/plans/cli-v0.md).
 
 ## Release Sequence
 
@@ -31,14 +34,16 @@ and known drift are maintained in the [delivery plan](docs/plans/cli-v0.md).
 3. [x] Publish document-encoding guidance that refuses missing financial
    decisions.
 4. [x] Define the reference CLI surface and observable acceptance contract.
-5. [ ] Close known contract-artifact gaps and verify the selected public CLI
+5. [x] Close known contract-artifact gaps and verify the selected public CLI
    integration boundary.
-6. [ ] Add deterministic CLI fixtures, then implement full validation.
-7. [ ] Add contract discovery and atomic, non-overwriting document creation.
-8. [ ] Generate agent guidance from one source, then add snapshot recording
+6. [x] Add deterministic CLI fixtures, then implement full validation.
+7. [x] Add contract discovery and atomic, non-overwriting document creation.
+8. [ ] Adopt the revised Effect-native CLI contract, acceptance fixtures, and
+   `effect/unstable/cli` runner.
+9. [ ] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.
-9. [ ] Replace placeholder schema identifiers, run cross-platform package
-   verification, and release V0.
+10. [ ] Replace placeholder schema identifiers, run cross-platform package
+    verification, and release V0.
 
 ## Later Directions
 

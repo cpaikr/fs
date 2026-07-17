@@ -7,6 +7,10 @@ implementation. The [acceptance contract](../../cli/acceptance.md) is
 authoritative for behavior; these fixtures provide executable evidence rather
 than a second prose definition.
 
+This suite is the completed pre-migration process baseline. Phase 6 replaces
+the affected grammar, help, and built-in cases while retaining its domain,
+content, logging, and filesystem coverage.
+
 ## Fixture Foundation
 
 - [x] Add `fixtures/cli/case.schema.json` and `fixtures/cli/manifest.json`.

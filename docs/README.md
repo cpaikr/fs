@@ -10,11 +10,11 @@ one primary responsibility.
 - Encode a document: [Authoring guide](authoring.md)
 - Implement or assess artifact behavior:
   [Semantic specification](semantic-spec.md)
-- Understand the planned command surface: [CLI design](cli/design.md)
+- Understand the command surface: [CLI design](cli/design.md)
 - Implement or test process behavior:
   [CLI acceptance contract](cli/acceptance.md)
 - See strategic milestones: [Roadmap](../ROADMAP.md)
-- Continue current implementation work: [V0 CLI plan](plans/cli-v0.md)
+- Continue the Effect-native CLI migration: [V0 CLI plan](plans/cli-v0.md)
 
 The scoped [example guide](../examples/README.md) and
 [fixture guide](../fixtures/README.md) explain their local evidence.

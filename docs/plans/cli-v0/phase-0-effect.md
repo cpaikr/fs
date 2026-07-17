@@ -7,6 +7,11 @@ can implement the accepted CLI process contract entirely through public APIs.
 The production adapter and retained tests belong to
 [Phase 2](phase-2-package.md).
 
+This is the completed investigation that selected the pre-migration
+`util.parseArgs` seam under the former contract. The
+[Effect-native migration](phase-6-effect-cli.md) owns its deliberate
+replacement after accepting the published built-ins and native presentation.
+
 ## Scope
 
 - [x] Select exact coordinated versions for Effect, Node.js platform/runtime,

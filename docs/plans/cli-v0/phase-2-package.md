@@ -8,6 +8,10 @@ Node-core command and public Effect integration seams selected in
 [Phase 0b](phase-0-effect.md) against the complete fixture protocol fixed in
 [Phase 1](phase-1-acceptance.md).
 
+This is the completed pre-migration package baseline. Phase 6 owns removal of
+the Node-core grammar adapter and static help boundary; its validator,
+application, logging, packaging, and filesystem evidence remains retained.
+
 ## Package Foundation
 
 - [x] Add `package.json`, an exact pnpm lock, strict TypeScript configuration,
