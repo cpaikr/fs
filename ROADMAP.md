@@ -2,13 +2,13 @@
 
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
-[V0 CLI plan](docs/plans/cli-v0.md) owns current task state, validation,
-blockers, and the next action.
+[step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md) owns current
+task state, validation, blockers, and the next action.
 
 ## Reference CLI
 
-Steps 1–8 define the reference CLI sequence. Detailed scope, phase status,
-validation, and known drift are maintained in the
+Steps 1–8 define the completed reference CLI sequence. Detailed historical
+scope and validation are maintained in the
 [V0 CLI plan](docs/plans/cli-v0.md).
 
 ## Release Sequence

@@ -55,11 +55,7 @@ and packed executable implement the revised contract. Artifact semantics,
 operation results, exact bundled content, logging, and filesystem behavior
 remain unchanged.
 
-## Current Blockers
+## Closure
 
-None.
-
-## Next Action
-
-Start Roadmap step 9 under a new active plan. This CLI delivery plan is
-complete.
+This CLI delivery plan is complete. Roadmap step 9 continues under its
+[own active plan](agent-guidance-snapshots-rendering.md).

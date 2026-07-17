@@ -2,8 +2,9 @@
 
 ## Repository state
 
-- Read [the active CLI plan](docs/plans/cli-v0.md) before assuming any package,
-  executable, build, validator, or command is available.
+- Read [the active plan](docs/plans/agent-guidance-snapshots-rendering.md)
+  before assuming any package, executable, build, validator, or command is
+  available.
 - Start with [the documentation index](docs/README.md) and use its authority
   map instead of inferring behavior from summaries.
 - Treat CLI contract prose as intended behavior, not evidence that the behavior
@@ -13,7 +14,7 @@
 
 - Update a decision in its owning document, then link to it from summaries.
   Do not copy live status or a next action outside
-  [the active CLI plan](docs/plans/cli-v0.md).
+  [the active plan](docs/plans/agent-guidance-snapshots-rendering.md).
 - Keep contract changes aligned across the semantic specification, schemas,
   fixtures, and affected CLI contracts. Record known temporary drift in the
   active plan.

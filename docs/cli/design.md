@@ -1,8 +1,9 @@
 # CLI Design
 
 The CLI is the packaged reference consumer and authoring aid for complete FS
-documents. The [delivery plan](../plans/cli-v0.md) owns implementation state
-and technical delivery choices.
+documents. The
+[active delivery plan](../plans/agent-guidance-snapshots-rendering.md) owns
+implementation state and technical delivery choices.
 
 ## Boundary
 
@@ -82,7 +83,7 @@ drift.
 The [portable template](../../content/guide/authoring.md.template) is that
 source. Its [installed rendering](../../assets/guide/authoring.md) uses `fs`;
 the deterministic renderer accepts an exact package version and fixes the
-`npx -y @cpai/fs@<version>` prefix for future Phase 7 Skill generation.
+`npx -y @cpai/fs@<version>` prefix for Agent Skill generation.
 
 Generated routes and commands must work outside a repository checkout. The
 guide routes to schemas, examples, and the semantic specification without
@@ -222,6 +223,8 @@ installation.
 
 ## Delivery
 
-The [V0 CLI plan](../plans/cli-v0.md) owns the selected runtime, package,
-dependency constraints, implementation phases, validation gates, and current
-next action.
+The
+[active delivery plan](../plans/agent-guidance-snapshots-rendering.md) owns the
+implementation phases, validation gates, and current next action. The
+[completed V0 CLI plan](../plans/cli-v0.md) retains the selected runtime,
+package, dependency constraints, and step-8 validation evidence.

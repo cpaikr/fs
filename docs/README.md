@@ -14,7 +14,10 @@ one primary responsibility.
 - Implement or test process behavior:
   [CLI acceptance contract](cli/acceptance.md)
 - See strategic milestones: [Roadmap](../ROADMAP.md)
-- Continue the Effect-native CLI migration: [V0 CLI plan](plans/cli-v0.md)
+- Continue Roadmap step 9:
+  [Agent guidance, snapshots, and rendering plan](plans/agent-guidance-snapshots-rendering.md)
+- Inspect the completed Effect-native CLI milestone:
+  [V0 CLI plan](plans/cli-v0.md)
 
 The scoped [example guide](../examples/README.md) and
 [fixture guide](../fixtures/README.md) explain their local evidence.
@@ -29,8 +32,8 @@ When documents overlap, use this order:
 2. The CLI design defines command intent and boundaries. The CLI acceptance
    contract defines observable arguments, streams, results, exit codes, and
    filesystem effects.
-3. The roadmap owns strategic sequence. The V0 CLI plan owns mutable task
-   state, gates, validation, blockers, and the next action; it is not a
+3. The roadmap owns strategic sequence. The active step-9 plan owns mutable
+   task state, gates, validation, blockers, and the next action; it is not a
    normative product contract.
 
 The product scope and glossary explain intent and terminology but do not
