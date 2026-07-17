@@ -54,7 +54,6 @@ export const isSnapshotValid = (snapshot: ValidationSnapshot): boolean => {
   if (snapshot.conformance === "nonconforming") {
     return snapshot.calculations === "not-run" && snapshot.applications.length === 0
   }
-  if (snapshot.calculations === "not-run") return false
   if (snapshot.calculations === "not-defined") return snapshot.applications.length === 0
   if (snapshot.calculations === "consistent") {
     return snapshot.applications.length > 0 && snapshot.applications.every(({ status }) => status === "satisfied")

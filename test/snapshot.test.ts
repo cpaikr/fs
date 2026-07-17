@@ -41,6 +41,7 @@ describe("snapshot comparison", () => {
         change.change === "removed"
     )
     if (added === undefined || removed === undefined) throw new Error("Application-set fixture lost a change")
+    if (removed.recorded.status !== "satisfied") throw new Error("Recorded removal must be satisfied")
 
     const snapshot: ValidationSnapshot = {
       conformance: "conforming",

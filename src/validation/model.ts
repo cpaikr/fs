@@ -44,15 +44,20 @@ export interface CellIdentity {
   readonly period: string
 }
 
+interface NumericApplication {
+  readonly key: ApplicationKey
+  readonly actual: string
+  readonly expected: string
+  readonly difference: string
+  readonly tolerance: string
+}
+
+export type SatisfiedApplication = NumericApplication & { readonly status: "satisfied" }
+export type UnsatisfiedApplication = NumericApplication & { readonly status: "unsatisfied" }
+
 export type ApplicationResult =
-  | {
-      readonly key: ApplicationKey
-      readonly status: "satisfied" | "unsatisfied"
-      readonly actual: string
-      readonly expected: string
-      readonly difference: string
-      readonly tolerance: string
-    }
+  | SatisfiedApplication
+  | UnsatisfiedApplication
   | {
       readonly key: ApplicationKey
       readonly status: "error"
@@ -60,13 +65,50 @@ export type ApplicationResult =
       readonly cell: CellIdentity
     }
 
+export type FailedApplication = Exclude<ApplicationResult, SatisfiedApplication>
+export type ConsistentApplications = readonly [SatisfiedApplication, ...SatisfiedApplication[]]
+declare const inconsistentApplicationsBrand: unique symbol
+export type InconsistentApplications = readonly [ApplicationResult, ...ApplicationResult[]] & {
+  readonly [inconsistentApplicationsBrand]: true
+}
+
+export const inconsistentApplications = (
+  applications: ReadonlyArray<ApplicationResult>
+): InconsistentApplications | undefined => {
+  const [first, ...rest] = applications
+  if (
+    first === undefined ||
+    !applications.some(({ status }) => status === "unsatisfied" || status === "error")
+  ) {
+    return undefined
+  }
+  const copied: readonly [ApplicationResult, ...ApplicationResult[]] = [first, ...rest]
+  return copied as InconsistentApplications
+}
+
 export type CalculationStatus = "not-run" | "not-defined" | "consistent" | "inconsistent"
 
-export interface ValidationSnapshot {
-  readonly conformance: "conforming" | "nonconforming"
-  readonly calculations: CalculationStatus
-  readonly applications: ReadonlyArray<ApplicationResult>
-}
+export type ValidationSnapshot =
+  | {
+      readonly conformance: "nonconforming"
+      readonly calculations: "not-run"
+      readonly applications: readonly []
+    }
+  | {
+      readonly conformance: "conforming"
+      readonly calculations: "not-defined"
+      readonly applications: readonly []
+    }
+  | {
+      readonly conformance: "conforming"
+      readonly calculations: "consistent"
+      readonly applications: ConsistentApplications
+    }
+  | {
+      readonly conformance: "conforming"
+      readonly calculations: "inconsistent"
+      readonly applications: InconsistentApplications
+    }
 
 export interface Document {
   readonly formatVersion: "0.1"

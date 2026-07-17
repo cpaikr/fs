@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest"
 
 import { decodeJson } from "../src/json.js"
 import { recordValidationSnapshot } from "../src/record-validation.js"
-import type { Document } from "../src/validation/model.js"
+import type { ApplicationResult, Document } from "../src/validation/model.js"
 import { validateDocument } from "../src/validation/validate.js"
 
 describe("validation snapshot recording", () => {
@@ -66,5 +66,17 @@ describe("validation snapshot recording", () => {
 
     expect(Object.keys(recorded.document)).toEqual(expectedOrder)
     expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)
+  })
+
+  it("does not retain a mutable alias to refined application arrays", () => {
+    const input = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
+    const validation = validateDocument(input).validation
+    const recorded = recordValidationSnapshot(input, validation)
+    const snapshot = structuredClone(recorded.document.validationSnapshot)
+
+    const sourceApplications = validation.calculations.applications as Array<ApplicationResult>
+    sourceApplications.splice(0)
+
+    expect(recorded.document.validationSnapshot).toEqual(snapshot)
   })
 })

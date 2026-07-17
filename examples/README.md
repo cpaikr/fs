@@ -29,8 +29,7 @@ the [authoring guide](../docs/authoring.md) for the encoding workflow.
 - Most rows use KRW millions while the EPS row uses KRW per share, proving
   mixed-unit statement presentation without permitting mixed-unit rollup
   edges.
-- Values include exact decimals, signs, zero, null, and explicit
-  unavailability.
+- Values include exact decimals, signs, zero, and explicit unavailability.
 
 Structural conformance and calculation consistency are separate outcomes; the
 example is valid even though one rollup application is unsatisfied.

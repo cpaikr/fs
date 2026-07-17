@@ -190,7 +190,11 @@ schema discovery, parsing, validation, calculation, snapshot recording and
 comparison, rendering, exact creation, CLI acceptance, and packed installation.
 The clean final `pnpm verify`, `./scripts/check-docs.sh`, and
 `git diff --check` gates pass. The required fresh final review reports no
-material finding or unresolved decision.
+material finding or unresolved decision. GitHub Codex and CodeRabbit follow-up
+then aligns the CLI matrix fixture name, corrects the example's value-coverage
+claim, and makes validation-snapshot status/application combinations
+unrepresentable by typed producers. Follow-up review also closes mutable aliases
+when refining application arrays into those snapshot states.
 
 ## Blockers
 
