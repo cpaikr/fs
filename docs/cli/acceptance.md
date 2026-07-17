@@ -89,17 +89,7 @@ An illustrative case descriptor is:
       "values": [
         {
           "pointer": "/help",
-          "equals": [
-            {
-              "executable": "fs",
-              "arguments": [
-                "record-validation",
-                "--output",
-                "<new-document>",
-                "input.json"
-              ]
-            }
-          ]
+          "equals": []
         }
       ]
     },
@@ -199,11 +189,9 @@ is `nonconforming`; the named code and path match exactly; the message is
 nonempty; and calculations are `not-run` with no applications. This does not
 create a duplicate semantic expected-result file merely for the CLI layer.
 
-When a structurally conforming document has no recorded snapshot, `help`
-contains one structured `fs record-validation` argv suggestion. It carries
-forward the path input or `-` and uses `<new-document>` for the required output
-path. When a snapshot exists, or when structural nonconformance prevents
-recording, `help` is empty.
+`help` is empty until an implemented command can directly remediate the
+reported result. In particular, validation does not suggest the planned
+`record-validation` command before that command is available.
 
 Structural nonconformance is a validation result with exit code `1`, not a
 generic command error. It has calculation status `not-run`. Calculation

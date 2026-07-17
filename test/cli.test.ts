@@ -93,6 +93,17 @@ describe("Effect CLI boundary", () => {
     expect(calls).toEqual([])
   })
 
+  it("reports a missing guide topic through native help and diagnostics", () => {
+    const calls: Array<string> = []
+    const observed = runCli(["guide"], ioWithCalls(calls))
+
+    expect(observed.exitCode).toBe(2)
+    expect(observed.stdout.toString("utf8")).toContain("fs guide")
+    expect(observed.stdout.toString("utf8")).toContain("authoring")
+    expect(observed.stderr.toString("utf8")).toContain("topic")
+    expect(calls).toEqual([])
+  })
+
   it("lets a native action short-circuit invalid ordinary values without application I/O", () => {
     const calls: Array<string> = []
     const observed = runCli(

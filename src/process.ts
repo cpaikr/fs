@@ -269,12 +269,8 @@ const runValidate = (
       calculations: result.validation.calculations.status,
       snapshot: result.snapshotDiff.status
     })
-    const help =
-      result.validation.conformance.status === "conforming" && result.snapshotDiff.status === "not-recorded"
-        ? [commandSuggestion("record-validation", "--output", "<new-document>", input)]
-        : []
     return jsonResult(
-      { validation: result.validation, snapshotDiff: result.snapshotDiff, help },
+      { validation: result.validation, snapshotDiff: result.snapshotDiff, help: [] },
       result.validation.conformance.status === "conforming" ? 0 : 1,
       logger.bytes()
     )

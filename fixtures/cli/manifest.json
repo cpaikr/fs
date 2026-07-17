@@ -29,6 +29,7 @@
     "cases/example/unknown-name.json",
     "cases/guide/authoring.json",
     "cases/guide/extra-argument.json",
+    "cases/guide/missing-topic.json",
     "cases/guide/unknown-topic.json",
     "cases/help/action-create-extra-operand.json",
     "cases/help/action-schema-unknown-name.json",

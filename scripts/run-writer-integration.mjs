@@ -114,12 +114,41 @@ const spawnContender = (destination, payload, ready, release) =>
     })
   })
 
-const waitForBarrier = async (readyPaths) => {
+const waitForBarrier = async (readyPaths, signal) => {
   const deadline = Date.now() + 30_000
   while (!readyPaths.every((path) => existsSync(path))) {
+    if (signal.aborted) return
     if (Date.now() >= deadline) throw new Error("concurrent writers did not reach the preflight barrier")
     await new Promise((resolve) => setTimeout(resolve, 10))
   }
+}
+
+const waitForContendersAtBarrier = async (readyPaths, contenders) => {
+  const controller = new AbortController()
+  const earlyExit = Promise.race(contenders).then(({ code, stderr }) => {
+    throw new Error(`concurrent writer exited before barrier: code=${String(code)} stderr=${stderr}`)
+  })
+  try {
+    await Promise.race([waitForBarrier(readyPaths, controller.signal), earlyExit])
+  } finally {
+    controller.abort()
+  }
+}
+
+const runEarlyExitCase = async (root) => {
+  const startedAt = Date.now()
+  let failure
+  try {
+    await waitForContendersAtBarrier(
+      [join(root, "early-exit-never-ready")],
+      [Promise.resolve({ code: 2, stderr: "preflight failed" })]
+    )
+  } catch (error) {
+    failure = error
+  }
+  assert(failure instanceof Error, "early contender exit did not fail the barrier")
+  assert(failure.message.includes("code=2 stderr=preflight failed"), "early contender exit details were lost")
+  assert(Date.now() - startedAt < 1_000, "early contender exit did not fail promptly")
 }
 
 const runContentionCase = async (root) => {
@@ -134,17 +163,9 @@ const runContentionCase = async (root) => {
     spawnContender(destination, payload, readyPaths[index], release)
   )
   const settledPromise = Promise.allSettled(contenders)
-  const earlyFailure = new Promise((resolve) => {
-    for (const contender of contenders) contender.catch(resolve)
-  })
   let barrierFailure
   try {
-    await Promise.race([
-      waitForBarrier(readyPaths),
-      earlyFailure.then((error) => {
-        throw error
-      })
-    ])
+    await waitForContendersAtBarrier(readyPaths, contenders)
   } catch (error) {
     barrierFailure = error
   } finally {
@@ -175,8 +196,9 @@ if (role === "child-crash") {
   const root = mkdtempSync(join(tmpdir(), "fs-writer-integration-"))
   try {
     runCrashCases(root)
+    await runEarlyExitCase(root)
     await runContentionCase(root)
-    process.stdout.write(`Passed ${crashPoints.length} crash points and 16 concurrent writers.\n`)
+    process.stdout.write(`Passed ${crashPoints.length} crash points, early-exit monitoring, and 16 concurrent writers.\n`)
   } finally {
     rmSync(root, { recursive: true, force: true })
   }

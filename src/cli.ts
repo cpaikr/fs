@@ -219,7 +219,9 @@ const authoring = Command.make("authoring", { operands: noOperands }, () => disp
   Command.withDescription("Show the standalone authoring workflow for an author-resolved financial model.")
 )
 
-const guide = Command.make("guide").pipe(
+const guide = Command.make("guide", {}, () =>
+  failWithUsage(["fs", "guide"], new CliError.MissingArgument({ argument: "topic" }))
+).pipe(
   Command.withDescription("Read focused standalone FS guidance."),
   Command.withSubcommands([authoring])
 )
