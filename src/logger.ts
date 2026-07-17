@@ -1,4 +1,4 @@
-import type { LogLevel } from "./arguments.js"
+export type LogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "none"
 
 type EmittedLevel = Exclude<LogLevel, "none">
 

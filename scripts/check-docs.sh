@@ -56,25 +56,6 @@ for invalid_version in latest 1.0.0-.. 1.0.0-01; do
     exit 1
   fi
 done
-if ! diff -u \
-  <(
-    printf '%s\n' \
-      'assets/help/create.md' \
-      'assets/help/example.md' \
-      'assets/help/fs.md' \
-      'assets/help/guide-authoring.md' \
-      'assets/help/guide.md' \
-      'assets/help/schema.md' \
-      'assets/help/validate.md'
-  ) \
-  <(
-    find assets/help -mindepth 1 -maxdepth 1 -print \
-      | LC_ALL=C sort
-  ); then
-  echo "Help asset inventory differs from the accepted command surface" >&2
-  exit 1
-fi
-
 echo "Parsing JSON artifacts"
 find . \
   -path './.git' -prune -o \
