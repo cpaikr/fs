@@ -90,15 +90,17 @@ describe("atomic no-replace writer", () => {
 
   it("uses a bounded temporary name and preserves collisions it does not own", () => {
     const fake = fakeWriter()
-    const temporary = "/work/.fs-fixed.tmp"
+    const parent = join("work")
+    const destination = join(parent, "a".repeat(255))
+    const temporary = join(parent, ".fs-fixed.tmp")
     fake.paths.add(temporary)
 
-    expect(writeNewFile(`/work/${"a".repeat(255)}`, Buffer.from("x"), fake.services)).toBe("write-failed")
+    expect(writeNewFile(destination, Buffer.from("x"), fake.services)).toBe("write-failed")
     expect(fake.paths.has(temporary)).toBe(true)
     expect(fake.calls).toEqual([`open:${temporary}`])
 
     const available = fakeWriter()
-    expect(writeNewFile(`/work/${"a".repeat(255)}`, Buffer.from("x"), available.services)).toBeNull()
+    expect(writeNewFile(destination, Buffer.from("x"), available.services)).toBeNull()
     expect(available.calls[0]).toBe(`open:${temporary}`)
   })
 
