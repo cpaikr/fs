@@ -13,6 +13,12 @@ one primary responsibility.
 - Understand the command surface: [CLI design](cli/design.md)
 - Implement or test process behavior:
   [CLI acceptance contract](cli/acceptance.md)
+- Review the accepted replacement model:
+  [statement item rows](adr/0001-replace-dimensional-members-with-item-grouping.md)
+- Continue Roadmap step 10:
+  [Statement item row refactor](plans/statement-item-row-refactor.md)
+- Review the independent proposed rendering policy:
+  [Finite rendering limits](adr/0002-bound-render-output.md)
 - See strategic milestones: [Roadmap](../ROADMAP.md)
 - Inspect completed Roadmap step 9:
   [Agent guidance, snapshots, and rendering plan](plans/agent-guidance-snapshots-rendering.md)
@@ -38,6 +44,12 @@ When documents overlap, use this order:
 
 The product scope and glossary explain intent and terminology but do not
 override the semantic specification.
+
+ADR 0001 fixes the accepted replacement target but does not override the
+current semantic, schema, fixture, or CLI contracts until Roadmap step 10
+incorporates it into those owning documents. Its active plan owns transition
+state and temporary drift. Proposed ADRs have no contract authority until
+accepted and incorporated.
 
 ## Maintenance
 

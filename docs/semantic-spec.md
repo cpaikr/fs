@@ -1,5 +1,11 @@
 # FS V0 Semantic Specification
 
+This specification remains the normative current `0.1` contract. The accepted
+[statement-item-row replacement](adr/0001-replace-dimensional-members-with-item-grouping.md)
+is not valid input until the coordinated
+[Roadmap step-10 refactor](plans/statement-item-row-refactor.md) replaces this
+document, schemas, fixtures, and implementation together.
+
 This specification defines the meaning of an FS document independently of any
 implementation language. The [JSON Schema](../schema/fs-document.schema.json)
 checks its JSON shape. Requirements in this document that concern uniqueness,

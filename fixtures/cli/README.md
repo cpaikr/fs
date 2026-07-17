@@ -1,5 +1,9 @@
 # CLI Acceptance Fixtures
 
+These cases remain executable evidence for the current `0.1` contract. Their
+artifact-sensitive inputs and outputs change only through the coordinated
+[Roadmap step-10 refactor](../../docs/plans/statement-item-row-refactor.md).
+
 These fixtures provide executable evidence for the observable process contract
 in the [CLI acceptance contract](../../docs/cli/acceptance.md). The contract is
 authoritative for target behavior. The

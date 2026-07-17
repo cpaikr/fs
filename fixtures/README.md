@@ -1,5 +1,10 @@
 # Language-Neutral Fixtures
 
+These fixtures remain executable evidence for the current `0.1` contract. The
+[Roadmap step-10 refactor](../docs/plans/statement-item-row-refactor.md) will
+replace the complete matrix rather than editing individual fixtures to resemble
+the accepted target prematurely.
+
 These fixtures provide machine-readable evidence for the normative
 [semantic specification](../docs/semantic-spec.md). Deterministic CLI process
 fixtures live under [`cli/`](cli/) and follow the

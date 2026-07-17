@@ -1,5 +1,10 @@
 # V0 Examples
 
+These files remain examples of the current `0.1` contract. Their coordinated
+replacement is planned in
+[Roadmap step 10](../docs/plans/statement-item-row-refactor.md); they are not
+examples of the accepted row model.
+
 These examples provide conformance evidence for the normative
 [semantic specification](../docs/semantic-spec.md). They demonstrate artifact
 behavior; they do not define statement contents or act as partially completed

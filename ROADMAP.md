@@ -5,6 +5,9 @@ This roadmap owns strategic sequence only. The
 [completed step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md)
 records its delivery decisions and validation.
 
+The accepted statement-item-row redesign is planned in the active
+[refactor plan](docs/plans/statement-item-row-refactor.md).
+
 ## Reference CLI
 
 Steps 1–8 define the completed reference CLI sequence. Detailed historical
@@ -27,7 +30,9 @@ scope and validation are maintained in the
    `effect/unstable/cli` runner.
 9. [x] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.
-10. [ ] Replace placeholder schema identifiers, run cross-platform package
+10. [ ] Replace the dimensional fact model with statement-owned item rows,
+    nested value and grouping maps, and additive rollup validation.
+11. [ ] Replace placeholder schema identifiers, run cross-platform package
     verification, and release V0.
 
 ## Later Directions

@@ -1,5 +1,10 @@
 # Authoring FS Documents
 
+This guide remains the authoring contract for the currently implemented `0.1`
+format. Do not author the accepted statement-item-row replacement until the
+[Roadmap step-10 refactor](plans/statement-item-row-refactor.md) updates schema
+discovery, validation, examples, and this guide together.
+
 This guide is the entry point for a person or agent encoding an already-resolved
 financial-statement model as an FS document. The
 [semantic specification](semantic-spec.md) remains normative. The

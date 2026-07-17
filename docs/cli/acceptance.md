@@ -1,5 +1,11 @@
 # CLI Acceptance Contract
 
+This contract remains authoritative for the current `0.1` implementation. The
+accepted statement-item-row replacement does not change observable process
+behavior until the
+[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates this
+contract, fixtures, and runtime together.
+
 ## Purpose
 
 CLI acceptance fixtures fix the observable process contract of the reference

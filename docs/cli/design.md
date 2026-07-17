@@ -1,5 +1,11 @@
 # CLI Design
 
+This design describes the current CLI and `0.1` artifact behavior. The accepted
+statement-item-row model changes artifact-dependent validation, snapshots,
+examples, and rendering only after the
+[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates the
+owning contracts and executable evidence.
+
 The CLI is the packaged reference consumer and authoring aid for complete FS
 documents. The
 [completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)

@@ -1,7 +1,8 @@
 # fs
 
-Status: V0 artifact semantics and the packed reference CLI through `fs render`
-exist. `fs` is a working title.
+Status: The current V0 artifact semantics and packed reference CLI through
+`fs render` exist. A replacement statement-item-row model is accepted and its
+refactor is planned but not implemented. `fs` is a working title.
 
 `fs` is a public format for clean, structured financial statements. It gives
 people and agents one predictable artifact to produce after extracting or
@@ -22,6 +23,8 @@ engine.
   [product scope](docs/product-scope.md).
 - For every document and its authority, use the
   [documentation index](docs/README.md).
+- To review or execute the accepted redesign, use the
+  [statement-item-row refactor plan](docs/plans/statement-item-row-refactor.md).
 
 ## Repository State
 
@@ -33,4 +36,6 @@ standalone HTML presentations.
 
 The [roadmap](ROADMAP.md) shows strategic milestones. The
 [step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md) records its
-delivery decisions and validation.
+delivery decisions and validation. The
+[step-10 plan](docs/plans/statement-item-row-refactor.md) owns the pending
+replacement and its temporary contract drift.
