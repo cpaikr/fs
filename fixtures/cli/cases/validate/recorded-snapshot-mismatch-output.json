@@ -1,0 +1,29 @@
+{
+  "id": "validate-recorded-snapshot-mismatch-output",
+  "command": "fs",
+  "arguments": ["validate", "recorded.json"],
+  "workspace": [
+    { "copy": "expected/record-validation/snapshot-mismatch.json", "to": "recorded.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "help"] }
+      ],
+      "equalities": [
+        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/snapshot-mismatch-current.json" } },
+        { "pointer": "/snapshotDiff", "equalsFile": { "file": "../snapshot-diffs/recorded-snapshot-mismatch.json" } },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["recorded.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

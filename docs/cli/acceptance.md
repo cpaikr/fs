@@ -189,9 +189,12 @@ is `nonconforming`; the named code and path match exactly; the message is
 nonempty; and calculations are `not-run` with no applications. This does not
 create a duplicate semantic expected-result file merely for the CLI layer.
 
-`help` is empty until an implemented command can directly remediate the
-reported result. In particular, validation does not suggest the planned
-`record-validation` command before that command is available.
+`help` is empty unless an implemented command can directly remediate the
+reported result. A conforming validation whose snapshot status is
+`not-recorded` or `mismatch` suggests `record-validation --output
+<new-document> <document|->`, preserving the supplied path or `-` operand.
+Matching snapshots, structural nonconformance, and invalid embedded snapshots
+do not produce that suggestion.
 
 Structural nonconformance is a validation result with exit code `1`, not a
 generic command error. It has calculation status `not-run`. Calculation
@@ -293,6 +296,11 @@ candidate is invalid and the destination exists. The implementation must also
 enforce no-overwrite at the atomic commit boundary so the preflight check does
 not introduce a race.
 
+`fs record-validation` uses the same precedence. It checks an already-existing
+destination before reading the input and still enforces no-overwrite at atomic
+commit. Missing parents and commit-time write failures occur only after input
+validation and snapshot generation.
+
 Ordinary acceptance cases prove that failed commands leave no partial output.
 A separate child-process fault-injection integration test terminates writers
 after open, write, sync, close, and link, and verifies the hard-link commit
@@ -317,6 +325,30 @@ Structural refusal returns the same validation information, uses output status
 `not-created` with reason `structural-nonconformance`, exits `1`, and leaves
 the requested path absent. Preflight and operational failures use the command
 error shape instead.
+
+### Recorded documents
+
+`fs record-validation` parses and fully validates the input before replacing
+its optional `validationSnapshot`. A present invalid snapshot is structural
+nonconformance; the command never strips invalid data to make an input pass.
+For a conforming document, the replacement snapshot contains exactly the
+current conformance status, calculation status, and calculation applications
+in their validation-result order. Calculation inconsistency is recordable.
+
+The generated document is UTF-8 JSON with two-space indentation and one final
+LF. It preserves the parsed member order of the input, except that an existing
+top-level `validationSnapshot` is removed and the replacement is appended as
+the final top-level member. The snapshot's members are ordered `conformance`,
+`calculations`, and `applications`; each application preserves the validator's
+stable validation-result member order. This is a deterministic CLI encoding,
+not a canonical JSON requirement for FS documents generally.
+
+Successful recording reports the current validation, snapshot diff `match`
+for the created document, output status `created`, the argument path, and
+empty help. Structural refusal reports the input validation and snapshot diff,
+output status `not-created` with reason `structural-nonconformance`, and empty
+help. Operational errors use operation `record-validation` and the shared
+stable error vocabulary.
 
 ## Required Cases
 
@@ -393,8 +425,8 @@ After validation, add cases in this order:
 
 1. `fs` with no arguments: exact discovery JSON, stable executable and npm
    package identities, no selected input, supported artifact version and
-   serialization, read/write classification, and complete next commands. Also
-   reject an unknown command.
+   serialization, read/write classification including `record-validation`, and
+   complete next commands. Also reject an unknown command.
 2. `fs guide authoring`: exact generated standalone Markdown and rejection of
    unknown topics or arguments.
 3. `fs schema`: all three supported names, exact standard-output payload,
@@ -415,6 +447,25 @@ creation, malformed input, schema and semantic structural refusal, missing
 `--output`, duplicate `--output`, unknown arguments and flags, missing parent,
 existing output, and the combined invalid-input/existing-output precedence
 case. Successful output must be byte-for-byte equal to the candidate.
+
+### `fs record-validation`
+
+Cover path and standard-input success without a prior snapshot, replacement of
+a mismatching snapshot, calculation-inconsistent success, and exact generated
+document bytes. Re-validating every expected generated document must produce
+snapshot status `match`.
+
+Cover malformed input, schema and semantic structural refusal, an invalid
+embedded snapshot, missing input, missing parent, existing output, and the
+combined invalid-input/existing-output precedence case. Cover missing and
+duplicate `--output`, missing and extra input operands, unknown flags, and
+native command help. Successful output and every refusal leave the input
+unchanged, and every failure creates no output or residue.
+
+Instrument the application boundary to prove preflight-before-read ordering,
+one standard-input read, validation-before-write ordering, and unchanged
+behavior with logging. The shared writer fault and concurrency suite continues
+to own crash atomicity and commit-race behavior.
 
 ## Implementation Gate
 

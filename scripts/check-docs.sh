@@ -206,6 +206,9 @@ echo "Validating conforming documents"
 "${ajv[@]}" \
   -s schema/fs-document.schema.json \
   -d 'fixtures/valid/*.json'
+"${ajv[@]}" \
+  -s schema/fs-document.schema.json \
+  -d 'fixtures/cli/expected/record-validation/*.json'
 
 echo "Checking invalid-fixture schema classification"
 while IFS=$'\t' read -r document layer; do

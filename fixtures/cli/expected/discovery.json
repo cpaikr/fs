@@ -11,7 +11,8 @@
     { "name": "schema", "access": "read-write" },
     { "name": "example", "access": "read-write" },
     { "name": "validate", "access": "read" },
-    { "name": "create", "access": "write" }
+    { "name": "create", "access": "write" },
+    { "name": "record-validation", "access": "write" }
   ],
   "help": [
     { "executable": "fs", "arguments": ["guide","authoring"] },

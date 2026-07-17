@@ -21,6 +21,7 @@ const assertNativeHelp = (result, label) => {
     "example",
     "validate",
     "create",
+    "record-validation",
     "--help",
     "--version",
     "--completions",

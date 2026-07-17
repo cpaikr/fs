@@ -1,0 +1,45 @@
+{
+  "id": "record-validation-stdin",
+  "command": "fs",
+  "arguments": ["record-validation", "--output", "recorded.json", "-"],
+  "workspace": [],
+  "stdin": { "file": "../valid/no-calculation-rules.json" },
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "output", "help"] },
+        { "pointer": "/snapshotDiff", "equals": ["formatVersion", "status", "conformance", "calculations", "applications"] },
+        { "pointer": "/snapshotDiff/conformance", "equals": ["recorded", "current"] },
+        { "pointer": "/snapshotDiff/calculations", "equals": ["recorded", "current"] },
+        { "pointer": "/output", "equals": ["status", "path"] }
+      ],
+      "arrays": [{ "pointer": "/snapshotDiff/applications", "equals": 0 }],
+      "equalities": [
+        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rules.json" } },
+        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.1" },
+        { "pointer": "/snapshotDiff/status", "equals": "match" },
+        { "pointer": "/snapshotDiff/conformance/recorded", "equals": "conforming" },
+        { "pointer": "/snapshotDiff/conformance/current", "equals": "conforming" },
+        { "pointer": "/snapshotDiff/calculations/recorded", "equals": "not-defined" },
+        { "pointer": "/snapshotDiff/calculations/current", "equals": "not-defined" },
+        { "pointer": "/output/status", "equals": "created" },
+        { "pointer": "/output/path", "equals": "recorded.json" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": {
+        "created": [
+          { "path": "recorded.json", "equalsFile": "expected/record-validation/no-rules.json" }
+        ],
+        "unchanged": [],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

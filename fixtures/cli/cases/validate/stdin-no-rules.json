@@ -30,7 +30,7 @@
         },
         {
           "pointer": "/help",
-          "equals": []
+          "equals": [{ "executable": "fs", "arguments": ["record-validation", "--output", "<new-document>", "-"] }]
         }
       ],
       "nonemptyStrings": []

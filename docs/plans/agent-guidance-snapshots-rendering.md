@@ -46,10 +46,10 @@ V0 release remain out of scope.
 
 - [x] Phase 0: generate and validate the installable Agent Skill from the
   shared source.
-- [ ] Phase 1: fix `record-validation` grammar, results, streams, and
-  filesystem effects in acceptance prose and fixtures. In progress.
+- [x] Phase 1: fix `record-validation` grammar, results, streams, and
+  filesystem effects in acceptance prose and fixtures.
 - [ ] Phase 2: implement the packed `record-validation` command and pass its
-  fixture and fault/integration gates.
+  fixture and fault/integration gates. In progress.
 - [ ] Phase 3: fix deterministic `render` HTML and failure behavior in
   acceptance prose and fixtures.
 - [ ] Phase 4: implement the packed `render` command and pass its fixture and
@@ -59,20 +59,23 @@ V0 release remain out of scope.
 
 ## Current State
 
-Roadmap steps 1–8 and the step-9 Agent Skill slice are complete. The
+Roadmap steps 1–8, the step-9 Agent Skill, and the `record-validation`
+contract slice are complete. The
 repository-distributed `author-fs` Skill is generated from the shared portable
 authoring template with exact-version `npx` commands. The package contains the
-complete validator and atomic no-overwrite writer but does not yet expose
-`record-validation` and `render` in the command tree.
+complete validator and atomic no-overwrite writer. The new snapshot fixtures
+fix exact generated JSON, result envelopes, corrective help, error precedence,
+discovery, grammar, and filesystem effects before the command is implemented.
 
-The next slice will fix the complete observable `record-validation` contract
-and executable fixtures before implementation begins.
+The next slice will implement `record-validation` against those fixtures
+without beginning `render` contract work.
 
 ## Known Temporary Drift
 
-- The CLI design names `record-validation` and `render`, but their detailed
-  acceptance behavior, fixtures, and implementation are intentionally absent
-  until their contract-first phases.
+- The `record-validation` acceptance fixtures lead the implementation by 25
+  intentionally failing packed-process cases. The CLI design also names
+  `render`, but its detailed acceptance behavior, fixtures, and implementation
+  remain absent until Phase 3.
 
 ## Validation
 
@@ -86,12 +89,21 @@ incomplete financial model without inventing decisions. Later step-9 gates
 include targeted tests, `pnpm verify`, packed-install execution, and repeat
 documentation and whitespace checks.
 
+The `record-validation` contract slice passes `./scripts/check-docs.sh`: all
+100 descriptors are schema-valid and integrity-checked, both generated
+documents are structurally conforming, and exact expected result artifacts
+validate against their schemas. The existing validator independently reports
+snapshot `match` for both generated documents. The packed acceptance run
+passes 75 existing and revalidation cases and reports the expected 25-case
+temporary drift for the absent command, discovery/help additions, and new
+corrective validation help.
+
 ## Blockers
 
 None.
 
 ## Next Action
 
-Define the `record-validation` result envelopes, generated-document bytes,
-error precedence, corrective help, discovery, and exhaustive acceptance
-fixture matrix. Commit that contract slice before implementing the command.
+Implement the typed `record-validation` request and Effect command, snapshot
+serializer, corrective validation help, logging-preserving I/O order, and
+shared-writer integration until all 100 packed-process cases pass.

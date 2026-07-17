@@ -1,0 +1,21 @@
+{
+  "id": "record-validation-missing-document",
+  "command": "fs",
+  "arguments": ["record-validation", "--output", "recorded.json"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs record-validation", "document...", "Exactly one", "--output"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "native-text", "contains": ["document"], "excludes": [], "ansi": false },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": ["recorded.json"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

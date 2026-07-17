@@ -1,0 +1,52 @@
+{
+  "formatVersion": "0.1",
+  "status": "match",
+  "conformance": {
+    "recorded": "conforming",
+    "current": "conforming"
+  },
+  "calculations": {
+    "recorded": "inconsistent",
+    "current": "inconsistent"
+  },
+  "applications": [
+    {
+      "change": "unchanged",
+      "recorded": {
+        "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
+        "status": "unsatisfied",
+        "actual": "11",
+        "expected": "10",
+        "difference": "1",
+        "tolerance": "0"
+      },
+      "current": {
+        "key": { "rule": "subtotal", "period": "fy2025", "dimensions": {} },
+        "status": "unsatisfied",
+        "actual": "11",
+        "expected": "10",
+        "difference": "1",
+        "tolerance": "0"
+      }
+    },
+    {
+      "change": "unchanged",
+      "recorded": {
+        "key": { "rule": "parts-agree", "period": "fy2025", "dimensions": {} },
+        "status": "unsatisfied",
+        "actual": "6",
+        "expected": "4",
+        "difference": "2",
+        "tolerance": "0"
+      },
+      "current": {
+        "key": { "rule": "parts-agree", "period": "fy2025", "dimensions": {} },
+        "status": "unsatisfied",
+        "actual": "6",
+        "expected": "4",
+        "difference": "2",
+        "tolerance": "0"
+      }
+    }
+  ]
+}

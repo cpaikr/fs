@@ -73,7 +73,8 @@ The revised suite keeps these domain and operational cases:
   malformed input, trailing content, duplicate members, unsafe scale, and
   missing input;
 - deterministic discovery and exact installed guide, schema, example, and
-  created-document bytes;
+  created-document bytes, including generated validation snapshots that
+  revalidate as snapshot matches;
 - silent and enabled logging, thresholds, bounded failure context, and I/O
   invariance; and
 - atomic no-overwrite behavior, missing parents, write failures, existing
