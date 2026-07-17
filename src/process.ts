@@ -11,6 +11,9 @@ import {
 } from "./assets.js"
 import { decodeJson } from "./json.js"
 import { DiagnosticLogger, type LogLevel } from "./logger.js"
+import { recordValidationSnapshot } from "./record-validation.js"
+import type { Document } from "./validation/model.js"
+import { compareSnapshot } from "./validation/snapshot.js"
 import { validateDocument } from "./validation/validate.js"
 import { outputEntryExists, writeNewFile, type WriteFailure } from "./writer.js"
 
@@ -85,6 +88,12 @@ export type ApplicationRequest =
   | { readonly command: "example"; readonly name: ExampleName; readonly output?: string }
   | { readonly command: "validate"; readonly input: string; readonly logLevel: LogLevel }
   | { readonly command: "create"; readonly input: string; readonly output: string }
+  | {
+      readonly command: "record-validation"
+      readonly input: string
+      readonly output: string
+      readonly logLevel: LogLevel
+    }
 
 interface CommandSuggestion {
   readonly executable: "fs"
@@ -141,7 +150,8 @@ const discovery = {
     { name: "schema", access: "read-write" },
     { name: "example", access: "read-write" },
     { name: "validate", access: "read" },
-    { name: "create", access: "write" }
+    { name: "create", access: "write" },
+    { name: "record-validation", access: "write" }
   ],
   help: [
     commandSuggestion("guide", "authoring"),
@@ -168,11 +178,12 @@ const examples = {
 } as const
 
 const writeFailure = (
-  operation: "schema" | "example" | "create",
+  operation: "schema" | "example" | "create" | "record-validation",
   failure: WriteFailure,
   path: string,
-  help: ReadonlyArray<CommandSuggestion>
-): ProcessResult => commandError(operation, failure, help, path)
+  help: ReadonlyArray<CommandSuggestion>,
+  stderr: Buffer = empty
+): ProcessResult => commandError(operation, failure, help, path, undefined, stderr)
 
 const runSchema = (
   name: SchemaName,
@@ -221,7 +232,7 @@ interface ReadInputSuccess {
 
 const readInput = (
   input: string,
-  operation: "validate" | "create",
+  operation: "validate" | "create" | "record-validation",
   io: ApplicationIOService
 ): Effect.Effect<ReadInputSuccess | ProcessResult> =>
   Effect.gen(function*() {
@@ -236,10 +247,21 @@ const readInput = (
     const help = code === "input-not-found"
       ? operation === "validate"
         ? [commandSuggestion("validate", "<existing-document>")]
-        : [commandSuggestion("create", "--output", "<new-document>", "<existing-candidate>")]
+        : operation === "create"
+          ? [commandSuggestion("create", "--output", "<new-document>", "<existing-candidate>")]
+          : [commandSuggestion("record-validation", "--output", "<new-document>", "<existing-document>")]
       : []
     return commandError(operation, code, help, input)
   })
+
+const validationHelp = (
+  input: string,
+  validation: ReturnType<typeof validateDocument>
+): ReadonlyArray<CommandSuggestion> =>
+  validation.validation.conformance.status === "conforming" &&
+    (validation.snapshotDiff.status === "not-recorded" || validation.snapshotDiff.status === "mismatch")
+    ? [commandSuggestion("record-validation", "--output", "<new-document>", input)]
+    : []
 
 const runValidate = (
   input: string,
@@ -270,7 +292,11 @@ const runValidate = (
       snapshot: result.snapshotDiff.status
     })
     return jsonResult(
-      { validation: result.validation, snapshotDiff: result.snapshotDiff, help: [] },
+      {
+        validation: result.validation,
+        snapshotDiff: result.snapshotDiff,
+        help: validationHelp(input, result)
+      },
       result.validation.conformance.status === "conforming" ? 0 : 1,
       logger.bytes()
     )
@@ -319,6 +345,122 @@ const runCreate = (
     )
   })
 
+const runRecordValidation = (
+  input: string,
+  output: string,
+  logLevel: LogLevel,
+  io: ApplicationIOService
+): Effect.Effect<ProcessResult> =>
+  Effect.gen(function*() {
+    const logger = new DiagnosticLogger(logLevel)
+    const destination = resolve(io.cwd, output)
+    const outputHelp = [
+      commandSuggestion("record-validation", "--output", "<new-document>", input)
+    ]
+    const exists = yield* Effect.result(io.outputExists(destination))
+    if (Result.isFailure(exists)) {
+      logger.emit("error", "output-failed", "record-validation", { code: "write-failed" })
+      return commandError(
+        "record-validation",
+        "write-failed",
+        outputHelp,
+        output,
+        undefined,
+        logger.bytes()
+      )
+    }
+    if (exists.success) {
+      logger.emit("error", "output-failed", "record-validation", { code: "output-exists" })
+      return commandError(
+        "record-validation",
+        "output-exists",
+        outputHelp,
+        output,
+        undefined,
+        logger.bytes()
+      )
+    }
+
+    const read = yield* readInput(input, "record-validation", io)
+    if (!("ok" in read)) {
+      const error = JSON.parse(read.stdout.toString("utf8")) as { readonly error: { readonly code: string } }
+      logger.emit("error", "input-failed", "record-validation", {
+        code: error.error.code,
+        source: input === "-" ? "stdin" : "path"
+      })
+      return { ...read, stderr: logger.bytes() }
+    }
+    logger.emit("debug", "input-read", "record-validation", { source: read.source })
+    const decoded = decodeJson(read.bytes)
+    if (!decoded.ok) {
+      logger.emit("error", "input-failed", "record-validation", {
+        code: "invalid-json",
+        source: read.source
+      })
+      return commandError(
+        "record-validation",
+        "invalid-json",
+        [],
+        input,
+        decoded.message,
+        logger.bytes()
+      )
+    }
+    const result = validateDocument(decoded.value)
+    logger.emit("info", "validation-completed", "record-validation", {
+      conformance: result.validation.conformance.status,
+      calculations: result.validation.calculations.status,
+      snapshot: result.snapshotDiff.status
+    })
+    if (result.validation.conformance.status === "nonconforming") {
+      return jsonResult(
+        {
+          validation: result.validation,
+          snapshotDiff: result.snapshotDiff,
+          output: { status: "not-created", path: output, reason: "structural-nonconformance" },
+          help: []
+        },
+        1,
+        logger.bytes()
+      )
+    }
+
+    const recorded = recordValidationSnapshot(decoded.value as Document, result.validation)
+    const snapshotDiff = compareSnapshot(recorded.document.validationSnapshot, result.validation)
+    const written = yield* Effect.result(io.writeFile(destination, recorded.bytes))
+    if (Result.isFailure(written)) {
+      logger.emit("error", "output-failed", "record-validation", { code: "write-failed" })
+      return writeFailure(
+        "record-validation",
+        "write-failed",
+        output,
+        outputHelp,
+        logger.bytes()
+      )
+    }
+    if (written.success !== null) {
+      logger.emit("error", "output-failed", "record-validation", { code: written.success })
+      return writeFailure(
+        "record-validation",
+        written.success,
+        output,
+        outputHelp,
+        logger.bytes()
+      )
+    }
+    logger.emit("info", "output-created", "record-validation", {})
+    return jsonResult(
+      {
+        validation: result.validation,
+        snapshotDiff,
+        output: { status: "created", path: output },
+        help: []
+      },
+      0,
+      logger.bytes()
+    )
+  })
+
 const run = (request: ApplicationRequest): Effect.Effect<ProcessResult, never, ApplicationIO> =>
   Effect.gen(function*() {
     const io = yield* ApplicationIO
@@ -335,6 +477,13 @@ const run = (request: ApplicationRequest): Effect.Effect<ProcessResult, never, A
         return yield* runValidate(request.input, request.logLevel, io)
       case "create":
         return yield* runCreate(request.input, request.output, io)
+      case "record-validation":
+        return yield* runRecordValidation(
+          request.input,
+          request.output,
+          request.logLevel,
+          io
+        )
     }
   })
 

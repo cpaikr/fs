@@ -48,10 +48,10 @@ V0 release remain out of scope.
   shared source.
 - [x] Phase 1: fix `record-validation` grammar, results, streams, and
   filesystem effects in acceptance prose and fixtures.
-- [ ] Phase 2: implement the packed `record-validation` command and pass its
-  fixture and fault/integration gates. In progress.
+- [x] Phase 2: implement the packed `record-validation` command and pass its
+  fixture and fault/integration gates.
 - [ ] Phase 3: fix deterministic `render` HTML and failure behavior in
-  acceptance prose and fixtures.
+  acceptance prose and fixtures. In progress.
 - [ ] Phase 4: implement the packed `render` command and pass its fixture and
   fault/integration gates.
 - [ ] Phase 5: complete full repository validation and review proving every
@@ -60,22 +60,21 @@ V0 release remain out of scope.
 ## Current State
 
 Roadmap steps 1–8, the step-9 Agent Skill, and the `record-validation`
-contract slice are complete. The
+contract and implementation slices are complete. The
 repository-distributed `author-fs` Skill is generated from the shared portable
 authoring template with exact-version `npx` commands. The package contains the
-complete validator and atomic no-overwrite writer. The new snapshot fixtures
-fix exact generated JSON, result envelopes, corrective help, error precedence,
-discovery, grammar, and filesystem effects before the command is implemented.
+complete validator, atomic no-overwrite writer, and packed snapshot-recording
+command. Snapshot recording replaces an existing valid snapshot, refuses
+structural nonconformance, reports the created document as a snapshot match,
+and preserves input and destination safety.
 
-The next slice will implement `record-validation` against those fixtures
-without beginning `render` contract work.
+The next slice will fix the complete observable `render` contract and
+executable fixtures before rendering implementation begins.
 
 ## Known Temporary Drift
 
-- The `record-validation` acceptance fixtures lead the implementation by 25
-  intentionally failing packed-process cases. The CLI design also names
-  `render`, but its detailed acceptance behavior, fixtures, and implementation
-  remain absent until Phase 3.
+- The CLI design names `render`, but its detailed acceptance behavior,
+  fixtures, and implementation remain absent until Phase 3.
 
 ## Validation
 
@@ -89,14 +88,12 @@ incomplete financial model without inventing decisions. Later step-9 gates
 include targeted tests, `pnpm verify`, packed-install execution, and repeat
 documentation and whitespace checks.
 
-The `record-validation` contract slice passes `./scripts/check-docs.sh`: all
-100 descriptors are schema-valid and integrity-checked, both generated
-documents are structurally conforming, and exact expected result artifacts
-validate against their schemas. The existing validator independently reports
-snapshot `match` for both generated documents. The packed acceptance run
-passes 75 existing and revalidation cases and reports the expected 25-case
-temporary drift for the absent command, discovery/help additions, and new
-corrective validation help.
+The completed `record-validation` slice passes `pnpm verify`: typecheck, zero
+strict Effect diagnostics, 100 unit and boundary tests, all 100 packed-process
+cases, five writer crash points, early contender-exit detection, 16-way writer
+contention, and installed-tarball npm/npx smoke for 41 cleanly built packed
+files. `./scripts/check-docs.sh` passes with exact generated documents that
+revalidate as snapshot matches, and `git diff --check` passes.
 
 ## Blockers
 
@@ -104,6 +101,7 @@ None.
 
 ## Next Action
 
-Implement the typed `record-validation` request and Effect command, snapshot
-serializer, corrective validation help, logging-preserving I/O order, and
-shared-writer integration until all 100 packed-process cases pass.
+Define standalone HTML bytes, flat presentation ordering, labels and metadata,
+missing and unavailable cells, exact decimal display, escaping, result
+envelopes, error precedence, discovery, and exhaustive `render` fixtures.
+Commit that contract slice before implementing the renderer.

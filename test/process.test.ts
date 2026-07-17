@@ -93,6 +93,32 @@ describe("application process boundary", () => {
     }
   })
 
+  it("reads stdin exactly once when recording validation", () => {
+    const root = mkdtempSync(join(tmpdir(), "fs-process-"))
+    let reads = 0
+    try {
+      const result = run(
+        {
+          command: "record-validation",
+          input: "-",
+          output: "result.json",
+          logLevel: "none"
+        },
+        makeIO(root, {
+          readStdin: Effect.sync(() => {
+            reads += 1
+            return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+          })
+        })
+      )
+
+      expect(result.exitCode).toBe(0)
+      expect(reads).toBe(1)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
   it("checks an existing create destination before reading stdin", () => {
     const calls: Array<string> = []
     const io = makeIO(process.cwd(), {
@@ -115,6 +141,38 @@ describe("application process boundary", () => {
     expect(result.exitCode).toBe(1)
     expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
       error: { operation: "create", code: "output-exists" }
+    })
+    expect(calls).toEqual(["exists"])
+  })
+
+  it("checks an existing snapshot destination before reading stdin", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "record-validation",
+        input: "-",
+        output: "result.json",
+        logLevel: "none"
+      },
+      makeIO(process.cwd(), {
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return Buffer.alloc(0)
+        }),
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return true
+        }),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      error: { operation: "record-validation", code: "output-exists" }
     })
     expect(calls).toEqual(["exists"])
   })
@@ -159,6 +217,40 @@ describe("application process boundary", () => {
 
     expect(result.exitCode).toBe(0)
     expect(calls).toEqual(["exists", "read", "write"])
+  })
+
+  it("preserves snapshot read, validation, and write ordering", () => {
+    const calls: Array<string> = []
+    let written: Buffer = Buffer.alloc(0)
+    const result = run(
+      {
+        command: "record-validation",
+        input: "-",
+        output: "result.json",
+        logLevel: "debug"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+        }),
+        writeFile: (_path, contents) => Effect.sync(() => {
+          calls.push("write")
+          written = contents
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(0)
+    expect(calls).toEqual(["exists", "read", "write"])
+    expect(written).toEqual(
+      readFileSync(resolve("fixtures/cli/expected/record-validation/no-rules.json"))
+    )
   })
 
   it("contains unexpected application defects without leaking causes", () => {

@@ -61,7 +61,11 @@ const runCli = (
   }
 }
 
-const ioWithCalls = (calls: Array<string>, stdin = readFileSync(resolve("examples/minimal.json"))): ApplicationIOService => ({
+const ioWithCalls = (
+  calls: Array<string>,
+  stdin = readFileSync(resolve("examples/minimal.json")),
+  written: Array<Buffer> = []
+): ApplicationIOService => ({
   cwd: process.cwd(),
   readFile: (path) => Effect.sync(() => {
     calls.push(`read-file:${path}`)
@@ -75,8 +79,9 @@ const ioWithCalls = (calls: Array<string>, stdin = readFileSync(resolve("example
     calls.push("output-exists")
     return false
   }),
-  writeFile: () => Effect.sync(() => {
+  writeFile: (_path, contents) => Effect.sync(() => {
     calls.push("write-file")
+    written.push(contents)
     return null
   })
 })
@@ -140,6 +145,33 @@ describe("Effect CLI boundary", () => {
 
     expect(observed.exitCode).toBe(0)
     expect(calls).toEqual(["output-exists", "read-stdin", "write-file"])
+  })
+
+  it("keeps snapshot results, bytes, and I/O order invariant with logging", () => {
+    const observations = [
+      [],
+      ["--log-level", "none"],
+      ["--log-level", "debug"]
+    ].map((loggingArgs) => {
+      const calls: Array<string> = []
+      const written: Array<Buffer> = []
+      const observed = runCli(
+        [...loggingArgs, "record-validation", "--output", "result.json", "-"],
+        ioWithCalls(calls, undefined, written)
+      )
+      expect(observed.exitCode).toBe(0)
+      expect(calls).toEqual(["output-exists", "read-stdin", "write-file"])
+      expect(written).toHaveLength(1)
+      return { observed, written: written[0] }
+    })
+
+    expect(observations[1]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
+    expect(observations[2]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
+    expect(observations[1]?.written).toEqual(observations[0]?.written)
+    expect(observations[2]?.written).toEqual(observations[0]?.written)
+    expect(observations[0]?.observed.stderr).toEqual(Buffer.alloc(0))
+    expect(observations[1]?.observed.stderr).toEqual(Buffer.alloc(0))
+    expect(observations[2]?.observed.stderr.length).toBeGreaterThan(0)
   })
 
   it("normalizes the all logging alias before validation dispatch", () => {

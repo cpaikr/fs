@@ -1,7 +1,7 @@
 # fs
 
-Status: V0 artifact semantics and the packed reference CLI through `fs create`
-exist. `fs` is a working title.
+Status: V0 artifact semantics and the packed reference CLI through
+`fs record-validation` exist. `fs` is a working title.
 
 `fs` is a public format for clean, structured financial statements. It gives
 people and agents one predictable artifact to produce after extracting or
@@ -27,8 +27,8 @@ engine.
 
 The V0 semantic contract, schemas, examples, language-neutral fixtures, full
 validator, bundled discovery/content commands, and exact-byte non-overwriting
-creation exist. The packed CLI runs the revised contract through
-`effect/unstable/cli`.
+creation and validation-snapshot recording exist. The packed CLI runs the
+revised contract through `effect/unstable/cli`.
 
 The [roadmap](ROADMAP.md) shows strategic milestones. The
 [step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md) is the only
