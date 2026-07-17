@@ -1,29 +1,15 @@
 # Roadmap
 
-Status: The reference CLI and Effect-native migration are complete.
-
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
 [V0 CLI plan](docs/plans/cli-v0.md) owns current task state, validation,
 blockers, and the next action.
 
-## Current Milestone: Reference CLI
+## Reference CLI
 
-Completed foundations:
-
-- the normative V0 artifact semantics;
-- baseline document and result schemas, examples, and fixtures;
-- authoring guidance for an already-resolved financial model;
-- the command surface and deterministic process contract;
-- full semantic validation, bundled discovery and content, and atomic
-  exact-byte creation; and
-- the packed TypeScript, Node.js, Effect, and npm delivery path.
-
-The completed milestone replaces the Node-core grammar adapter and static help
-with the revised Effect-native contract and `effect/unstable/cli` runner. It
-preserves artifact meaning, validation results, exact bundled content,
-logging, and filesystem safety. Its completed phase gates are recorded in the
-[delivery plan](docs/plans/cli-v0.md).
+Steps 1–8 define the reference CLI sequence. Detailed scope, phase status,
+validation, and known drift are maintained in the
+[V0 CLI plan](docs/plans/cli-v0.md).
 
 ## Release Sequence
 
