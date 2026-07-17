@@ -1,10 +1,7 @@
 # CLI Acceptance Contract
 
-This contract remains authoritative for the current `0.1` implementation. The
-accepted statement-item-row replacement does not change observable process
-behavior until the
-[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates this
-contract, fixtures, and runtime together.
+This contract defines observable process behavior for the current `0.1`
+statement-item-row contract.
 
 ## Purpose
 
@@ -73,7 +70,7 @@ An illustrative case descriptor is:
   "arguments": ["validate", "input.json"],
   "workspace": [
     {
-      "copy": "../valid/no-calculation-rules.json",
+      "copy": "../valid/no-rollups.json",
       "to": "input.json"
     }
   ],
@@ -85,7 +82,7 @@ An illustrative case descriptor is:
       "subtrees": [
         {
           "pointer": "/validation",
-          "equalsFile": "../calculation-results/no-rules.json"
+          "equalsFile": "../calculation-results/no-rollups.json"
         },
         {
           "pointer": "/snapshotDiff",
@@ -189,7 +186,7 @@ not repeat the command, input path, working directory, validator identity, or
 time. The case where the embedded snapshot itself is structurally unusable is
 represented by `not-comparable` with reason `invalid-snapshot`.
 
-When an invalid-document manifest entry has no complete calculation-result
+When an invalid-document manifest entry has no complete validation-result
 file, its CLI expectation is composed from the existing manifest: conformance
 is `nonconforming`; the named code and path match exactly; the message is
 nonempty; and calculations are `not-run` with no applications. This does not
@@ -203,7 +200,7 @@ Matching snapshots, structural nonconformance, and invalid embedded snapshots
 do not produce that suggestion.
 
 Structural nonconformance is a validation result with exit code `1`, not a
-generic command error. It has calculation status `not-run`. Calculation
+generic command error. It has calculation status `not-run`. Rollup
 inconsistency and snapshot mismatch remain successful results with exit code
 `0`.
 
@@ -266,7 +263,7 @@ framework-defined and are not supported workflows.
 
 ## Exit Codes
 
-- `0`: an action flag or operation completed, including calculation
+- `0`: an action flag or operation completed, including rollup
   inconsistency, snapshot mismatch, and definitive empty results.
 - `1`: an operational, parsing, or structural conformance failure prevented
   the requested successful outcome.
@@ -289,7 +286,7 @@ deletion, or content change.
 `fs schema` and `fs example` write the exact bundled bytes. `fs create`
 preserves the complete candidate bytes from either a path or standard input;
 it is not a serializer or normalizer. A structurally conforming but
-calculation-inconsistent candidate may be written. Malformed or structurally
+rollup-inconsistent candidate may be written. Malformed or structurally
 nonconforming input creates no output.
 
 Successful `fs schema --output` and named `fs example --output` operations
@@ -348,8 +345,8 @@ error shape instead.
 its optional `validationSnapshot`. A present invalid snapshot is structural
 nonconformance; the command never strips invalid data to make an input pass.
 For a conforming document, the replacement snapshot contains exactly the
-current conformance status, calculation status, and calculation applications
-in their validation-result order. Calculation inconsistency is recordable.
+current conformance status, calculation status, and rollup applications in
+their validation-result order. Rollup inconsistency is recordable.
 
 The generated document is UTF-8 JSON with two-space indentation and one final
 LF. It preserves the parsed member order of the input, except that an existing
@@ -370,39 +367,45 @@ stable error vocabulary.
 
 `fs render` fully validates the input before rendering. Structural
 nonconformance, including an invalid embedded snapshot, prevents output;
-calculation inconsistency and snapshot mismatch do not. Calculation rules and
-the optional validation snapshot affect the reported validation result but
-never the rendered page.
+rollup inconsistency and snapshot mismatch do not. Rollup relationships and the
+optional validation snapshot affect the reported validation result but never
+the rendered values or row order.
 
 The output is one deterministic UTF-8 HTML document with one final LF. It uses
 the exact `<!doctype html>` document structure and embedded CSS fixed by the
 executable render fixtures. It contains no scripts, external resources, or
-author-controlled HTML. Every author-controlled entity, scope, statement,
-unit, measure, dimension, member, item, and entry-override label is escaped as
-text. Identifiers and descriptions are not displayed.
+author-controlled HTML. Every displayed entity, scope, statement, item, unit,
+measure, grouping-column name, and grouping value is escaped as text.
+`documentId`, optional metadata identifiers, period and item identifiers,
+descriptions, `rollupTo`, validation results, and snapshots are not displayed.
 
 The page title combines the entity name and scope label. Its body shows that
-metadata, then every statement in document display order. Each statement
-shows its label and unit label, measure, and literal base-ten scale. Values are
-the exact stored decimal strings: rendering performs no numeric conversion,
-rescaling, rounding, aggregation, or calculation.
+metadata, then every statement in document order. Each statement is one flat
+table. Rows follow item array order; columns are, in order:
 
-Each statement is one table. Rows follow `entries`; an item override label
-wins over the referenced item's label. A heading spans the whole table and
-is a visual separator rendered as an ordinary table cell; it has no table
-header scope, row-group semantics, or nesting. Columns are period-major: for
-each listed period in display order, enumerate the Cartesian product of listed
-axes in axis and member display order, with the first axis changing slowest. A
-statement without axes has one column per period. Instant headers use the exact
-date; duration headers use `<start> – <end>`. Axis coordinates follow the
-period, formatted as `<dimension label>: <member label>` and separated with
-` · `.
+1. one `Item` column;
+2. one `Unit` column only when the statement is heterogeneous;
+3. every declared grouping column in document declaration order; and
+4. one value column for every statement period in statement period order.
 
-A cell lookup uses exactly the item, period, statement unit, and complete axis
-coordinate. A stored value is displayed verbatim, explicit unavailability is
-displayed as `Unavailable`, and an absent coordinate is displayed as
-`Missing`. Dimensionless facts therefore do not fill dimensional cells, and
-facts with unlisted dimensions are not rendered.
+A statement is homogeneous exactly when every item uses the same unit
+identifier. A homogeneous statement displays that resolved unit once above
+the table and omits the `Unit` column. A heterogeneous statement has no common
+unit display and identifies each row's resolved unit in its `Unit` cell. Unit
+text is `<label> (<measure>, scale <scale>)`; scale is the literal signed base-
+ten exponent and is not applied to stored values.
+
+Grouping headers display the declared identifier. A string grouping value is
+displayed verbatim; JSON `null` is displayed as `—`. Grouping cells remain
+ordinary flat columns. Equal values do not merge cells or create headings,
+nesting, indentation, ordering, rollups, or styling.
+
+Instant period headers use the exact date. Duration headers use
+`<start> – <end>`. A value cell is read directly from
+`item.values[period]`. An exact decimal is displayed verbatim, JSON `null` is
+displayed as `Missing`, and `{ "unavailable": true }` is displayed as
+`Unavailable`. Rendering performs no numeric conversion, rescaling, rounding,
+aggregation, derivation, or subtotal styling.
 
 Successful rendering reports the input validation and snapshot diff, output
 status `created`, the argument path, and empty help. Structural refusal uses
@@ -412,13 +415,13 @@ Operational errors use operation `render` and the shared stable error
 vocabulary.
 
 Rendering computes finite structural budgets with checked arithmetic before
-constructing coordinates, rows, or cells. A rendered statement may contain at
-most 1,000 logical columns including its label column, so the current layout
-permits at most 999 data columns. Across the document, rendered tables may
-occupy at most 100,000 logical grid slots after spans are expanded. A current
-statement with `C` data columns and `R` body rows consumes
-`(C + 1) * (R + 1)` slots. Arithmetic that cannot stay within a budget is
-over-limit without requiring the expanded count to be representable.
+constructing rows or cells. A rendered statement may contain at most 1,000
+logical columns including every item, conditional unit, grouping, and period
+column. Across the document, rendered tables may occupy at most 100,000
+logical grid slots after spans are expanded. A statement with `C` total
+columns and `R` item rows consumes `C * (R + 1)` slots, including its header
+row. Arithmetic that cannot stay within a budget is over-limit without
+requiring the exact expanded count to be representable.
 
 After structural preflight, rendering uses a bounded sink and rejects final
 UTF-8 HTML larger than 16 MiB (16,777,216 bytes), measured after escaping and
@@ -426,10 +429,14 @@ encoding. Any budget violation returns operation `render`, code
 `output-limit-exceeded`, exit code `1`, a message naming the budget and limit,
 the requested output path, empty help, and no output file.
 
-An existing destination still wins before input I/O. Malformed or structurally
-nonconforming input wins before render budgets. Structural budgets precede the
-encoded-byte budget; every budget failure precedes parent inspection and
-commit-time writer failures.
+Precedence is exact. An existing destination wins before input I/O. Input read
+and JSON parse failures precede document validation. Schema and semantic
+nonconformance, including invalid embedded snapshots, precede render budgets.
+For conforming input, inspect statements in order: the first over-limit column
+count wins; otherwise checked document-wide grid accumulation is next. The
+encoded-byte budget follows structural preflight. Every budget failure
+precedes output-parent inspection and commit-time writer failures. Rollup
+inconsistency and snapshot mismatch never prevent or reorder rendering.
 
 ## Required Cases
 
@@ -441,9 +448,9 @@ language-neutral semantic fixture. Paths in the table are relative to
 
 | Case | Reused input | Exit |
 | --- | --- | ---: |
-| Valid path with no rules | `valid/no-calculation-rules.json` | 0 |
+| Valid path with no rollups | `valid/no-rollups.json` | 0 |
 | Same document through standard input | same | 0 |
-| Calculation inconsistency | `examples/manufacturing-group.json` | 0 |
+| Rollup inconsistency | `examples/manufacturing-group.json` | 0 |
 | Recorded snapshot match | `valid/recorded-snapshot.json` | 0 |
 | Recorded snapshot mismatch | `valid/snapshot-mismatch-source.json` | 0 |
 | JSON Schema failure | `invalid/decimal-number.json` | 1 |
@@ -523,7 +530,7 @@ touch the requested path.
 
 ### `fs create`
 
-Cover valid path and standard-input creation, calculation-inconsistent
+Cover valid path and standard-input creation, rollup-inconsistent
 creation, malformed input, schema and semantic structural refusal, missing
 `--output`, duplicate `--output`, unknown arguments and flags, missing parent,
 existing output, and the combined invalid-input/existing-output precedence
@@ -532,7 +539,7 @@ case. Successful output must be byte-for-byte equal to the candidate.
 ### `fs record-validation`
 
 Cover path and standard-input success without a prior snapshot, replacement of
-a mismatching snapshot, calculation-inconsistent success, and exact generated
+a mismatching snapshot, rollup-inconsistent success, and exact generated
 document bytes. Re-validating every expected generated document must produce
 snapshot status `match`.
 
@@ -551,13 +558,15 @@ to own crash atomicity and commit-race behavior.
 ### `fs render`
 
 Cover exact HTML from a path for the complete presentation fixture and from
-standard input for the minimal example. Cover a calculation-inconsistent,
+standard input for the minimal example. Cover a rollup-inconsistent,
 snapshot-mismatching input to prove both states remain renderable while their
-content is absent from the HTML. Exact output fixtures prove statement,
-period, axis, member, and row ordering; dimensionless and dimensional lookup;
-exact zero, negative, and fractional decimals; literal scale metadata;
-missing and unavailable cells; entry-label override; heading behavior; and
-escaping of every author-controlled label kind.
+content is absent from the HTML. Exact output fixtures prove statement, item,
+period, unit, and grouping-column order independent of definition order;
+homogeneous-unit collapsing and heterogeneous row units; exact zero, negative,
+and fractional decimals; literal scale metadata; missing and unavailable
+cells; null and string grouping values; and escaping of every displayed
+author-controlled text kind. They also prove that grouping values and rollups
+create no hierarchy, merged cells, or subtotal styling.
 
 Cover malformed input, schema and semantic structural refusal, an invalid
 embedded snapshot, missing input, missing parent, existing output, and the

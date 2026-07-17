@@ -1,7 +1,7 @@
 # Statement Item Row Refactor Plan
 
-Status: Ready. Roadmap step 10 is planned; no contract or implementation
-cutover has started.
+Status: In progress. Phase 0 is complete; the machine-readable and runtime
+cutover has not started.
 
 This file is the concise milestone index and the only owner of live progress,
 temporary drift, blockers, and the next action. Stable phase scope and gates
@@ -48,7 +48,7 @@ cross-platform release verification, version publication, and npm release.
 
 | Phase | State | Detailed plan |
 | --- | --- | --- |
-| 0. Contract and remaining decisions | Not started | [Target contract](statement-item-row-refactor/phase-0-contract.md) |
+| 0. Contract and remaining decisions | Complete | [Target contract](statement-item-row-refactor/phase-0-contract.md) |
 | 1. Schemas and contract evidence | Not started | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
 | 2. Document model and structural validation | Not started | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
 | 3. Rollups, results, and snapshots | Not started | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
@@ -66,11 +66,21 @@ green.
 
 ## Current State
 
-The replacement shape and vocabulary are accepted. The decision ADR, product
-scope, glossary, roadmap, and this plan describe the target. All normative
-schemas, fixtures, examples, authoring and CLI contracts, and runtime code
-still implement format `0.1` and the dimensional fact model. No refactor code
-has been written.
+Phase 0 incorporates the accepted statement-item-row model into the semantic,
+authoring, and affected CLI contracts while retaining the unreleased
+`formatVersion: "0.1"` contract and result literals. Rollup cell errors use
+`missing-value` or `unavailable-value` with a
+`{statement, item, period}` cell. HTML shows grouping columns as flat metadata,
+collapses a unit only when every statement item has the same unit identifier,
+and otherwise identifies each row's unit. Render precedence and the row-model
+column and grid accounting are exact.
+
+Schemas, fixtures, examples, generated guidance, and runtime code still
+implement the dimensional fact model. No compatibility path or refactor code
+has been added. The delivery uses two sequential PRs: the completed Phase-0
+contract slice, followed after merge by one coordinated Phase-1-through-6
+machine and runtime cutover. This is the fewest split that preserves the
+contract-only review boundary and the runtime cutover that remains unmerged.
 
 The completed step-9 renderer and snapshot implementation remain the verified
 baseline. Historical delivery evidence stays in the
@@ -86,13 +96,11 @@ phases reuse rather than duplicate earlier evidence.
 
 ## Known Temporary Drift
 
-- The product scope and glossary describe the accepted target while the
-  semantic specification, schemas, examples, fixtures, and implementation
-  still define the current fact-and-dimension contract.
-- ADR 0001 uses provisional `formatVersion: "0.2"`; Phase 0 must decide whether
-  the unreleased contract replaces `0.1` or advances the artifact version.
-- The exact serialized rollup-error payload, mixed-unit HTML presentation, and
-  grouping-column HTML visibility remain Phase-0 contract decisions.
+- The normative prose defines the replacement contract while schemas,
+  examples, fixtures, generated guidance, and implementation still define the
+  prior model. Phase 1 replaces the machine-readable evidence as one set;
+  Phases 2–5 close the runtime and generated projections on the same cutover
+  branch.
 
 This drift is deliberate only while Roadmap step 10 is active. Do not update
 examples or fixtures piecemeal to make summaries appear current.
@@ -110,16 +118,24 @@ cross-contract review applied safe corrections. Follow-up review assigned each
 shared fixture to the earliest phase that consumes it and left no unresolved
 material finding.
 
+The Phase-0 contract slice passes `./scripts/check-docs.sh`, including
+Markdown, links, maintained content, all current schema and fixture integrity,
+and every manifest-listed CLI descriptor. `git diff --check` passes. The
+remaining contract/artifact mismatch is the deliberate Phase-1 cutover
+boundary above. Codex and CodeRabbit reviews completed and their follow-up
+clarified transition-time tooling, grouping obligations, statement grammar,
+decimal serialization, and closed snapshot-diff forms. The same documentation
+and whitespace gates pass after those changes.
+
 ## Blockers
 
-None to beginning Phase 0. Its explicit decisions must be resolved before
-normative schemas or implementation change.
+None to beginning Phase 1.
 
 ## Next Action
 
-Execute Phase 0 as a contract-only slice: settle the remaining serialized and
-rendering decisions, then rewrite the semantic, authoring, and affected CLI
-contracts before changing machine-readable artifacts.
+Open and complete the Phase-0 contract PR against `dev`, including review and
+merge. Then create the coordinated Phase-1-through-6 cutover branch from the
+updated `dev` and replace schemas and contract evidence before runtime code.
 
 ## Completion
 

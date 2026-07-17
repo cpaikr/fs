@@ -2,19 +2,18 @@
 
 Status: Accepted.
 
-Replace the current item/fact/dimension/member model with ordered statement
-item rows. Each row owns its unit, a period-keyed `values` map, a user-keyed
-`groupings` map, and one optional additive `rollupTo` relationship. Keep JSON
-as the canonical authoring format. This is an intentionally smaller model for
-ordinary financial statements, not a general database, taxonomy, or
-multidimensional reporting system.
+This decision replaces the item/fact/dimension/member model with ordered
+statement item rows. Each row owns its unit, a period-keyed `values` map, a
+`groupings` map keyed by the document's declared grouping columns, and one
+optional additive `rollupTo` relationship. Keep JSON as the canonical
+authoring format. This is an intentionally smaller model for ordinary
+financial statements, not a general database, taxonomy, or multidimensional
+reporting system.
 
-This ADR records the accepted replacement target. It does not make an
-unimplemented format normative: until the coordinated
-[statement-item-row refactor](../plans/statement-item-row-refactor.md) updates
-the owning documents and implementation, the
-[semantic specification](../semantic-spec.md), schemas, fixtures, and CLI
-contracts continue to define current behavior.
+This ADR records the accepted replacement decision. Roadmap step 10
+incorporates it into owning contracts and then coordinates the schema,
+fixture, and implementation cutover through the
+[statement-item-row refactor](../plans/statement-item-row-refactor.md).
 
 ## Decision summary
 
@@ -44,9 +43,9 @@ over compact serialization.
 
 ## Why `member` is the wrong concept
 
-In the current contract, a dimension member distinguishes one fact from
+In the replaced contract, a dimension member distinguished one fact from
 another. Revenue for Korea and revenue for Japan are different facts because
-the member participates in fact identity. A member is therefore not a group,
+the member participated in fact identity. A member was therefore not a group,
 category, subtotal, mapping, or presentation label.
 
 The motivating need is different. One already-atomic item should be usable in
@@ -111,13 +110,13 @@ The accepted model keeps only the distinction that affects correctness:
 
 ## Accepted document shape
 
-The following is the complete accepted statement-data shape. The example uses
-`formatVersion: "0.2"` to make the incompatible change visible; the version may
-be renumbered before an unreleased contract is replaced.
+The following is the complete accepted statement-data shape. Because V0 is
+unreleased, Phase 0 retained `formatVersion: "0.1"` and replaced the contract
+directly rather than introducing a compatibility version.
 
 ```json
 {
-  "formatVersion": "0.2",
+  "formatVersion": "0.1",
   "documentId": "example-2025",
   "entity": { "name": "Example Entity" },
   "scope": { "label": "Consolidated financial statements" },
@@ -527,13 +526,13 @@ applications retain `actual`, `expected`, `difference`, and `tolerance`, where
 The document calculation status is `not-run` after structural failure,
 `not-defined` when no row has `rollupTo`, `consistent` when every application
 is satisfied, and `inconsistent` when any application is unsatisfied or an
-error. The current `not-evaluated` and `skipped` states disappear because every
+error. The previous `not-evaluated` and `skipped` states disappear because every
 well-formed rollup applies to every period selected by its statement.
 
 An optional `validationSnapshot` retains the current role of historical
 validation evidence and stores the accepted statuses and ordered applications.
 Snapshot diffing continues to use application keys; result and snapshot schemas
-must replace their current rule/dimension key with the key above.
+must replace their previous rule/dimension key with the key above.
 
 ## JSON versus TOON and 2D tables
 
