@@ -1,7 +1,6 @@
 # Roadmap
 
-Status: The reference CLI through `fs create` is implemented. Effect-native
-CLI migration is the current milestone.
+Status: The reference CLI and Effect-native migration are complete.
 
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
@@ -20,11 +19,11 @@ Completed foundations:
   exact-byte creation; and
 - the packed TypeScript, Node.js, Effect, and npm delivery path.
 
-The current milestone replaces the Node-core grammar adapter and static help
+The completed milestone replaces the Node-core grammar adapter and static help
 with the revised Effect-native contract and `effect/unstable/cli` runner. It
 preserves artifact meaning, validation results, exact bundled content,
-logging, and filesystem safety. Detailed phase gates and known drift are
-maintained in the [delivery plan](docs/plans/cli-v0.md).
+logging, and filesystem safety. Its completed phase gates are recorded in the
+[delivery plan](docs/plans/cli-v0.md).
 
 ## Release Sequence
 
@@ -38,7 +37,7 @@ maintained in the [delivery plan](docs/plans/cli-v0.md).
    integration boundary.
 6. [x] Add deterministic CLI fixtures, then implement full validation.
 7. [x] Add contract discovery and atomic, non-overwriting document creation.
-8. [ ] Adopt the revised Effect-native CLI contract, acceptance fixtures, and
+8. [x] Adopt the revised Effect-native CLI contract, acceptance fixtures, and
    `effect/unstable/cli` runner.
 9. [ ] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.

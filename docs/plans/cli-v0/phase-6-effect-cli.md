@@ -86,7 +86,7 @@ this plan because the revised contract accepts those built-ins.
   Effect services and the process entry point.
 - [x] Prove generated help remains ANSI-free with both disabled-color fixtures
   and a color-capable terminal test.
-- [ ] Verify the packed executable on the supported Node and platform matrix.
+- [x] Verify the packed executable on the supported Node and platform matrix.
 
 ## Gate
 

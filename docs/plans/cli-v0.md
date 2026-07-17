@@ -1,7 +1,7 @@
 # V0 CLI Delivery Plan
 
-Status: Effect-native CLI implementation and local gates complete; supported
-platform CI verification remains.
+Status: Complete. The Effect-native CLI and supported-platform verification
+gates pass.
 
 This file is the concise milestone index. Detailed scope, decisions, progress,
 and validation evidence live in the linked child plans. The
@@ -27,7 +27,7 @@ Agent Skill generation, `record-validation`, `render`, and release readiness.
 | 2. Package and fail-closed validator | Complete | [Package foundation](cli-v0/phase-2-package.md) |
 | 3. Complete semantic validation | Complete | [Semantic validation](cli-v0/phase-3-validation.md) |
 | 4–5. Discovery, content, and creation | Complete | [Content and creation](cli-v0/phase-4-5-content-create.md) |
-| 6. Effect-native CLI contract and migration | In progress | [Effect-native CLI migration](cli-v0/phase-6-effect-cli.md) |
+| 6. Effect-native CLI contract and migration | Complete | [Effect-native CLI migration](cli-v0/phase-6-effect-cli.md) |
 
 Phases 0–5 record the completed pre-migration implementation. Phase 6
 deliberately supersedes only the command grammar and native presentation
@@ -44,12 +44,9 @@ installed-tarball npm/npx smoke for 39 cleanly built packed files. The packed
 help checks include the production entry point with color-capable terminal
 state and reject CSI and OSC escapes.
 
-The same full suite passed locally on Node 24.15.0 before the final
-packaging-test hardening; the final pack check passes on both supported Node
-versions. Full isolated Linux verification also passes on both versions.
-`./scripts/check-docs.sh` and `git diff --check` pass. CI is configured for
-both Node versions on Linux, macOS, and Windows, but has not run for these
-local commits.
+The same full suite passes in GitHub-hosted CI on Node 22.17.0 and 24.15.0
+across Linux, macOS, and Windows. The GitHub-hosted documentation job,
+`./scripts/check-docs.sh`, and `git diff --check` pass.
 
 ## Known Temporary Drift
 
@@ -60,10 +57,9 @@ remain unchanged.
 
 ## Current Blockers
 
-- The current PR head has not completed the GitHub-hosted Linux, macOS, and
-  Windows CI matrix.
+None.
 
 ## Next Action
 
-Require all six supported Node/platform CI legs and the documentation check to
-pass, then close Phase 6 and Roadmap step 8.
+Start Roadmap step 9 under a new active plan. This CLI delivery plan is
+complete.
