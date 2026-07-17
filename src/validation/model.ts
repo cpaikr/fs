@@ -1,18 +1,9 @@
-export type Dimensions = Readonly<Record<string, string>>
-
 export interface Definition {
   readonly id: string
 }
 
-export interface NamedDefinition extends Definition {
+export interface Unit extends Definition {
   readonly label: string
-}
-
-export interface Item extends NamedDefinition {
-  readonly description?: string
-}
-
-export interface Unit extends NamedDefinition {
   readonly measure: string
   readonly scale: number
   readonly defaultTolerance?: string
@@ -22,83 +13,35 @@ export type Period =
   | (Definition & { readonly kind: "instant"; readonly date: string })
   | (Definition & { readonly kind: "duration"; readonly start: string; readonly end: string })
 
-export interface Dimension extends NamedDefinition {
-  readonly members: ReadonlyArray<NamedDefinition>
-}
+export type ValueCell = string | null | { readonly unavailable: true }
 
-export interface Coordinate {
-  readonly item: string
-  readonly period: string
-  readonly unit: string
-  readonly dimensions?: Dimensions
-}
+export type GroupingCell = string | null
 
-export interface Fact extends Coordinate {
-  readonly value?: string
-  readonly unavailable?: true
-}
-
-export interface ItemTerm {
-  readonly coefficient: string
-  readonly item: string
-}
-
-export interface FactTerm {
-  readonly coefficient: string
-  readonly fact: Coordinate
-}
-
-export interface RuleScope {
-  readonly periods: ReadonlyArray<string>
-  readonly dimensions?: ReadonlyArray<Dimensions>
-}
-
-export type CalculationRule =
-  | {
-      readonly id: string
-      readonly kind: "samePeriod"
-      readonly unit: string
-      readonly target: { readonly item: string }
-      readonly terms: ReadonlyArray<ItemTerm>
-      readonly scope: RuleScope
-      readonly tolerance?: string
-    }
-  | {
-      readonly id: string
-      readonly kind: "rollForward"
-      readonly unit: string
-      readonly balance: { readonly item: string }
-      readonly movements: ReadonlyArray<ItemTerm>
-      readonly scope: RuleScope
-      readonly tolerance?: string
-    }
-  | {
-      readonly id: string
-      readonly kind: "assertion"
-      readonly target: Coordinate
-      readonly terms: ReadonlyArray<FactTerm>
-      readonly tolerance?: string
-    }
-
-export interface Statement {
-  readonly id: string
+export interface Item extends Definition {
   readonly label: string
+  readonly description?: string
   readonly unit: string
+  readonly values: Readonly<Record<string, ValueCell>>
+  readonly groupings: Readonly<Record<string, GroupingCell>>
+  readonly rollupTo?: string
+}
+
+export interface Statement extends Definition {
+  readonly label: string
   readonly periods: ReadonlyArray<string>
-  readonly dimensions?: ReadonlyArray<{
-    readonly dimension: string
-    readonly members: ReadonlyArray<string>
-  }>
-  readonly entries: ReadonlyArray<
-    | { readonly type: "heading"; readonly label: string }
-    | { readonly type: "item"; readonly item: string; readonly label?: string }
-  >
+  readonly items: ReadonlyArray<Item>
 }
 
 export interface ApplicationKey {
-  readonly rule: string
+  readonly statement: string
+  readonly parent: string
   readonly period: string
-  readonly dimensions: Dimensions
+}
+
+export interface CellIdentity {
+  readonly statement: string
+  readonly item: string
+  readonly period: string
 }
 
 export type ApplicationResult =
@@ -113,25 +56,15 @@ export type ApplicationResult =
   | {
       readonly key: ApplicationKey
       readonly status: "error"
-      readonly reason: "missing-fact" | "unavailable-fact"
-      readonly coordinate: Required<Coordinate>
+      readonly reason: "missing-value" | "unavailable-value"
+      readonly cell: CellIdentity
     }
-  | {
-      readonly key: ApplicationKey
-      readonly status: "error"
-      readonly reason: "missing-boundary-period"
-      readonly boundary: "opening" | "closing"
-      readonly date: string
-    }
-  | {
-      readonly key: ApplicationKey
-      readonly status: "skipped"
-      readonly reason: "no-predecessor" | "gap" | "ambiguous-predecessor"
-    }
+
+export type CalculationStatus = "not-run" | "not-defined" | "consistent" | "inconsistent"
 
 export interface ValidationSnapshot {
   readonly conformance: "conforming" | "nonconforming"
-  readonly calculations: "not-run" | "not-defined" | "not-evaluated" | "consistent" | "inconsistent"
+  readonly calculations: CalculationStatus
   readonly applications: ReadonlyArray<ApplicationResult>
 }
 
@@ -140,12 +73,9 @@ export interface Document {
   readonly documentId?: string
   readonly entity: { readonly id?: string; readonly name: string }
   readonly scope: { readonly id?: string; readonly label: string }
-  readonly items: ReadonlyArray<Item>
   readonly units: ReadonlyArray<Unit>
   readonly periods: ReadonlyArray<Period>
-  readonly dimensions?: ReadonlyArray<Dimension>
-  readonly facts: ReadonlyArray<Fact>
+  readonly groupingColumns?: ReadonlyArray<string>
   readonly statements: ReadonlyArray<Statement>
-  readonly calculationRules?: ReadonlyArray<CalculationRule>
   readonly validationSnapshot?: ValidationSnapshot
 }

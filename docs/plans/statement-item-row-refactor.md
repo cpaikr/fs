@@ -1,6 +1,6 @@
 # Statement Item Row Refactor Plan
 
-Status: In progress. Phases 0 and 1 are complete; the runtime cutover is next.
+Status: In progress. Phases 0–2 are complete; rollups and snapshots are next.
 
 This file is the concise milestone index and the only owner of live progress,
 temporary drift, blockers, and the next action. Stable phase scope and gates
@@ -49,7 +49,7 @@ cross-platform release verification, version publication, and npm release.
 | --- | --- | --- |
 | 0. Contract and remaining decisions | Complete | [Target contract](statement-item-row-refactor/phase-0-contract.md) |
 | 1. Schemas and contract evidence | Complete | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
-| 2. Document model and structural validation | Not started | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
+| 2. Document model and structural validation | Complete | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
 | 3. Rollups, results, and snapshots | Not started | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
 | 4. Rendering | Not started | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
 | 5. CLI, guidance, and package integration | Not started | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
@@ -78,10 +78,13 @@ Schemas, examples, the language-neutral fixture matrix, record-validation
 expected documents, and artifact-sensitive CLI descriptors now implement the
 statement-row model directly. The replacement schemas close result and diff
 variants, encode status/application cardinality, and retain relative schema
-identifiers for Roadmap step 11. The runtime and generated guidance still
-implement the dimensional fact model; no compatibility path has been added.
-The delivery uses two sequential PRs: the merged Phase-0 contract slice and
-this coordinated Phase-1-through-6 machine and runtime cutover.
+identifiers for Roadmap step 11. The in-process document model, application
+identity, schema diagnostics, and semantic validation now use statement-owned
+rows and statement-local rollup graphs. Calculation, snapshot, rendering, and
+generated guidance code still implement the dimensional fact model; no
+compatibility path has been added. The delivery uses two sequential PRs: the
+merged Phase-0 contract slice and this coordinated Phase-1-through-6 machine
+and runtime cutover.
 
 The completed step-9 renderer and snapshot implementation remain the verified
 baseline. Historical delivery evidence stays in the
@@ -98,9 +101,11 @@ phases reuse rather than duplicate earlier evidence.
 ## Known Temporary Drift
 
 - The normative prose and machine-readable evidence define the replacement
-  contract while runtime code, runtime tests, exact HTML, and generated
-  guidance still define the prior model. Phases 2–5 close those projections on
-  this cutover branch.
+  contract. The shared runtime model and structural validation also use it,
+  while calculation, snapshot, rendering, their direct tests, exact HTML, and
+  generated guidance still define the prior model. Phases 3–5 close those
+  projections on this cutover branch. Typecheck is consequently red only at
+  those remaining direct consumers of removed model fields and statuses.
 
 This drift is deliberate only while Roadmap step 10 is active. Do not update
 examples or fixtures piecemeal to make summaries appear current.
@@ -135,15 +140,24 @@ schemas and use unique statement-qualified application keys. Static CLI
 descriptor references and JSON Pointer selections resolve. The documentation
 and whitespace gates pass.
 
+Phase 2 replaces the TypeScript model, application identity, schema diagnostic
+normalization, and semantic validator without a compatibility branch. Targeted
+tests cover every Phase-1 schema and semantic fixture through the public
+validator where calculation or snapshot migration is not yet required. They
+also prove exact diagnostic ordering, root pointers, discriminated period and
+snapshot failures, canonical versus mistyped nested cells, statement-local
+identifier reuse, complete cycle reporting, and semantic map-key validation.
+Fresh review found and closed irrelevant-union diagnostic leakage and
+well-typed cell misclassification. The targeted test and whitespace gates pass.
+
 ## Blockers
 
-None to beginning Phase 2.
+None to beginning Phase 3.
 
 ## Next Action
 
-Replace the document model and structural validation in Phase 2, using the
-Phase-1 fixture matrix as executable evidence and preserving the single direct
-cutover path.
+Replace general calculation evaluation and dimensional snapshot identity with
+direct additive rollups and statement-qualified snapshot comparison in Phase 3.
 
 ## Completion
 
