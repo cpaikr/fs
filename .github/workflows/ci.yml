@@ -19,7 +19,7 @@ jobs:
         node: [22.17.0, 24.15.0]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
       - name: Enable pinned pnpm
@@ -33,7 +33,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.15.0
       - name: Check documentation and fixture contracts
