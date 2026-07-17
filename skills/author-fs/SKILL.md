@@ -4,7 +4,7 @@ description: >-
   Encode and validate complete FS financial-statement documents from
   author-resolved models. Use when an agent must create or repair an FS JSON
   document without inferring missing financial meanings, values, taxonomy,
-  calculations, or source mappings.
+  rollups, groupings, or source mappings.
 ---
 
 # Authoring FS Documents
@@ -20,11 +20,11 @@ financial meanings, map a taxonomy, convert units, or invent values.
 Before encoding, obtain all of these from the author:
 
 - the reporting entity and exact reporting scope;
-- every item meaning and stable document-local identifier;
-- units, scales, periods, fact values, and any dimensions;
-- the intended distinction between zero, missing, and unavailable facts;
-- statement composition and display order; and
-- any calculation rules and tolerances to check.
+- every statement's item meanings, order, and stable local identifiers;
+- units, scales, selected periods, and one cell state for every item-period;
+- any grouping-column names and each item's assignments;
+- the intended distinction between zero, missing, and unavailable values; and
+- every confirmed additive parent-child relationship and unit tolerance.
 
 Stop and request missing or contradictory inputs. Do not infer a meaning,
 choose a sign, aggregate items, map a taxonomy, or invent a value.
@@ -32,14 +32,19 @@ choose a sign, aggregate items, map a taxonomy, or invent a value.
 ## Workflow
 
 1. Create one document for exactly one entity and reporting scope.
-2. Define items, units, periods, and dimensions before referencing them.
-3. Store each supplied value at its complete fact coordinate. Use exact decimal
-   strings, encode zero as `"0"`, omit a missing coordinate, and use
-   `"unavailable": true` only for explicit unavailability.
-4. Add flat statement presentations over the shared facts. Presentation does
-   not create facts, hierarchy, or calculations.
-5. Add only confirmed calculation checks. Rules validate stored facts and
-   never materialize values.
+2. Define units and periods before statements reference them. Declare any
+   custom grouping purposes once in `groupingColumns`; they are flat metadata,
+   not hierarchies or value coordinates.
+3. Place ordered items directly in each statement. Give every item one unit, a
+   `values` map whose keys exactly match the statement periods, and a
+   `groupings` map whose keys exactly match `groupingColumns`.
+4. Encode each cell deliberately: use normalized exact decimal strings for
+   values, `"0"` for zero, JSON `null` for missing, and
+   `{ "unavailable": true }` only for explicit unavailability. Never omit a
+   selected period key.
+5. Set `rollupTo` on a child only for a confirmed additive relationship to a
+   same-unit parent in the same statement. Parent values remain explicit;
+   validation checks direct children and never materializes a subtotal.
 6. Validate the complete candidate before creating a document.
 
 ## Contract Discovery
@@ -66,8 +71,8 @@ code and JSON Pointer path to correct the encoding, then validate the complete
 candidate again. Do not invent a missing financial decision during repair.
 Run `create` only after validation reports structural conformance.
 
-Structural conformance, calculation consistency, and snapshot comparison are
-separate results. Calculation inconsistency may still be a successful usable
-validation result and does not prevent `create`; structural nonconformance
-does. `create` copies the candidate's exact bytes atomically and never
-overwrites an existing path or creates a missing parent directory.
+Structural conformance, rollup calculation consistency, and snapshot
+comparison are separate results. A rollup inconsistency may still be a
+successful usable validation result and does not prevent `create`; structural
+nonconformance does. `create` copies the candidate's exact bytes atomically and
+never overwrites an existing path or creates a missing parent directory.

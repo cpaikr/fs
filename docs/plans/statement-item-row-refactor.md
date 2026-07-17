@@ -1,6 +1,6 @@
 # Statement Item Row Refactor Plan
 
-Status: In progress. Phases 0–4 are complete; CLI and guidance integration is next.
+Status: In progress. Phases 0–5 are complete; the final removal audit is next.
 
 This file is the concise milestone index and the only owner of live progress,
 temporary drift, blockers, and the next action. Stable phase scope and gates
@@ -52,7 +52,7 @@ cross-platform release verification, version publication, and npm release.
 | 2. Document model and structural validation | Complete | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
 | 3. Rollups, results, and snapshots | Complete | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
 | 4. Rendering | Complete | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
-| 5. CLI, guidance, and package integration | Not started | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
+| 5. CLI, guidance, and package integration | Complete | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
 | 6. Legacy removal and final gate | Not started | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
 
 Phases 2–4 are ordered work packets within one runtime cutover. The shared
@@ -84,7 +84,8 @@ rows and statement-local rollup graphs. Calculation, validation results,
 snapshot comparison, and snapshot recording now use direct-child rollups and
 statement-qualified application keys. Rendering now emits ordered statement-row
 tables with flat grouping metadata and the fixed finite output budgets.
-Generated authoring guidance still implements the dimensional fact model; no
+Generated authoring guidance, current README routing, executable CLI evidence,
+and installed-package smoke coverage now project the same contract. No
 compatibility path has been added.
 The delivery uses two sequential PRs: the merged Phase-0 contract slice and
 this coordinated Phase-1-through-6 machine and runtime cutover.
@@ -103,10 +104,7 @@ phases reuse rather than duplicate earlier evidence.
 
 ## Known Temporary Drift
 
-- The normative prose, machine-readable evidence, and runtime implementation
-  define the replacement contract. Generated authoring guidance still defines
-  the prior model. Phase 5 closes that final projection and runs executable CLI
-  and package integration on this cutover branch.
+None. Phase 6 audits for unplanned legacy paths before closing the milestone.
 
 This drift is deliberate only while Roadmap step 10 is active. Do not update
 examples or fixtures piecemeal to make summaries appear current.
@@ -174,15 +172,28 @@ three failures without writing plus each exact boundary. Targeted renderer and
 process tests, TypeScript, Effect diagnostics, documentation, and whitespace
 gates pass.
 
+Phase 5 rewrites the authoritative portable authoring workflow around
+statement-owned items, exact-key value and grouping maps, explicit cell states,
+and confirmed additive rollups. The installed guide and Agent Skill regenerate
+exactly from that source, the skill structure validates, and an independent
+forward-use produced a conforming direct-child rollup document. Current README,
+authoring, and authority routing no longer describe the accepted model as
+future work. Fresh review found that the packed-install smoke omitted
+validation, creation, and snapshot recording. It now executes those commands
+from the installed tarball, checks accepted structured results, preserves exact
+candidate bytes, and matches exact recorded-document bytes. The full repository,
+packed CLI acceptance, writer integration, installed-package, documentation,
+and whitespace gates pass.
+
 ## Blockers
 
-None to beginning Phase 5.
+None to beginning Phase 6.
 
 ## Next Action
 
-Regenerate the authoring guidance from the replacement contract, align the
-remaining executable CLI and package integration, and restore the full
-repository gate in Phase 5.
+Audit and remove every unplanned legacy contract path, trace representative
+documents across all public surfaces, run the clean final gate and fresh
+code-review pass, and close Roadmap step 10 in Phase 6.
 
 ## Completion
 

@@ -45,11 +45,10 @@ When documents overlap, use this order:
 The product scope and glossary explain intent and terminology but do not
 override the semantic specification.
 
-ADR 0001 fixes the accepted replacement target but does not override the
-current semantic, schema, fixture, or CLI contracts until Roadmap step 10
-incorporates it into those owning documents. Its active plan owns transition
-state and temporary drift. Proposed ADRs have no contract authority until
-accepted and incorporated.
+ADR 0001 records the accepted replacement decision now incorporated into the
+semantic, schema, fixture, and CLI contracts. Its active plan owns remaining
+delivery state and temporary drift. Proposed ADRs have no contract authority
+until accepted and incorporated.
 
 ## Maintenance
 
