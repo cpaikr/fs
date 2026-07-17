@@ -1,0 +1,31 @@
+{
+  "id": "help-record-validation",
+  "command": "fs",
+  "arguments": ["record-validation", "--help"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": [
+        "USAGE",
+        "fs record-validation",
+        "document...",
+        "Exactly one",
+        "--output",
+        "--help",
+        "--version",
+        "--completions",
+        "--log-level"
+      ],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

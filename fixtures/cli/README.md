@@ -1,15 +1,19 @@
 # CLI Acceptance Fixtures
 
+These cases remain executable evidence for the current `0.1` contract. Their
+artifact-sensitive inputs and outputs change only through the coordinated
+[Roadmap step-10 refactor](../../docs/plans/statement-item-row-refactor.md).
+
 These fixtures provide executable evidence for the observable process contract
 in the [CLI acceptance contract](../../docs/cli/acceptance.md). The contract is
 authoritative for target behavior. The
-[active CLI plan](../../docs/plans/cli-v0.md) is the sole source for migration
-state, validation, blockers, and the next action.
+[completed step-9 plan](../../docs/plans/agent-guidance-snapshots-rendering.md)
+records its delivery state and validation.
 
 The checked-in suite retains the pre-migration domain, content, logging, and
 filesystem evidence while encoding the Effect-native grammar, help, built-in,
-and usage-presentation contract. The active plan records whether the current
-implementation satisfies it.
+and usage-presentation contract. The completed plan records the implementation
+evidence that satisfies it.
 
 ## Layout
 
@@ -73,7 +77,9 @@ The revised suite keeps these domain and operational cases:
   malformed input, trailing content, duplicate members, unsafe scale, and
   missing input;
 - deterministic discovery and exact installed guide, schema, example, and
-  created-document bytes;
+  created-document bytes, including generated validation snapshots that
+  revalidate as snapshot matches, plus deterministic standalone HTML from the
+  flat presentation model;
 - silent and enabled logging, thresholds, bounded failure context, and I/O
   invariance; and
 - atomic no-overwrite behavior, missing parents, write failures, existing
@@ -89,7 +95,8 @@ The revised grammar and native presentation coverage requires:
 - native help on standard output, a native diagnostic on standard error, and
   exit code `2` for missing or extra operands, unknown commands, unknown flags,
   unknown command values, and invalid log levels;
-- duplicate `--output` rejection for schema, named example, and create;
+- duplicate `--output` rejection for schema, named example, create,
+  snapshot recording, and rendering;
 - canonical local-flag-before-operand invocations without acceptance promises
   for alternate placement or subcommand operands after `--`; and
 - native action short-circuiting without application I/O, without fixing

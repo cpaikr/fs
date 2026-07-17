@@ -1,0 +1,38 @@
+{
+  "id": "record-validation-replace-mismatch",
+  "command": "fs",
+  "arguments": ["record-validation", "--output", "recorded.json", "input.json"],
+  "workspace": [
+    { "copy": "../valid/snapshot-mismatch-source.json", "to": "input.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "output", "help"] },
+        { "pointer": "/output", "equals": ["status", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/snapshot-mismatch-current.json" } },
+        { "pointer": "/snapshotDiff", "equalsFile": { "file": "../snapshot-diffs/recorded-snapshot-mismatch.json" } },
+        { "pointer": "/output/status", "equals": "created" },
+        { "pointer": "/output/path", "equals": "recorded.json" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": {
+        "created": [
+          { "path": "recorded.json", "equalsFile": "expected/record-validation/snapshot-mismatch.json" }
+        ],
+        "unchanged": ["input.json"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

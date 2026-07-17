@@ -1,6 +1,6 @@
 # Authoring FS Documents
 
-Use this workflow only after the financial model is resolved. FS encodes one
+{{FS_VERSION_NOTE}}Use this workflow only after the financial model is resolved. FS encodes one
 entity and reporting scope; it does not extract source material, choose
 financial meanings, map a taxonomy, convert units, or invent values.
 

@@ -21,6 +21,8 @@ const assertNativeHelp = (result, label) => {
     "example",
     "validate",
     "create",
+    "record-validation",
+    "render",
     "--help",
     "--version",
     "--completions",
@@ -55,6 +57,7 @@ try {
     "dist/bin.js",
     "dist/cli.js",
     "dist/process.js",
+    "dist/render.js",
     "examples/manufacturing-group.json",
     "examples/minimal.json",
     "package.json",
@@ -67,8 +70,14 @@ try {
     if (!paths.includes(path)) throw new Error(`packed file missing: ${path}`)
   }
   for (const path of paths) {
-    if (path.startsWith("src/") || path.startsWith("test/") || path.startsWith("fixtures/")) {
-      throw new Error(`development-only path was packed: ${path}`)
+    if (
+      path.startsWith(".agents/") ||
+      path.startsWith("skills/") ||
+      path.startsWith("src/") ||
+      path.startsWith("test/") ||
+      path.startsWith("fixtures/")
+    ) {
+      throw new Error(`repository-only path was packed: ${path}`)
     }
   }
 
@@ -111,6 +120,24 @@ try {
   const expectedDiscovery = JSON.parse(readFileSync("fixtures/cli/expected/discovery.json", "utf8"))
   if (JSON.stringify(JSON.parse(discovery.stdout)) !== JSON.stringify(expectedDiscovery)) {
     throw new Error("installed fs discovery differs from the accepted value")
+  }
+
+  const renderedPath = join(temporaryDirectory, "installed-render.html")
+  const rendered = run(
+    shim,
+    [
+      "render",
+      "--output",
+      renderedPath,
+      join(installedRoot, "examples", "minimal.json")
+    ],
+    { cwd: installDirectory, encoding: "utf8" }
+  )
+  if (rendered.status !== 0 || rendered.stderr !== "") {
+    throw new Error(rendered.stderr || "installed fs render failed")
+  }
+  if (!readFileSync(renderedPath).equals(readFileSync("fixtures/cli/expected/render/minimal.html"))) {
+    throw new Error("installed fs render bytes differ from the accepted value")
   }
 
   const help = run(shim, ["--help"], { cwd: installDirectory })

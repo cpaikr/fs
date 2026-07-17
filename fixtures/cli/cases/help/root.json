@@ -21,7 +21,9 @@
         "schema",
         "example",
         "validate",
-        "create"
+        "create",
+        "record-validation",
+        "render"
       ],
       "excludes": ["wizard", "prompt", "interactive"],
       "ansi": false

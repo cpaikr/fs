@@ -1,0 +1,36 @@
+{
+  "id": "render-missing-path",
+  "command": "fs",
+  "arguments": ["render", "--output", "report.html", "missing.json"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "render" },
+        { "pointer": "/error/code", "equals": "input-not-found" },
+        { "pointer": "/error/path", "equals": "missing.json" },
+        {
+          "pointer": "/help",
+          "equals": [{ "executable": "fs", "arguments": ["render", "--output", "<new-html>", "<existing-document>"] }]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": [],
+        "absent": ["missing.json", "report.html"]
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

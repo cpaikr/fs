@@ -1,0 +1,21 @@
+{
+  "id": "render-missing-document",
+  "command": "fs",
+  "arguments": ["render", "--output", "report.html"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs render", "document...", "Exactly one", "--output"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "native-text", "contains": ["document"], "excludes": [], "ansi": false },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": ["report.html"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

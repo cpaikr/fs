@@ -1,5 +1,10 @@
 # Authoring FS Documents
 
+This guide remains the authoring contract for the currently implemented `0.1`
+format. Do not author the accepted statement-item-row replacement until the
+[Roadmap step-10 refactor](plans/statement-item-row-refactor.md) updates schema
+discovery, validation, examples, and this guide together.
+
 This guide is the entry point for a person or agent encoding an already-resolved
 financial-statement model as an FS document. The
 [semantic specification](semantic-spec.md) remains normative. The
@@ -127,7 +132,7 @@ prompt. They must stop when the prerequisite financial model is incomplete and
 must not claim full semantic conformance until the reference validator has
 run.
 
-The CLI guide and future installable Agent Skill share one portable source
+The CLI guide and repository-distributed Agent Skill share one portable source
 derived from this workflow. They must not add extraction or mapping
 instructions and should route to focused references rather than embed the
 complete schema or fixture suite in default context.

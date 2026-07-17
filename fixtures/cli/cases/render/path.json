@@ -1,0 +1,38 @@
+{
+  "id": "render-path",
+  "command": "fs",
+  "arguments": ["render", "--output", "report.html", "input.json"],
+  "workspace": [
+    { "copy": "../valid/render-presentation.json", "to": "input.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "output", "help"] },
+        { "pointer": "/output", "equals": ["status", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rules.json" } },
+        { "pointer": "/snapshotDiff", "equalsFile": { "file": "../snapshot-diffs/not-recorded.json" } },
+        { "pointer": "/output/status", "equals": "created" },
+        { "pointer": "/output/path", "equals": "report.html" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": {
+        "created": [
+          { "path": "report.html", "equalsFile": "expected/render/render-presentation.html" }
+        ],
+        "unchanged": ["input.json"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

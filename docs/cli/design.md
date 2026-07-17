@@ -1,8 +1,15 @@
 # CLI Design
 
+This design describes the current CLI and `0.1` artifact behavior. The accepted
+statement-item-row model changes artifact-dependent validation, snapshots,
+examples, and rendering only after the
+[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates the
+owning contracts and executable evidence.
+
 The CLI is the packaged reference consumer and authoring aid for complete FS
-documents. The [delivery plan](../plans/cli-v0.md) owns implementation state
-and technical delivery choices.
+documents. The
+[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
+records Roadmap step 9 implementation and validation.
 
 ## Boundary
 
@@ -82,11 +89,13 @@ drift.
 The [portable template](../../content/guide/authoring.md.template) is that
 source. Its [installed rendering](../../assets/guide/authoring.md) uses `fs`;
 the deterministic renderer accepts an exact package version and fixes the
-`npx -y @cpai/fs@<version>` prefix for future Phase 7 Skill generation.
+`npx -y @cpai/fs@<version>` prefix and visible version-basis note for Agent
+Skill generation.
 
-Generated routes and commands must work outside a repository checkout. The
-guide routes to schemas, examples, and the semantic specification without
-embedding the whole contract in default agent context.
+Generated routes and commands do not assume a repository checkout. Package
+publication remains release work. The guide routes to schemas, examples, and
+the semantic specification without embedding the whole contract in default
+agent context.
 
 ### `fs schema [--output <path>] <name>`
 
@@ -158,7 +167,9 @@ inconsistency may be recorded; structural nonconformance prevents writing.
 
 Produce a simple standalone HTML presentation at the requested new path.
 Rendering uses the flat presentation model and does not infer hierarchy,
-calculations, or missing facts.
+calculations, or missing facts. Checked structural budgets prevent unbounded
+table expansion before allocation, and a bounded sink rejects encoded HTML
+that exceeds the accepted finite-output policy.
 
 ## Commands Intentionally Absent
 
@@ -216,12 +227,15 @@ It identifies missing prerequisite inputs without supplying them, invokes the
 reference validator, and routes structural diagnostics into an encoding repair
 loop. Static Skill guidance and `fs guide authoring` share one source.
 
-Installed CLI guidance uses `fs`. Generated Skill commands pin the released
-npm package as `npx -y @cpai/fs@<version>` so they do not assume a global
-installation.
+Publish the Skill from the repository's root `skills/` catalog. Installed CLI
+guidance uses `fs`. Generated Skill commands name an exact npm package version
+as `npx -y @cpai/fs@<version>` and state that version as their basis; package
+publication remains separate release work.
 
 ## Delivery
 
-The [V0 CLI plan](../plans/cli-v0.md) owns the selected runtime, package,
-dependency constraints, implementation phases, validation gates, and current
-next action.
+The
+[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
+records the implementation phases and validation gates. The
+[completed V0 CLI plan](../plans/cli-v0.md) retains the selected runtime,
+package, dependency constraints, and step-8 validation evidence.

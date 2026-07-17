@@ -1,5 +1,5 @@
 import { Effect } from "effect"
-import { mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs"
+import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 
@@ -93,6 +93,58 @@ describe("application process boundary", () => {
     }
   })
 
+  it("reads stdin exactly once when recording validation", () => {
+    const root = mkdtempSync(join(tmpdir(), "fs-process-"))
+    let reads = 0
+    try {
+      const result = run(
+        {
+          command: "record-validation",
+          input: "-",
+          output: "result.json",
+          logLevel: "none"
+        },
+        makeIO(root, {
+          readStdin: Effect.sync(() => {
+            reads += 1
+            return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+          })
+        })
+      )
+
+      expect(result.exitCode).toBe(0)
+      expect(reads).toBe(1)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  it("reads stdin exactly once when rendering", () => {
+    const root = mkdtempSync(join(tmpdir(), "fs-process-"))
+    let reads = 0
+    try {
+      const result = run(
+        {
+          command: "render",
+          input: "-",
+          output: "result.html",
+          logLevel: "none"
+        },
+        makeIO(root, {
+          readStdin: Effect.sync(() => {
+            reads += 1
+            return readFileSync(resolve("examples/minimal.json"))
+          })
+        })
+      )
+
+      expect(result.exitCode).toBe(0)
+      expect(reads).toBe(1)
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
   it("checks an existing create destination before reading stdin", () => {
     const calls: Array<string> = []
     const io = makeIO(process.cwd(), {
@@ -118,6 +170,95 @@ describe("application process boundary", () => {
     })
     expect(calls).toEqual(["exists"])
   })
+
+  it("checks an existing snapshot destination before reading stdin", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "record-validation",
+        input: "-",
+        output: "result.json",
+        logLevel: "none"
+      },
+      makeIO(process.cwd(), {
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return Buffer.alloc(0)
+        }),
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return true
+        }),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      error: { operation: "record-validation", code: "output-exists" }
+    })
+    expect(calls).toEqual(["exists"])
+  })
+
+  it("checks an existing render destination before reading stdin", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "render",
+        input: "-",
+        output: "result.html",
+        logLevel: "none"
+      },
+      makeIO(process.cwd(), {
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return Buffer.alloc(0)
+        }),
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return true
+        }),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      error: { operation: "render", code: "output-exists" }
+    })
+    expect(calls).toEqual(["exists"])
+  })
+
+  it.each(["record-validation", "render"] as const)(
+    "validates input before reporting a non-directory output parent for %s",
+    (command) => {
+      const root = mkdtempSync(join(tmpdir(), "fs-process-"))
+      writeFileSync(join(root, "input.json"), "{")
+      writeFileSync(join(root, "parent"), "not a directory")
+      try {
+        const result = run({
+          command,
+          input: "input.json",
+          output: command === "render" ? "parent/result.html" : "parent/result.json",
+          logLevel: "none"
+        }, makeIO(root))
+
+        expect(result.exitCode).toBe(1)
+        expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+          error: { operation: command, code: "invalid-json", path: "input.json" },
+          help: []
+        })
+      } finally {
+        rmSync(root, { recursive: true, force: true })
+      }
+    }
+  )
 
   it("treats a dangling destination symlink as existing before reading the candidate", () => {
     const root = mkdtempSync(join(tmpdir(), "fs-process-"))
@@ -159,6 +300,144 @@ describe("application process boundary", () => {
 
     expect(result.exitCode).toBe(0)
     expect(calls).toEqual(["exists", "read", "write"])
+  })
+
+  it("preserves snapshot read, validation, and write ordering", () => {
+    const calls: Array<string> = []
+    let written: Buffer = Buffer.alloc(0)
+    const result = run(
+      {
+        command: "record-validation",
+        input: "-",
+        output: "result.json",
+        logLevel: "debug"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+        }),
+        writeFile: (_path, contents) => Effect.sync(() => {
+          calls.push("write")
+          written = contents
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(0)
+    expect(calls).toEqual(["exists", "read", "write"])
+    expect(written).toEqual(
+      readFileSync(resolve("fixtures/cli/expected/record-validation/no-rules.json"))
+    )
+  })
+
+  it("preserves render read, validation, and exact write ordering", () => {
+    const calls: Array<string> = []
+    let written: Buffer = Buffer.alloc(0)
+    const result = run(
+      {
+        command: "render",
+        input: "-",
+        output: "result.html",
+        logLevel: "debug"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return readFileSync(resolve("examples/minimal.json"))
+        }),
+        writeFile: (_path, contents) => Effect.sync(() => {
+          calls.push("write")
+          written = contents
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(0)
+    expect(calls).toEqual(["exists", "read", "write"])
+    expect(written).toEqual(readFileSync(resolve("fixtures/cli/expected/render/minimal.html")))
+  })
+
+  it("does not render or write a structurally nonconforming document", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "render",
+        input: "-",
+        output: "result.html",
+        logLevel: "none"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return readFileSync(resolve("fixtures/invalid/unresolved-item.json"))
+        }),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      output: { status: "not-created", reason: "structural-nonconformance" }
+    })
+    expect(calls).toEqual(["exists", "read"])
+  })
+
+  it("reports render limits after validation without writing output", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "render",
+        input: "-",
+        output: "result.html",
+        logLevel: "error"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return readFileSync(resolve("fixtures/valid/render-column-limit-exceeded.json"))
+        }),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      error: {
+        operation: "render",
+        code: "output-limit-exceeded",
+        path: "result.html"
+      },
+      help: []
+    })
+    expect(result.stderr.toString("utf8")).toContain(
+      '"code":"output-limit-exceeded","budget":"columns","limit":1000'
+    )
+    expect(calls).toEqual(["exists", "read"])
   })
 
   it("contains unexpected application defects without leaking causes", () => {

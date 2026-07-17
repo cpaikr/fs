@@ -4,7 +4,17 @@ export interface Definition {
   readonly id: string
 }
 
-export interface Unit extends Definition {
+export interface NamedDefinition extends Definition {
+  readonly label: string
+}
+
+export interface Item extends NamedDefinition {
+  readonly description?: string
+}
+
+export interface Unit extends NamedDefinition {
+  readonly measure: string
+  readonly scale: number
   readonly defaultTolerance?: string
 }
 
@@ -12,8 +22,8 @@ export type Period =
   | (Definition & { readonly kind: "instant"; readonly date: string })
   | (Definition & { readonly kind: "duration"; readonly start: string; readonly end: string })
 
-export interface Dimension extends Definition {
-  readonly members: ReadonlyArray<Definition>
+export interface Dimension extends NamedDefinition {
+  readonly members: ReadonlyArray<NamedDefinition>
 }
 
 export interface Coordinate {
@@ -72,6 +82,7 @@ export type CalculationRule =
 
 export interface Statement {
   readonly id: string
+  readonly label: string
   readonly unit: string
   readonly periods: ReadonlyArray<string>
   readonly dimensions?: ReadonlyArray<{
@@ -80,7 +91,7 @@ export interface Statement {
   }>
   readonly entries: ReadonlyArray<
     | { readonly type: "heading"; readonly label: string }
-    | { readonly type: "item"; readonly item: string }
+    | { readonly type: "item"; readonly item: string; readonly label?: string }
   >
 }
 
@@ -126,11 +137,14 @@ export interface ValidationSnapshot {
 
 export interface Document {
   readonly formatVersion: "0.1"
-  readonly items?: ReadonlyArray<Definition>
-  readonly units?: ReadonlyArray<Unit>
-  readonly periods?: ReadonlyArray<Period>
+  readonly documentId?: string
+  readonly entity: { readonly id?: string; readonly name: string }
+  readonly scope: { readonly id?: string; readonly label: string }
+  readonly items: ReadonlyArray<Item>
+  readonly units: ReadonlyArray<Unit>
+  readonly periods: ReadonlyArray<Period>
   readonly dimensions?: ReadonlyArray<Dimension>
-  readonly facts?: ReadonlyArray<Fact>
+  readonly facts: ReadonlyArray<Fact>
   readonly statements: ReadonlyArray<Statement>
   readonly calculationRules?: ReadonlyArray<CalculationRule>
   readonly validationSnapshot?: ValidationSnapshot

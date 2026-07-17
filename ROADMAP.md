@@ -2,13 +2,16 @@
 
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
-[V0 CLI plan](docs/plans/cli-v0.md) owns current task state, validation,
-blockers, and the next action.
+[completed step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md)
+records its delivery decisions and validation.
+
+The accepted statement-item-row redesign is planned in the active
+[refactor plan](docs/plans/statement-item-row-refactor.md).
 
 ## Reference CLI
 
-Steps 1–8 define the reference CLI sequence. Detailed scope, phase status,
-validation, and known drift are maintained in the
+Steps 1–8 define the completed reference CLI sequence. Detailed historical
+scope and validation are maintained in the
 [V0 CLI plan](docs/plans/cli-v0.md).
 
 ## Release Sequence
@@ -25,9 +28,11 @@ validation, and known drift are maintained in the
 7. [x] Add contract discovery and atomic, non-overwriting document creation.
 8. [x] Adopt the revised Effect-native CLI contract, acceptance fixtures, and
    `effect/unstable/cli` runner.
-9. [ ] Generate agent guidance from one source, then add snapshot recording
+9. [x] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.
-10. [ ] Replace placeholder schema identifiers, run cross-platform package
+10. [ ] Replace the dimensional fact model with statement-owned item rows,
+    nested value and grouping maps, and additive rollup validation.
+11. [ ] Replace placeholder schema identifiers, run cross-platform package
     verification, and release V0.
 
 ## Later Directions

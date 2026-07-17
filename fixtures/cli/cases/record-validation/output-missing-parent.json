@@ -1,0 +1,38 @@
+{
+  "id": "record-validation-output-missing-parent",
+  "command": "fs",
+  "arguments": ["record-validation", "--output", "missing/recorded.json", "input.json"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "input.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "record-validation" },
+        { "pointer": "/error/code", "equals": "output-parent-not-found" },
+        { "pointer": "/error/path", "equals": "missing/recorded.json" },
+        {
+          "pointer": "/help",
+          "equals": [{ "executable": "fs", "arguments": ["record-validation", "--output", "<new-document>", "input.json"] }]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json"],
+        "absent": ["missing/recorded.json"]
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "record-validation-missing-path",
+  "command": "fs",
+  "arguments": ["record-validation", "--output", "recorded.json", "missing.json"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "record-validation" },
+        { "pointer": "/error/code", "equals": "input-not-found" },
+        { "pointer": "/error/path", "equals": "missing.json" },
+        {
+          "pointer": "/help",
+          "equals": [{ "executable": "fs", "arguments": ["record-validation", "--output", "<new-document>", "<existing-document>"] }]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": [],
+        "absent": ["missing.json", "recorded.json"]
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

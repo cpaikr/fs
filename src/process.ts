@@ -11,6 +11,10 @@ import {
 } from "./assets.js"
 import { decodeJson } from "./json.js"
 import { DiagnosticLogger, type LogLevel } from "./logger.js"
+import { recordValidationSnapshot } from "./record-validation.js"
+import { renderHtml } from "./render.js"
+import type { Document } from "./validation/model.js"
+import { compareSnapshot } from "./validation/snapshot.js"
 import { validateDocument } from "./validation/validate.js"
 import { outputEntryExists, writeNewFile, type WriteFailure } from "./writer.js"
 
@@ -85,6 +89,18 @@ export type ApplicationRequest =
   | { readonly command: "example"; readonly name: ExampleName; readonly output?: string }
   | { readonly command: "validate"; readonly input: string; readonly logLevel: LogLevel }
   | { readonly command: "create"; readonly input: string; readonly output: string }
+  | {
+      readonly command: "record-validation"
+      readonly input: string
+      readonly output: string
+      readonly logLevel: LogLevel
+    }
+  | {
+      readonly command: "render"
+      readonly input: string
+      readonly output: string
+      readonly logLevel: LogLevel
+    }
 
 interface CommandSuggestion {
   readonly executable: "fs"
@@ -141,13 +157,16 @@ const discovery = {
     { name: "schema", access: "read-write" },
     { name: "example", access: "read-write" },
     { name: "validate", access: "read" },
-    { name: "create", access: "write" }
+    { name: "create", access: "write" },
+    { name: "record-validation", access: "write" },
+    { name: "render", access: "write" }
   ],
   help: [
     commandSuggestion("guide", "authoring"),
     commandSuggestion("schema", "document"),
     commandSuggestion("example"),
-    commandSuggestion("validate", "<document|->")
+    commandSuggestion("validate", "<document|->"),
+    commandSuggestion("render", "--output", "<new-html>", "<document|->")
   ]
 } as const
 
@@ -168,11 +187,12 @@ const examples = {
 } as const
 
 const writeFailure = (
-  operation: "schema" | "example" | "create",
+  operation: "schema" | "example" | "create" | "record-validation" | "render",
   failure: WriteFailure,
   path: string,
-  help: ReadonlyArray<CommandSuggestion>
-): ProcessResult => commandError(operation, failure, help, path)
+  help: ReadonlyArray<CommandSuggestion>,
+  stderr: Buffer = empty
+): ProcessResult => commandError(operation, failure, help, path, undefined, stderr)
 
 const runSchema = (
   name: SchemaName,
@@ -221,7 +241,7 @@ interface ReadInputSuccess {
 
 const readInput = (
   input: string,
-  operation: "validate" | "create",
+  operation: "validate" | "create" | "record-validation" | "render",
   io: ApplicationIOService
 ): Effect.Effect<ReadInputSuccess | ProcessResult> =>
   Effect.gen(function*() {
@@ -236,10 +256,23 @@ const readInput = (
     const help = code === "input-not-found"
       ? operation === "validate"
         ? [commandSuggestion("validate", "<existing-document>")]
-        : [commandSuggestion("create", "--output", "<new-document>", "<existing-candidate>")]
+        : operation === "create"
+          ? [commandSuggestion("create", "--output", "<new-document>", "<existing-candidate>")]
+          : operation === "record-validation"
+            ? [commandSuggestion("record-validation", "--output", "<new-document>", "<existing-document>")]
+            : [commandSuggestion("render", "--output", "<new-html>", "<existing-document>")]
       : []
     return commandError(operation, code, help, input)
   })
+
+const validationHelp = (
+  input: string,
+  validation: ReturnType<typeof validateDocument>
+): ReadonlyArray<CommandSuggestion> =>
+  validation.validation.conformance.status === "conforming" &&
+    (validation.snapshotDiff.status === "not-recorded" || validation.snapshotDiff.status === "mismatch")
+    ? [commandSuggestion("record-validation", "--output", "<new-document>", input)]
+    : []
 
 const runValidate = (
   input: string,
@@ -270,7 +303,11 @@ const runValidate = (
       snapshot: result.snapshotDiff.status
     })
     return jsonResult(
-      { validation: result.validation, snapshotDiff: result.snapshotDiff, help: [] },
+      {
+        validation: result.validation,
+        snapshotDiff: result.snapshotDiff,
+        help: validationHelp(input, result)
+      },
       result.validation.conformance.status === "conforming" ? 0 : 1,
       logger.bytes()
     )
@@ -319,6 +356,201 @@ const runCreate = (
     )
   })
 
+type DerivedOutputOperation = "record-validation" | "render"
+
+interface GeneratedOutputSuccess {
+  readonly ok: true
+  readonly bytes: Buffer
+  readonly snapshotDiff: ReturnType<typeof validateDocument>["snapshotDiff"]
+}
+
+interface GeneratedOutputFailure {
+  readonly ok: false
+  readonly code: "output-limit-exceeded"
+  readonly message: string
+  readonly context: Readonly<Record<string, string | number | boolean>>
+}
+
+type GeneratedOutput = GeneratedOutputSuccess | GeneratedOutputFailure
+
+const runValidatedOutput = (
+  operation: DerivedOutputOperation,
+  input: string,
+  output: string,
+  logLevel: LogLevel,
+  io: ApplicationIOService,
+  generate: (
+    document: Document,
+    validation: ReturnType<typeof validateDocument>
+  ) => GeneratedOutput
+): Effect.Effect<ProcessResult> =>
+  Effect.gen(function*() {
+    const logger = new DiagnosticLogger(logLevel)
+    const destination = resolve(io.cwd, output)
+    const outputHelp = [
+      commandSuggestion(
+        operation,
+        "--output",
+        operation === "render" ? "<new-html>" : "<new-document>",
+        input
+      )
+    ]
+    const exists = yield* Effect.result(io.outputExists(destination))
+    if (Result.isFailure(exists)) {
+      logger.emit("error", "output-failed", operation, { code: "write-failed" })
+      return commandError(
+        operation,
+        "write-failed",
+        outputHelp,
+        output,
+        undefined,
+        logger.bytes()
+      )
+    }
+    if (exists.success) {
+      logger.emit("error", "output-failed", operation, { code: "output-exists" })
+      return commandError(
+        operation,
+        "output-exists",
+        outputHelp,
+        output,
+        undefined,
+        logger.bytes()
+      )
+    }
+
+    const read = yield* readInput(input, operation, io)
+    if (!("ok" in read)) {
+      const error = JSON.parse(read.stdout.toString("utf8")) as { readonly error: { readonly code: string } }
+      logger.emit("error", "input-failed", operation, {
+        code: error.error.code,
+        source: input === "-" ? "stdin" : "path"
+      })
+      return { ...read, stderr: logger.bytes() }
+    }
+    logger.emit("debug", "input-read", operation, { source: read.source })
+    const decoded = decodeJson(read.bytes)
+    if (!decoded.ok) {
+      logger.emit("error", "input-failed", operation, {
+        code: "invalid-json",
+        source: read.source
+      })
+      return commandError(
+        operation,
+        "invalid-json",
+        [],
+        input,
+        decoded.message,
+        logger.bytes()
+      )
+    }
+    const result = validateDocument(decoded.value)
+    logger.emit("info", "validation-completed", operation, {
+      conformance: result.validation.conformance.status,
+      calculations: result.validation.calculations.status,
+      snapshot: result.snapshotDiff.status
+    })
+    if (result.validation.conformance.status === "nonconforming") {
+      return jsonResult(
+        {
+          validation: result.validation,
+          snapshotDiff: result.snapshotDiff,
+          output: { status: "not-created", path: output, reason: "structural-nonconformance" },
+          help: []
+        },
+        1,
+        logger.bytes()
+      )
+    }
+
+    const generated = generate(decoded.value as Document, result)
+    if (!generated.ok) {
+      logger.emit("error", "output-failed", operation, {
+        code: generated.code,
+        ...generated.context
+      })
+      return commandError(
+        operation,
+        generated.code,
+        [],
+        output,
+        generated.message,
+        logger.bytes()
+      )
+    }
+
+    const written = yield* Effect.result(io.writeFile(destination, generated.bytes))
+    if (Result.isFailure(written)) {
+      logger.emit("error", "output-failed", operation, { code: "write-failed" })
+      return writeFailure(
+        operation,
+        "write-failed",
+        output,
+        outputHelp,
+        logger.bytes()
+      )
+    }
+    if (written.success !== null) {
+      logger.emit("error", "output-failed", operation, { code: written.success })
+      return writeFailure(
+        operation,
+        written.success,
+        output,
+        outputHelp,
+        logger.bytes()
+      )
+    }
+    logger.emit("info", "output-created", operation, {})
+    return jsonResult(
+      {
+        validation: result.validation,
+        snapshotDiff: generated.snapshotDiff,
+        output: { status: "created", path: output },
+        help: []
+      },
+      0,
+      logger.bytes()
+    )
+  })
+
+const runRecordValidation = (
+  input: string,
+  output: string,
+  logLevel: LogLevel,
+  io: ApplicationIOService
+): Effect.Effect<ProcessResult> =>
+  runValidatedOutput("record-validation", input, output, logLevel, io, (document, result) => {
+    const recorded = recordValidationSnapshot(document, result.validation)
+    return {
+      ok: true,
+      bytes: recorded.bytes,
+      snapshotDiff: compareSnapshot(recorded.document.validationSnapshot, result.validation)
+    }
+  })
+
+const runRender = (
+  input: string,
+  output: string,
+  logLevel: LogLevel,
+  io: ApplicationIOService
+): Effect.Effect<ProcessResult> =>
+  runValidatedOutput("render", input, output, logLevel, io, (document, result) => {
+    const rendered = renderHtml(document)
+    if (!rendered.ok) {
+      return {
+        ok: false,
+        code: "output-limit-exceeded",
+        message: `Rendered output exceeds the ${rendered.budget} budget of ${rendered.limit}.`,
+        context: { budget: rendered.budget, limit: rendered.limit }
+      }
+    }
+    return {
+      ok: true,
+      bytes: rendered.bytes,
+      snapshotDiff: result.snapshotDiff
+    }
+  })
+
 const run = (request: ApplicationRequest): Effect.Effect<ProcessResult, never, ApplicationIO> =>
   Effect.gen(function*() {
     const io = yield* ApplicationIO
@@ -335,6 +567,20 @@ const run = (request: ApplicationRequest): Effect.Effect<ProcessResult, never, A
         return yield* runValidate(request.input, request.logLevel, io)
       case "create":
         return yield* runCreate(request.input, request.output, io)
+      case "record-validation":
+        return yield* runRecordValidation(
+          request.input,
+          request.output,
+          request.logLevel,
+          io
+        )
+      case "render":
+        return yield* runRender(
+          request.input,
+          request.output,
+          request.logLevel,
+          io
+        )
     }
   })
 

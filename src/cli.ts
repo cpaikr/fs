@@ -206,6 +206,64 @@ const create = Command.make(
     })
 ).pipe(Command.withDescription("Validate and atomically copy exact candidate bytes to a new path."))
 
+const recordValidation = Command.make(
+  "record-validation",
+  {
+    output: outputFlag("Create the document with its current validation snapshot at this new path."),
+    document: exactDocument
+  },
+  ({ output, document }) =>
+    Effect.gen(function*() {
+      const path = firstOutput(output)
+      if (path === undefined) {
+        return yield* failWithUsage(
+          ["fs", "record-validation"],
+          new CliError.MissingOption({ option: "output" })
+        )
+      }
+      const logLevel = yield* currentLogLevel
+      yield* dispatch({
+        command: "record-validation",
+        input: document,
+        output: path,
+        logLevel
+      })
+    })
+).pipe(
+  Command.withDescription(
+    "Validate and atomically create a document containing its current validation snapshot."
+  )
+)
+
+const render = Command.make(
+  "render",
+  {
+    output: outputFlag("Create the standalone HTML presentation at this new path."),
+    document: exactDocument
+  },
+  ({ output, document }) =>
+    Effect.gen(function*() {
+      const path = firstOutput(output)
+      if (path === undefined) {
+        return yield* failWithUsage(
+          ["fs", "render"],
+          new CliError.MissingOption({ option: "output" })
+        )
+      }
+      const logLevel = yield* currentLogLevel
+      yield* dispatch({
+        command: "render",
+        input: document,
+        output: path,
+        logLevel
+      })
+    })
+).pipe(
+  Command.withDescription(
+    "Validate and atomically create a standalone HTML presentation."
+  )
+)
+
 const noOperands = Argument.string("operand").pipe(
   Argument.withDescription("No operands are accepted."),
   Argument.variadic(),
@@ -228,9 +286,9 @@ const guide = Command.make("guide", {}, () =>
 
 const root = Command.make("fs", {}, () => dispatch({ command: "fs" })).pipe(
   Command.withDescription(
-    "Inspect, validate, and safely create FS documents. Diagnostic logging defaults to none."
+    "Inspect, validate, snapshot, render, and safely create FS documents. Diagnostic logging defaults to none."
   ),
-  Command.withSubcommands([guide, schema, example, validate, create])
+  Command.withSubcommands([guide, schema, example, validate, create, recordValidation, render])
 )
 
 export const noColorOutput = CliOutput.layer(CliOutput.defaultFormatter({ colors: false }))

@@ -23,6 +23,7 @@ done < <(
 
 echo "Checking maintained CLI content"
 node scripts/render-guide.mjs --check-installed
+node scripts/render-guide.mjs --check-skill
 npx_guide="$(node scripts/render-guide.mjs --npx-version 0.1.0)"
 for expected_command in \
   'schema document' \
@@ -49,10 +50,20 @@ if [[ "$npx_guide" == *'{{'* ]]; then
   exit 1
 fi
 node scripts/render-guide.mjs --npx-version 1.0.0+build.1 >/dev/null
+skill_guide="$(node scripts/render-guide.mjs --skill-version 1.0.0+build.1)"
+if [[ "$skill_guide" != *'This Skill is based on `@cpai/fs` version `1.0.0+build.1`.'* ]]; then
+  echo "Agent Skill rendering lost its package-version basis" >&2
+  exit 1
+fi
 for invalid_version in latest 1.0.0-.. 1.0.0-01; do
   if node scripts/render-guide.mjs \
     --npx-version "$invalid_version" >/dev/null 2>&1; then
     echo "Pinned npx guide rendering accepted $invalid_version" >&2
+    exit 1
+  fi
+  if node scripts/render-guide.mjs \
+    --skill-version "$invalid_version" >/dev/null 2>&1; then
+    echo "Agent Skill rendering accepted $invalid_version" >&2
     exit 1
   fi
 done
@@ -199,6 +210,9 @@ echo "Validating conforming documents"
 "${ajv[@]}" \
   -s schema/fs-document.schema.json \
   -d 'fixtures/valid/*.json'
+"${ajv[@]}" \
+  -s schema/fs-document.schema.json \
+  -d 'fixtures/cli/expected/record-validation/*.json'
 
 echo "Checking invalid-fixture schema classification"
 while IFS=$'\t' read -r document layer; do

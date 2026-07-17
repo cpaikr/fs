@@ -1,5 +1,11 @@
 # CLI Acceptance Contract
 
+This contract remains authoritative for the current `0.1` implementation. The
+accepted statement-item-row replacement does not change observable process
+behavior until the
+[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates this
+contract, fixtures, and runtime together.
+
 ## Purpose
 
 CLI acceptance fixtures fix the observable process contract of the reference
@@ -189,9 +195,12 @@ is `nonconforming`; the named code and path match exactly; the message is
 nonempty; and calculations are `not-run` with no applications. This does not
 create a duplicate semantic expected-result file merely for the CLI layer.
 
-`help` is empty until an implemented command can directly remediate the
-reported result. In particular, validation does not suggest the planned
-`record-validation` command before that command is available.
+`help` is empty unless an implemented command can directly remediate the
+reported result. A conforming validation whose snapshot status is
+`not-recorded` or `mismatch` suggests `record-validation --output
+<new-document> <document|->`, preserving the supplied path or `-` operand.
+Matching snapshots, structural nonconformance, and invalid embedded snapshots
+do not produce that suggestion.
 
 Structural nonconformance is a validation result with exit code `1`, not a
 generic command error. It has calculation status `not-run`. Calculation
@@ -223,8 +232,8 @@ instead of a validation envelope:
 Fixtures fix the exact fields appropriate to each error. Stable V0 usage codes
 are not part of the JSON vocabulary; grammar failures use Effect-native text.
 Stable operational codes are `input-not-found`, `input-unreadable`,
-`invalid-json`, `output-exists`, `output-parent-not-found`, `write-failed`, and
-`internal-error`.
+`invalid-json`, `output-exists`, `output-parent-not-found`,
+`output-limit-exceeded`, `write-failed`, and `internal-error`.
 
 Malformed syntax, trailing content, and duplicate object members all produce
 `invalid-json` before JSON Schema validation. Duplicate members are never
@@ -293,6 +302,21 @@ candidate is invalid and the destination exists. The implementation must also
 enforce no-overwrite at the atomic commit boundary so the preflight check does
 not introduce a race.
 
+`fs record-validation` uses the same precedence. It checks an already-existing
+destination before reading the input and still enforces no-overwrite at atomic
+commit. Missing parents and commit-time write failures occur only after input
+validation and snapshot generation.
+
+`fs render` uses the same precedence and atomic commit boundary. It checks an
+already-existing destination before reading the input. Missing parents and
+commit-time write failures occur only after complete validation and HTML
+generation.
+
+A destination below a non-directory path component does not itself exist, so
+`ENOTDIR` during the destination preflight does not become `write-failed`.
+Input parsing and validation retain precedence; after successful generation,
+the writer reports the non-directory parent as `output-parent-not-found`.
+
 Ordinary acceptance cases prove that failed commands leave no partial output.
 A separate child-process fault-injection integration test terminates writers
 after open, write, sync, close, and link, and verifies the hard-link commit
@@ -317,6 +341,95 @@ Structural refusal returns the same validation information, uses output status
 `not-created` with reason `structural-nonconformance`, exits `1`, and leaves
 the requested path absent. Preflight and operational failures use the command
 error shape instead.
+
+### Recorded documents
+
+`fs record-validation` parses and fully validates the input before replacing
+its optional `validationSnapshot`. A present invalid snapshot is structural
+nonconformance; the command never strips invalid data to make an input pass.
+For a conforming document, the replacement snapshot contains exactly the
+current conformance status, calculation status, and calculation applications
+in their validation-result order. Calculation inconsistency is recordable.
+
+The generated document is UTF-8 JSON with two-space indentation and one final
+LF. It preserves the parsed member order of the input, except that an existing
+top-level `validationSnapshot` is removed and the replacement is appended as
+the final top-level member. The snapshot's members are ordered `conformance`,
+`calculations`, and `applications`; each application preserves the validator's
+stable validation-result member order. This is a deterministic CLI encoding,
+not a canonical JSON requirement for FS documents generally.
+
+Successful recording reports the current validation, snapshot diff `match`
+for the created document, output status `created`, the argument path, and
+empty help. Structural refusal reports the input validation and snapshot diff,
+output status `not-created` with reason `structural-nonconformance`, and empty
+help. Operational errors use operation `record-validation` and the shared
+stable error vocabulary.
+
+### Rendered HTML
+
+`fs render` fully validates the input before rendering. Structural
+nonconformance, including an invalid embedded snapshot, prevents output;
+calculation inconsistency and snapshot mismatch do not. Calculation rules and
+the optional validation snapshot affect the reported validation result but
+never the rendered page.
+
+The output is one deterministic UTF-8 HTML document with one final LF. It uses
+the exact `<!doctype html>` document structure and embedded CSS fixed by the
+executable render fixtures. It contains no scripts, external resources, or
+author-controlled HTML. Every author-controlled entity, scope, statement,
+unit, measure, dimension, member, item, and entry-override label is escaped as
+text. Identifiers and descriptions are not displayed.
+
+The page title combines the entity name and scope label. Its body shows that
+metadata, then every statement in document display order. Each statement
+shows its label and unit label, measure, and literal base-ten scale. Values are
+the exact stored decimal strings: rendering performs no numeric conversion,
+rescaling, rounding, aggregation, or calculation.
+
+Each statement is one table. Rows follow `entries`; an item override label
+wins over the referenced item's label. A heading spans the whole table and
+is a visual separator rendered as an ordinary table cell; it has no table
+header scope, row-group semantics, or nesting. Columns are period-major: for
+each listed period in display order, enumerate the Cartesian product of listed
+axes in axis and member display order, with the first axis changing slowest. A
+statement without axes has one column per period. Instant headers use the exact
+date; duration headers use `<start> – <end>`. Axis coordinates follow the
+period, formatted as `<dimension label>: <member label>` and separated with
+` · `.
+
+A cell lookup uses exactly the item, period, statement unit, and complete axis
+coordinate. A stored value is displayed verbatim, explicit unavailability is
+displayed as `Unavailable`, and an absent coordinate is displayed as
+`Missing`. Dimensionless facts therefore do not fill dimensional cells, and
+facts with unlisted dimensions are not rendered.
+
+Successful rendering reports the input validation and snapshot diff, output
+status `created`, the argument path, and empty help. Structural refusal uses
+the same validation information, output status `not-created` with reason
+`structural-nonconformance`, exits `1`, and leaves the output absent.
+Operational errors use operation `render` and the shared stable error
+vocabulary.
+
+Rendering computes finite structural budgets with checked arithmetic before
+constructing coordinates, rows, or cells. A rendered statement may contain at
+most 1,000 logical columns including its label column, so the current layout
+permits at most 999 data columns. Across the document, rendered tables may
+occupy at most 100,000 logical grid slots after spans are expanded. A current
+statement with `C` data columns and `R` body rows consumes
+`(C + 1) * (R + 1)` slots. Arithmetic that cannot stay within a budget is
+over-limit without requiring the expanded count to be representable.
+
+After structural preflight, rendering uses a bounded sink and rejects final
+UTF-8 HTML larger than 16 MiB (16,777,216 bytes), measured after escaping and
+encoding. Any budget violation returns operation `render`, code
+`output-limit-exceeded`, exit code `1`, a message naming the budget and limit,
+the requested output path, empty help, and no output file.
+
+An existing destination still wins before input I/O. Malformed or structurally
+nonconforming input wins before render budgets. Structural budgets precede the
+encoded-byte budget; every budget failure precedes parent inspection and
+commit-time writer failures.
 
 ## Required Cases
 
@@ -393,8 +506,8 @@ After validation, add cases in this order:
 
 1. `fs` with no arguments: exact discovery JSON, stable executable and npm
    package identities, no selected input, supported artifact version and
-   serialization, read/write classification, and complete next commands. Also
-   reject an unknown command.
+   serialization, read/write classification including `record-validation`, and
+   complete next commands. Also reject an unknown command.
 2. `fs guide authoring`: exact generated standalone Markdown and rejection of
    unknown topics or arguments.
 3. `fs schema`: all three supported names, exact standard-output payload,
@@ -415,6 +528,54 @@ creation, malformed input, schema and semantic structural refusal, missing
 `--output`, duplicate `--output`, unknown arguments and flags, missing parent,
 existing output, and the combined invalid-input/existing-output precedence
 case. Successful output must be byte-for-byte equal to the candidate.
+
+### `fs record-validation`
+
+Cover path and standard-input success without a prior snapshot, replacement of
+a mismatching snapshot, calculation-inconsistent success, and exact generated
+document bytes. Re-validating every expected generated document must produce
+snapshot status `match`.
+
+Cover malformed input, schema and semantic structural refusal, an invalid
+embedded snapshot, missing input, missing parent, existing output, and the
+combined invalid-input/existing-output precedence case. Cover missing and
+duplicate `--output`, missing and extra input operands, unknown flags, and
+native command help. Successful output and every refusal leave the input
+unchanged, and every failure creates no output or residue.
+
+Instrument the application boundary to prove preflight-before-read ordering,
+one standard-input read, validation-before-write ordering, and unchanged
+behavior with logging. The shared writer fault and concurrency suite continues
+to own crash atomicity and commit-race behavior.
+
+### `fs render`
+
+Cover exact HTML from a path for the complete presentation fixture and from
+standard input for the minimal example. Cover a calculation-inconsistent,
+snapshot-mismatching input to prove both states remain renderable while their
+content is absent from the HTML. Exact output fixtures prove statement,
+period, axis, member, and row ordering; dimensionless and dimensional lookup;
+exact zero, negative, and fractional decimals; literal scale metadata;
+missing and unavailable cells; entry-label override; heading behavior; and
+escaping of every author-controlled label kind.
+
+Cover malformed input, schema and semantic structural refusal, an invalid
+embedded snapshot, missing input, missing parent, existing output, and the
+combined invalid-input/existing-output precedence case. Cover missing and
+duplicate `--output`, missing and extra input operands, unknown flags, native
+command help, discovery, and root help. Successful output and every refusal
+leave the input unchanged, and every failure creates no output or residue.
+
+Cover a non-directory output parent with both malformed and conforming input.
+Cover checked rejection beyond the column, grid-slot, and encoded-byte budgets
+and success at each boundary; prove that over-limit rendering never enters the
+writer.
+
+Instrument the application boundary to prove preflight-before-read ordering,
+one standard-input read, validation-before-write ordering, unchanged rendered
+bytes with logging, and no render write on structural refusal. The shared
+writer fault and concurrency suite continues to own crash atomicity and
+commit-race behavior.
 
 ## Implementation Gate
 

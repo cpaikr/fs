@@ -1,0 +1,35 @@
+{
+  "id": "render-output-limit-exceeded",
+  "command": "fs",
+  "arguments": ["render", "--output", "report.html", "input.json"],
+  "workspace": [
+    { "copy": "../valid/render-column-limit-exceeded.json", "to": "input.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "render" },
+        { "pointer": "/error/code", "equals": "output-limit-exceeded" },
+        { "pointer": "/error/path", "equals": "report.html" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json"],
+        "absent": ["report.html"]
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}
