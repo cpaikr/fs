@@ -14,9 +14,9 @@
     { "name": "create", "access": "write" }
   ],
   "help": [
-    "fs guide authoring",
-    "fs schema document --version 0.1",
-    "fs example",
-    "fs validate <document|-> --format json"
+    { "executable": "fs", "arguments": ["guide","authoring"] },
+    { "executable": "fs", "arguments": ["schema","document"] },
+    { "executable": "fs", "arguments": ["example"] },
+    { "executable": "fs", "arguments": ["validate","<document|->"] }
   ]
 }

@@ -1,29 +1,19 @@
 {
   "id": "create-extra-argument",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "extra.json", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "candidate.json", "extra.json"],
   "workspace": [
     { "copy": "../valid/no-calculation-rules.json", "to": "candidate.json" }
   ],
   "stdin": null,
   "expect": {
     "stdout": {
-      "encoding": "json",
-      "members": [
-        { "pointer": "", "equals": ["error", "help"] },
-        { "pointer": "/error", "equals": ["operation", "code", "message"] }
-      ],
-      "equalities": [
-        { "pointer": "/error/operation", "equals": "create" },
-        { "pointer": "/error/code", "equals": "unexpected-argument" },
-        {
-          "pointer": "/help",
-          "equals": ["fs create candidate.json --output <new-document>"]
-        }
-      ],
-      "nonemptyStrings": ["/error/message"]
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs create", "candidate...", "Exactly one", "--output"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
     },
-    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "stderr": { "encoding": "native-text", "contains": ["extra.json"], "excludes": [], "ansi": false },
     "exitCode": 2,
     "filesystem": {
       "workspace": {

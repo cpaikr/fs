@@ -12,7 +12,7 @@
     }
   ],
   "help": [
-    "fs example minimal",
-    "fs example manufacturing-group"
+    { "executable": "fs", "arguments": ["example","minimal"] },
+    { "executable": "fs", "arguments": ["example","manufacturing-group"] }
   ]
 }

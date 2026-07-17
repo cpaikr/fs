@@ -9,7 +9,7 @@ import {
   writeFileSync
 } from "node:fs"
 import { randomBytes } from "node:crypto"
-import { basename, dirname, join } from "node:path"
+import { dirname, join } from "node:path"
 
 export type WriteFailure = "output-exists" | "output-parent-not-found" | "write-failed"
 
@@ -91,17 +91,24 @@ export const writeNewFile = (
     return code === "ENOENT" || code === "ENOTDIR" ? "output-parent-not-found" : "write-failed"
   }
 
-  const temporary = join(parent, `.${basename(path)}.fs-${services.suffix()}.tmp`)
+  let temporary: string
+  try {
+    temporary = join(parent, `.fs-${services.suffix()}.tmp`)
+  } catch {
+    return "write-failed"
+  }
   let descriptor: number | null = null
+  let ownsTemporary = false
   try {
     descriptor = services.openExclusive(temporary)
+    ownsTemporary = true
     services.write(descriptor, bytes)
     services.sync(descriptor)
     services.close(descriptor)
     descriptor = null
   } catch {
     closeWithoutMasking(descriptor, services)
-    unlinkWithoutMasking(temporary, services)
+    if (ownsTemporary) unlinkWithoutMasking(temporary, services)
     return "write-failed"
   }
 

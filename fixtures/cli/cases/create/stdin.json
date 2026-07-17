@@ -1,7 +1,7 @@
 {
   "id": "create-stdin",
   "command": "fs",
-  "arguments": ["create", "-", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "-"],
   "workspace": [],
   "stdin": { "file": "../raw-input/noncanonical-valid.json" },
   "expect": {

@@ -1,0 +1,23 @@
+{
+  "id": "help-action-create-extra-operand",
+  "command": "fs",
+  "arguments": ["create", "--output", "result.json", "candidate.json", "extra.json", "--help"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "candidate.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs create", "candidate...", "Exactly one", "--output", "--help"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["candidate.json"], "absent": ["result.json"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

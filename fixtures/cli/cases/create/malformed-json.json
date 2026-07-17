@@ -1,7 +1,7 @@
 {
   "id": "create-malformed-json",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
     { "copy": "../raw-input/malformed-json.json.txt", "to": "candidate.json" }
   ],

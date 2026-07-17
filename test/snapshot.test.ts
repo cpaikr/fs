@@ -32,4 +32,40 @@ describe("snapshot comparison", () => {
       reason: "invalid-snapshot"
     })
   })
+
+  it("rejects a contradictory numeric snapshot application", () => {
+    for (const application of [
+      { status: "unsatisfied", difference: "999" },
+      { status: "satisfied", difference: "-1" }
+    ] as const) {
+      const value = JSON.parse(readFileSync("examples/minimal.json", "utf8")) as Record<string, unknown>
+      value.validationSnapshot = {
+        conformance: "conforming",
+        calculations: application.status === "satisfied" ? "consistent" : "inconsistent",
+        applications: [
+          {
+            key: { rule: "historical-rule", period: "historical-period", dimensions: {} },
+            status: application.status,
+            actual: "1",
+            expected: "2",
+            difference: application.difference,
+            tolerance: "0"
+          }
+        ]
+      }
+
+      const result = validateDocument(value)
+      expect(result.validation.conformance).toMatchObject({
+        status: "nonconforming",
+        errors: expect.arrayContaining([
+          expect.objectContaining({ code: "invalid-snapshot", path: "/validationSnapshot" })
+        ])
+      })
+      expect(result.snapshotDiff).toEqual({
+        formatVersion: "0.1",
+        status: "not-comparable",
+        reason: "invalid-snapshot"
+      })
+    }
+  })
 })

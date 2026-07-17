@@ -172,6 +172,26 @@
         { "required": ["equalsUtf8"] }
       ]
     },
+    "nativeTextMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "contains", "excludes", "ansi"],
+      "properties": {
+        "encoding": { "const": "native-text" },
+        "contains": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "excludes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "ansi": { "const": false }
+      }
+    },
     "jsonLineRecord": {
       "type": "object",
       "required": ["level", "event", "operation"],
@@ -230,6 +250,7 @@
     "stderrMatcher": {
       "oneOf": [
         { "$ref": "#/$defs/byteMatcher" },
+        { "$ref": "#/$defs/nativeTextMatcher" },
         { "$ref": "#/$defs/jsonLinesMatcher" }
       ]
     },
@@ -285,7 +306,8 @@
         "stdout": {
           "oneOf": [
             { "$ref": "#/$defs/jsonMatcher" },
-            { "$ref": "#/$defs/byteMatcher" }
+            { "$ref": "#/$defs/byteMatcher" },
+            { "$ref": "#/$defs/nativeTextMatcher" }
           ]
         },
         "stderr": { "$ref": "#/$defs/stderrMatcher" },

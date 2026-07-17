@@ -22,6 +22,16 @@
 - Do not edit examples or expected-result fixtures merely to make a prose
   summary appear current; resolve the underlying contract deliberately.
 
+<!-- effect-solutions:start -->
+
+## Effect
+
+Before writing Effect code, run `effect-solutions list`, then
+`effect-solutions show <topic>` for the relevant guide. Do not guess Effect
+patterns.
+
+<!-- effect-solutions:end -->
+
 ## Verification
 
 - Run `./scripts/check-docs.sh` after changing documentation, schemas,

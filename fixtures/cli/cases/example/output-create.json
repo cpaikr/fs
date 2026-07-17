@@ -1,7 +1,7 @@
 {
   "id": "example-output-create",
   "command": "fs",
-  "arguments": ["example", "minimal", "--output", "minimal.json"],
+  "arguments": ["example", "--output", "minimal.json", "minimal"],
   "workspace": [],
   "stdin": null,
   "expect": {

@@ -6,8 +6,10 @@
   "stdin": null,
   "expect": {
     "stdout": {
-      "encoding": "bytes",
-      "equalsFile": "../../assets/help/guide-authoring.md"
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs guide authoring", "--help", "--version", "--completions", "--log-level"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
     },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,

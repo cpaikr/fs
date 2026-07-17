@@ -1,7 +1,7 @@
 {
   "id": "example-output-missing-parent",
   "command": "fs",
-  "arguments": ["example", "minimal", "--output", "missing/minimal.json"],
+  "arguments": ["example", "--output", "missing/minimal.json", "minimal"],
   "workspace": [],
   "stdin": null,
   "expect": {
@@ -15,7 +15,7 @@
         { "pointer": "/error/operation", "equals": "example" },
         { "pointer": "/error/code", "equals": "output-parent-not-found" },
         { "pointer": "/error/path", "equals": "missing/minimal.json" },
-        { "pointer": "/help", "equals": ["fs example minimal --output <new-path>"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["example","--output","<new-path>","minimal"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

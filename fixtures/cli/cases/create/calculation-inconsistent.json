@@ -1,7 +1,7 @@
 {
   "id": "create-calculation-inconsistent",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
     { "copy": "../../examples/manufacturing-group.json", "to": "candidate.json" }
   ],

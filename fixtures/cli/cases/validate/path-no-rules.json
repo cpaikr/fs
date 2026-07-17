@@ -1,7 +1,7 @@
 {
   "id": "validate-path-no-rules",
   "command": "fs",
-  "arguments": ["validate", "input.json", "--format", "json"],
+  "arguments": ["validate", "input.json"],
   "workspace": [
     {
       "copy": "../valid/no-calculation-rules.json",
@@ -33,9 +33,7 @@
         },
         {
           "pointer": "/help",
-          "equals": [
-            "fs record-validation input.json --output <new-document>"
-          ]
+          "equals": []
         }
       ],
       "nonemptyStrings": []

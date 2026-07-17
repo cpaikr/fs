@@ -10,7 +10,7 @@ model, score prose, or make fuzzy judgments.
 The [semantic specification](../semantic-spec.md) defines artifact behavior.
 Existing [language-neutral fixtures](../../fixtures/) provide authoritative
 expected artifact results. CLI cases reuse them instead of copying their
-semantic matrix. The planned location is `fixtures/cli/`.
+semantic matrix. Process cases live in [`fixtures/cli/`](../../fixtures/cli/).
 
 ## Fixture Protocol
 
@@ -20,8 +20,10 @@ Each case records:
 - an isolated working directory and any files copied into it;
 - either no standard input or the exact fixture bytes supplied to standard
   input;
-- the expected standard-output encoding and structured value or exact payload;
-- expected standard error: exact bytes for ordinary cases, or a structured
+- the expected standard-output encoding and structured value, exact payload,
+  or semantic native-CLI text assertions;
+- expected standard error: exact bytes for ordinary application cases,
+  semantic native-CLI text assertions for usage failures, or a structured
   JSON Lines matcher for diagnostic logging cases;
 - the expected exit code; and
 - created, unchanged, and absent filesystem paths after execution.
@@ -45,13 +47,24 @@ comparison:
   create with `--output`, must equal the exact bundled JSON bytes; and
 - `fs guide authoring` must equal its generated Markdown source bytes.
 
+Generated help and usage text have a deliberately narrower comparison. Cases
+assert the active command path, required operands, command-local flags, Effect
+built-ins, relevant offending token, and absence of ANSI control sequences.
+They do not copy formatter prose, wrapping, spacing, or section layout into
+independent expected files. Exact-one operand descriptions must contain the
+literal `Exactly one`. A native variadic ellipsis produced by the beta.98
+consume-all refinement is not interpreted as accepting extras. Version cases
+assert the exact installed package version, and completion cases assert a
+nonempty script for the requested shell; completion metadata does not expand
+the accepted command grammar.
+
 An illustrative case descriptor is:
 
 ```json
 {
   "id": "validate-path-no-rules",
   "command": "fs",
-  "arguments": ["validate", "input.json", "--format", "json"],
+  "arguments": ["validate", "input.json"],
   "workspace": [
     {
       "copy": "../valid/no-calculation-rules.json",
@@ -76,9 +89,7 @@ An illustrative case descriptor is:
       "values": [
         {
           "pointer": "/help",
-          "equals": [
-            "fs record-validation input.json --output <new-document>"
-          ]
+          "equals": []
         }
       ]
     },
@@ -93,17 +104,15 @@ An illustrative case descriptor is:
 }
 ```
 
-The fixture schema, once added, is authoritative for descriptor mechanics. It
-uses generic JSON Pointer equality and nonempty-string assertions rather than
-command-specific matcher fields. This document is authoritative for observable
-CLI behavior.
+The fixture schema is authoritative for descriptor mechanics. It uses generic
+JSON Pointer equality, nonempty-string assertions, and semantic native-text
+assertions rather than command-specific result fields. This document is
+authoritative for observable CLI behavior.
 
 ## Output Contract
 
-JSON is the default V0 encoding for structured CLI results and errors. For
-`fs validate`, `--format json` selects the same encoding explicitly and any
-other value is a usage error with exit code `2`. Other commands accept only the
-flags shown in the [CLI design](design.md). A compact encoding such as TOON is
+JSON is the only V0 encoding for structured operation results and operational
+errors. There is no format selector. A compact encoding such as TOON is
 future, additive work that requires a pinned specification version and its own
 acceptance cases.
 
@@ -113,19 +122,26 @@ escaping it inside a result object:
 - bundled schemas and named examples are JSON; and
 - authoring guidance is Markdown.
 
-No progress text is written to standard output. Structured errors are written
-to standard output. Standard error is empty when `--log-level` is omitted or
-set to `none`. Explicit logging cases compare deterministic diagnostic JSON
-Lines on standard error without changing the expected standard output, exit
-code, or filesystem state.
+The process has three output modes:
+
+- operation results and operational errors are JSON on standard output;
+- explicit help, version, and completions are native text on standard output,
+  with empty standard error and exit code `0`; and
+- grammar failures write generated help for the active command to standard
+  output, a native diagnostic to standard error, and exit code `2`.
+
+No progress text is written to either stream. Standard error is empty for
+ordinary application cases when `--log-level` is omitted or set to `none`.
+Explicit logging cases compare deterministic diagnostic JSON Lines on standard
+error without changing the expected operation result, exit code, or filesystem
+state.
 
 ### Diagnostic logging
 
 Every command path accepts
 `--log-level <all|trace|debug|info|warn|warning|error|fatal|none>`. Omitting the
 flag is equivalent to `none`, and `warning` is an alias for `warn`. An invalid
-value is a usage error with exit code `2`, structured standard output, and
-empty standard error.
+value follows the native usage-failure stream contract and exits `2`.
 
 When enabled, the logger writes one canonical JSON object plus LF per event to
 standard error. Each object contains `level`, `event`, `operation`, and only
@@ -139,13 +155,13 @@ internal observability details. One canonical validation smoke case compares an
 exact ordered transcript; other logging cases parse JSON Lines and make
 structural assertions only over the events relevant to that behavior.
 
-The requested threshold filters events by level. Help and usage errors do not
-emit diagnostic events. Logging may observe command decisions but must not
-change the command result, standard output, exit code, or final filesystem
-effects. Instrumented boundary tests separately prove that logging does not
-change input reads or write ordering; black-box process fixtures cannot observe
-those calls. The ordinary fixture matrix runs without logging, so its exact
-standard error remains empty.
+The requested threshold filters events by level. Help, version, completions,
+and usage failures do not emit diagnostic events. Logging may observe command
+decisions but must not change the command result, standard output, exit code,
+or final filesystem effects. Instrumented boundary tests separately prove that
+logging does not change input reads or write ordering; black-box process
+fixtures cannot observe those calls. The ordinary application fixture matrix
+runs without logging, so its exact standard error remains empty.
 
 ### Validation results
 
@@ -173,21 +189,19 @@ is `nonconforming`; the named code and path match exactly; the message is
 nonempty; and calculations are `not-run` with no applications. This does not
 create a duplicate semantic expected-result file merely for the CLI layer.
 
-When a structurally conforming document has no recorded snapshot, `help`
-contains one complete `fs record-validation` command template. It carries
-forward the path input or `-` and uses `<new-document>` for the required output
-path. When a snapshot exists, or when structural nonconformance prevents
-recording, `help` is empty.
+`help` is empty until an implemented command can directly remediate the
+reported result. In particular, validation does not suggest the planned
+`record-validation` command before that command is available.
 
 Structural nonconformance is a validation result with exit code `1`, not a
 generic command error. It has calculation status `not-run`. Calculation
 inconsistency and snapshot mismatch remain successful results with exit code
 `0`.
 
-### Command errors
+### Operational errors
 
-Usage, input parsing, filesystem, and other operational failures use an error
-object instead of a validation envelope:
+Input parsing, filesystem, and other operational failures use an error object
+instead of a validation envelope:
 
 ```json
 {
@@ -197,16 +211,20 @@ object instead of a validation envelope:
     "message": "The input path does not exist.",
     "path": "missing.json"
   },
-  "help": ["fs validate <existing-document> --format json"]
+  "help": [
+    {
+      "executable": "fs",
+      "arguments": ["validate", "<existing-document>"]
+    }
+  ]
 }
 ```
 
 Fixtures fix the exact fields appropriate to each error. Stable V0 usage codes
-include `missing-argument`, `unexpected-argument`, `unknown-command`,
-`unknown-flag`, `unknown-schema`, `unknown-example`, `unsupported-version`,
-`unsupported-format`, and `unsupported-log-level`. Stable operational codes
-include `input-not-found`, `input-unreadable`, `invalid-json`, `output-exists`,
-`output-parent-not-found`, `write-failed`, and `internal-error`.
+are not part of the JSON vocabulary; grammar failures use Effect-native text.
+Stable operational codes are `input-not-found`, `input-unreadable`,
+`invalid-json`, `output-exists`, `output-parent-not-found`, `write-failed`, and
+`internal-error`.
 
 Malformed syntax, trailing content, and duplicate object members all produce
 `invalid-json` before JSON Schema validation. Duplicate members are never
@@ -219,22 +237,33 @@ must still use their specific tagged error rather than collapse into this
 fallback.
 
 Messages are concise and nonempty but are not compared word-for-word. `help`
-is always an array and contains only complete command templates that can
-correct the error; it is empty when no such correction exists. Dependency
+is always an array and contains only structured command suggestions that can
+correct the error; it is empty when no such correction exists. Each suggestion
+has an `executable` and an `arguments` array. Consumers invoke those values
+directly without shell parsing; paths and metacharacters remain one argument,
+and placeholder values such as `<new-document>` occupy one argument to replace
+before invocation. A relative path beginning with `-` is spelled `./-name`;
+V0 suggestions do not depend on the `--` end-of-options delimiter. Dependency
 names, raw operating-system messages, stack traces, and partial payloads are
 never exposed.
 
-Command and flag usage is validated before any input is read or output path is
-modified. A usage error therefore takes precedence over parsing, validation,
-and filesystem errors.
+Without a native action flag, command grammar is validated before any input is
+read or output path is modified. A usage failure therefore takes precedence
+over parsing, validation, and filesystem errors. Help, version, and
+completions may short-circuit ordinary operand, cardinality, and command-value
+validation without entering application I/O. Precedence among combined action
+flags, and behavior when `--completions` has no shell value, are
+framework-defined and are not supported workflows.
 
 ## Exit Codes
 
-- `0`: the operation completed, including calculation inconsistency, snapshot
-  mismatch, and definitive empty results.
+- `0`: an action flag or operation completed, including calculation
+  inconsistency, snapshot mismatch, and definitive empty results.
 - `1`: an operational, parsing, or structural conformance failure prevented
   the requested successful outcome.
-- `2`: the command, arguments, flags, or requested format are invalid.
+- `2`: native command grammar is invalid. The process boundary maps Effect's
+  nonempty usage-help failure to this status without translating its text to
+  JSON.
 
 ## Filesystem Contract
 
@@ -265,8 +294,10 @@ enforce no-overwrite at the atomic commit boundary so the preflight check does
 not introduce a race.
 
 Ordinary acceptance cases prove that failed commands leave no partial output.
-Crash-level atomicity requires a separate fault-injection integration test; a
-post-execution fixture alone cannot prove it.
+A separate child-process fault-injection integration test terminates writers
+after open, write, sync, close, and link, and verifies the hard-link commit
+boundary. A concurrent-writer case verifies exactly one complete winner and
+no ordinary temporary-file residue.
 
 Successful creation reports:
 
@@ -311,15 +342,36 @@ language-neutral semantic fixture. Paths in the table are relative to
 | Duplicate JSON members | `raw-input/duplicate-members.json.txt` | 1 |
 | Missing path | staged absent path | 1 |
 | Missing or extra argument | none | 2 |
-| Unknown flag or unsupported format | any valid staged input | 2 |
+| Unknown flag | any valid staged input | 2 |
 
 Every validation case asserts an unchanged workspace and no created path.
 
-### Global help and logging
+### Native actions, grammar, and logging
 
-Add exact cases for top-level and per-command `--help` and representative `-h`
-aliases; the accepted Markdown lists both help spellings and `--log-level` but
-does not expose wizard, completions, version, or other unaccepted built-ins.
+Add semantic text cases for top-level and per-command `--help` and
+representative `-h` aliases. Generated help identifies the active command,
+required operands, command-local flags, and the accepted help, version,
+completions, and log-level built-ins. It contains no ANSI control sequences and
+does not expose wizard, prompt, or interactive surfaces. Add success cases for
+`--version`, `-v`, and each documented completion shell.
+
+The fixed fixture environment disables color. A separate integration test
+provides a color-capable terminal and still requires generated help to contain
+no ANSI control sequences.
+
+Add grammar cases that prove:
+
+- missing operands, extra operands, unknown commands, unknown flags, and
+  unknown command values use native help and diagnostics with exit code `2`;
+- repeated single-valued command-local flags are rejected;
+- documented cases place global flags immediately after `fs` and local flags
+  before operands, without fixing alternate placement;
+- no case promises a subcommand operand after `--`; a leading-dash relative
+  filename uses `./-name`; and
+- action flags may succeed without ordinary command validation or application
+  I/O. Combined action-flag precedence and valueless completions behavior are
+  not fixed.
+
 Add logging cases that prove:
 
 - omitted and explicit `none` logging produce identical standard output and
@@ -332,14 +384,8 @@ Add logging cases that prove:
 
 Instrument the I/O boundaries in integration tests to prove that omitted,
 `none`, and enabled logging preserve the same input-read and write-call order,
-and that invalid global flags invoke neither boundary.
-
-Add explicit rejection cases for global `--version`, `-v`, and `--completions`,
-plus a success case proving that
-`fs schema <name> --version <artifact-version>` still selects the command-local
-schema version flag. This also locks a documented positional-then-flag
-invocation so a dependency upgrade cannot silently narrow the accepted
-grammar.
+and that grammar failures and native actions invoke neither application
+boundary.
 
 ### Discovery and read-only content
 
@@ -351,35 +397,31 @@ After validation, add cases in this order:
    reject an unknown command.
 2. `fs guide authoring`: exact generated standalone Markdown and rejection of
    unknown topics or arguments.
-3. `fs schema`: all three supported names, default and explicit version `0.1`,
-   exact standard-output payload, output creation, unknown name, unsupported
-   version, missing parent, and overwrite refusal.
+3. `fs schema`: all three supported names, exact standard-output payload,
+   output creation, unknown name, missing parent, overwrite refusal, and
+   duplicate `--output` rejection.
 4. `fs example`: exact example list, each named example payload, the resolved
    unnamed-output behavior, output creation, unknown name, missing parent, and
-   overwrite refusal.
+   overwrite refusal. Named output cases reject duplicate `--output`.
 
 The list form does not accept `--output`. Supplying `--output` without an
-example name is a `missing-argument` usage error, exits `2`, and does not touch
-the requested path.
+example name is a native missing-operand usage failure, exits `2`, and does not
+touch the requested path.
 
 ### `fs create`
 
 Cover valid path and standard-input creation, calculation-inconsistent
 creation, malformed input, schema and semantic structural refusal, missing
-`--output`, unknown arguments and flags, missing parent, existing output, and
-the combined invalid-input/existing-output precedence case. Successful output
-must be byte-for-byte equal to the candidate.
+`--output`, duplicate `--output`, unknown arguments and flags, missing parent,
+existing output, and the combined invalid-input/existing-output precedence
+case. Successful output must be byte-for-byte equal to the candidate.
 
 ## Implementation Gate
 
-These fixtures describe the final V0 contract even while implementation is
-incremental. The first implementation slice may wire argument handling, input
-reading, JSON parsing, and JSON Schema validation, but it must not be released
-as a full validator while schema-valid documents can bypass semantic checks.
-
-Intermediate work either remains internal or fails closed after the checks it
-can perform. It must not label an arbitrary schema-valid document as
-`conforming`. The process adapter must also fail closed until it can own every
-accepted output and translate unexpected defects to `internal-error` without
-leaking raw causes. Pending cases remain visible, and no temporary output shape
-becomes part of the acceptance contract.
+The packed CLI must satisfy the complete contract. Intermediate migrations
+either remain internal or fail closed; they must not weaken semantic
+validation, exact content, logging, filesystem safety, or defect redaction.
+The command boundary must own every accepted output and translate unexpected
+application defects to `internal-error` without leaking raw causes. Pending
+cases remain visible, and no temporary output shape becomes part of the
+acceptance contract.

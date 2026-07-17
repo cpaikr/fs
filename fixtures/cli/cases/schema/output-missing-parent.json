@@ -1,7 +1,7 @@
 {
   "id": "schema-output-missing-parent",
   "command": "fs",
-  "arguments": ["schema", "document", "--output", "missing/document.schema.json"],
+  "arguments": ["schema", "--output", "missing/document.schema.json", "document"],
   "workspace": [],
   "stdin": null,
   "expect": {
@@ -15,7 +15,7 @@
         { "pointer": "/error/operation", "equals": "schema" },
         { "pointer": "/error/code", "equals": "output-parent-not-found" },
         { "pointer": "/error/path", "equals": "missing/document.schema.json" },
-        { "pointer": "/help", "equals": ["fs schema document --output <new-path>"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["schema","--output","<new-path>","document"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

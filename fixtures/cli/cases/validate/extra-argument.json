@@ -8,22 +8,12 @@
   "stdin": null,
   "expect": {
     "stdout": {
-      "encoding": "json",
-      "members": [
-        { "pointer": "", "equals": ["error", "help"] },
-        { "pointer": "/error", "equals": ["operation", "code", "message"] }
-      ],
-      "equalities": [
-        { "pointer": "/error/operation", "equals": "validate" },
-        { "pointer": "/error/code", "equals": "unexpected-argument" },
-        {
-          "pointer": "/help",
-          "equals": ["fs validate input.json --format json"]
-        }
-      ],
-      "nonemptyStrings": ["/error/message"]
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs validate", "document...", "Exactly one"],
+      "excludes": ["--format"],
+      "ansi": false
     },
-    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "stderr": { "encoding": "native-text", "contains": ["extra.json"], "excludes": [], "ansi": false },
     "exitCode": 2,
     "filesystem": {
       "workspace": { "created": [], "unchanged": ["input.json"], "absent": [] },

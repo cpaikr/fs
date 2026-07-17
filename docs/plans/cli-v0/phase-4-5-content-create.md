@@ -7,6 +7,10 @@ owns discovery and exact bundled content commands, the shared atomic writer,
 and `fs create`. It excludes Agent Skill generation, `record-validation`,
 `render`, and release-readiness work.
 
+This is the completed pre-migration delivery baseline. Phase 6 supersedes its
+exact custom-help and command-adapter decisions while retaining the guide,
+bundled-content, validation, exact-copy, and atomic-write guarantees.
+
 ## Phase 4: Discovery and Bundled Content
 
 - [x] Implement deterministic no-argument discovery without directory scans.
@@ -17,7 +21,7 @@ and `fs create`. It excludes Agent Skill generation, `record-validation`,
 - [x] Reject unknown names, versions, arguments, flags, and unresolved unnamed
   output behavior exactly as accepted.
 - [x] Verify maintained guidance and packaged assets are current in CI without
-  generating the Phase 6 Agent Skill.
+  generating the Phase 7 Agent Skill.
 - [x] Add platform fault tests for the shared writer.
 
 Phase 4 gate: discovery, help, guide, schema, and example cases pass offline
@@ -61,6 +65,8 @@ competing-destination failures. After commit, persistent temp unlink failure
 retains success and may leave only a private-mode complete hard link; it never
 retracts or partially exposes the synced destination. The suite also proves
 exact bytes, no ordinary overwrite, single reads, and stable read-before-write
-ordering across logging settings. `pnpm verify` passes on macOS and isolated
-Linux Node 22.17.0 and 24.15.0; CI runs the same gate on Linux, macOS, and
-Windows.
+ordering across logging settings. A real child-process integration harness
+crashes after open, write, sync, close, and link to verify the commit boundary,
+then races 16 writers to prove exactly one complete winner and ordinary temp
+cleanup. `pnpm verify` passes on macOS and isolated Linux Node 22.17.0 and
+24.15.0; CI runs the same gate on Linux, macOS, and Windows.

@@ -33,9 +33,7 @@
         },
         {
           "pointer": "/help",
-          "equals": [
-            "fs record-validation input.json --output <new-document>"
-          ]
+          "equals": []
         }
       ],
       "nonemptyStrings": []

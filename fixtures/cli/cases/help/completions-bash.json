@@ -1,0 +1,21 @@
+{
+  "id": "help-completions-bash",
+  "command": "fs",
+  "arguments": ["--completions", "bash"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["complete -F _fs fs"],
+      "excludes": [],
+      "ansi": false
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

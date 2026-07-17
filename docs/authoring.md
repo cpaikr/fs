@@ -75,19 +75,17 @@ Rules check stored values; they never supply them.
 
 Full validation must check JSON shape plus all semantic invariants and must
 report structural conformance, calculation consistency, and snapshot
-comparison separately. The planned `fs validate <document|-> --format json`
-command will be the reference operational conformance check once implemented;
-the semantic specification remains normative.
+comparison separately. `fs validate <document|->` is the reference operational
+conformance check; the semantic specification remains normative.
 
-Until then, the AJV commands in the [fixture guide](../fixtures/README.md)
-provide shape validation only. Passing JSON Schema is not sufficient evidence
-of FS conformance.
+The AJV commands in the [fixture guide](../fixtures/README.md) remain useful
+for shape validation only. Passing JSON Schema is not sufficient evidence of
+FS conformance.
 
 A reviewable authoring result should include:
 
 1. the FS JSON document;
-2. its complete structured validation result when the reference validator is
-   available.
+2. its complete structured validation result from the reference validator.
 
 FS defines no source ledger, provenance sidecar, or conversion record. Other
 systems may maintain their own records, but they are outside this project and
@@ -98,8 +96,8 @@ nonconforming in V0.
 
 Every V0 document declares `"formatVersion": "0.1"`. Do not add a top-level
 `$schema` property: the current closed document schema does not permit it. Use
-the bundled schema directly, and later use `fs schema document --version 0.1`
-when the reference CLI is available.
+`fs schema document` to read the exact bundled schema, or
+`fs schema --output <new-path> document` to create an exact copy.
 
 Before public release, the project will replace the schema's placeholder `$id`
 with an immutable versioned URL and decide whether to permit an optional
@@ -126,10 +124,10 @@ author-controlled.
 
 Agents should follow this guide directly rather than copy a second maintained
 prompt. They must stop when the prerequisite financial model is incomplete and
-must not claim full semantic conformance until the reference validator exists
-and has run.
+must not claim full semantic conformance until the reference validator has
+run.
 
-The planned CLI guide and installable Agent Skill will be generated from one
-portable source derived from this workflow. They must not add extraction or
-mapping instructions and should route to focused references rather than embed
-the complete schema or fixture suite in default context.
+The CLI guide and future installable Agent Skill share one portable source
+derived from this workflow. They must not add extraction or mapping
+instructions and should route to focused references rather than embed the
+complete schema or fixture suite in default context.

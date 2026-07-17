@@ -1,0 +1,23 @@
+{
+  "id": "create-duplicate-output",
+  "command": "fs",
+  "arguments": ["create", "--output", "first.json", "--output", "second.json", "candidate.json"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "candidate.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs create", "candidate...", "Exactly one", "--output"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "native-text", "contains": ["output"], "excludes": [], "ansi": false },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["candidate.json"], "absent": ["first.json", "second.json"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

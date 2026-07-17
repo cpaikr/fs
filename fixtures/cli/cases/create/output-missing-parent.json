@@ -1,7 +1,7 @@
 {
   "id": "create-output-missing-parent",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "--output", "missing/result.json"],
+  "arguments": ["create", "--output", "missing/result.json", "candidate.json"],
   "workspace": [
     { "copy": "../raw-input/noncanonical-valid.json", "to": "candidate.json" }
   ],
@@ -19,7 +19,7 @@
         { "pointer": "/error/path", "equals": "missing/result.json" },
         {
           "pointer": "/help",
-          "equals": ["fs create candidate.json --output <new-document>"]
+          "equals": [{ "executable": "fs", "arguments": ["create","--output","<new-document>","candidate.json"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

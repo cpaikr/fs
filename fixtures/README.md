@@ -1,9 +1,9 @@
 # Language-Neutral Fixtures
 
 These fixtures provide machine-readable evidence for the normative
-[semantic specification](../docs/semantic-spec.md). Future deterministic CLI
-process fixtures belong under `cli/` and follow the
-[CLI acceptance contract](../docs/cli/acceptance.md); they should reference the
+[semantic specification](../docs/semantic-spec.md). Deterministic CLI process
+fixtures live under [`cli/`](cli/) and follow the
+[CLI acceptance contract](../docs/cli/acceptance.md). They reference the
 artifact inputs and results here instead of duplicating this matrix.
 
 [`manifest.json`](manifest.json) is the fixture index. Its `document` paths are

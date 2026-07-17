@@ -1,0 +1,21 @@
+{
+  "id": "guide-missing-topic",
+  "command": "fs",
+  "arguments": ["guide"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs guide", "authoring"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "native-text", "contains": ["topic"], "excludes": [], "ansi": false },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

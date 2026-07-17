@@ -10,6 +10,10 @@ language-neutral fixtures own artifact meaning; the
 [acceptance contract](../../cli/acceptance.md) own CLI discovery and process
 behavior.
 
+This is the completed pre-migration baseline. Phase 6 deliberately supersedes
+only its exact custom-help and rejected framework-built-in decisions; its
+artifact, portable-guide, and raw-input work remains authoritative evidence.
+
 ## Scope
 
 - [x] Settle invalid-snapshot, example-output, portable-guide, help,
@@ -23,7 +27,7 @@ behavior.
   schema.
 - [x] Add valid boundary and invalid out-of-range language-neutral fixtures.
 - [x] Define one portable authoring source and byte-stable installed-CLI and
-  pinned-`npx` generation targets without generating the Phase 6 Agent Skill.
+  pinned-`npx` generation targets without generating the Phase 7 Agent Skill.
 - [x] Define exact top-level and per-command help Markdown through `create`.
 - [x] Add malformed, trailing-content, and duplicate-member raw inputs outside
   the document manifest, with explicit integrity checks.
@@ -41,7 +45,7 @@ behavior.
 - Static Agent Skill guidance and `fs guide authoring` will share one
   maintained portable source. Phase 0 fixes the source and render contracts;
   installed-CLI commands render as `fs`, future Skill commands render with the
-  pinned `npx -y @cpai/fs@<version>` prefix, and Phase 6 generation remains
+  pinned `npx -y @cpai/fs@<version>` prefix, and Phase 7 generation remains
   outside this milestone.
 - Help is maintained as exact Markdown content and exposed through the CLI
   adapter without accepting framework-provided version or completion commands.
@@ -59,4 +63,4 @@ adjacent schema failures, the invalid-snapshot diff, and all three raw-input
 classes. It also checks the closed help inventory and exact installed-guide
 rendering from the portable source. The future pinned-`npx` mode requires an
 exact package version and fixes the complete command prefix without creating a
-Phase 6 Skill. `git diff --check` also passes.
+Phase 7 Skill. `git diff --check` also passes.

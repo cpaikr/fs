@@ -1,21 +1,18 @@
 #!/usr/bin/env node
 
+import { NodeServices } from "@effect/platform-node"
 import { runMain } from "@effect/platform-node/NodeRuntime"
-import { Effect } from "effect"
-import { readFileSync } from "node:fs"
+import { Effect, Layer } from "effect"
 
-import { execute } from "./process.js"
+import { noColorOutput, program } from "./cli.js"
+import { ApplicationIO } from "./process.js"
+
+const mainLayer = ApplicationIO.live.pipe(
+  Layer.provideMerge(NodeServices.layer),
+  Layer.merge(noColorOutput)
+)
 
 runMain(
-  Effect.sync(() => {
-    const arguments_ = process.argv.slice(2)
-    const result = execute(arguments_, {
-      cwd: process.cwd(),
-      readStdin: () => readFileSync(0)
-    })
-    process.stdout.write(result.stdout)
-    process.stderr.write(result.stderr)
-    process.exitCode = result.exitCode
-  }),
+  program.pipe(Effect.provide(mainLayer)),
   { disableErrorReporting: true }
 )

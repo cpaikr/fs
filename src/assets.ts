@@ -7,10 +7,6 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const readAsset = (relativePath: string): Buffer =>
   readFileSync(resolve(packageRoot, relativePath))
 
-export const helpAsset = (
-  name: "fs" | "guide" | "guide-authoring" | "schema" | "example" | "validate" | "create"
-): Buffer => readAsset(`assets/help/${name}.md`)
-
 export const authoringGuide = (): Buffer => readAsset("assets/guide/authoring.md")
 
 const schemaPaths = {

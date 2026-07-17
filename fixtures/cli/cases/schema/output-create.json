@@ -1,7 +1,7 @@
 {
   "id": "schema-output-create",
   "command": "fs",
-  "arguments": ["schema", "document", "--output", "document.schema.json"],
+  "arguments": ["schema", "--output", "document.schema.json", "document"],
   "workspace": [],
   "stdin": null,
   "expect": {

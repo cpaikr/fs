@@ -1,0 +1,21 @@
+{
+  "id": "schema-duplicate-output",
+  "command": "fs",
+  "arguments": ["schema", "--output", "first.json", "--output", "second.json", "document"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs schema", "name...", "Exactly one", "--output"],
+      "excludes": ["--artifact-version"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "native-text", "contains": ["output"], "excludes": [], "ansi": false },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": ["first.json", "second.json"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

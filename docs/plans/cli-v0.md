@@ -1,6 +1,7 @@
 # V0 CLI Delivery Plan
 
-Status: complete through `fs create`.
+Status: Complete. The Effect-native CLI and supported-platform verification
+gates pass.
 
 This file is the concise milestone index. Detailed scope, decisions, progress,
 and validation evidence live in the linked child plans. The
@@ -10,10 +11,11 @@ behavior, and the [roadmap](../../ROADMAP.md) owns strategic sequence.
 
 ## Milestone
 
-Deliver the packed `@cpai/fs` reference CLI through `fs create`. The milestone
-includes complete discovery and bundled content, full validation, and atomic
-exact-byte non-overwriting creation. It stops before Agent Skill generation,
-`record-validation`, `render`, and release readiness.
+Deliver the packed `@cpai/fs` reference CLI through `fs create`, then migrate
+that surface to the revised Effect-native contract. The milestone includes
+complete discovery and bundled content, full validation, atomic exact-byte
+non-overwriting creation, and the `effect/unstable/cli` runner. It stops before
+Agent Skill generation, `record-validation`, `render`, and release readiness.
 
 ## Aggregate State
 
@@ -25,24 +27,39 @@ exact-byte non-overwriting creation. It stops before Agent Skill generation,
 | 2. Package and fail-closed validator | Complete | [Package foundation](cli-v0/phase-2-package.md) |
 | 3. Complete semantic validation | Complete | [Semantic validation](cli-v0/phase-3-validation.md) |
 | 4–5. Discovery, content, and creation | Complete | [Content and creation](cli-v0/phase-4-5-content-create.md) |
+| 6. Effect-native CLI contract and migration | Complete | [Effect-native CLI migration](cli-v0/phase-6-effect-cli.md) |
 
-Production implementation begins only after both Phase 0 lanes and Phase 1
-pass their gates. A partial validator is never a releasable conformance
-command.
+Phases 0–5 record the completed pre-migration implementation. Phase 6
+deliberately supersedes only the command grammar and native presentation
+decisions identified in its plan. A partial validator is never a releasable
+conformance command.
 
 ## Current Validation
 
-`pnpm verify` passes strict typecheck, Effect diagnostics, 83 unit and fault
-tests, all 76 packed-process cases, build, installed-tarball npm/npx smoke, and
-exact checks for 46 packed files. The same gate passes in isolated Linux
-environments on Node 22.17.0 and 24.15.0; CI enforces both versions on Linux,
-macOS, and Windows. `./scripts/check-docs.sh` and `git diff --check` pass.
+The current Effect-native implementation passes `pnpm verify` on supported
+Node 22.17.0: strict typecheck, zero strict Effect diagnostics, 92 unit and
+fault tests, all 81 revised packed-process cases, five child-process crash
+points, early contender-exit detection, 16-way writer contention, and
+installed-tarball npm/npx smoke for 39 cleanly built packed files. The packed
+help checks include the production entry point with color-capable terminal
+state and reject CSI and OSC escapes.
+
+The same full suite passes in GitHub-hosted CI on Node 22.17.0 and 24.15.0
+across Linux, macOS, and Windows. The GitHub-hosted documentation job,
+`./scripts/check-docs.sh`, and `git diff --check` pass.
+
+## Known Temporary Drift
+
+None. The private Effect command tree, typed application boundary, fixtures,
+and packed executable implement the revised contract. Artifact semantics,
+operation results, exact bundled content, logging, and filesystem behavior
+remain unchanged.
 
 ## Current Blockers
 
-- None.
+None.
 
 ## Next Action
 
-No in-milestone action remains. The next roadmap slice is Phase 6 Agent
-Guidance, which is deliberately outside this milestone.
+Start Roadmap step 9 under a new active plan. This CLI delivery plan is
+complete.

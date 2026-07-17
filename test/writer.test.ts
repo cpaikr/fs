@@ -35,6 +35,7 @@ const fakeWriter = (options: FakeOptions = {}) => {
     openExclusive: (path) => {
       calls.push(`open:${path}`)
       if (options.failure === "open") throw new Error("open failed")
+      if (paths.has(path)) throw Object.assign(new Error("temporary exists"), { code: "EEXIST" })
       paths.add(path)
       return 7
     },
@@ -85,6 +86,35 @@ describe("atomic no-replace writer", () => {
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
+  })
+
+  it("uses a bounded temporary name and preserves collisions it does not own", () => {
+    const fake = fakeWriter()
+    const parent = join("work")
+    const destination = join(parent, "a".repeat(255))
+    const temporary = join(parent, ".fs-fixed.tmp")
+    fake.paths.add(temporary)
+
+    expect(writeNewFile(destination, Buffer.from("x"), fake.services)).toBe("write-failed")
+    expect(fake.paths.has(temporary)).toBe(true)
+    expect(fake.calls).toEqual([`open:${temporary}`])
+
+    const available = fakeWriter()
+    expect(writeNewFile(destination, Buffer.from("x"), available.services)).toBeNull()
+    expect(available.calls[0]).toBe(`open:${temporary}`)
+  })
+
+  it("maps temporary-name generation failures without throwing", () => {
+    const fake = fakeWriter()
+    const services: WriterServices = {
+      ...fake.services,
+      suffix: () => {
+        throw new Error("random source unavailable")
+      }
+    }
+
+    expect(writeNewFile("/work/result.json", Buffer.from("x"), services)).toBe("write-failed")
+    expect(fake.calls).toEqual([])
   })
 
   it.each(["open", "write", "sync", "close"] as const)(

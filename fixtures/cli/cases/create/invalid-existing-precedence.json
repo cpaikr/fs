@@ -1,7 +1,7 @@
 {
   "id": "create-invalid-existing-precedence",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
     { "copy": "../raw-input/malformed-json.json.txt", "to": "candidate.json" },
     { "copy": "../valid/no-calculation-rules.json", "to": "result.json" }
@@ -20,7 +20,7 @@
         { "pointer": "/error/path", "equals": "result.json" },
         {
           "pointer": "/help",
-          "equals": ["fs create candidate.json --output <new-document>"]
+          "equals": [{ "executable": "fs", "arguments": ["create","--output","<new-document>","candidate.json"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

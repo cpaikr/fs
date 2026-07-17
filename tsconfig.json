@@ -12,6 +12,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "skipLibCheck": false,
+    "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "plugins": [

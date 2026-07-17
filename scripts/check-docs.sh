@@ -25,13 +25,22 @@ echo "Checking maintained CLI content"
 node scripts/render-guide.mjs --check-installed
 npx_guide="$(node scripts/render-guide.mjs --npx-version 0.1.0)"
 for expected_command in \
-  'schema document --version 0.1' \
+  'schema document' \
   'example' \
   'example minimal' \
-  'validate candidate.json --format json' \
-  'create candidate.json --output statement.fs.json'; do
+  'validate candidate.json' \
+  'create --output statement.fs.json candidate.json'; do
   if [[ "$npx_guide" != *"npx -y @cpai/fs@0.1.0 $expected_command"* ]]; then
     echo "Pinned npx guide rendering lost an expected command" >&2
+    exit 1
+  fi
+done
+for removed_command in \
+  'schema document --version' \
+  'validate candidate.json --format' \
+  'create candidate.json --output'; do
+  if [[ "$npx_guide" == *"$removed_command"* ]]; then
+    echo "Pinned npx guide retained a removed command form" >&2
     exit 1
   fi
 done
@@ -47,25 +56,6 @@ for invalid_version in latest 1.0.0-.. 1.0.0-01; do
     exit 1
   fi
 done
-if ! diff -u \
-  <(
-    printf '%s\n' \
-      'assets/help/create.md' \
-      'assets/help/example.md' \
-      'assets/help/fs.md' \
-      'assets/help/guide-authoring.md' \
-      'assets/help/guide.md' \
-      'assets/help/schema.md' \
-      'assets/help/validate.md'
-  ) \
-  <(
-    find assets/help -mindepth 1 -maxdepth 1 -print \
-      | LC_ALL=C sort
-  ); then
-  echo "Help asset inventory differs from the accepted command surface" >&2
-  exit 1
-fi
-
 echo "Parsing JSON artifacts"
 find . \
   -path './.git' -prune -o \

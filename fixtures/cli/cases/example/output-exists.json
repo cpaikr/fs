@@ -1,7 +1,7 @@
 {
   "id": "example-output-exists",
   "command": "fs",
-  "arguments": ["example", "minimal", "--output", "existing.json"],
+  "arguments": ["example", "--output", "existing.json", "minimal"],
   "workspace": [
     { "copy": "../valid/no-calculation-rules.json", "to": "existing.json" }
   ],
@@ -17,7 +17,7 @@
         { "pointer": "/error/operation", "equals": "example" },
         { "pointer": "/error/code", "equals": "output-exists" },
         { "pointer": "/error/path", "equals": "existing.json" },
-        { "pointer": "/help", "equals": ["fs example minimal --output <new-path>"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["example","--output","<new-path>","minimal"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

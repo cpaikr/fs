@@ -1,7 +1,7 @@
 {
   "id": "logging-warn-failure",
   "command": "fs",
-  "arguments": ["validate", "missing.json", "--log-level", "warn"],
+  "arguments": ["--log-level", "warn", "validate", "missing.json"],
   "workspace": [],
   "stdin": null,
   "expect": {
@@ -20,7 +20,7 @@
         { "pointer": "/error/path", "equals": "missing.json" },
         {
           "pointer": "/help",
-          "equals": ["fs validate <existing-document> --format json"]
+          "equals": [{ "executable": "fs", "arguments": ["validate","<existing-document>"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

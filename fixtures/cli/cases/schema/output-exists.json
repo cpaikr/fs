@@ -1,7 +1,7 @@
 {
   "id": "schema-output-exists",
   "command": "fs",
-  "arguments": ["schema", "document", "--output", "existing.json"],
+  "arguments": ["schema", "--output", "existing.json", "document"],
   "workspace": [
     { "copy": "../valid/no-calculation-rules.json", "to": "existing.json" }
   ],
@@ -17,7 +17,7 @@
         { "pointer": "/error/operation", "equals": "schema" },
         { "pointer": "/error/code", "equals": "output-exists" },
         { "pointer": "/error/path", "equals": "existing.json" },
-        { "pointer": "/help", "equals": ["fs schema document --output <new-path>"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["schema","--output","<new-path>","document"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

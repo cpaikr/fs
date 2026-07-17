@@ -26,6 +26,11 @@ describe("JSON boundary", () => {
   it("rejects numeric lexemes that cannot cross the runtime boundary", () => {
     expect(decodeJson(Buffer.from("{\"scale\":9007199254740993}"))).toMatchObject({ ok: false })
     expect(decodeJson(Buffer.from("{\"value\":1e9999}"))).toMatchObject({ ok: false })
+    expect(decodeJson(Buffer.from("{\"scale\":1.0000000000000001}"))).toMatchObject({ ok: false })
+    expect(decodeJson(Buffer.from("{\"scale\":9007199254740991.1}"))).toMatchObject({ ok: false })
+    expect(decodeJson(Buffer.from("{\"scale\":1e-400}"))).toMatchObject({ ok: false })
     expect(decodeJson(Buffer.from("{\"scale\":9007199254740992}"))).toMatchObject({ ok: true })
+    expect(decodeJson(Buffer.from("{\"scale\":1.0}"))).toMatchObject({ ok: true })
+    expect(decodeJson(Buffer.from("{\"value\":1.5}"))).toMatchObject({ ok: true })
   })
 })

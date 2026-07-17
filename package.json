@@ -18,15 +18,16 @@
   },
   "packageManager": "pnpm@10.28.0",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.build.json",
     "check": "pnpm check:docs && pnpm verify",
     "check:docs": "./scripts/check-docs.sh",
     "check:effect": "effect-language-service diagnostics --project tsconfig.json --format text --strict",
     "pack:check": "node scripts/check-pack.mjs",
     "test": "vitest run",
     "test:acceptance": "pnpm build && node scripts/run-cli-acceptance.mjs",
+    "test:writer-integration": "pnpm build && node scripts/run-writer-integration.mjs",
     "typecheck": "tsc -p tsconfig.json",
-    "verify": "pnpm typecheck && pnpm check:effect && pnpm test && pnpm test:acceptance && pnpm pack:check",
+    "verify": "pnpm typecheck && pnpm check:effect && pnpm test && pnpm test:acceptance && pnpm test:writer-integration && pnpm pack:check",
     "prepack": "pnpm build"
   },
   "dependencies": {
@@ -39,6 +40,7 @@
     "@effect/language-service": "0.87.0",
     "@effect/vitest": "4.0.0-beta.98",
     "@types/node": "24.10.0",
+    "cross-spawn": "7.0.6",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
   },

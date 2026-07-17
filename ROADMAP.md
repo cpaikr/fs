@@ -1,27 +1,15 @@
 # Roadmap
 
-Status: V0 artifact and CLI contracts are designed. Contract-artifact
-alignment and CLI integration research are the current milestone.
-
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
 [V0 CLI plan](docs/plans/cli-v0.md) owns current task state, validation,
 blockers, and the next action.
 
-## Current Milestone: Reference CLI
+## Reference CLI
 
-Completed foundations:
-
-- the normative V0 artifact semantics;
-- baseline document and result schemas, examples, and fixtures;
-- authoring guidance for an already-resolved financial model;
-- the planned command surface and deterministic process contract; and
-- the TypeScript, Node.js, Effect, and npm delivery direction.
-
-Before implementation begins, the project must align the remaining schema and
-fixture gaps, verify a public integration seam in the selected CLI stack, and
-encode the accepted command behavior as process fixtures. Detailed phase gates
-and known drift are maintained in the [delivery plan](docs/plans/cli-v0.md).
+Steps 1–8 define the reference CLI sequence. Detailed scope, phase status,
+validation, and known drift are maintained in the
+[V0 CLI plan](docs/plans/cli-v0.md).
 
 ## Release Sequence
 
@@ -31,14 +19,16 @@ and known drift are maintained in the [delivery plan](docs/plans/cli-v0.md).
 3. [x] Publish document-encoding guidance that refuses missing financial
    decisions.
 4. [x] Define the reference CLI surface and observable acceptance contract.
-5. [ ] Close known contract-artifact gaps and verify the selected public CLI
+5. [x] Close known contract-artifact gaps and verify the selected public CLI
    integration boundary.
-6. [ ] Add deterministic CLI fixtures, then implement full validation.
-7. [ ] Add contract discovery and atomic, non-overwriting document creation.
-8. [ ] Generate agent guidance from one source, then add snapshot recording
+6. [x] Add deterministic CLI fixtures, then implement full validation.
+7. [x] Add contract discovery and atomic, non-overwriting document creation.
+8. [x] Adopt the revised Effect-native CLI contract, acceptance fixtures, and
+   `effect/unstable/cli` runner.
+9. [ ] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.
-9. [ ] Replace placeholder schema identifiers, run cross-platform package
-   verification, and release V0.
+10. [ ] Replace placeholder schema identifiers, run cross-platform package
+    verification, and release V0.
 
 ## Later Directions
 

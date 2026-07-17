@@ -34,7 +34,7 @@ choose a sign, aggregate items, map a taxonomy, or invent a value.
 ## Contract Discovery
 
 ```sh
-fs schema document --version 0.1
+fs schema document
 fs example
 fs example minimal
 ```
@@ -46,8 +46,8 @@ conformance evidence.
 ## Validate and Create
 
 ```sh
-fs validate candidate.json --format json
-fs create candidate.json --output statement.fs.json
+fs validate candidate.json
+fs create --output statement.fs.json candidate.json
 ```
 
 If validation reports structural nonconformance, use each diagnostic's stable

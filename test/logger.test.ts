@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import type { LogLevel } from "../src/arguments.js"
-import { DiagnosticLogger } from "../src/logger.js"
+import { DiagnosticLogger, type LogLevel } from "../src/logger.js"
 
 const levels = ["trace", "debug", "info", "warn", "error", "fatal"] as const
 

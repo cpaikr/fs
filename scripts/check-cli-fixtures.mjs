@@ -218,6 +218,22 @@ const validateByteReference = (value, context) => {
   }
 };
 
+const validateNativeTextMatcher = (matcher, context) => {
+  assertUnique(matcher.contains, `${context} required native text`);
+  assertUnique(matcher.excludes, `${context} excluded native text`);
+  const overlap = matcher.contains.filter((value) =>
+    matcher.excludes.includes(value),
+  );
+  if (overlap.length > 0) {
+    fail(`${context}: native text cannot be both required and excluded`);
+  }
+  for (const value of [...matcher.contains, ...matcher.excludes]) {
+    if (/\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001b\\))/u.test(value)) {
+      fail(`${context}: native text assertions cannot contain ANSI sequences`);
+    }
+  }
+};
+
 const logLevels = new Set(["trace", "debug", "info", "warn", "error", "fatal"]);
 const forbiddenLogFields = new Set([
   "timestamp",
@@ -330,10 +346,16 @@ for (const caseReference of manifest.cases) {
 
   if (descriptor.expect.stdout.encoding === "json") {
     validateJsonMatcher(descriptor.expect.stdout, `${context} stdout`);
+  } else if (descriptor.expect.stdout.encoding === "native-text") {
+    validateNativeTextMatcher(descriptor.expect.stdout, `${context} stdout`);
   } else {
     validateByteReference(descriptor.expect.stdout, `${context} stdout`);
   }
-  validateByteReference(descriptor.expect.stderr, `${context} stderr`);
+  if (descriptor.expect.stderr.encoding === "native-text") {
+    validateNativeTextMatcher(descriptor.expect.stderr, `${context} stderr`);
+  } else {
+    validateByteReference(descriptor.expect.stderr, `${context} stderr`);
+  }
   if (descriptor.expect.stderr.encoding === "json-lines") {
     if (descriptor.expect.stderr.equalsFile !== undefined) {
       validateJsonLinesFile(

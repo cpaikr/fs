@@ -1,0 +1,16 @@
+{
+  "id": "help-version-short",
+  "command": "fs",
+  "arguments": ["-v"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": { "encoding": "native-text", "contains": ["0.1.0"], "excludes": [], "ansi": false },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

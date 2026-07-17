@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process"
+import spawn from "cross-spawn"
 import {
   cpSync,
   existsSync,
@@ -25,9 +25,12 @@ const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm"
 if (selectedCases.length === 0) throw new Error("acceptance case pattern selected no cases")
 
 const run = (command, args, options = {}) => {
-  const result = spawnSync(command, args, { encoding: "utf8", ...options })
+  const result = spawn.sync(command, args, {
+    encoding: "utf8",
+    ...options
+  })
   if (result.status !== 0) {
-    throw new Error(result.stderr || result.stdout || `${command} failed`)
+    throw new Error(result.error?.message || result.stderr || result.stdout || `${command} failed`)
   }
   return result
 }
@@ -133,9 +136,34 @@ const matchJsonLines = (actual, matcher, context) => {
   }
 }
 
+const ansiPattern = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001b\\))/u
+
+const matchNativeText = (actual, matcher, context) => {
+  let text
+  try {
+    text = new TextDecoder("utf-8", { fatal: true }).decode(actual)
+  } catch (error) {
+    throw new Error(`${context}: native CLI text is not UTF-8`, { cause: error })
+  }
+  for (const required of matcher.contains) {
+    if (!text.includes(required)) {
+      throw new Error(`${context}: required native CLI text is missing: ${JSON.stringify(required)}`)
+    }
+  }
+  for (const excluded of matcher.excludes) {
+    if (text.includes(excluded)) {
+      throw new Error(`${context}: excluded native CLI text is present: ${JSON.stringify(excluded)}`)
+    }
+  }
+  if (matcher.ansi === false && ansiPattern.test(text)) {
+    throw new Error(`${context}: native CLI text contains ANSI sequences`)
+  }
+}
+
 const matchStream = (actual, matcher, context) => {
   if (matcher.encoding === "bytes") return matchBytes(actual, matcher, context)
   if (matcher.encoding === "json") return matchJson(actual, matcher, context)
+  if (matcher.encoding === "native-text") return matchNativeText(actual, matcher, context)
   return matchJsonLines(actual, matcher, context)
 }
 
@@ -260,7 +288,7 @@ try {
     }
     delete environment.NODE_OPTIONS
 
-    const observed = spawnSync(process.execPath, [entrypoint, ...descriptor.arguments], {
+    const observed = spawn.sync(process.execPath, [entrypoint, ...descriptor.arguments], {
       cwd: workspace,
       env: environment,
       input: stdin,
