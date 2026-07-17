@@ -1,6 +1,6 @@
 # Statement Item Row Refactor Plan
 
-Status: In progress. Phases 0–3 are complete; rendering is next.
+Status: In progress. Phases 0–4 are complete; CLI and guidance integration is next.
 
 This file is the concise milestone index and the only owner of live progress,
 temporary drift, blockers, and the next action. Stable phase scope and gates
@@ -51,7 +51,7 @@ cross-platform release verification, version publication, and npm release.
 | 1. Schemas and contract evidence | Complete | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
 | 2. Document model and structural validation | Complete | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
 | 3. Rollups, results, and snapshots | Complete | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
-| 4. Rendering | Not started | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
+| 4. Rendering | Complete | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
 | 5. CLI, guidance, and package integration | Not started | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
 | 6. Legacy removal and final gate | Not started | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
 
@@ -82,8 +82,10 @@ identifiers for Roadmap step 11. The in-process document model, application
 identity, schema diagnostics, and semantic validation now use statement-owned
 rows and statement-local rollup graphs. Calculation, validation results,
 snapshot comparison, and snapshot recording now use direct-child rollups and
-statement-qualified application keys. Rendering and generated guidance still
-implement the dimensional fact model; no compatibility path has been added.
+statement-qualified application keys. Rendering now emits ordered statement-row
+tables with flat grouping metadata and the fixed finite output budgets.
+Generated authoring guidance still implements the dimensional fact model; no
+compatibility path has been added.
 The delivery uses two sequential PRs: the merged Phase-0 contract slice and
 this coordinated Phase-1-through-6 machine and runtime cutover.
 
@@ -101,12 +103,10 @@ phases reuse rather than duplicate earlier evidence.
 
 ## Known Temporary Drift
 
-- The normative prose and machine-readable evidence define the replacement
-  contract. Runtime validation, rollup calculation, results, snapshot
-  comparison, and recording also use it, while rendering, its direct tests,
-  exact HTML, and generated guidance still define the prior model. Phases 4–5
-  close those projections on this cutover branch. Typecheck is consequently
-  red only in the renderer and its tests.
+- The normative prose, machine-readable evidence, and runtime implementation
+  define the replacement contract. Generated authoring guidance still defines
+  the prior model. Phase 5 closes that final projection and runs executable CLI
+  and package integration on this cutover branch.
 
 This drift is deliberate only while Roadmap step 10 is active. Do not update
 examples or fixtures piecemeal to make summaries appear current.
@@ -162,14 +162,27 @@ application was not blocking recording. It now produces structural
 recording refusal. The targeted calculation, validation, snapshot, recording,
 process, documentation, and whitespace gates pass.
 
+Phase 4 replaces the dimensional renderer and exact HTML fixtures with ordered
+statement-row tables. It proves homogeneous-unit collapse, heterogeneous unit
+columns, flat grouping metadata, null and missing values, full HTML escaping,
+multi-statement order, and exact column, grid-slot, and final-byte boundaries.
+Fresh review found that structural preflight could report an earlier statement's
+grid overflow before a later statement's column overflow and that process-level
+budget coverage was incomplete. The renderer now scans every statement for the
+first column failure before accumulating grid slots, and process tests cover all
+three failures without writing plus each exact boundary. Targeted renderer and
+process tests, TypeScript, Effect diagnostics, documentation, and whitespace
+gates pass.
+
 ## Blockers
 
-None to beginning Phase 4.
+None to beginning Phase 5.
 
 ## Next Action
 
-Replace the renderer and exact HTML fixtures with ordered statement-row tables
-while preserving every preflight and final-byte output budget in Phase 4.
+Regenerate the authoring guidance from the replacement contract, align the
+remaining executable CLI and package integration, and restore the full
+repository gate in Phase 5.
 
 ## Completion
 

@@ -1,12 +1,4 @@
-import { coordinateKey } from "./validation/identity.js"
-import type {
-  Dimension,
-  Dimensions,
-  Document,
-  Fact,
-  Period,
-  Statement
-} from "./validation/model.js"
+import type { Document, Period, Statement, Unit, ValueCell } from "./validation/model.js"
 
 export const renderLimits = {
   columns: 1_000,
@@ -23,21 +15,6 @@ export type RenderResult =
       readonly budget: RenderLimitBudget
       readonly limit: number
     }
-
-interface Column {
-  readonly period: Period
-  readonly axes: NonNullable<Statement["dimensions"]>
-  readonly coordinate: AxisCoordinate
-}
-
-interface DimensionIndex {
-  readonly definition: Dimension
-  readonly members: ReadonlyMap<string, Dimension["members"][number]>
-}
-
-interface AxisCoordinate {
-  readonly memberIndexes: ReadonlyMap<number, number>
-}
 
 interface HtmlPart {
   readonly text: string
@@ -99,9 +76,7 @@ class HtmlSink {
     let remaining = renderLimits.htmlBytes - this.byteCount - 1
     const renderedParts: Array<string> | null = this.lines === null ? null : []
     for (const part of parts) {
-      const length = part.escaped
-        ? escapedByteLength(part.text)
-        : Buffer.byteLength(part.text, "utf8")
+      const length = part.escaped ? escapedByteLength(part.text) : Buffer.byteLength(part.text, "utf8")
       if (length > remaining) {
         this.exceeded = true
         return
@@ -134,9 +109,8 @@ const stylesheet = [
   "    .table-scroll { overflow-x: auto; }",
   "    table { border-collapse: collapse; min-width: 100%; }",
   "    th, td { border-bottom: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }",
-  "    th:first-child, td:first-child { text-align: left; }",
+  "    th:first-child, td:first-child, .metadata { text-align: left; }",
   "    thead th { border-bottom: 2px solid #6b7280; }",
-  "    .heading { background: #f3f4f6; }",
   "    .missing, .unavailable { color: #6b7280; font-style: italic; }"
 ] as const
 
@@ -146,196 +120,107 @@ const limitExceeded = (budget: RenderLimitBudget, limit: number): RenderResult =
   limit
 })
 
-const structuralPreflight = (document: Document): RenderResult | null => {
-  const maximumDataColumns = renderLimits.columns - 1
-  let gridSlots = 0
+const homogeneousUnit = (statement: Statement): string | undefined => {
+  const first = statement.items[0]
+  if (first === undefined) throw new Error("Validated statement lost its first item")
+  return statement.items.every(({ unit }) => unit === first.unit) ? first.unit : undefined
+}
 
+const structuralPreflight = (document: Document): RenderResult | undefined => {
+  const groupingColumns = document.groupingColumns?.length ?? 0
   for (const statement of document.statements) {
-    let dataColumns = statement.periods.length
-    if (dataColumns > maximumDataColumns) {
+    const fixedColumns = 1 + (homogeneousUnit(statement) === undefined ? 1 : 0) + groupingColumns
+    if (fixedColumns > renderLimits.columns || statement.periods.length > renderLimits.columns - fixedColumns) {
       return limitExceeded("columns", renderLimits.columns)
     }
-    for (const axis of statement.dimensions ?? []) {
-      if (dataColumns > Math.floor(maximumDataColumns / axis.members.length)) {
-        return limitExceeded("columns", renderLimits.columns)
-      }
-      dataColumns *= axis.members.length
-    }
+  }
 
-    const columns = dataColumns + 1
-    const rows = statement.entries.length + 1
+  let gridSlots = 0
+  for (const statement of document.statements) {
+    const fixedColumns = 1 + (homogeneousUnit(statement) === undefined ? 1 : 0) + groupingColumns
+    const columns = fixedColumns + statement.periods.length
+    const rows = statement.items.length + 1
     const remainingSlots = renderLimits.gridSlots - gridSlots
     if (rows > Math.floor(remainingSlots / columns)) {
       return limitExceeded("grid-slots", renderLimits.gridSlots)
     }
     gridSlots += rows * columns
   }
-
-  return null
+  return undefined
 }
 
 const periodLabel = (period: Period): string =>
   period.kind === "instant" ? period.date : `${period.start} – ${period.end}`
 
-const coordinateDimensions = (column: Column): Dimensions => {
-  const dimensions: Record<string, string> = {}
-  for (const [axisIndex, axis] of column.axes.entries()) {
-    const memberIndex = column.coordinate.memberIndexes.get(axisIndex) ?? 0
-    dimensions[axis.dimension] = axis.members[memberIndex] as string
-  }
-  return dimensions
-}
+const unitParts = (unit: Unit): ReadonlyArray<HtmlPart> =>
+  [
+    authorText(unit.label),
+    literal(" ("),
+    authorText(unit.measure),
+    literal(`, scale ${unit.scale})`)
+  ]
 
-const axisCoordinates = function* (statement: Statement): IterableIterator<AxisCoordinate> {
-  const axes = statement.dimensions ?? []
-  const varyingAxes: Array<{
-    readonly axis: NonNullable<Statement["dimensions"]>[number]
-    readonly index: number
-  }> = []
-  for (const [index, axis] of axes.entries()) {
-    if (axis.members.length > 1) varyingAxes.push({ axis, index })
-  }
-
-  const memberIndexes = Array.from({ length: varyingAxes.length }, () => 0)
-  while (true) {
-    yield {
-      memberIndexes: new Map(varyingAxes.map(({ index }, position) => [
-        index,
-        memberIndexes[position] as number
-      ]))
-    }
-
-    let position = varyingAxes.length - 1
-    while (position >= 0) {
-      const axis = varyingAxes[position]?.axis as NonNullable<Statement["dimensions"]>[number]
-      memberIndexes[position] = (memberIndexes[position] as number) + 1
-      if ((memberIndexes[position] as number) < axis.members.length) break
-      memberIndexes[position] = 0
-      position -= 1
-    }
-    if (position < 0) return
-  }
-}
-
-const statementColumns = function* (
-  statement: Statement,
-  periods: ReadonlyMap<string, Period>
-): IterableIterator<Column> {
-  const axes = statement.dimensions ?? []
-  for (const periodId of statement.periods) {
-    const period = periods.get(periodId) as Period
-    for (const coordinate of axisCoordinates(statement)) {
-      yield { period, axes, coordinate }
-    }
-  }
-}
-
-const columnHeaderParts = function* (
-  column: Column,
-  dimensions: ReadonlyMap<string, DimensionIndex>
-): IterableIterator<HtmlPart> {
-  yield literal('              <th scope="col">')
-  yield authorText(periodLabel(column.period))
-  for (const [axisIndex, axis] of column.axes.entries()) {
-    const dimension = dimensions.get(axis.dimension) as DimensionIndex
-    const memberIndex = column.coordinate.memberIndexes.get(axisIndex) ?? 0
-    const memberId = axis.members[memberIndex] as string
-    const member = dimension.members.get(memberId) as Dimension["members"][number]
-    yield literal(" · ")
-    yield authorText(dimension.definition.label)
-    yield literal(": ")
-    yield authorText(member.label)
-  }
-  yield literal("</th>")
-}
-
-const statementDataColumnCount = (statement: Statement): number => {
-  let columns = statement.periods.length
-  for (const axis of statement.dimensions ?? []) columns *= axis.members.length
-  return columns
-}
-
-const appendColumnHeader = (
-  sink: HtmlSink,
-  column: Column,
-  dimensions: ReadonlyMap<string, DimensionIndex>
-): void => {
-  sink.append(columnHeaderParts(column, dimensions))
-}
-
-const appendRenderedCell = (sink: HtmlSink, fact: Fact | undefined): void => {
-  if (fact === undefined) {
+const appendValue = (sink: HtmlSink, value: ValueCell): void => {
+  if (value === null) {
     sink.appendLiteral('              <td class="missing">Missing</td>')
-    return
-  }
-  if (fact.unavailable === true) {
+  } else if (typeof value === "object") {
     sink.appendLiteral('              <td class="unavailable">Unavailable</td>')
-    return
+  } else {
+    sink.append([literal('              <td class="value">'), literal(value), literal("</td>")])
   }
-  sink.append([
-    literal('              <td class="value">'),
-    literal(fact.value as string),
-    literal("</td>")
-  ])
 }
 
 const renderStatement = (
   statement: Statement,
-  items: ReadonlyMap<string, Document["items"][number]>,
-  units: ReadonlyMap<string, Document["units"][number]>,
+  groupingColumns: ReadonlyArray<string>,
+  units: ReadonlyMap<string, Unit>,
   periods: ReadonlyMap<string, Period>,
-  dimensions: ReadonlyMap<string, DimensionIndex>,
-  facts: ReadonlyMap<string, Fact>,
   sink: HtmlSink
 ): void => {
-  const unit = units.get(statement.unit) as Document["units"][number]
-  const dataColumns = statementDataColumnCount(statement)
+  const commonUnit = homogeneousUnit(statement)
   sink.appendLiteral("    <section>")
   sink.append([literal("      <h2>"), authorText(statement.label), literal("</h2>")])
-  sink.append([
-    literal('      <p class="unit">Unit: '),
-    authorText(unit.label),
-    literal(" · Measure: "),
-    authorText(unit.measure),
-    literal(` · Scale: 10<sup>${unit.scale}</sup></p>`)
-  ])
+  if (commonUnit !== undefined) {
+    const unit = units.get(commonUnit)
+    if (unit === undefined) throw new Error("Validated statement lost its unit")
+    sink.append([literal('      <p class="unit">Unit: '), ...unitParts(unit), literal("</p>")])
+  }
   sink.appendLiteral('      <div class="table-scroll">')
   sink.appendLiteral("        <table>")
   sink.appendLiteral("          <thead>")
   sink.appendLiteral("            <tr>")
   sink.appendLiteral('              <th scope="col">Item</th>')
-  for (const column of statementColumns(statement, periods)) {
-    appendColumnHeader(sink, column, dimensions)
-    if (sink.exceeded) return
+  if (commonUnit === undefined) sink.appendLiteral('              <th scope="col">Unit</th>')
+  for (const grouping of groupingColumns) {
+    sink.append([literal('              <th scope="col">'), authorText(grouping), literal("</th>")])
+  }
+  for (const periodId of statement.periods) {
+    const period = periods.get(periodId)
+    if (period === undefined) throw new Error("Validated statement lost its period")
+    sink.append([literal('              <th scope="col">'), authorText(periodLabel(period)), literal("</th>")])
   }
   sink.appendLiteral("            </tr>")
   sink.appendLiteral("          </thead>")
   sink.appendLiteral("          <tbody>")
 
-  for (const entry of statement.entries) {
+  for (const item of statement.items) {
     sink.appendLiteral("            <tr>")
-    if (entry.type === "heading") {
+    sink.append([literal('              <th scope="row">'), authorText(item.label), literal("</th>")])
+    if (commonUnit === undefined) {
+      const unit = units.get(item.unit)
+      if (unit === undefined) throw new Error("Validated item lost its unit")
+      sink.append([literal('              <td class="metadata">'), ...unitParts(unit), literal("</td>")])
+    }
+    for (const grouping of groupingColumns) {
+      const value = item.groupings[grouping]
       sink.append([
-        literal(`              <td class="heading" colspan="${dataColumns + 1}">`),
-        authorText(entry.label),
+        literal('              <td class="metadata">'),
+        value === null ? literal("—") : authorText(value as string),
         literal("</td>")
       ])
-    } else {
-      const item = items.get(entry.item) as Document["items"][number]
-      sink.append([
-        literal('              <th scope="row">'),
-        authorText(entry.label ?? item.label),
-        literal("</th>")
-      ])
-      for (const column of statementColumns(statement, periods)) {
-        appendRenderedCell(sink, facts.get(coordinateKey({
-          item: entry.item,
-          period: column.period.id,
-          unit: statement.unit,
-          dimensions: coordinateDimensions(column)
-        })))
-        if (sink.exceeded) return
-      }
+    }
+    for (const period of statement.periods) {
+      appendValue(sink, item.values[period] as ValueCell)
     }
     sink.appendLiteral("            </tr>")
     if (sink.exceeded) return
@@ -348,19 +233,9 @@ const renderStatement = (
 }
 
 const renderInto = (document: Document, sink: HtmlSink): void => {
-  const items = new Map(document.items.map((item) => [item.id, item]))
   const units = new Map(document.units.map((unit) => [unit.id, unit]))
   const periods = new Map(document.periods.map((period) => [period.id, period]))
-  const dimensions = new Map(
-    (document.dimensions ?? []).map((dimension) => [
-      dimension.id,
-      {
-        definition: dimension,
-        members: new Map(dimension.members.map((member) => [member.id, member]))
-      }
-    ])
-  )
-  const facts = new Map(document.facts.map((fact) => [coordinateKey(fact), fact]))
+  const groupingColumns = document.groupingColumns ?? []
 
   sink.appendLiteral("<!doctype html>")
   sink.appendLiteral('<html lang="en">')
@@ -381,15 +256,11 @@ const renderInto = (document: Document, sink: HtmlSink): void => {
   sink.appendLiteral("<body>")
   sink.appendLiteral("  <header>")
   sink.append([literal("    <h1>"), authorText(document.entity.name), literal("</h1>")])
-  sink.append([
-    literal('    <p class="scope">'),
-    authorText(document.scope.label),
-    literal("</p>")
-  ])
+  sink.append([literal('    <p class="scope">'), authorText(document.scope.label), literal("</p>")])
   sink.appendLiteral("  </header>")
   sink.appendLiteral("  <main>")
   for (const statement of document.statements) {
-    renderStatement(statement, items, units, periods, dimensions, facts, sink)
+    renderStatement(statement, groupingColumns, units, periods, sink)
     if (sink.exceeded) return
   }
   sink.appendLiteral("  </main>")
@@ -399,7 +270,7 @@ const renderInto = (document: Document, sink: HtmlSink): void => {
 
 export const renderHtml = (document: Document): RenderResult => {
   const structuralFailure = structuralPreflight(document)
-  if (structuralFailure !== null) return structuralFailure
+  if (structuralFailure !== undefined) return structuralFailure
 
   const measuringSink = new HtmlSink(false)
   renderInto(document, measuringSink)
@@ -407,6 +278,6 @@ export const renderHtml = (document: Document): RenderResult => {
 
   const outputSink = new HtmlSink(true)
   renderInto(document, outputSink)
-  if (outputSink.exceeded) throw new Error("measured HTML exceeded its byte budget while encoding")
+  if (outputSink.exceeded) throw new Error("Measured HTML exceeded its byte budget while encoding")
   return { ok: true, bytes: outputSink.bytes() }
 }

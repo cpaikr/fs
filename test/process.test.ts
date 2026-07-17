@@ -12,6 +12,8 @@ import {
   type ApplicationIOService,
   type ApplicationRequest
 } from "../src/process.js"
+import { renderHtml, renderLimits } from "../src/render.js"
+import type { Document, Item, Period } from "../src/validation/model.js"
 import { outputEntryExists, writeNewFile } from "../src/writer.js"
 
 const makeIO = (
@@ -39,6 +41,54 @@ const run = (
   request: ApplicationRequest,
   io: ApplicationIOService = makeIO(process.cwd())
 ) => Effect.runSync(execute(request).pipe(Effect.provideService(ApplicationIO, io)))
+
+const tableDocument = (periodCount: number, itemCount: number): Document => {
+  const periods: Array<Period> = []
+  const periodIds: Array<string> = []
+  const start = Date.UTC(2020, 0, 1)
+  for (let index = 0; index < periodCount; index += 1) {
+    const id = `p${index}`
+    periods.push({
+      id,
+      kind: "instant",
+      date: new Date(start + index * 86_400_000).toISOString().slice(0, 10)
+    })
+    periodIds.push(id)
+  }
+  const values = Object.fromEntries(periodIds.map((period) => [period, "1"]))
+  const items: Array<Item> = Array.from({ length: itemCount }, (_, index) => ({
+    id: `item${index}`,
+    label: `Item ${index}`,
+    unit: "usd",
+    values,
+    groupings: {}
+  }))
+  return {
+    formatVersion: "0.1",
+    entity: { name: "Process render boundary" },
+    scope: { label: "Rendering" },
+    units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],
+    periods,
+    statements: [{ id: "statement", label: "Statement", periods: periodIds, items }]
+  }
+}
+
+const exactByteDocument = (): Document => {
+  const document = JSON.parse(readFileSync(resolve("examples/minimal.json"), "utf8")) as Document
+  const baseline = renderHtml(document)
+  if (!baseline.ok) throw new Error("Minimal fixture unexpectedly exceeded a render budget")
+  const statement = document.statements[0]
+  const first = statement?.items[0]
+  if (statement === undefined || first === undefined) throw new Error("Minimal fixture lost its first item")
+  const length = renderLimits.htmlBytes - baseline.bytes.length + 1
+  return {
+    ...document,
+    statements: [{
+      ...statement,
+      items: [{ ...first, values: { fy2025: `1${"0".repeat(length - 1)}` } }]
+    }]
+  }
+}
 
 describe("application process boundary", () => {
   it("reports deterministic discovery without entering I/O", () => {
@@ -438,15 +488,26 @@ describe("application process boundary", () => {
     expect(calls).toEqual(["exists", "read"])
   })
 
-  it("reports render limits after validation without writing output", () => {
+  it.each([
+    [
+      "columns",
+      () => readFileSync(resolve("fixtures/valid/render-column-limit-exceeded.json"))
+    ],
+    ["grid-slots", () => Buffer.from(JSON.stringify(tableDocument(99, 1_000)))],
+    [
+      "html-bytes",
+      () => {
+        const document = JSON.parse(readFileSync(resolve("examples/minimal.json"), "utf8")) as Document
+        return Buffer.from(JSON.stringify({
+          ...document,
+          entity: { ...document.entity, name: "&".repeat(Math.floor(renderLimits.htmlBytes / 10) + 1) }
+        }))
+      }
+    ]
+  ] as const)("reports the %s render limit after validation without writing output", (budget, input) => {
     const calls: Array<string> = []
     const result = run(
-      {
-        command: "render",
-        input: "-",
-        output: "result.html",
-        logLevel: "error"
-      },
+      { command: "render", input: "-", output: "result.html", logLevel: "error" },
       makeIO(process.cwd(), {
         outputExists: () => Effect.sync(() => {
           calls.push("exists")
@@ -454,7 +515,7 @@ describe("application process boundary", () => {
         }),
         readStdin: Effect.sync(() => {
           calls.push("read")
-          return readFileSync(resolve("fixtures/valid/render-column-limit-exceeded.json"))
+          return input()
         }),
         writeFile: () => Effect.sync(() => {
           calls.push("write")
@@ -465,17 +526,45 @@ describe("application process boundary", () => {
 
     expect(result.exitCode).toBe(1)
     expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
-      error: {
-        operation: "render",
-        code: "output-limit-exceeded",
-        path: "result.html"
-      },
+      error: { operation: "render", code: "output-limit-exceeded", path: "result.html" },
       help: []
     })
     expect(result.stderr.toString("utf8")).toContain(
-      '"code":"output-limit-exceeded","budget":"columns","limit":1000'
+      `"code":"output-limit-exceeded","budget":"${budget}"`
     )
     expect(calls).toEqual(["exists", "read"])
+  })
+
+  it.each([
+    ["columns", () => tableDocument(renderLimits.columns - 1, 1)],
+    ["grid-slots", () => tableDocument(99, 999)],
+    ["html-bytes", exactByteDocument]
+  ] as const)("writes successfully at the exact %s render boundary", (budget, input) => {
+    const calls: Array<string> = []
+    let written: Buffer<ArrayBufferLike> = Buffer.alloc(0)
+    const result = run(
+      { command: "render", input: "-", output: "result.html", logLevel: "none" },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return Buffer.from(JSON.stringify(input()))
+        }),
+        writeFile: (_path, contents) => Effect.sync(() => {
+          calls.push("write")
+          written = contents
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(0)
+    expect(calls).toEqual(["exists", "read", "write"])
+    expect(written.length).toBeGreaterThan(0)
+    if (budget === "html-bytes") expect(written).toHaveLength(renderLimits.htmlBytes)
   })
 
   it("contains unexpected application defects without leaking causes", () => {
