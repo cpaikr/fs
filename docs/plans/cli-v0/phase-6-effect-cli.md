@@ -75,16 +75,16 @@ this plan because the revised contract accepts those built-ins.
 - [x] Revise the owning CLI design and acceptance contracts.
 - [x] Replace affected process fixtures and integrity assertions while
   retaining unchanged domain and filesystem cases.
-- [ ] Define one private Effect command tree using public APIs.
-- [ ] Enforce exact operand cardinality and duplicate command-local flag
+- [x] Define one private Effect command tree using public APIs.
+- [x] Enforce exact operand cardinality and duplicate command-local flag
   rejection with Effect argument and flag refinements.
-- [ ] Describe exact-one operands explicitly and cover the beta.98 native-help
+- [x] Describe exact-one operands explicitly and cover the beta.98 native-help
   cardinality clarification in semantic fixtures.
-- [ ] Dispatch parsed commands into the existing typed application boundary.
-- [ ] Replace the custom parser, help assets, and compatibility-only tests.
-- [ ] Preserve logging, native streams, and exit-code invariants through
+- [x] Dispatch parsed commands into the existing typed application boundary.
+- [x] Replace the custom parser, help assets, and compatibility-only tests.
+- [x] Preserve logging, native streams, and exit-code invariants through
   Effect services and the process entry point.
-- [ ] Prove generated help remains ANSI-free with both disabled-color fixtures
+- [x] Prove generated help remains ANSI-free with both disabled-color fixtures
   and a color-capable terminal test.
 - [ ] Verify the packed executable on the supported Node and platform matrix.
 

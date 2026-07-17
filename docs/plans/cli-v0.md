@@ -1,7 +1,7 @@
 # V0 CLI Delivery Plan
 
-Status: Effect-native CLI migration in progress; implementation through
-`fs create` remains complete under the prior adapter.
+Status: Effect-native CLI implementation and local gates complete; supported
+platform CI verification remains.
 
 This file is the concise milestone index. Detailed scope, decisions, progress,
 and validation evidence live in the linked child plans. The
@@ -36,35 +36,33 @@ conformance command.
 
 ## Current Validation
 
-The retained pre-migration baseline last passed `pnpm verify`: strict
-typecheck, Effect diagnostics, 96 unit and fault tests, all 80 historical
-packed-process cases, five child-process crash points, 16-way writer
-contention, build, installed-tarball npm/npx smoke, and exact checks for 46
-packed files. The same baseline passed in isolated Linux environments on Node
-22.17.0 and 24.15.0; CI enforces both versions on Linux, macOS, and Windows.
+The committed Effect-native implementation passes `pnpm verify` on supported
+Node 22.17.0: strict typecheck, zero strict Effect diagnostics, 91 unit and
+fault tests, all 80 revised packed-process cases, five child-process crash
+points, 16-way writer contention, and installed-tarball npm/npx smoke for 39
+cleanly built packed files. The packed help checks include the production
+entry point with color-capable terminal state and reject CSI and OSC escapes.
 
-The revised 80-case descriptor suite and its semantic native-text matcher pass
-fixture integrity and `./scripts/check-docs.sh`; `git diff --check` also passes.
-The packed-process suite is expected to remain red until the old adapter is
-replaced and does not yet prove Phase 6 complete.
+The same full suite passed locally on Node 24.15.0 before the final
+packaging-test hardening; the final pack check passes on both supported Node
+versions. Full isolated Linux verification also passes on both versions.
+`./scripts/check-docs.sh` and `git diff --check` pass. CI is configured for
+both Node versions on Linux, macOS, and Windows, but has not run for these
+local commits.
 
 ## Known Temporary Drift
 
-The CLI design, acceptance contract, and process fixtures now define the
-Effect-native surface. The exact help assets, `util.parseArgs` adapter, and
-related source and unit tests still implement the superseded contract until
-Phase 6 migrates them. The maintained authoring guide and revised fixtures use
-the canonical command forms, so the old adapter does not yet satisfy the
-packed-process suite. Artifact semantics, operation results, exact bundled
-content, logging, and filesystem behavior are not drifting.
+None. The private Effect command tree, typed application boundary, fixtures,
+and packed executable implement the revised contract. Artifact semantics,
+operation results, exact bundled content, logging, and filesystem behavior
+remain unchanged.
 
 ## Current Blockers
 
-- None.
+- The committed migration has not run on the configured Windows CI matrix.
+  Running that external check requires pushing the local commits.
 
 ## Next Action
 
-Define the private public-API `effect/unstable/cli` command tree with refined
-operand and command-local flag cardinality, then dispatch its handlers into
-the existing typed application boundary without changing retained operation
-results or filesystem behavior.
+Push the committed migration, require all six supported Node/platform CI legs
+to pass, then close Phase 6 and Roadmap step 8.
