@@ -1,7 +1,6 @@
 # Statement Item Row Refactor Plan
 
-Status: In progress. Phase 0 is complete; the machine-readable and runtime
-cutover has not started.
+Status: In progress. Phases 0 and 1 are complete; the runtime cutover is next.
 
 This file is the concise milestone index and the only owner of live progress,
 temporary drift, blockers, and the next action. Stable phase scope and gates
@@ -49,7 +48,7 @@ cross-platform release verification, version publication, and npm release.
 | Phase | State | Detailed plan |
 | --- | --- | --- |
 | 0. Contract and remaining decisions | Complete | [Target contract](statement-item-row-refactor/phase-0-contract.md) |
-| 1. Schemas and contract evidence | Not started | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
+| 1. Schemas and contract evidence | Complete | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
 | 2. Document model and structural validation | Not started | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
 | 3. Rollups, results, and snapshots | Not started | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
 | 4. Rendering | Not started | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
@@ -75,12 +74,14 @@ collapses a unit only when every statement item has the same unit identifier,
 and otherwise identifies each row's unit. Render precedence and the row-model
 column and grid accounting are exact.
 
-Schemas, fixtures, examples, generated guidance, and runtime code still
-implement the dimensional fact model. No compatibility path or refactor code
-has been added. The delivery uses two sequential PRs: the completed Phase-0
-contract slice, followed after merge by one coordinated Phase-1-through-6
-machine and runtime cutover. This is the fewest split that preserves the
-contract-only review boundary and the runtime cutover that remains unmerged.
+Schemas, examples, the language-neutral fixture matrix, record-validation
+expected documents, and artifact-sensitive CLI descriptors now implement the
+statement-row model directly. The replacement schemas close result and diff
+variants, encode status/application cardinality, and retain relative schema
+identifiers for Roadmap step 11. The runtime and generated guidance still
+implement the dimensional fact model; no compatibility path has been added.
+The delivery uses two sequential PRs: the merged Phase-0 contract slice and
+this coordinated Phase-1-through-6 machine and runtime cutover.
 
 The completed step-9 renderer and snapshot implementation remain the verified
 baseline. Historical delivery evidence stays in the
@@ -96,11 +97,10 @@ phases reuse rather than duplicate earlier evidence.
 
 ## Known Temporary Drift
 
-- The normative prose defines the replacement contract while schemas,
-  examples, fixtures, generated guidance, and implementation still define the
-  prior model. Phase 1 replaces the machine-readable evidence as one set;
-  Phases 2–5 close the runtime and generated projections on the same cutover
-  branch.
+- The normative prose and machine-readable evidence define the replacement
+  contract while runtime code, runtime tests, exact HTML, and generated
+  guidance still define the prior model. Phases 2–5 close those projections on
+  this cutover branch.
 
 This drift is deliberate only while Roadmap step 10 is active. Do not update
 examples or fixtures piecemeal to make summaries appear current.
@@ -127,15 +127,23 @@ clarified transition-time tooling, grouping obligations, statement grammar,
 decimal serialization, and closed snapshot-diff forms. The same documentation
 and whitespace gates pass after those changes.
 
+Phase 1 replaces all three schemas and the complete example and fixture matrix.
+Every valid document and record output passes the replacement document schema;
+semantic-invalid fixtures pass JSON Schema first; schema-invalid fixtures fail
+at that layer. Expected validation and snapshot-diff results pass their closed
+schemas and use unique statement-qualified application keys. Static CLI
+descriptor references and JSON Pointer selections resolve. The documentation
+and whitespace gates pass.
+
 ## Blockers
 
-None to beginning Phase 1.
+None to beginning Phase 2.
 
 ## Next Action
 
-Open and complete the Phase-0 contract PR against `dev`, including review and
-merge. Then create the coordinated Phase-1-through-6 cutover branch from the
-updated `dev` and replace schemas and contract evidence before runtime code.
+Replace the document model and structural validation in Phase 2, using the
+Phase-1 fixture matrix as executable evidence and preserving the single direct
+cutover path.
 
 ## Completion
 

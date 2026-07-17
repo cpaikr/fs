@@ -1,16 +1,35 @@
 {
   "formatVersion": "0.1",
-  "conformance": { "status": "conforming", "errors": [] },
+  "conformance": {
+    "status": "conforming",
+    "errors": []
+  },
   "calculations": {
     "status": "consistent",
     "applications": [
       {
-        "key": { "rule": "absolute-tolerance-boundary", "period": "fy2025", "dimensions": {} },
+        "key": {
+          "statement": "statement",
+          "parent": "subtotal",
+          "period": "fy2025"
+        },
         "status": "satisfied",
-        "actual": "-1.5",
-        "expected": "-1",
-        "difference": "-0.5",
-        "tolerance": "0.5"
+        "actual": "0.3",
+        "expected": "0.3",
+        "difference": "0",
+        "tolerance": "0.1"
+      },
+      {
+        "key": {
+          "statement": "statement",
+          "parent": "grand-total",
+          "period": "fy2025"
+        },
+        "status": "satisfied",
+        "actual": "1.1",
+        "expected": "1",
+        "difference": "0.1",
+        "tolerance": "0.1"
       }
     ]
   }

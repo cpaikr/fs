@@ -1,0 +1,40 @@
+{
+  "formatVersion": "0.1",
+  "conformance": {
+    "status": "conforming",
+    "errors": []
+  },
+  "calculations": {
+    "status": "inconsistent",
+    "applications": [
+      {
+        "key": {
+          "statement": "statement",
+          "parent": "missing-parent",
+          "period": "fy2025"
+        },
+        "status": "error",
+        "reason": "missing-value",
+        "cell": {
+          "statement": "statement",
+          "item": "missing-parent",
+          "period": "fy2025"
+        }
+      },
+      {
+        "key": {
+          "statement": "statement",
+          "parent": "unavailable-parent",
+          "period": "fy2025"
+        },
+        "status": "error",
+        "reason": "unavailable-value",
+        "cell": {
+          "statement": "statement",
+          "item": "unavailable-child",
+          "period": "fy2025"
+        }
+      }
+    ]
+  }
+}

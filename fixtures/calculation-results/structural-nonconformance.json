@@ -5,8 +5,8 @@
     "errors": [
       {
         "code": "unresolved-reference",
-        "path": "/facts/0/item",
-        "message": "Item 'unknown-item' is not defined in this document."
+        "path": "/statements/0/items/0/unit",
+        "message": "Unit is not defined."
       }
     ]
   },

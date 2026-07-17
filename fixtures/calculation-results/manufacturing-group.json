@@ -1,43 +1,18 @@
 {
   "formatVersion": "0.1",
-  "conformance": { "status": "conforming", "errors": [] },
+  "conformance": {
+    "status": "conforming",
+    "errors": []
+  },
   "calculations": {
     "status": "inconsistent",
     "applications": [
       {
-        "key": { "rule": "gross-profit-subtotal", "period": "fy2024", "dimensions": {} },
-        "status": "satisfied",
-        "actual": "400",
-        "expected": "400",
-        "difference": "0",
-        "tolerance": "0.1"
-      },
-      {
-        "key": { "rule": "gross-profit-subtotal", "period": "fy2025", "dimensions": {} },
-        "status": "unsatisfied",
-        "actual": "410",
-        "expected": "400",
-        "difference": "10",
-        "tolerance": "0.1"
-      },
-      {
-        "key": { "rule": "manufacturing-cost-subtotal", "period": "fy2024", "dimensions": {} },
-        "status": "satisfied",
-        "actual": "700",
-        "expected": "700",
-        "difference": "0",
-        "tolerance": "0"
-      },
-      {
-        "key": { "rule": "manufacturing-cost-subtotal", "period": "fy2025", "dimensions": {} },
-        "status": "satisfied",
-        "actual": "630",
-        "expected": "630",
-        "difference": "0",
-        "tolerance": "0"
-      },
-      {
-        "key": { "rule": "liabilities-and-equity-subtotal", "period": "at-2024-12-31", "dimensions": {} },
+        "key": {
+          "statement": "balance-sheet",
+          "parent": "assets",
+          "period": "at-2025"
+        },
         "status": "satisfied",
         "actual": "1000",
         "expected": "1000",
@@ -45,47 +20,107 @@
         "tolerance": "0"
       },
       {
-        "key": { "rule": "liabilities-and-equity-subtotal", "period": "at-2025-12-31", "dimensions": {} },
+        "key": {
+          "statement": "balance-sheet",
+          "parent": "assets",
+          "period": "at-2024"
+        },
         "status": "satisfied",
-        "actual": "1050",
-        "expected": "1050",
+        "actual": "900",
+        "expected": "900",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "equity-component-rollup", "period": "fy2024", "dimensions": { "equity-component": "share-capital" } },
+        "key": {
+          "statement": "balance-sheet",
+          "parent": "liabilities-and-equity",
+          "period": "at-2025"
+        },
         "status": "satisfied",
-        "actual": "200",
-        "expected": "200",
+        "actual": "1000",
+        "expected": "1000",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "equity-component-rollup", "period": "fy2024", "dimensions": { "equity-component": "retained-earnings" } },
+        "key": {
+          "statement": "balance-sheet",
+          "parent": "liabilities-and-equity",
+          "period": "at-2024"
+        },
         "status": "satisfied",
-        "actual": "250",
-        "expected": "250",
+        "actual": "900",
+        "expected": "900",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "equity-component-rollup", "period": "fy2025", "dimensions": { "equity-component": "share-capital" } },
+        "key": {
+          "statement": "income-statement",
+          "parent": "revenue",
+          "period": "fy2025"
+        },
         "status": "satisfied",
-        "actual": "230",
-        "expected": "230",
+        "actual": "100",
+        "expected": "100",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "equity-component-rollup", "period": "fy2025", "dimensions": { "equity-component": "retained-earnings" } },
+        "key": {
+          "statement": "income-statement",
+          "parent": "revenue",
+          "period": "fy2024"
+        },
         "status": "satisfied",
-        "actual": "280",
-        "expected": "280",
+        "actual": "80",
+        "expected": "80",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "cash-flow-subtotal", "period": "fy2024", "dimensions": {} },
+        "key": {
+          "statement": "income-statement",
+          "parent": "cost-of-sales",
+          "period": "fy2025"
+        },
+        "status": "satisfied",
+        "actual": "-60",
+        "expected": "-60",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": {
+          "statement": "income-statement",
+          "parent": "cost-of-sales",
+          "period": "fy2024"
+        },
+        "status": "satisfied",
+        "actual": "-50",
+        "expected": "-50",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": {
+          "statement": "income-statement",
+          "parent": "gross-profit",
+          "period": "fy2025"
+        },
+        "status": "unsatisfied",
+        "actual": "41",
+        "expected": "40",
+        "difference": "1",
+        "tolerance": "0"
+      },
+      {
+        "key": {
+          "statement": "income-statement",
+          "parent": "gross-profit",
+          "period": "fy2024"
+        },
         "status": "satisfied",
         "actual": "30",
         "expected": "30",
@@ -93,7 +128,11 @@
         "tolerance": "0"
       },
       {
-        "key": { "rule": "cash-flow-subtotal", "period": "fy2025", "dimensions": {} },
+        "key": {
+          "statement": "cash-flow-statement",
+          "parent": "net-cash-flow",
+          "period": "fy2025"
+        },
         "status": "satisfied",
         "actual": "20",
         "expected": "20",
@@ -101,64 +140,62 @@
         "tolerance": "0"
       },
       {
-        "key": { "rule": "cash-roll-forward", "period": "fy2023", "dimensions": {} },
-        "status": "skipped",
-        "reason": "no-predecessor"
-      },
-      {
-        "key": { "rule": "cash-roll-forward", "period": "fy2024", "dimensions": {} },
+        "key": {
+          "statement": "cash-flow-statement",
+          "parent": "net-cash-flow",
+          "period": "fy2024"
+        },
         "status": "satisfied",
-        "actual": "130",
-        "expected": "130",
+        "actual": "15",
+        "expected": "15",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "cash-roll-forward", "period": "q4-2024", "dimensions": {} },
-        "status": "skipped",
-        "reason": "gap"
-      },
-      {
-        "key": { "rule": "cash-roll-forward", "period": "fy2025", "dimensions": {} },
-        "status": "skipped",
-        "reason": "ambiguous-predecessor"
-      },
-      {
-        "key": { "rule": "cash-roll-forward", "period": "q1-2025", "dimensions": {} },
-        "status": "skipped",
-        "reason": "ambiguous-predecessor"
-      },
-      {
-        "key": { "rule": "cash-roll-forward", "period": "q2-2025", "dimensions": {} },
+        "key": {
+          "statement": "equity-statement",
+          "parent": "total-equity",
+          "period": "at-2025"
+        },
         "status": "satisfied",
-        "actual": "145",
-        "expected": "145",
+        "actual": "550",
+        "expected": "550",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "cash-roll-forward", "period": "ytd-h1-2025", "dimensions": {} },
-        "status": "skipped",
-        "reason": "ambiguous-predecessor"
-      },
-      {
-        "key": { "rule": "cash-roll-forward", "period": "fy2026", "dimensions": {} },
+        "key": {
+          "statement": "equity-statement",
+          "parent": "total-equity",
+          "period": "at-2024"
+        },
         "status": "satisfied",
-        "actual": "165",
-        "expected": "165",
+        "actual": "500",
+        "expected": "500",
         "difference": "0",
         "tolerance": "0"
       },
       {
-        "key": { "rule": "cash-roll-forward", "period": "fy2028", "dimensions": {} },
-        "status": "skipped",
-        "reason": "gap"
+        "key": {
+          "statement": "manufacturing-statement",
+          "parent": "manufacturing-cost",
+          "period": "fy2025"
+        },
+        "status": "satisfied",
+        "actual": "60",
+        "expected": "60",
+        "difference": "0",
+        "tolerance": "0"
       },
       {
-        "key": { "rule": "net-income-reconciliation", "period": "fy2025", "dimensions": {} },
+        "key": {
+          "statement": "manufacturing-statement",
+          "parent": "manufacturing-cost",
+          "period": "fy2024"
+        },
         "status": "satisfied",
-        "actual": "150",
-        "expected": "150",
+        "actual": "50",
+        "expected": "50",
         "difference": "0",
         "tolerance": "0"
       }

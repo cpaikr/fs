@@ -1,0 +1,36 @@
+{
+  "formatVersion": "0.1",
+  "conformance": {
+    "status": "conforming",
+    "errors": []
+  },
+  "calculations": {
+    "status": "consistent",
+    "applications": [
+      {
+        "key": {
+          "statement": "first",
+          "parent": "total",
+          "period": "fy2025"
+        },
+        "status": "satisfied",
+        "actual": "1",
+        "expected": "1",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": {
+          "statement": "second",
+          "parent": "total",
+          "period": "fy2025"
+        },
+        "status": "satisfied",
+        "actual": "2",
+        "expected": "2",
+        "difference": "0",
+        "tolerance": "0"
+      }
+    ]
+  }
+}

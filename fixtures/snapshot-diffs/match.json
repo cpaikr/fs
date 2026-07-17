@@ -13,20 +13,28 @@
     {
       "change": "unchanged",
       "recorded": {
-        "key": { "rule": "accounting-equation", "period": "at-2025", "dimensions": {} },
+        "key": {
+          "statement": "statement",
+          "parent": "total",
+          "period": "fy2025"
+        },
         "status": "satisfied",
-        "actual": "100",
-        "expected": "100",
+        "actual": "10",
+        "expected": "10",
         "difference": "0",
-        "tolerance": "0.01"
+        "tolerance": "0"
       },
       "current": {
-        "key": { "rule": "accounting-equation", "period": "at-2025", "dimensions": {} },
+        "key": {
+          "statement": "statement",
+          "parent": "total",
+          "period": "fy2025"
+        },
         "status": "satisfied",
-        "actual": "100",
-        "expected": "100",
+        "actual": "10",
+        "expected": "10",
         "difference": "0",
-        "tolerance": "0.01"
+        "tolerance": "0"
       }
     }
   ]

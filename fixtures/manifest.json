@@ -1,102 +1,69 @@
 {
   "formatVersion": "0.1",
   "validDocuments": [
-    { "document": "../examples/minimal.json", "calculationStatus": "not-defined" },
-    { "document": "../examples/manufacturing-group.json", "calculationStatus": "inconsistent" },
-    { "document": "valid/no-calculation-rules.json", "calculationStatus": "not-defined" },
-    { "document": "valid/recorded-snapshot.json", "calculationStatus": "consistent" },
-    { "document": "valid/all-rules-skipped.json", "calculationStatus": "not-evaluated" },
-    { "document": "valid/calculation-errors.json", "calculationStatus": "inconsistent" },
-    { "document": "valid/exact-arithmetic.json", "calculationStatus": "consistent" },
-    { "document": "valid/scale-boundaries.json", "calculationStatus": "not-defined" },
-    { "document": "valid/render-column-limit-exceeded.json", "calculationStatus": "not-defined" },
-    { "document": "valid/render-presentation.json", "calculationStatus": "not-defined" },
-    { "document": "valid/snapshot-mismatch-source.json", "calculationStatus": "inconsistent" }
+    {
+      "document": "../examples/manufacturing-group.json",
+      "calculationStatus": "inconsistent"
+    },
+    {
+      "document": "../examples/minimal.json",
+      "calculationStatus": "not-defined"
+    },
+    {
+      "document": "valid/exact-arithmetic.json",
+      "calculationStatus": "consistent"
+    },
+    {
+      "document": "valid/no-rollups.json",
+      "calculationStatus": "not-defined"
+    },
+    {
+      "document": "valid/recorded-snapshot.json",
+      "calculationStatus": "consistent"
+    },
+    {
+      "document": "valid/render-column-limit-exceeded.json",
+      "calculationStatus": "not-defined"
+    },
+    {
+      "document": "valid/render-presentation.json",
+      "calculationStatus": "not-defined"
+    },
+    {
+      "document": "valid/rollup-cell-errors.json",
+      "calculationStatus": "inconsistent"
+    },
+    {
+      "document": "valid/scale-boundaries.json",
+      "calculationStatus": "not-defined"
+    },
+    {
+      "document": "valid/snapshot-mismatch-source.json",
+      "calculationStatus": "inconsistent"
+    },
+    {
+      "document": "valid/statement-local-rollups.json",
+      "calculationStatus": "consistent"
+    }
   ],
   "invalidDocuments": [
+    {
+      "document": "invalid/cyclic-rollup.json",
+      "layer": "semantic",
+      "code": "cyclic-rollup",
+      "path": "/statements/0/items/0/rollupTo"
+    },
     {
       "document": "invalid/decimal-number.json",
       "layer": "schema",
       "code": "decimal-string-required",
-      "path": "/facts/0/value"
-    },
-    {
-      "document": "invalid/value-and-unavailable.json",
-      "layer": "schema",
-      "code": "fact-value-exclusive",
-      "path": "/facts/0"
-    },
-    {
-      "document": "invalid/provenance-property.json",
-      "layer": "schema",
-      "code": "unknown-property",
-      "path": "/facts/0/source"
-    },
-    {
-      "document": "invalid/negative-tolerance.json",
-      "layer": "schema",
-      "code": "invalid-tolerance",
-      "path": "/units/0/defaultTolerance"
-    },
-    {
-      "document": "invalid/scale-below-minimum.json",
-      "layer": "schema",
-      "code": "scale-out-of-range",
-      "path": "/units/0/scale"
-    },
-    {
-      "document": "invalid/scale-above-maximum.json",
-      "layer": "schema",
-      "code": "scale-out-of-range",
-      "path": "/units/0/scale"
+      "path": "/statements/0/items/0/values/fy2025"
     },
     {
       "document": "invalid/duplicate-item-id.json",
       "layer": "semantic",
       "code": "duplicate-id",
-      "path": "/items/1/id"
-    },
-    {
-      "document": "invalid/unresolved-item.json",
-      "layer": "semantic",
-      "code": "unresolved-reference",
-      "path": "/facts/0/item"
-    },
-    {
-      "document": "invalid/duplicate-fact-coordinate.json",
-      "layer": "semantic",
-      "code": "duplicate-fact-coordinate",
-      "path": "/facts/1"
-    },
-    {
-      "document": "invalid/impossible-date.json",
-      "layer": "semantic",
-      "code": "invalid-date",
-      "path": "/periods/0/date"
-    },
-    {
-      "document": "invalid/reversed-duration.json",
-      "layer": "semantic",
-      "code": "invalid-duration",
-      "path": "/periods/0"
-    },
-    {
-      "document": "invalid/unresolved-dimension-member.json",
-      "layer": "semantic",
-      "code": "unresolved-reference",
-      "path": "/facts/0/dimensions/component"
-    },
-    {
-      "document": "invalid/assertion-unit-mismatch.json",
-      "layer": "semantic",
-      "code": "unit-mismatch",
-      "path": "/calculationRules/0/terms/0/fact/unit"
-    },
-    {
-      "document": "invalid/duplicate-statement-axis.json",
-      "layer": "semantic",
-      "code": "duplicate-statement-axis",
-      "path": "/statements/0/dimensions/1/dimension"
+      "path": "/statements/0/items/1/id"
     },
     {
       "document": "invalid/duplicate-period-definition.json",
@@ -105,16 +72,118 @@
       "path": "/periods/1"
     },
     {
-      "document": "invalid/roll-forward-instant-scope.json",
-      "layer": "semantic",
-      "code": "invalid-period-kind",
-      "path": "/calculationRules/0/scope/periods/0"
-    },
-    {
       "document": "invalid/duplicate-snapshot-application-key.json",
       "layer": "semantic",
       "code": "duplicate-application-key",
       "path": "/validationSnapshot/applications/1/key"
+    },
+    {
+      "document": "invalid/duplicate-statement-period.json",
+      "layer": "schema",
+      "code": "duplicate-reference",
+      "path": "/statements/0/periods/1"
+    },
+    {
+      "document": "invalid/extra-grouping-key.json",
+      "layer": "semantic",
+      "code": "map-key-mismatch",
+      "path": "/statements/0/items/0/groupings"
+    },
+    {
+      "document": "invalid/extra-value-key.json",
+      "layer": "semantic",
+      "code": "map-key-mismatch",
+      "path": "/statements/0/items/0/values"
+    },
+    {
+      "document": "invalid/impossible-date.json",
+      "layer": "semantic",
+      "code": "invalid-date",
+      "path": "/periods/0/start"
+    },
+    {
+      "document": "invalid/missing-grouping-key.json",
+      "layer": "semantic",
+      "code": "map-key-mismatch",
+      "path": "/statements/0/items/0/groupings"
+    },
+    {
+      "document": "invalid/missing-value-key.json",
+      "layer": "semantic",
+      "code": "map-key-mismatch",
+      "path": "/statements/0/items/0/values"
+    },
+    {
+      "document": "invalid/negative-tolerance.json",
+      "layer": "schema",
+      "code": "invalid-tolerance",
+      "path": "/units/0/defaultTolerance"
+    },
+    {
+      "document": "invalid/reversed-duration.json",
+      "layer": "semantic",
+      "code": "invalid-duration",
+      "path": "/periods/0"
+    },
+    {
+      "document": "invalid/rollup-unit-mismatch.json",
+      "layer": "semantic",
+      "code": "unit-mismatch",
+      "path": "/statements/0/items/0/rollupTo"
+    },
+    {
+      "document": "invalid/scale-above-maximum.json",
+      "layer": "schema",
+      "code": "scale-out-of-range",
+      "path": "/units/0/scale"
+    },
+    {
+      "document": "invalid/scale-below-minimum.json",
+      "layer": "schema",
+      "code": "scale-out-of-range",
+      "path": "/units/0/scale"
+    },
+    {
+      "document": "invalid/self-rollup.json",
+      "layer": "semantic",
+      "code": "self-rollup",
+      "path": "/statements/0/items/0/rollupTo"
+    },
+    {
+      "document": "invalid/unknown-item-property.json",
+      "layer": "schema",
+      "code": "unknown-property",
+      "path": "/statements/0/items/0/source"
+    },
+    {
+      "document": "invalid/unresolved-period.json",
+      "layer": "semantic",
+      "code": "unresolved-reference",
+      "path": "/statements/0/periods/0"
+    },
+    {
+      "document": "invalid/unresolved-rollup.json",
+      "layer": "semantic",
+      "code": "unresolved-reference",
+      "path": "/statements/0/items/0/rollupTo"
+    },
+    {
+      "document": "invalid/unresolved-unit.json",
+      "layer": "semantic",
+      "code": "unresolved-reference",
+      "path": "/statements/0/items/0/unit"
+    },
+    {
+      "document": "invalid/wrong-grouping-cell-type.json",
+      "layer": "schema",
+      "code": "invalid-type",
+      "path": "/statements/0/items/0/groupings/valuation"
+    },
+    {
+      "document": "invalid/wrong-value-cell-type.json",
+      "layer": "schema",
+      "code": "invalid-type",
+      "path": "/statements/0/items/0/values/fy2025"
     }
   ]
 }

@@ -1,27 +1,11 @@
 {
   "formatVersion": "0.1",
-  "documentId": "snapshot-mismatch",
   "entity": {
-    "name": "Changed Validation Co"
+    "name": "Example Entity"
   },
   "scope": {
-    "id": "separate",
-    "label": "Separate"
+    "label": "Consolidated financial statements"
   },
-  "items": [
-    {
-      "id": "total",
-      "label": "Total"
-    },
-    {
-      "id": "part-a",
-      "label": "Part A"
-    },
-    {
-      "id": "part-b",
-      "label": "Part B"
-    }
-  ],
   "units": [
     {
       "id": "usd",
@@ -38,90 +22,32 @@
       "end": "2025-12-31"
     }
   ],
-  "facts": [
-    {
-      "item": "total",
-      "period": "fy2025",
-      "unit": "usd",
-      "value": "11"
-    },
-    {
-      "item": "part-a",
-      "period": "fy2025",
-      "unit": "usd",
-      "value": "6"
-    },
-    {
-      "item": "part-b",
-      "period": "fy2025",
-      "unit": "usd",
-      "value": "4"
-    }
-  ],
   "statements": [
     {
-      "id": "total-view",
-      "label": "Total view",
-      "unit": "usd",
+      "id": "statement",
+      "label": "Statement",
       "periods": [
         "fy2025"
       ],
-      "entries": [
+      "items": [
         {
-          "type": "item",
-          "item": "part-a"
+          "id": "child",
+          "label": "Child",
+          "unit": "usd",
+          "values": {
+            "fy2025": "10"
+          },
+          "groupings": {},
+          "rollupTo": "total"
         },
         {
-          "type": "item",
-          "item": "part-b"
-        },
-        {
-          "type": "item",
-          "item": "total"
-        }
-      ]
-    }
-  ],
-  "calculationRules": [
-    {
-      "id": "subtotal",
-      "kind": "samePeriod",
-      "unit": "usd",
-      "target": {
-        "item": "total"
-      },
-      "terms": [
-        {
-          "coefficient": "1",
-          "item": "part-a"
-        },
-        {
-          "coefficient": "1",
-          "item": "part-b"
-        }
-      ],
-      "scope": {
-        "periods": [
-          "fy2025"
-        ]
-      }
-    },
-    {
-      "id": "parts-agree",
-      "kind": "assertion",
-      "target": {
-        "item": "part-a",
-        "period": "fy2025",
-        "unit": "usd"
-      },
-      "terms": [
-        {
-          "coefficient": "1",
-          "fact": {
-            "item": "part-b",
-            "period": "fy2025",
-            "unit": "usd"
-          }
+          "id": "total",
+          "label": "Total",
+          "unit": "usd",
+          "values": {
+            "fy2025": "11"
+          },
+          "groupings": {}
         }
       ]
     }
@@ -132,26 +58,14 @@
     "applications": [
       {
         "key": {
-          "rule": "subtotal",
-          "period": "fy2025",
-          "dimensions": {}
+          "statement": "statement",
+          "parent": "total",
+          "period": "fy2025"
         },
         "status": "unsatisfied",
         "actual": "11",
         "expected": "10",
         "difference": "1",
-        "tolerance": "0"
-      },
-      {
-        "key": {
-          "rule": "parts-agree",
-          "period": "fy2025",
-          "dimensions": {}
-        },
-        "status": "unsatisfied",
-        "actual": "6",
-        "expected": "4",
-        "difference": "2",
         "tolerance": "0"
       }
     ]

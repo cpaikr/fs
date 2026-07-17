@@ -1,48 +1,36 @@
 # V0 Examples
 
-These files remain examples of the current `0.1` contract. Their coordinated
-replacement is planned in
-[Roadmap step 10](../docs/plans/statement-item-row-refactor.md); they are not
-examples of the accepted row model.
-
-These examples provide conformance evidence for the normative
-[semantic specification](../docs/semantic-spec.md). They demonstrate artifact
-behavior; they do not define statement contents or act as partially completed
-documents. See the [authoring guide](../docs/authoring.md) for the encoding
-workflow.
+These examples provide conformance evidence for the current `0.1`
+[semantic specification](../docs/semantic-spec.md). They demonstrate complete
+artifacts rather than acting as partially completed authoring templates. See
+the [authoring guide](../docs/authoring.md) for the encoding workflow.
 
 ## Files
 
-- `minimal.json` proves that document, entity, and scope identifiers,
-  dimensions, and calculation rules are optional. Its calculation status is
-  `not-defined`.
-- `manufacturing-group.json` combines materially different presentations over
-  one entity rather than treating each statement as a separate artifact. It is
-  structurally conforming and deliberately calculation-inconsistent.
+- `minimal.json` is the smallest complete statement-row document. It omits
+  optional identifiers, grouping columns, rollups, and validation snapshot, so
+  its calculation status is `not-defined`.
+- `manufacturing-group.json` combines income, balance-sheet, cash-flow, equity,
+  and manufacturing statements for one entity. It is structurally conforming
+  and deliberately calculation-inconsistent.
 
 ## Manufacturing Example Evidence
 
-- **Multiple statements:** income, balance sheet, cash flow, equity, and
-  manufacturing presentations.
-- **Non-period axis:** `changes-in-equity.dimensions` presents equity
-  components.
-- **Passing and failing totals:** `gross-profit-subtotal` and
-  `manufacturing-cost-subtotal`.
-- **Shared fact:** `net-income` appears in income and cash-flow presentations.
-- **Distinct facts reconciled explicitly:** `net-income-reconciliation`.
-- **Roll-forward:** `cash-roll-forward` relates opening, movement, and closing
-  balances.
-- **First, consecutive, and gapped periods:** `fy2023`, `fy2024`, and `fy2028`.
-- **Overlapping durations:** `fy2025`, `q1-2025`, and `ytd-h1-2025`.
-- **Temporal binding:** `fy2024` and `q2-2025` are unambiguous, while `fy2025`
-  and `q1-2025` demonstrate ambiguity.
-- **Exact values:** facts and units cover decimals, scales, measures, zero, and
-  explicit unavailability.
-- **Missing versus unavailable:** 2025 treasury-share statement coordinates
-  are absent; separate 2024 treasury-share and 2025 inventory coordinates are
-  explicitly unavailable.
-- **Flat presentation:** income and balance-sheet statements demonstrate
-  headings and explicit period order.
+- Statements own their ordered items and select their display periods.
+- Income uses a nested revenue and cost-of-sales subtotal graph; the explicit
+  2025 gross-profit value is deliberately inconsistent with its direct
+  children.
+- Balance sheet, cash flow, equity, and manufacturing statements include
+  satisfied rollups alongside that failure.
+- Item identifiers such as `materials` and `labor` repeat across statements,
+  proving item and rollup identity is statement-local.
+- `majorGroup` and `valuation` demonstrate exact grouping maps, including null
+  grouping cells.
+- Most rows use KRW millions while the EPS row uses KRW per share, proving
+  mixed-unit statement presentation without permitting mixed-unit rollup
+  edges.
+- Values include exact decimals, signs, zero, null, and explicit
+  unavailability.
 
-The intentionally incorrect 2025 gross-profit value proves that structural
-conformance and calculation consistency are separate outcomes.
+Structural conformance and calculation consistency are separate outcomes; the
+example is valid even though one rollup application is unsatisfied.
