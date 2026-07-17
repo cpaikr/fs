@@ -57,5 +57,5 @@ remain unchanged.
 
 ## Closure
 
-This CLI delivery plan is complete. Roadmap step 9 continues under its
-[own active plan](agent-guidance-snapshots-rendering.md).
+This CLI delivery plan is complete. Roadmap step 9 delivery evidence is
+recorded in its [completed plan](agent-guidance-snapshots-rendering.md).

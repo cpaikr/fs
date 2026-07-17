@@ -41,6 +41,9 @@ describe("HTML rendering", () => {
     expect(html).not.toContain("Unlisted alternate unit")
     expect(html).not.toContain("Unlisted West")
     expect(html).not.toContain("Not displayed")
+    expect(html.match(/<td class="heading"/gu)).toHaveLength(2)
+    expect(html).not.toContain('<th class="heading"')
+    expect(html).not.toContain('scope="rowgroup"')
     expect(JSON.stringify(document)).toBe(original)
   })
 

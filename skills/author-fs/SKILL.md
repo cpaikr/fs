@@ -9,6 +9,8 @@ description: >-
 
 # Authoring FS Documents
 
+This Skill is based on `@cpai/fs` version `0.1.0`.
+
 Use this workflow only after the financial model is resolved. FS encodes one
 entity and reporting scope; it does not extract source material, choose
 financial meanings, map a taxonomy, convert units, or invent values.

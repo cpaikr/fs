@@ -98,7 +98,9 @@
       ],
       "entries": [
         { "type": "heading", "label": "Operating & results" },
-        { "type": "item", "item": "sales", "label": "Net \"sales\" & <other>" }
+        { "type": "item", "item": "sales", "label": "Net \"sales\" & <other>" },
+        { "type": "heading", "label": "Other <visual> section" },
+        { "type": "item", "item": "expense", "label": "Expense after separator" }
       ]
     },
     {

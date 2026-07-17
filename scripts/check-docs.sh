@@ -50,7 +50,11 @@ if [[ "$npx_guide" == *'{{'* ]]; then
   exit 1
 fi
 node scripts/render-guide.mjs --npx-version 1.0.0+build.1 >/dev/null
-node scripts/render-guide.mjs --skill-version 1.0.0+build.1 >/dev/null
+skill_guide="$(node scripts/render-guide.mjs --skill-version 1.0.0+build.1)"
+if [[ "$skill_guide" != *'This Skill is based on `@cpai/fs` version `1.0.0+build.1`.'* ]]; then
+  echo "Agent Skill rendering lost its package-version basis" >&2
+  exit 1
+fi
 for invalid_version in latest 1.0.0-.. 1.0.0-01; do
   if node scripts/render-guide.mjs \
     --npx-version "$invalid_version" >/dev/null 2>&1; then

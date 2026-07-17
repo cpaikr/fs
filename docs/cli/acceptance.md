@@ -378,12 +378,14 @@ rescaling, rounding, aggregation, or calculation.
 
 Each statement is one table. Rows follow `entries`; an item override label
 wins over the referenced item's label. A heading spans the whole table and
-adds no nesting. Columns are period-major: for each listed period in display
-order, enumerate the Cartesian product of listed axes in axis and member
-display order, with the first axis changing slowest. A statement without axes
-has one column per period. Instant headers use the exact date; duration headers
-use `<start> – <end>`. Axis coordinates follow the period, formatted as
-`<dimension label>: <member label>` and separated with ` · `.
+is a visual separator rendered as an ordinary table cell; it has no table
+header scope, row-group semantics, or nesting. Columns are period-major: for
+each listed period in display order, enumerate the Cartesian product of listed
+axes in axis and member display order, with the first axis changing slowest. A
+statement without axes has one column per period. Instant headers use the exact
+date; duration headers use `<start> – <end>`. Axis coordinates follow the
+period, formatted as `<dimension label>: <member label>` and separated with
+` · `.
 
 A cell lookup uses exactly the item, period, statement unit, and complete axis
 coordinate. A stored value is displayed verbatim, explicit unavailability is

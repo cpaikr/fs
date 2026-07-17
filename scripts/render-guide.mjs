@@ -13,13 +13,14 @@ const installedPath = resolve(repositoryRoot, "assets/guide/authoring.md");
 const packagePath = resolve(repositoryRoot, "package.json");
 const skillPath = resolve(
   repositoryRoot,
-  ".agents/skills/author-fs/SKILL.md",
+  "skills/author-fs/SKILL.md",
 );
 const skillMetadataPath = resolve(
   repositoryRoot,
-  ".agents/skills/author-fs/agents/openai.yaml",
+  "skills/author-fs/agents/openai.yaml",
 );
-const placeholder = "{{FS_COMMAND}}";
+const commandPlaceholder = "{{FS_COMMAND}}";
+const versionNotePlaceholder = "{{FS_VERSION_NOTE}}";
 const skillFrontmatter = `---
 name: author-fs
 description: >-
@@ -85,12 +86,16 @@ const isExactSemVer = (value) => {
   return true;
 };
 
-const render = (command) => {
+const render = (command, versionNote = "") => {
   const template = readFileSync(templatePath, "utf8");
-  if (!template.includes(placeholder)) {
-    throw new Error(`Guide template does not contain ${placeholder}`);
+  for (const placeholder of [commandPlaceholder, versionNotePlaceholder]) {
+    if (!template.includes(placeholder)) {
+      throw new Error(`Guide template does not contain ${placeholder}`);
+    }
   }
-  const rendered = template.replaceAll(placeholder, command);
+  const rendered = template
+    .replaceAll(commandPlaceholder, command)
+    .replaceAll(versionNotePlaceholder, versionNote);
   if (rendered.includes("{{")) {
     throw new Error("Guide template contains an unresolved placeholder");
   }
@@ -101,7 +106,8 @@ const renderSkill = (version) => {
   if (!isExactSemVer(version)) {
     throw new Error("The package version must be an exact npm version");
   }
-  return skillFrontmatter + render(`npx -y @cpai/fs@${version}`);
+  const versionNote = `This Skill is based on \`@cpai/fs\` version \`${version}\`.\n\n`;
+  return skillFrontmatter + render(`npx -y @cpai/fs@${version}`, versionNote);
 };
 
 const packageVersion = () => {
@@ -130,14 +136,14 @@ if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
   const actual = readFileSync(skillPath, "utf8");
   if (actual !== expected) {
     process.stderr.write(
-      ".agents/skills/author-fs/SKILL.md is stale; render the Agent Skill\n",
+      "skills/author-fs/SKILL.md is stale; render the Agent Skill\n",
     );
     process.exitCode = 1;
   }
   const actualMetadata = readFileSync(skillMetadataPath, "utf8");
   if (actualMetadata !== skillMetadata) {
     process.stderr.write(
-      ".agents/skills/author-fs/agents/openai.yaml is stale\n",
+      "skills/author-fs/agents/openai.yaml is stale\n",
     );
     process.exitCode = 1;
   }

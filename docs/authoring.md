@@ -127,7 +127,7 @@ prompt. They must stop when the prerequisite financial model is incomplete and
 must not claim full semantic conformance until the reference validator has
 run.
 
-The CLI guide and future installable Agent Skill share one portable source
+The CLI guide and repository-distributed Agent Skill share one portable source
 derived from this workflow. They must not add extraction or mapping
 instructions and should route to focused references rather than embed the
 complete schema or fixture suite in default context.

@@ -49,25 +49,29 @@ interface Column {
   readonly label: string
 }
 
+interface DimensionIndex {
+  readonly definition: Dimension
+  readonly members: ReadonlyMap<string, Dimension["members"][number]>
+}
+
 const periodLabel = (period: Period): string =>
   period.kind === "instant" ? period.date : `${period.start} – ${period.end}`
 
 const axisCoordinates = (
   statement: Statement,
-  dimensions: ReadonlyMap<string, Dimension>
+  dimensions: ReadonlyMap<string, DimensionIndex>
 ): ReadonlyArray<{ readonly dimensions: Dimensions; readonly labels: ReadonlyArray<string> }> =>
   (statement.dimensions ?? []).reduce<
     ReadonlyArray<{ readonly dimensions: Dimensions; readonly labels: ReadonlyArray<string> }>
   >(
     (coordinates, axis) => {
-      const dimension = dimensions.get(axis.dimension) as Dimension
-      const members = new Map(dimension.members.map((member) => [member.id, member]))
+      const dimension = dimensions.get(axis.dimension) as DimensionIndex
       return coordinates.flatMap((coordinate) =>
         axis.members.map((memberId) => {
-          const member = members.get(memberId) as Dimension["members"][number]
+          const member = dimension.members.get(memberId) as Dimension["members"][number]
           return {
             dimensions: { ...coordinate.dimensions, [axis.dimension]: memberId },
-            labels: [...coordinate.labels, `${dimension.label}: ${member.label}`]
+            labels: [...coordinate.labels, `${dimension.definition.label}: ${member.label}`]
           }
         })
       )
@@ -78,7 +82,7 @@ const axisCoordinates = (
 const statementColumns = (
   statement: Statement,
   periods: ReadonlyMap<string, Period>,
-  dimensions: ReadonlyMap<string, Dimension>
+  dimensions: ReadonlyMap<string, DimensionIndex>
 ): ReadonlyArray<Column> => {
   const coordinates = axisCoordinates(statement, dimensions)
   return statement.periods.flatMap((periodId) => {
@@ -98,14 +102,13 @@ const renderedCell = (fact: Fact | undefined): string => {
 }
 
 const renderStatement = (
-  document: Document,
   statement: Statement,
+  items: ReadonlyMap<string, Document["items"][number]>,
+  units: ReadonlyMap<string, Document["units"][number]>,
   periods: ReadonlyMap<string, Period>,
-  dimensions: ReadonlyMap<string, Dimension>,
+  dimensions: ReadonlyMap<string, DimensionIndex>,
   facts: ReadonlyMap<string, Fact>
 ): ReadonlyArray<string> => {
-  const items = new Map(document.items.map((item) => [item.id, item]))
-  const units = new Map(document.units.map((unit) => [unit.id, unit]))
   const unit = units.get(statement.unit) as Document["units"][number]
   const columns = statementColumns(statement, periods, dimensions)
   const lines = [
@@ -127,7 +130,7 @@ const renderStatement = (
     lines.push("            <tr>")
     if (entry.type === "heading") {
       lines.push(
-        `              <th class="heading" scope="rowgroup" colspan="${columns.length + 1}">${escapeHtml(entry.label)}</th>`
+        `              <td class="heading" colspan="${columns.length + 1}">${escapeHtml(entry.label)}</td>`
       )
     } else {
       const item = items.get(entry.item) as Document["items"][number]
@@ -154,8 +157,18 @@ const renderStatement = (
 }
 
 export const renderHtml = (document: Document): Buffer => {
+  const items = new Map(document.items.map((item) => [item.id, item]))
+  const units = new Map(document.units.map((unit) => [unit.id, unit]))
   const periods = new Map(document.periods.map((period) => [period.id, period]))
-  const dimensions = new Map((document.dimensions ?? []).map((dimension) => [dimension.id, dimension]))
+  const dimensions = new Map(
+    (document.dimensions ?? []).map((dimension) => [
+      dimension.id,
+      {
+        definition: dimension,
+        members: new Map(dimension.members.map((member) => [member.id, member]))
+      }
+    ])
+  )
   const facts = new Map(document.facts.map((fact) => [coordinateKey(fact), fact]))
   const title = `${escapeHtml(document.entity.name)} — ${escapeHtml(document.scope.label)}`
   const lines = [
@@ -176,7 +189,7 @@ export const renderHtml = (document: Document): Buffer => {
     "  </header>",
     "  <main>",
     ...document.statements.flatMap((statement) =>
-      renderStatement(document, statement, periods, dimensions, facts)
+      renderStatement(statement, items, units, periods, dimensions, facts)
     ),
     "  </main>",
     "</body>",

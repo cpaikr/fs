@@ -70,8 +70,14 @@ try {
     if (!paths.includes(path)) throw new Error(`packed file missing: ${path}`)
   }
   for (const path of paths) {
-    if (path.startsWith("src/") || path.startsWith("test/") || path.startsWith("fixtures/")) {
-      throw new Error(`development-only path was packed: ${path}`)
+    if (
+      path.startsWith(".agents/") ||
+      path.startsWith("skills/") ||
+      path.startsWith("src/") ||
+      path.startsWith("test/") ||
+      path.startsWith("fixtures/")
+    ) {
+      throw new Error(`repository-only path was packed: ${path}`)
     }
   }
 

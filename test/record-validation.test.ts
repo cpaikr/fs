@@ -36,4 +36,39 @@ describe("validation snapshot recording", () => {
     expect(Object.keys(recorded.document).at(-1)).toBe("validationSnapshot")
     expect(validateDocument(recorded.document).snapshotDiff.status).toBe("match")
   })
+
+  it("preserves arbitrary parsed top-level member order before the appended snapshot", () => {
+    const decoded = decodeJson(readFileSync(resolve("fixtures/valid/no-calculation-rules.json")))
+    expect(decoded.ok).toBe(true)
+    if (!decoded.ok) return
+    const source = decoded.value as Document
+    const reordered: Document = {
+      statements: source.statements,
+      facts: source.facts,
+      periods: source.periods,
+      units: source.units,
+      items: source.items,
+      scope: source.scope,
+      entity: source.entity,
+      formatVersion: source.formatVersion
+    }
+    const validation = validateDocument(reordered).validation
+    expect(validation.conformance.status).toBe("conforming")
+
+    const recorded = recordValidationSnapshot(reordered, validation)
+    const expectedOrder = [
+      "statements",
+      "facts",
+      "periods",
+      "units",
+      "items",
+      "scope",
+      "entity",
+      "formatVersion",
+      "validationSnapshot"
+    ]
+
+    expect(Object.keys(recorded.document)).toEqual(expectedOrder)
+    expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)
+  })
 })

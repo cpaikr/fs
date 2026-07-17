@@ -21,11 +21,11 @@ V0 release remain out of scope.
 
 - Agent Skill guidance and `fs guide authoring` remain renderings of
   `content/guide/authoring.md.template`; the Skill rendering pins one exact npm
-  package version and must work outside a repository checkout.
+  package version and states that version as its basis.
 - The repository-distributed Skill lives at
-  `.agents/skills/author-fs/SKILL.md`. It is installable from the repository and
-  is not duplicated in the npm tarball; its pinned commands invoke that npm
-  package when the Skill runs.
+  `skills/author-fs/SKILL.md`. The root `skills/` catalog is the installable
+  repository distribution; the Skill is not duplicated in the npm tarball,
+  and package publication remains Roadmap step-10 release work.
 - The Skill stays concise and routes to published contracts and bundled CLI
   discovery instead of embedding schemas, examples, or the semantic
   specification in default agent context.
@@ -47,6 +47,8 @@ V0 release remain out of scope.
 - The HTML has fixed embedded styling and no scripts or external resources.
   All author-controlled displayed text is escaped; rules, snapshots,
   identifiers, and descriptions are not displayed.
+- Statement headings are visual separator cells only; they have no table
+  header scope, row-group semantics, or presentation nesting.
 
 ## Phase State
 
@@ -92,11 +94,11 @@ The completed step-8 baseline is recorded in the
 [CLI milestone index](cli-v0.md). The initial plan-routing slice passes
 `./scripts/check-docs.sh` and `git diff --check`. The Agent Skill slice passes
 deterministic generated-byte checks, exact-version acceptance and rejection,
-the Skill validator in an ephemeral PyYAML environment, and
-`./scripts/check-docs.sh`. A fresh-context refusal test also stopped on an
-incomplete financial model without inventing decisions. The final step-9 gate
-repeats repository, documentation, and whitespace checks after the last state
-update.
+root-catalog discovery through `bunx skills add ./skills/author-fs --list`, the
+Skill validator in an ephemeral PyYAML environment, and `./scripts/check-docs.sh`.
+A fresh-context refusal test also stopped on an incomplete financial model
+without inventing decisions. The final step-9 gate repeats repository,
+documentation, and whitespace checks after the last state update.
 
 The completed `record-validation` slice passes `pnpm verify`: typecheck, zero
 strict Effect diagnostics, 100 unit and boundary tests, all 100 packed-process
@@ -114,7 +116,7 @@ wildcard implementations. Its expected pre-implementation discovery and
 command failures are now closed by the implementation slice.
 
 The render implementation slice and final repository gate pass `pnpm verify`:
-typecheck, zero strict Effect diagnostics, 109 unit and boundary tests, all 117
+typecheck, zero strict Effect diagnostics, 110 unit and boundary tests, all 117
 packed-process cases, five writer crash points, early contender-exit
 detection, 16-way writer contention, and installed-tarball smoke across 43
 packed files. The tarball smoke executes `render` and compares its exact HTML.
