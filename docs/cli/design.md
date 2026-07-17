@@ -2,8 +2,8 @@
 
 The CLI is the packaged reference consumer and authoring aid for complete FS
 documents. The
-[active delivery plan](../plans/agent-guidance-snapshots-rendering.md) owns
-current implementation state and step-9 delivery choices.
+[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
+records Roadmap step 9 implementation and validation.
 
 ## Boundary
 
@@ -224,7 +224,7 @@ installation.
 ## Delivery
 
 The
-[active delivery plan](../plans/agent-guidance-snapshots-rendering.md) owns the
-implementation phases, validation gates, and current next action. The
+[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
+records the implementation phases and validation gates. The
 [completed V0 CLI plan](../plans/cli-v0.md) retains the selected runtime,
 package, dependency constraints, and step-8 validation evidence.

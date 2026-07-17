@@ -1,9 +1,9 @@
 # Agent Guidance, Snapshot Recording, and Rendering Plan
 
-Status: Active.
+Status: Complete.
 
-This plan owns mutable task state, gates, validation, blockers, and the next
-action for Roadmap step 9. The [semantic specification](../semantic-spec.md)
+This plan records decisions, gates, and validation for completed Roadmap step
+9. The [semantic specification](../semantic-spec.md)
 owns artifact meaning, the [CLI design](../cli/design.md) owns command intent,
 the [CLI acceptance contract](../cli/acceptance.md) owns observable process
 behavior, and the [roadmap](../../ROADMAP.md) owns strategic sequence.
@@ -60,8 +60,8 @@ V0 release remain out of scope.
   acceptance prose and fixtures.
 - [x] Phase 4: implement the packed `render` command and pass its fixture and
   fault/integration gates.
-- [ ] Phase 5: complete full repository validation and review proving every
-  step-9 deliverable. In progress.
+- [x] Phase 5: complete full repository validation and review proving every
+  step-9 deliverable.
 
 ## Current State
 
@@ -74,9 +74,10 @@ command. Snapshot recording replaces an existing valid snapshot, refuses
 structural nonconformance, reports the created document as a snapshot match,
 and preserves input and destination safety.
 
-The packed CLI now includes deterministic standalone HTML rendering through a
-pure renderer, complete presentation model types, the shared validated-output
-lifecycle, and the Effect command surface. Its 17 executable cases fix and
+Roadmap step 9 is complete. The packed CLI includes deterministic standalone
+HTML rendering through a pure renderer, complete presentation model types,
+the shared validated-output lifecycle, and the Effect command surface. Its 17
+executable cases fix and
 pass standalone bytes, metadata, flat table ordering, cell lookup and display,
 escaping, validation gates, process envelopes, filesystem precedence,
 discovery, and help. The suite has 117 total descriptors.
@@ -88,7 +89,7 @@ None.
 ## Validation
 
 The completed step-8 baseline is recorded in the
-[CLI milestone index](cli-v0.md). The active-plan slice passes
+[CLI milestone index](cli-v0.md). The initial plan-routing slice passes
 `./scripts/check-docs.sh` and `git diff --check`. The Agent Skill slice passes
 deterministic generated-byte checks, exact-version acceptance and rejection,
 the Skill validator in an ephemeral PyYAML environment, and
@@ -112,19 +113,23 @@ dimensionless lookup cannot pass accidentally through definition-order or
 wildcard implementations. Its expected pre-implementation discovery and
 command failures are now closed by the implementation slice.
 
-The render implementation slice passes `pnpm verify`: typecheck, zero strict
-Effect diagnostics, 109 unit and boundary tests, all 117 packed-process cases,
-five writer crash points, early contender-exit detection, 16-way writer
-contention, and installed-tarball smoke across 43 packed files. The tarball
-smoke executes `render` and compares its exact HTML. Focused implementation
-review found no correctness, regression, architecture, or validation gaps.
+The render implementation slice and final repository gate pass `pnpm verify`:
+typecheck, zero strict Effect diagnostics, 109 unit and boundary tests, all 117
+packed-process cases, five writer crash points, early contender-exit
+detection, 16-way writer contention, and installed-tarball smoke across 43
+packed files. The tarball smoke executes `render` and compares its exact HTML.
+Focused implementation review found no correctness, regression, architecture,
+or validation gaps.
+Final `./scripts/check-docs.sh` and `git diff --check` pass. The six incremental
+step-9 commits cover the plan, Agent Skill, snapshot contract, snapshot
+implementation, render contract, and render implementation. No Roadmap step-10
+schema-identifier, cross-platform release, or publishing work began.
 
 ## Blockers
 
 None.
 
-## Next Action
+## Closure
 
-Run the final step-9 repository and documentation gates, audit every milestone
-deliverable and commit, confirm no Roadmap step-10 work entered scope, then
-close this plan without starting release work.
+No step-9 action remains. Roadmap step 10 requires a new explicitly authorized
+plan; this work stops before release preparation.

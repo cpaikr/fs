@@ -2,7 +2,7 @@
 
 ## Repository state
 
-- Read [the active plan](docs/plans/agent-guidance-snapshots-rendering.md)
+- Read [the completed step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md)
   before assuming any package, executable, build, validator, or command is
   available.
 - Start with [the documentation index](docs/README.md) and use its authority
@@ -13,11 +13,13 @@
 ## Change discipline
 
 - Update a decision in its owning document, then link to it from summaries.
-  Do not copy live status or a next action outside
-  [the active plan](docs/plans/agent-guidance-snapshots-rendering.md).
+  Keep completed step-9 delivery evidence in
+  [its plan](docs/plans/agent-guidance-snapshots-rendering.md). For later
+  roadmap work, do not copy live status or a next action outside the
+  applicable active plan.
 - Keep contract changes aligned across the semantic specification, schemas,
   fixtures, and affected CLI contracts. Record known temporary drift in the
-  active plan.
+  applicable active plan when later roadmap work is explicitly started.
 - Update progress, validation, blockers, and the next action in place. Do not
   append session logs.
 - Do not edit examples or expected-result fixtures merely to make a prose

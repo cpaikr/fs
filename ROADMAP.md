@@ -2,8 +2,8 @@
 
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
-[step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md) owns current
-task state, validation, blockers, and the next action.
+[completed step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md)
+records its delivery decisions and validation.
 
 ## Reference CLI
 
@@ -25,7 +25,7 @@ scope and validation are maintained in the
 7. [x] Add contract discovery and atomic, non-overwriting document creation.
 8. [x] Adopt the revised Effect-native CLI contract, acceptance fixtures, and
    `effect/unstable/cli` runner.
-9. [ ] Generate agent guidance from one source, then add snapshot recording
+9. [x] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.
 10. [ ] Replace placeholder schema identifiers, run cross-platform package
     verification, and release V0.

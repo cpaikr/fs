@@ -3,13 +3,13 @@
 These fixtures provide executable evidence for the observable process contract
 in the [CLI acceptance contract](../../docs/cli/acceptance.md). The contract is
 authoritative for target behavior. The
-[active step-9 plan](../../docs/plans/agent-guidance-snapshots-rendering.md) is
-the sole source for current state, validation, blockers, and the next action.
+[completed step-9 plan](../../docs/plans/agent-guidance-snapshots-rendering.md)
+records its delivery state and validation.
 
 The checked-in suite retains the pre-migration domain, content, logging, and
 filesystem evidence while encoding the Effect-native grammar, help, built-in,
-and usage-presentation contract. The active plan records whether the current
-implementation satisfies it.
+and usage-presentation contract. The completed plan records the implementation
+evidence that satisfies it.
 
 ## Layout
 

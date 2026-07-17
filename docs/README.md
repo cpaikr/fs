@@ -14,7 +14,7 @@ one primary responsibility.
 - Implement or test process behavior:
   [CLI acceptance contract](cli/acceptance.md)
 - See strategic milestones: [Roadmap](../ROADMAP.md)
-- Continue Roadmap step 9:
+- Inspect completed Roadmap step 9:
   [Agent guidance, snapshots, and rendering plan](plans/agent-guidance-snapshots-rendering.md)
 - Inspect the completed Effect-native CLI milestone:
   [V0 CLI plan](plans/cli-v0.md)
@@ -32,9 +32,9 @@ When documents overlap, use this order:
 2. The CLI design defines command intent and boundaries. The CLI acceptance
    contract defines observable arguments, streams, results, exit codes, and
    filesystem effects.
-3. The roadmap owns strategic sequence. The active step-9 plan owns mutable
-   task state, gates, validation, blockers, and the next action; it is not a
-   normative product contract.
+3. The roadmap owns strategic sequence. The completed step-9 plan records its
+   delivery decisions, gates, and validation; it is not a normative product
+   contract.
 
 The product scope and glossary explain intent and terminology but do not
 override the semantic specification.
@@ -43,6 +43,7 @@ override the semantic specification.
 
 - Change the owning document and link to it from summaries instead of
   repeating decisions.
-- Keep live status and the next action only in the active plan.
+- Keep live status and the next action only in the applicable active plan when
+  later roadmap work is explicitly started.
 - Run `./scripts/check-docs.sh` after changing documentation or contract
   artifacts.
