@@ -1,16 +1,11 @@
 # Authoring FS Documents
 
-This guide remains the authoring contract for the currently implemented `0.1`
-format. Do not author the accepted statement-item-row replacement until the
-[Roadmap step-10 refactor](plans/statement-item-row-refactor.md) updates schema
-discovery, validation, examples, and this guide together.
-
-This guide is the entry point for a person or agent encoding an already-resolved
-financial-statement model as an FS document. The
-[semantic specification](semantic-spec.md) remains normative. The
-[JSON Schema](../schema/fs-document.schema.json) checks the JSON shape but does
-not enforce every reference, uniqueness, calendar, coordinate, or calculation
-invariant.
+This guide is the entry point for a person or agent encoding an already
+resolved financial-statement model as an FS document. The
+[semantic specification](semantic-spec.md) is normative. The
+[JSON Schema](../schema/fs-document.schema.json) checks the JSON shape but
+cannot enforce every reference, uniqueness, calendar, nested-map, rollup, or
+snapshot invariant.
 
 FS is a file-first interchange format, not an extraction system, accounting
 taxonomy, conversion method, or mutable financial database. It starts after an
@@ -21,71 +16,75 @@ author has chosen the financial meanings and values to represent.
 Before encoding begins, the author must supply:
 
 - the reporting entity and exact reporting scope;
-- every item meaning and stable local identifier;
-- units, scales, periods, and fact values;
-- any non-period dimensions and their members;
-- the intended distinction between zero, missing, and unavailable facts;
-- statement composition and display order; and
-- any calculation rules and tolerances the author wants checked.
+- every statement's item meanings, order, and stable local identifiers;
+- units, scales, selected periods, and one cell state for every item-period;
+- any custom grouping-column names and each item's assignments;
+- the intended distinction between zero, missing, and unavailable values; and
+- every confirmed additive parent-child relationship and applicable unit
+  tolerance.
 
 These are prerequisites, not questions the format answers. A person or agent
 must stop and request missing or contradictory inputs rather than infer a
-meaning, choose a sign, aggregate items, map a taxonomy, or invent a value.
+meaning, choose a sign, aggregate or split items, map a taxonomy, invent a
+grouping, or create a value.
 
 ## Workflow
 
 ### 1. Fix the artifact boundary
 
 Create one document for exactly one entity and reporting scope. Mixed entities
-or scopes require separate V0 documents. Choose stable local identifiers, but
-do not imply that they belong to a universal taxonomy.
+or scopes require separate documents. Choose stable local identifiers, but do
+not imply that they belong to a universal taxonomy.
 
-### 2. Define the coordinate vocabulary
+### 2. Define units, periods, and grouping columns
 
-Define items, units, periods, and any dimensions before referencing them.
-Items describe financial meanings rather than source rows or ledger accounts.
-Periods describe instants or inclusive durations rather than display columns.
-Units make the measure and base-ten display scale explicit.
+Define units and periods before statements reference them. Units make the
+measure and base-ten scale explicit. Periods describe instants or inclusive
+durations rather than merely naming display columns.
 
-### 3. Store facts independently
+Declare each custom grouping purpose once in `groupingColumns`. A grouping
+column is an opaque author-defined classification, not a hierarchy, category
+registry, value coordinate, or calculation.
 
-Store every supplied value as an individual fact at its complete item, period,
-unit, and dimension coordinate. In particular:
+### 3. Author statement-owned item rows
 
-- values are normalized exact decimal strings;
-- zero is `"0"`;
-- a missing fact is an absent coordinate;
-- an explicitly unavailable fact uses `"unavailable": true`; and
-- omitted dimensions and an empty dimensions object identify the same
-  dimensionless coordinate and must not be duplicated.
+Place ordered items directly inside each statement. An item identifier is
+unique only within that statement. Give every item one unit and a `values` map
+whose keys exactly match the statement's selected periods.
 
-Do not calculate a missing value into existence or alter a supplied value to
-make a relationship pass.
+Encode cell states deliberately:
 
-### 4. Add presentations
+- normalized exact decimal strings store values;
+- `"0"` is zero;
+- JSON `null` is missing; and
+- `{ "unavailable": true }` is explicitly unavailable.
 
-Statements are ordered views over shared facts. They choose a unit, displayed
-periods, optional dimension axes, and flat heading or item entries. They do not
-own facts, define fact identity, imply indentation, or imply calculations. One
-fact may appear in multiple statements.
+Never omit a selected period key, calculate a missing value into existence, or
+alter a supplied value to make a subtotal pass.
 
-### 5. Add only confirmed checks
+Give every item a `groupings` map whose keys exactly match
+`groupingColumns`. Use a nonempty string for an assignment and JSON `null` for
+no assignment. When the document declares no grouping columns, every item's
+map is `{}`.
 
-Calculation rules are optional. Use same-period rules for reusable item
-relationships, roll-forwards for unambiguous consecutive duration series, and
-explicit assertions for exact reconciliations or irregular relationships.
-Rules check stored values; they never supply them.
+### 4. Add only confirmed rollups
 
-### 6. Validate and deliver
+Set `rollupTo` on a child only when the author confirms that its stored value
+adds with coefficient one and its stored sign to a parent in the same
+statement. Child and parent must use the same unit. Relationships must be
+acyclic.
 
-Full validation must check JSON shape plus all semantic invariants and must
-report structural conformance, calculation consistency, and snapshot
-comparison separately. `fs validate <document|->` is the reference operational
-conformance check; the semantic specification remains normative.
+The parent's reported cells remain explicit. Rollup validation compares each
+parent with its direct children for every statement period; it does not derive
+the parent. Nested subtotals are valid because each level evaluates only its
+direct children. Custom grouping values never imply rollups.
 
-The AJV commands in the [fixture guide](../fixtures/README.md) remain useful
-for shape validation only. Passing JSON Schema is not sufficient evidence of
-FS conformance.
+### 5. Validate and deliver
+
+Full validation checks JSON shape plus all semantic invariants and reports
+structural conformance, rollup consistency, and snapshot comparison
+separately. `fs validate <document|->` is the reference operational check;
+passing JSON Schema alone is not full conformance evidence.
 
 A reviewable authoring result should include:
 
@@ -93,9 +92,8 @@ A reviewable authoring result should include:
 2. its complete structured validation result from the reference validator.
 
 FS defines no source ledger, provenance sidecar, or conversion record. Other
-systems may maintain their own records, but they are outside this project and
-its conformance contract. Source and provenance properties inside FS JSON are
-nonconforming in V0.
+systems may maintain their own records, but source and provenance properties
+inside FS JSON are nonconforming.
 
 ## Schema and Version Discovery
 
@@ -104,26 +102,23 @@ Every V0 document declares `"formatVersion": "0.1"`. Do not add a top-level
 `fs schema document` to read the exact bundled schema, or
 `fs schema --output <new-path> document` to create an exact copy.
 
-Before public release, the project will replace the schema's placeholder `$id`
-with an immutable versioned URL and decide whether to permit an optional
-constant `$schema` pointer. Such a pointer would aid discovery only; full
-semantic validation would still require the reference validator.
+Replacing placeholder schema identifiers and deciding whether to allow an
+optional constant `$schema` pointer remain Roadmap step 11. Such a pointer
+would aid discovery only; full semantic validation would still require the
+reference validator.
 
 ## Working With the Examples
 
 Use [`minimal.json`](../examples/minimal.json) to learn the smallest complete
-shape. It contains illustrative data and must not be treated as a partially
-filled document.
+shape. It contains illustrative data and is not a partially filled document.
 
-Use [`manufacturing-group.json`](../examples/manufacturing-group.json) to look
-up complex patterns such as shared facts, dimensions, assertions, and
-roll-forwards. It deliberately contains an inconsistent calculation and is
-evidence for validator behavior, not a general-purpose financial-statement
-template.
+Use [`manufacturing-group.json`](../examples/manufacturing-group.json) for a
+multi-statement example with mixed units, grouping columns, nested reported
+subtotals, and an intentionally inconsistent rollup. It is validator evidence,
+not a prescribed financial-statement template.
 
-FS does not provide balance-sheet, income-statement, or industry templates
-because those would prescribe meanings and contents that remain
-author-controlled.
+FS does not provide statement-type or industry templates because their
+meanings and contents remain author-controlled.
 
 ## Agent Use
 

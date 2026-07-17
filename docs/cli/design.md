@@ -1,10 +1,8 @@
 # CLI Design
 
-This design describes the current CLI and `0.1` artifact behavior. The accepted
-statement-item-row model changes artifact-dependent validation, snapshots,
-examples, and rendering only after the
-[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates the
-owning contracts and executable evidence.
+This design describes the CLI for the current `0.1` statement-item-row
+contract. The CLI projects the document contract without adding a second data
+model.
 
 The CLI is the packaged reference consumer and authoring aid for complete FS
 documents. The
@@ -121,19 +119,18 @@ form does not select a payload and therefore does not accept `--output`.
 Return the named example's exact bundled JSON or create an exact copy at the
 requested new path. Examples are illustrative documents, not partially
 completed statement templates. `manufacturing-group` is structurally
-conforming but deliberately calculation-inconsistent.
+conforming but deliberately rollup-inconsistent.
 
 ### `fs validate <document|->`
 
 Read a path or standard input (`-`) without modifying it and report structural
-conformance, current calculation status and applications, and comparison with
-an embedded validation snapshot.
+conformance, current rollup status and applications, and comparison with an
+embedded validation snapshot.
 
 Structural conformance and calculation consistency remain separate. A
-document with no rules reports `not-defined`; rules with no applicable
-evaluation report `not-evaluated`; calculation inconsistency and snapshot
-mismatch remain usable successful results. Structural nonconformance reports
-calculations as `not-run`.
+document with no rollup parents reports `not-defined`; rollup inconsistency and
+snapshot mismatch remain usable successful results. Structural nonconformance
+reports calculations as `not-run`.
 
 No recorded snapshot is explicit. A present but structurally unusable snapshot
 produces snapshot-diff status `not-comparable` with reason
@@ -151,8 +148,8 @@ requested new path. This is the authoring commit boundary, not a document
 generator.
 
 The command writes only a structurally conforming document, but may write one
-with inconsistent calculations. It never modifies the candidate, overwrites a
-destination, reserializes content, infers facts, fills totals, or changes
+with inconsistent rollups. It never modifies the candidate, overwrites a
+destination, reserializes content, infers values, fills totals, or changes
 financial meaning. An existing destination takes precedence over candidate
 validation and remains protected at commit time.
 
@@ -166,16 +163,18 @@ inconsistency may be recorded; structural nonconformance prevents writing.
 ### `fs render --output <html> <document|->`
 
 Produce a simple standalone HTML presentation at the requested new path.
-Rendering uses the flat presentation model and does not infer hierarchy,
-calculations, or missing facts. Checked structural budgets prevent unbounded
-table expansion before allocation, and a bounded sink rejects encoded HTML
-that exceeds the accepted finite-output policy.
+Rendering iterates statement-owned items directly. It presents grouping
+columns as flat metadata and identifies heterogeneous row units without
+inferring hierarchy, subtotal styling, calculations, or missing values.
+Checked structural budgets prevent unbounded tables before allocation, and a
+bounded sink rejects encoded HTML that exceeds the accepted finite-output
+policy.
 
 ## Commands Intentionally Absent
 
 - `fs init` does not create a blank document because the V0 contract requires
   meaningful nonempty content.
-- `add-account`, `add-row`, `set-cell`, `add-item`, and `add-fact` are not V0
+- `add-account`, `add-row`, `set-cell`, and `add-item` are not V0
   commands. Field-by-field mutation creates transient invalid state and makes
   poor use of an agent-facing interface.
 - Statement-type templates are absent because FS does not prescribe taxonomy
@@ -183,7 +182,7 @@ that exceeds the accepted finite-output policy.
 - `import-xbrl`, `import-sec`, `from-csv`, and source mapping remain outside
   the product boundary.
 - `repair`, `fix`, `normalize`, `calculate`, and `fill-totals` are absent
-  because apparent corrections commonly require author judgment and rules
+  because apparent corrections commonly require author judgment and rollups
   never materialize values.
 
 If later evidence supports mutation, prefer one atomic batch change document
