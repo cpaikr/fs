@@ -1,0 +1,36 @@
+{
+  "id": "record-validation-invalid-nondirectory-parent-precedence",
+  "command": "fs",
+  "arguments": ["record-validation", "--output", "parent/recorded.json", "input.json"],
+  "workspace": [
+    { "copy": "../raw-input/malformed-json.json.txt", "to": "input.json" },
+    { "copy": "../valid/no-calculation-rules.json", "to": "parent" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "record-validation" },
+        { "pointer": "/error/code", "equals": "invalid-json" },
+        { "pointer": "/error/path", "equals": "input.json" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json", "parent"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

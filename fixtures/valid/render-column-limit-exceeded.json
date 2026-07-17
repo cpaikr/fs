@@ -1,0 +1,122 @@
+{
+  "formatVersion": "0.1",
+  "entity": { "name": "Render limit example" },
+  "scope": { "label": "Separate financial statements" },
+  "items": [
+    { "id": "cash", "label": "Cash" }
+  ],
+  "units": [
+    { "id": "usd", "label": "US dollars", "measure": "USD", "scale": 0 }
+  ],
+  "periods": [
+    { "id": "year-end", "kind": "instant", "date": "2025-12-31" }
+  ],
+  "dimensions": [
+    {
+      "id": "d0",
+      "label": "Dimension 0",
+      "members": [
+        { "id": "d0-a", "label": "A" },
+        { "id": "d0-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d1",
+      "label": "Dimension 1",
+      "members": [
+        { "id": "d1-a", "label": "A" },
+        { "id": "d1-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d2",
+      "label": "Dimension 2",
+      "members": [
+        { "id": "d2-a", "label": "A" },
+        { "id": "d2-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d3",
+      "label": "Dimension 3",
+      "members": [
+        { "id": "d3-a", "label": "A" },
+        { "id": "d3-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d4",
+      "label": "Dimension 4",
+      "members": [
+        { "id": "d4-a", "label": "A" },
+        { "id": "d4-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d5",
+      "label": "Dimension 5",
+      "members": [
+        { "id": "d5-a", "label": "A" },
+        { "id": "d5-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d6",
+      "label": "Dimension 6",
+      "members": [
+        { "id": "d6-a", "label": "A" },
+        { "id": "d6-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d7",
+      "label": "Dimension 7",
+      "members": [
+        { "id": "d7-a", "label": "A" },
+        { "id": "d7-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d8",
+      "label": "Dimension 8",
+      "members": [
+        { "id": "d8-a", "label": "A" },
+        { "id": "d8-b", "label": "B" }
+      ]
+    },
+    {
+      "id": "d9",
+      "label": "Dimension 9",
+      "members": [
+        { "id": "d9-a", "label": "A" },
+        { "id": "d9-b", "label": "B" }
+      ]
+    }
+  ],
+  "facts": [
+    { "item": "cash", "period": "year-end", "unit": "usd", "value": "0" }
+  ],
+  "statements": [
+    {
+      "id": "financial-position",
+      "label": "Statement of financial position",
+      "unit": "usd",
+      "periods": ["year-end"],
+      "dimensions": [
+        { "dimension": "d0", "members": ["d0-a", "d0-b"] },
+        { "dimension": "d1", "members": ["d1-a", "d1-b"] },
+        { "dimension": "d2", "members": ["d2-a", "d2-b"] },
+        { "dimension": "d3", "members": ["d3-a", "d3-b"] },
+        { "dimension": "d4", "members": ["d4-a", "d4-b"] },
+        { "dimension": "d5", "members": ["d5-a", "d5-b"] },
+        { "dimension": "d6", "members": ["d6-a", "d6-b"] },
+        { "dimension": "d7", "members": ["d7-a", "d7-b"] },
+        { "dimension": "d8", "members": ["d8-a", "d8-b"] },
+        { "dimension": "d9", "members": ["d9-a", "d9-b"] }
+      ],
+      "entries": [
+        { "type": "item", "item": "cash" }
+      ]
+    }
+  ]
+}

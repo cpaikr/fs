@@ -167,7 +167,9 @@ inconsistency may be recorded; structural nonconformance prevents writing.
 
 Produce a simple standalone HTML presentation at the requested new path.
 Rendering uses the flat presentation model and does not infer hierarchy,
-calculations, or missing facts.
+calculations, or missing facts. Checked structural budgets prevent unbounded
+table expansion before allocation, and a bounded sink rejects encoded HTML
+that exceeds the accepted finite-output policy.
 
 ## Commands Intentionally Absent
 

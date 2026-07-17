@@ -30,7 +30,8 @@ export const outputEntryExists = (path: string): boolean => {
     lstatSync(path)
     return true
   } catch (error) {
-    if (errorCode(error) === "ENOENT") return false
+    const code = errorCode(error)
+    if (code === "ENOENT" || code === "ENOTDIR") return false
     throw error
   }
 }

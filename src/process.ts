@@ -358,10 +358,20 @@ const runCreate = (
 
 type DerivedOutputOperation = "record-validation" | "render"
 
-interface GeneratedOutput {
+interface GeneratedOutputSuccess {
+  readonly ok: true
   readonly bytes: Buffer
   readonly snapshotDiff: ReturnType<typeof validateDocument>["snapshotDiff"]
 }
+
+interface GeneratedOutputFailure {
+  readonly ok: false
+  readonly code: "output-limit-exceeded"
+  readonly message: string
+  readonly context: Readonly<Record<string, string | number | boolean>>
+}
+
+type GeneratedOutput = GeneratedOutputSuccess | GeneratedOutputFailure
 
 const runValidatedOutput = (
   operation: DerivedOutputOperation,
@@ -454,6 +464,21 @@ const runValidatedOutput = (
     }
 
     const generated = generate(decoded.value as Document, result)
+    if (!generated.ok) {
+      logger.emit("error", "output-failed", operation, {
+        code: generated.code,
+        ...generated.context
+      })
+      return commandError(
+        operation,
+        generated.code,
+        [],
+        output,
+        generated.message,
+        logger.bytes()
+      )
+    }
+
     const written = yield* Effect.result(io.writeFile(destination, generated.bytes))
     if (Result.isFailure(written)) {
       logger.emit("error", "output-failed", operation, { code: "write-failed" })
@@ -497,6 +522,7 @@ const runRecordValidation = (
   runValidatedOutput("record-validation", input, output, logLevel, io, (document, result) => {
     const recorded = recordValidationSnapshot(document, result.validation)
     return {
+      ok: true,
       bytes: recorded.bytes,
       snapshotDiff: compareSnapshot(recorded.document.validationSnapshot, result.validation)
     }
@@ -508,10 +534,22 @@ const runRender = (
   logLevel: LogLevel,
   io: ApplicationIOService
 ): Effect.Effect<ProcessResult> =>
-  runValidatedOutput("render", input, output, logLevel, io, (document, result) => ({
-    bytes: renderHtml(document),
-    snapshotDiff: result.snapshotDiff
-  }))
+  runValidatedOutput("render", input, output, logLevel, io, (document, result) => {
+    const rendered = renderHtml(document)
+    if (!rendered.ok) {
+      return {
+        ok: false,
+        code: "output-limit-exceeded",
+        message: `Rendered output exceeds the ${rendered.budget} budget of ${rendered.limit}.`,
+        context: { budget: rendered.budget, limit: rendered.limit }
+      }
+    }
+    return {
+      ok: true,
+      bytes: rendered.bytes,
+      snapshotDiff: result.snapshotDiff
+    }
+  })
 
 const run = (request: ApplicationRequest): Effect.Effect<ProcessResult, never, ApplicationIO> =>
   Effect.gen(function*() {

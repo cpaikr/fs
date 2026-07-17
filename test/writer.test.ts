@@ -1,10 +1,10 @@
-import { mkdtempSync, readFileSync, rmSync } from "node:fs"
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
 import { describe, expect, it } from "vitest"
 
-import { writeNewFile, type WriterServices } from "../src/writer.js"
+import { outputEntryExists, writeNewFile, type WriterServices } from "../src/writer.js"
 
 interface FakeOptions {
   readonly failure?:
@@ -83,6 +83,19 @@ describe("atomic no-replace writer", () => {
       expect(readFileSync(path)).toEqual(Buffer.from(" exact\n"))
       expect(writeNewFile(path, Buffer.from("different"))).toBe("output-exists")
       expect(readFileSync(path)).toEqual(Buffer.from(" exact\n"))
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  it("treats a path below a non-directory parent as absent until write", () => {
+    const root = mkdtempSync(join(tmpdir(), "fs-writer-"))
+    const parent = join(root, "parent")
+    const destination = join(parent, "result.json")
+    writeFileSync(parent, "not a directory")
+    try {
+      expect(outputEntryExists(destination)).toBe(false)
+      expect(writeNewFile(destination, Buffer.from("x"))).toBe("output-parent-not-found")
     } finally {
       rmSync(root, { recursive: true, force: true })
     }

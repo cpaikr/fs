@@ -232,8 +232,8 @@ instead of a validation envelope:
 Fixtures fix the exact fields appropriate to each error. Stable V0 usage codes
 are not part of the JSON vocabulary; grammar failures use Effect-native text.
 Stable operational codes are `input-not-found`, `input-unreadable`,
-`invalid-json`, `output-exists`, `output-parent-not-found`, `write-failed`, and
-`internal-error`.
+`invalid-json`, `output-exists`, `output-parent-not-found`,
+`output-limit-exceeded`, `write-failed`, and `internal-error`.
 
 Malformed syntax, trailing content, and duplicate object members all produce
 `invalid-json` before JSON Schema validation. Duplicate members are never
@@ -311,6 +311,11 @@ validation and snapshot generation.
 already-existing destination before reading the input. Missing parents and
 commit-time write failures occur only after complete validation and HTML
 generation.
+
+A destination below a non-directory path component does not itself exist, so
+`ENOTDIR` during the destination preflight does not become `write-failed`.
+Input parsing and validation retain precedence; after successful generation,
+the writer reports the non-directory parent as `output-parent-not-found`.
 
 Ordinary acceptance cases prove that failed commands leave no partial output.
 A separate child-process fault-injection integration test terminates writers
@@ -405,6 +410,26 @@ the same validation information, output status `not-created` with reason
 `structural-nonconformance`, exits `1`, and leaves the output absent.
 Operational errors use operation `render` and the shared stable error
 vocabulary.
+
+Rendering computes finite structural budgets with checked arithmetic before
+constructing coordinates, rows, or cells. A rendered statement may contain at
+most 1,000 logical columns including its label column, so the current layout
+permits at most 999 data columns. Across the document, rendered tables may
+occupy at most 100,000 logical grid slots after spans are expanded. A current
+statement with `C` data columns and `R` body rows consumes
+`(C + 1) * (R + 1)` slots. Arithmetic that cannot stay within a budget is
+over-limit without requiring the expanded count to be representable.
+
+After structural preflight, rendering uses a bounded sink and rejects final
+UTF-8 HTML larger than 16 MiB (16,777,216 bytes), measured after escaping and
+encoding. Any budget violation returns operation `render`, code
+`output-limit-exceeded`, exit code `1`, a message naming the budget and limit,
+the requested output path, empty help, and no output file.
+
+An existing destination still wins before input I/O. Malformed or structurally
+nonconforming input wins before render budgets. Structural budgets precede the
+encoded-byte budget; every budget failure precedes parent inspection and
+commit-time writer failures.
 
 ## Required Cases
 
@@ -540,6 +565,11 @@ combined invalid-input/existing-output precedence case. Cover missing and
 duplicate `--output`, missing and extra input operands, unknown flags, native
 command help, discovery, and root help. Successful output and every refusal
 leave the input unchanged, and every failure creates no output or residue.
+
+Cover a non-directory output parent with both malformed and conforming input.
+Cover checked rejection beyond the column, grid-slot, and encoded-byte budgets
+and success at each boundary; prove that over-limit rendering never enters the
+writer.
 
 Instrument the application boundary to prove preflight-before-read ordering,
 one standard-input read, validation-before-write ordering, unchanged rendered

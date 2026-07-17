@@ -1,6 +1,6 @@
 # Bound rendered output before allocation
 
-Status: Proposed.
+Status: Accepted.
 
 Rendering needs an explicit finite-output contract regardless of whether FS
 migrates from the current dimensional contract to the statement-row model
@@ -9,9 +9,9 @@ accepted by
 remains independent so the data-model and operational decisions can be
 accepted or revised separately.
 
-It is not yet normative. Until accepted and incorporated into the
-[CLI acceptance contract](../cli/acceptance.md), current contracts continue to
-define behavior.
+The [CLI acceptance contract](../cli/acceptance.md) incorporates this decision
+for the current renderer. The same budgets remain invariant across the planned
+statement-row refactor unless a later accepted decision changes them.
 
 ## Context
 
@@ -28,7 +28,7 @@ invalid value `colspan="1001"`. See the
 Streaming addresses peak buffering but cannot make inherently enormous output
 acceptable. The renderer needs both structural and encoded-byte budgets.
 
-## Proposed decision
+## Decision
 
 Before constructing output rows or cells, rendering computes with checked
 integer arithmetic and rejects a document that exceeds either structural

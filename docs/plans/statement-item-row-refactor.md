@@ -28,8 +28,8 @@ cross-platform release verification, version publication, and npm release.
 
 - Statements own ordered items and their values; there are no top-level items
   or facts.
-- Every item has fixed level-one fields and required nested `values` and
-  `groupings` maps.
+- Every item has fixed level-one fields, with required `values` and `groupings`
+  maps nested within it.
 - `groupingColumns` declares custom grouping keys without defining schemes,
   categories, hierarchies, or arithmetic.
 - Different items in one statement may use different units. A rollup parent
@@ -41,8 +41,8 @@ cross-platform release verification, version publication, and npm release.
 - General calculations, roll-forwards, dimensions, members, shared facts,
   presentation-only headings, and label overrides are removed rather than
   emulated.
-- [ADR 0002](../adr/0002-bound-render-output.md) remains an independent
-  proposed operational decision until explicitly accepted or revised.
+- [ADR 0002](../adr/0002-bound-render-output.md) independently fixes finite
+  rendering budgets and the `output-limit-exceeded` process contract.
 
 ## Aggregate State
 
@@ -93,8 +93,6 @@ phases reuse rather than duplicate earlier evidence.
   the unreleased contract replaces `0.1` or advances the artifact version.
 - The exact serialized rollup-error payload, mixed-unit HTML presentation, and
   grouping-column HTML visibility remain Phase-0 contract decisions.
-- Render budgets and `output-limit-exceeded` remain proposed in ADR 0002 and
-  are not part of the accepted row-model decision.
 
 This drift is deliberate only while Roadmap step 10 is active. Do not update
 examples or fixtures piecemeal to make summaries appear current.

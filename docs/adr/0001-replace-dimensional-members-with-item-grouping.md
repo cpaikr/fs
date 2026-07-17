@@ -632,7 +632,8 @@ Removing member axes eliminates the motivating Cartesian expansion, but it
 does not bound periods, rows, labels, or encoded output. The independent
 overflow-safe limits and operational error contract are recorded in
 [ADR 0002](0002-bound-render-output.md). The row-model decision does not accept
-the separate output-budget policy.
+the separate output-budget policy by implication; ADR 0002 now accepts it
+independently for both the current and replacement renderers.
 
 ## Considered alternatives
 

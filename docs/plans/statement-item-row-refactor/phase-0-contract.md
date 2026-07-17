@@ -25,9 +25,9 @@ general formulas, reusable taxonomies, or a second serialization.
    under a deterministic rule.
 4. Decide whether custom groupings appear in HTML or remain data-only. They
    must never acquire implicit arithmetic or hierarchy either way.
-5. Accept, revise, or explicitly defer
-   [ADR 0002](../../adr/0002-bound-render-output.md). Its limits are independent
-   from the row model and must not enter the contract by implication.
+5. Preserve the independently accepted limits and error contract from
+   [ADR 0002](../../adr/0002-bound-render-output.md), and define their exact
+   precedence relative to any new row-model rendering failures.
 
 ## Normative Rewrite
 

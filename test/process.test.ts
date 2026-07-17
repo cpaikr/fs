@@ -1,5 +1,5 @@
 import { Effect } from "effect"
-import { mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs"
+import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 
@@ -235,6 +235,31 @@ describe("application process boundary", () => {
     expect(calls).toEqual(["exists"])
   })
 
+  it.each(["record-validation", "render"] as const)(
+    "validates input before reporting a non-directory output parent for %s",
+    (command) => {
+      const root = mkdtempSync(join(tmpdir(), "fs-process-"))
+      writeFileSync(join(root, "input.json"), "{")
+      writeFileSync(join(root, "parent"), "not a directory")
+      try {
+        const result = run({
+          command,
+          input: "input.json",
+          output: command === "render" ? "parent/result.html" : "parent/result.json",
+          logLevel: "none"
+        }, makeIO(root))
+
+        expect(result.exitCode).toBe(1)
+        expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+          error: { operation: command, code: "invalid-json", path: "input.json" },
+          help: []
+        })
+      } finally {
+        rmSync(root, { recursive: true, force: true })
+      }
+    }
+  )
+
   it("treats a dangling destination symlink as existing before reading the candidate", () => {
     const root = mkdtempSync(join(tmpdir(), "fs-process-"))
     symlinkSync("missing-target.json", join(root, "result.json"), "file")
@@ -372,6 +397,46 @@ describe("application process boundary", () => {
     expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
       output: { status: "not-created", reason: "structural-nonconformance" }
     })
+    expect(calls).toEqual(["exists", "read"])
+  })
+
+  it("reports render limits after validation without writing output", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "render",
+        input: "-",
+        output: "result.html",
+        logLevel: "error"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return readFileSync(resolve("fixtures/valid/render-column-limit-exceeded.json"))
+        }),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      error: {
+        operation: "render",
+        code: "output-limit-exceeded",
+        path: "result.html"
+      },
+      help: []
+    })
+    expect(result.stderr.toString("utf8")).toContain(
+      '"code":"output-limit-exceeded","budget":"columns","limit":1000'
+    )
     expect(calls).toEqual(["exists", "read"])
   })
 

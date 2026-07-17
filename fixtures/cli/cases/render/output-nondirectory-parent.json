@@ -1,0 +1,39 @@
+{
+  "id": "render-output-nondirectory-parent",
+  "command": "fs",
+  "arguments": ["render", "--output", "parent/report.html", "input.json"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "input.json" },
+    { "copy": "../valid/no-calculation-rules.json", "to": "parent" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "render" },
+        { "pointer": "/error/code", "equals": "output-parent-not-found" },
+        { "pointer": "/error/path", "equals": "parent/report.html" },
+        {
+          "pointer": "/help",
+          "equals": [{ "executable": "fs", "arguments": ["render", "--output", "<new-html>", "input.json"] }]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json", "parent"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}
