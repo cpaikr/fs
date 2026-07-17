@@ -10,7 +10,31 @@ const templatePath = resolve(
   "content/guide/authoring.md.template",
 );
 const installedPath = resolve(repositoryRoot, "assets/guide/authoring.md");
+const packagePath = resolve(repositoryRoot, "package.json");
+const skillPath = resolve(
+  repositoryRoot,
+  ".agents/skills/author-fs/SKILL.md",
+);
+const skillMetadataPath = resolve(
+  repositoryRoot,
+  ".agents/skills/author-fs/agents/openai.yaml",
+);
 const placeholder = "{{FS_COMMAND}}";
+const skillFrontmatter = `---
+name: author-fs
+description: >-
+  Encode and validate complete FS financial-statement documents from
+  author-resolved models. Use when an agent must create or repair an FS JSON
+  document without inferring missing financial meanings, values, taxonomy,
+  calculations, or source mappings.
+---
+
+`;
+const skillMetadata = `interface:
+  display_name: "Author FS Documents"
+  short_description: "Encode and validate resolved financial statements"
+  default_prompt: "Use $author-fs to encode this resolved financial model as a conforming FS document."
+`;
 
 const isNumericIdentifier = (value) =>
   /^(?:0|[1-9][0-9]*)$/.test(value);
@@ -73,6 +97,21 @@ const render = (command) => {
   return rendered;
 };
 
+const renderSkill = (version) => {
+  if (!isExactSemVer(version)) {
+    throw new Error("The package version must be an exact npm version");
+  }
+  return skillFrontmatter + render(`npx -y @cpai/fs@${version}`);
+};
+
+const packageVersion = () => {
+  const value = JSON.parse(readFileSync(packagePath, "utf8")).version;
+  if (typeof value !== "string" || !isExactSemVer(value)) {
+    throw new Error("package.json version must be an exact npm version");
+  }
+  return value;
+};
+
 const arguments_ = process.argv.slice(2);
 
 if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
@@ -86,6 +125,22 @@ if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
   }
 } else if (arguments_.length === 1 && arguments_[0] === "--installed") {
   process.stdout.write(render("fs"));
+} else if (arguments_.length === 1 && arguments_[0] === "--check-skill") {
+  const expected = renderSkill(packageVersion());
+  const actual = readFileSync(skillPath, "utf8");
+  if (actual !== expected) {
+    process.stderr.write(
+      ".agents/skills/author-fs/SKILL.md is stale; render the Agent Skill\n",
+    );
+    process.exitCode = 1;
+  }
+  const actualMetadata = readFileSync(skillMetadataPath, "utf8");
+  if (actualMetadata !== skillMetadata) {
+    process.stderr.write(
+      ".agents/skills/author-fs/agents/openai.yaml is stale\n",
+    );
+    process.exitCode = 1;
+  }
 } else if (arguments_.length === 1 && arguments_[0] === "--npx-template") {
   process.stdout.write(render("npx -y @cpai/fs@<version>"));
 } else if (arguments_.length === 2 && arguments_[0] === "--npx-version") {
@@ -96,10 +151,18 @@ if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
   } else {
     process.stdout.write(render(`npx -y @cpai/fs@${version}`));
   }
+} else if (arguments_.length === 2 && arguments_[0] === "--skill-version") {
+  try {
+    process.stdout.write(renderSkill(arguments_[1]));
+  } catch (error) {
+    process.stderr.write(`${error.message}\n`);
+    process.exitCode = 2;
+  }
 } else {
   process.stderr.write(
-    "Usage: render-guide.mjs --check-installed | --installed | " +
-      "--npx-template | --npx-version <version>\n",
+    "Usage: render-guide.mjs --check-installed | --check-skill | " +
+      "--installed | --npx-template | --npx-version <version> | " +
+      "--skill-version <version>\n",
   );
   process.exitCode = 2;
 }

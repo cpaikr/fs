@@ -44,10 +44,10 @@ V0 release remain out of scope.
 
 ## Phase State
 
-- [ ] Phase 0: generate and validate the installable Agent Skill from the
-  shared source. In progress.
+- [x] Phase 0: generate and validate the installable Agent Skill from the
+  shared source.
 - [ ] Phase 1: fix `record-validation` grammar, results, streams, and
-  filesystem effects in acceptance prose and fixtures.
+  filesystem effects in acceptance prose and fixtures. In progress.
 - [ ] Phase 2: implement the packed `record-validation` command and pass its
   fixture and fault/integration gates.
 - [ ] Phase 3: fix deterministic `render` HTML and failure behavior in
@@ -59,29 +59,31 @@ V0 release remain out of scope.
 
 ## Current State
 
-Roadmap steps 1–8 are complete. The package contains the shared portable
-authoring template, deterministic installed and exact-version `npx`
-renderings, the complete validator, and the atomic no-overwrite writer. It
-does not yet contain the installable Agent Skill or expose
+Roadmap steps 1–8 and the step-9 Agent Skill slice are complete. The
+repository-distributed `author-fs` Skill is generated from the shared portable
+authoring template with exact-version `npx` commands. The package contains the
+complete validator and atomic no-overwrite writer but does not yet expose
 `record-validation` and `render` in the command tree.
 
-The active plan and authority routing are established. The next slice will
-generate the Agent Skill without changing completed CLI behavior.
+The next slice will fix the complete observable `record-validation` contract
+and executable fixtures before implementation begins.
 
 ## Known Temporary Drift
 
 - The CLI design names `record-validation` and `render`, but their detailed
   acceptance behavior, fixtures, and implementation are intentionally absent
   until their contract-first phases.
-- The shared authoring renderer supports exact-version `npx` output, but no
-  installable Skill artifact is generated or packed yet.
 
 ## Validation
 
 The completed step-8 baseline is recorded in the
 [CLI milestone index](cli-v0.md). The active-plan slice passes
-`./scripts/check-docs.sh` and `git diff --check`. Later step-9 gates include
-targeted tests, `pnpm verify`, packed-install execution, and repeat
+`./scripts/check-docs.sh` and `git diff --check`. The Agent Skill slice passes
+deterministic generated-byte checks, exact-version acceptance and rejection,
+the Skill validator in an ephemeral PyYAML environment, and
+`./scripts/check-docs.sh`. A fresh-context refusal test also stopped on an
+incomplete financial model without inventing decisions. Later step-9 gates
+include targeted tests, `pnpm verify`, packed-install execution, and repeat
 documentation and whitespace checks.
 
 ## Blockers
@@ -90,6 +92,6 @@ None.
 
 ## Next Action
 
-Finish the generated Agent Skill contract and artifact, validate its structure
-and exact bytes, review the slice, and commit the passing unit before defining
-the `record-validation` acceptance fixtures.
+Define the `record-validation` result envelopes, generated-document bytes,
+error precedence, corrective help, discovery, and exhaustive acceptance
+fixture matrix. Commit that contract slice before implementing the command.

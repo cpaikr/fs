@@ -3,7 +3,7 @@
 The CLI is the packaged reference consumer and authoring aid for complete FS
 documents. The
 [active delivery plan](../plans/agent-guidance-snapshots-rendering.md) owns
-implementation state and technical delivery choices.
+current implementation state and step-9 delivery choices.
 
 ## Boundary
 
