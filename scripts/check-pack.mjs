@@ -1,12 +1,15 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { spawnSync } from "node:child_process"
+import spawn from "cross-spawn"
 import { pathToFileURL } from "node:url"
 
 const temporaryDirectory = mkdtempSync(join(tmpdir(), "fs-pack-"))
 const npm = process.platform === "win32" ? "npm.cmd" : "npm"
 const ansiEscape = /\u001b(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001b\\))/
+
+const run = (command, args, options = {}) =>
+  spawn.sync(command, args, options)
 
 const assertNativeHelp = (result, label) => {
   const stdout = result.stdout.toString("utf8")
@@ -36,7 +39,7 @@ const assertNativeHelp = (result, label) => {
 }
 
 try {
-  const packed = spawnSync(
+  const packed = run(
     npm,
     ["pack", "--ignore-scripts", "--json", "--pack-destination", temporaryDirectory],
     { encoding: "utf8" }
@@ -75,7 +78,7 @@ try {
 
   const tarball = join(temporaryDirectory, filename)
   const installDirectory = join(temporaryDirectory, "install")
-  const installed = spawnSync(
+  const installed = run(
     npm,
     ["install", "--ignore-scripts", "--no-audit", "--no-fund", "--prefix", installDirectory, tarball],
     { encoding: "utf8" }
@@ -101,7 +104,7 @@ try {
 
   const shim = join(installDirectory, "node_modules", ".bin", process.platform === "win32" ? "fs.cmd" : "fs")
   if (!existsSync(shim)) throw new Error("installed fs shim is missing")
-  const discovery = spawnSync(shim, [], { cwd: installDirectory, encoding: "utf8" })
+  const discovery = run(shim, [], { cwd: installDirectory, encoding: "utf8" })
   if (discovery.status !== 0 || discovery.stderr !== "") {
     throw new Error(discovery.stderr || "installed fs discovery failed")
   }
@@ -110,10 +113,10 @@ try {
     throw new Error("installed fs discovery differs from the accepted value")
   }
 
-  const help = spawnSync(shim, ["--help"], { cwd: installDirectory })
+  const help = run(shim, ["--help"], { cwd: installDirectory })
   assertNativeHelp(help, "installed fs native help smoke")
 
-  const ttyHelp = spawnSync(
+  const ttyHelp = run(
     process.execPath,
     [
       "--input-type=module",
@@ -132,7 +135,7 @@ try {
   const npmEnvironment = Object.fromEntries(
     Object.entries(process.env).filter(([key]) => !key.toLowerCase().startsWith("npm_config_"))
   )
-  const npxHelp = spawnSync(npx, ["--no-install", "fs", "--help"], {
+  const npxHelp = run(npx, ["--no-install", "fs", "--help"], {
     cwd: installDirectory,
     env: npmEnvironment
   })

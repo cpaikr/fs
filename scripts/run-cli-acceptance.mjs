@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process"
+import spawn from "cross-spawn"
 import {
   cpSync,
   existsSync,
@@ -25,9 +25,12 @@ const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm"
 if (selectedCases.length === 0) throw new Error("acceptance case pattern selected no cases")
 
 const run = (command, args, options = {}) => {
-  const result = spawnSync(command, args, { encoding: "utf8", ...options })
+  const result = spawn.sync(command, args, {
+    encoding: "utf8",
+    ...options
+  })
   if (result.status !== 0) {
-    throw new Error(result.stderr || result.stdout || `${command} failed`)
+    throw new Error(result.error?.message || result.stderr || result.stdout || `${command} failed`)
   }
   return result
 }
@@ -285,7 +288,7 @@ try {
     }
     delete environment.NODE_OPTIONS
 
-    const observed = spawnSync(process.execPath, [entrypoint, ...descriptor.arguments], {
+    const observed = spawn.sync(process.execPath, [entrypoint, ...descriptor.arguments], {
       cwd: workspace,
       env: environment,
       input: stdin,
