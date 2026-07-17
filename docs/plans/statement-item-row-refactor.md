@@ -1,10 +1,9 @@
 # Statement Item Row Refactor Plan
 
-Status: In progress. Phases 0–5 are complete; the final removal audit is next.
+Status: Complete. Roadmap step 10 is implemented and verified.
 
-This file is the concise milestone index and the only owner of live progress,
-temporary drift, blockers, and the next action. Stable phase scope and gates
-live in the linked child plans. The
+This file is the concise milestone index and durable delivery evidence. Stable
+phase scope and gates live in the linked child plans. The
 [semantic specification](../semantic-spec.md) owns current artifact meaning,
 the [CLI acceptance contract](../cli/acceptance.md) owns observable process
 behavior, and [ADR 0001](../adr/0001-replace-dimensional-members-with-item-grouping.md)
@@ -53,7 +52,7 @@ cross-platform release verification, version publication, and npm release.
 | 3. Rollups, results, and snapshots | Complete | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
 | 4. Rendering | Complete | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
 | 5. CLI, guidance, and package integration | Complete | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
-| 6. Legacy removal and final gate | Not started | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
+| 6. Legacy removal and final gate | Complete | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
 
 Phases 2–4 are ordered work packets within one runtime cutover. The shared
 `Document` type is consumed throughout validation, snapshots, rendering, and
@@ -104,10 +103,7 @@ phases reuse rather than duplicate earlier evidence.
 
 ## Known Temporary Drift
 
-None. Phase 6 audits for unplanned legacy paths before closing the milestone.
-
-This drift is deliberate only while Roadmap step 10 is active. Do not update
-examples or fixtures piecemeal to make summaries appear current.
+None.
 
 ## Validation
 
@@ -185,19 +181,24 @@ candidate bytes, and matches exact recorded-document bytes. The full repository,
 packed CLI acceptance, writer integration, installed-package, documentation,
 and whitespace gates pass.
 
+Phase 6 removes stale transition prose and legacy-shaped duplicate-member
+input while preserving generic JSON-member terminology and historical plans.
+Independent audits find no legacy runtime, schema, fixture, example, generated
+guidance, compatibility-reader, diagnostic-path, status-literal, grouping, or
+cross-contract gap. Representative minimal and multi-statement documents pass
+schema discovery, parsing, validation, calculation, snapshot recording and
+comparison, rendering, exact creation, CLI acceptance, and packed installation.
+The clean final `pnpm verify`, `./scripts/check-docs.sh`, and
+`git diff --check` gates pass. The required fresh final review reports no
+material finding or unresolved decision.
+
 ## Blockers
 
-None to beginning Phase 6.
-
-## Next Action
-
-Audit and remove every unplanned legacy contract path, trace representative
-documents across all public surfaces, run the clean final gate and fresh
-code-review pass, and close Roadmap step 10 in Phase 6.
+None.
 
 ## Completion
 
-Roadmap step 10 is complete only when every phase is complete, no unplanned
-legacy contract path remains, all generated and checked-in artifacts agree,
-the full validation gate passes, and the required code-review pass has no
-unresolved material finding. Release work remains Roadmap step 11.
+Roadmap step 10 is complete: every phase is complete, no unplanned legacy
+contract path remains, generated and checked-in artifacts agree, the full
+validation gate passes, and the required code-review pass has no unresolved
+material finding. Release work remains Roadmap step 11.

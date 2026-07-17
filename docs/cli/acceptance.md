@@ -65,7 +65,7 @@ An illustrative case descriptor is:
 
 ```json
 {
-  "id": "validate-path-no-rules",
+  "id": "validate-path-no-rollups",
   "command": "fs",
   "arguments": ["validate", "input.json"],
   "workspace": [

@@ -22,7 +22,7 @@ engine.
   [product scope](docs/product-scope.md).
 - For every document and its authority, use the
   [documentation index](docs/README.md).
-- To follow the active statement-item-row delivery, use the
+- To review the completed statement-item-row delivery, use the
   [step-10 plan](docs/plans/statement-item-row-refactor.md).
 
 ## Repository State
@@ -36,5 +36,5 @@ deterministic standalone HTML tables.
 The [roadmap](ROADMAP.md) shows strategic milestones. The
 [step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md) records its
 delivery decisions and validation. The
-[step-10 plan](docs/plans/statement-item-row-refactor.md) owns the active
-delivery and any temporary drift.
+[step-10 plan](docs/plans/statement-item-row-refactor.md) records its delivery
+decisions and validation.
