@@ -41,6 +41,12 @@ V0 release remain out of scope.
 - Rendering is a deterministic, standalone HTML projection of the flat
   presentation model. It must not infer hierarchy, calculations, missing
   facts, taxonomy, or financial meaning.
+- Rendered tables follow semantic presentation order. Columns are
+  period-major with the first listed axis changing slowest; exact stored
+  decimals are not rescaled, and missing and unavailable cells stay distinct.
+- The HTML has fixed embedded styling and no scripts or external resources.
+  All author-controlled displayed text is escaped; rules, snapshots,
+  identifiers, and descriptions are not displayed.
 
 ## Phase State
 
@@ -50,10 +56,10 @@ V0 release remain out of scope.
   filesystem effects in acceptance prose and fixtures.
 - [x] Phase 2: implement the packed `record-validation` command and pass its
   fixture and fault/integration gates.
-- [ ] Phase 3: fix deterministic `render` HTML and failure behavior in
-  acceptance prose and fixtures. In progress.
+- [x] Phase 3: fix deterministic `render` HTML and failure behavior in
+  acceptance prose and fixtures.
 - [ ] Phase 4: implement the packed `render` command and pass its fixture and
-  fault/integration gates.
+  fault/integration gates. In progress.
 - [ ] Phase 5: complete full repository validation and review proving every
   step-9 deliverable.
 
@@ -68,13 +74,15 @@ command. Snapshot recording replaces an existing valid snapshot, refuses
 structural nonconformance, reports the created document as a snapshot match,
 and preserves input and destination safety.
 
-The next slice will fix the complete observable `render` contract and
-executable fixtures before rendering implementation begins.
+The render contract and 17 executable cases fix standalone bytes, metadata,
+flat table ordering, cell lookup and display, escaping, validation gates,
+process envelopes, filesystem precedence, discovery, and help. The suite has
+117 total descriptors. Implementation now begins against that fixed boundary.
 
 ## Known Temporary Drift
 
-- The CLI design names `render`, but its detailed acceptance behavior,
-  fixtures, and implementation remain absent until Phase 3.
+- Discovery, root help, and render cases intentionally fail the implementation
+  gate until the new command is wired and packed.
 
 ## Validation
 
@@ -95,13 +103,20 @@ contention, and installed-tarball npm/npx smoke for 41 cleanly built packed
 files. `./scripts/check-docs.sh` passes with exact generated documents that
 revalidate as snapshot matches, and `git diff --check` passes.
 
+The render contract slice passes `./scripts/check-docs.sh`, including all 117
+CLI descriptors and the new conforming presentation fixture, plus
+`git diff --check`. Its expected implementation-gate failure is limited to
+the absent `render` discovery and command surface. Contract review strengthened
+the presentation fixture so reversed and subset display order, exact unit and
+dimension matching, and dimensionless lookup cannot pass accidentally through
+definition-order or wildcard implementations.
+
 ## Blockers
 
 None.
 
 ## Next Action
 
-Define standalone HTML bytes, flat presentation ordering, labels and metadata,
-missing and unavailable cells, exact decimal display, escaping, result
-envelopes, error precedence, discovery, and exhaustive `render` fixtures.
-Commit that contract slice before implementing the renderer.
+Implement a pure deterministic HTML renderer, complete the validated document
+model needed by presentation, wire the Effect command through the shared
+process and atomic writer boundaries, and satisfy the 17 render cases.

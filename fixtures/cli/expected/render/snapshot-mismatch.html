@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Changed Validation Co — Separate</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { color: #1f2937; margin: 2rem; }
+    header, main { max-width: 100%; }
+    h1 { margin: 0; }
+    .scope { color: #4b5563; margin: 0.5rem 0 2rem; }
+    section + section { margin-top: 2.5rem; }
+    .unit { color: #4b5563; }
+    .table-scroll { overflow-x: auto; }
+    table { border-collapse: collapse; min-width: 100%; }
+    th, td { border-bottom: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { border-bottom: 2px solid #6b7280; }
+    .heading { background: #f3f4f6; }
+    .missing, .unavailable { color: #6b7280; font-style: italic; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Changed Validation Co</h1>
+    <p class="scope">Separate</p>
+  </header>
+  <main>
+    <section>
+      <h2>Total view</h2>
+      <p class="unit">Unit: USD · Measure: USD · Scale: 10<sup>0</sup></p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">2025-01-01 – 2025-12-31</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Part A</th>
+              <td class="value">6</td>
+            </tr>
+            <tr>
+              <th scope="row">Part B</th>
+              <td class="value">4</td>
+            </tr>
+            <tr>
+              <th scope="row">Total</th>
+              <td class="value">11</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

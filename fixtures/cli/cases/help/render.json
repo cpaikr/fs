@@ -1,7 +1,7 @@
 {
-  "id": "help-root",
+  "id": "help-render",
   "command": "fs",
-  "arguments": ["--help"],
+  "arguments": ["render", "--help"],
   "workspace": [],
   "stdin": null,
   "expect": {
@@ -9,21 +9,14 @@
       "encoding": "native-text",
       "contains": [
         "USAGE",
-        "fs",
+        "fs render",
+        "document...",
+        "Exactly one",
+        "--output",
         "--help",
         "--version",
         "--completions",
-        "<bash|zsh|fish|sh>",
-        "--log-level",
-        "<all|trace|debug|info|warn|warning|error|fatal|none>",
-        "defaults to none",
-        "guide",
-        "schema",
-        "example",
-        "validate",
-        "create",
-        "record-validation",
-        "render"
+        "--log-level"
       ],
       "excludes": ["wizard", "prompt", "interactive"],
       "ansi": false

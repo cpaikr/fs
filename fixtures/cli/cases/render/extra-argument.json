@@ -1,0 +1,27 @@
+{
+  "id": "render-extra-argument",
+  "command": "fs",
+  "arguments": ["render", "--output", "report.html", "input.json", "extra.json"],
+  "workspace": [
+    { "copy": "../valid/no-calculation-rules.json", "to": "input.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs render", "document...", "Exactly one", "--output"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "native-text", "contains": ["extra.json"], "excludes": [], "ansi": false },
+    "exitCode": 2,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json"],
+        "absent": ["report.html"]
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

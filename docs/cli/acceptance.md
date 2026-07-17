@@ -301,6 +301,11 @@ destination before reading the input and still enforces no-overwrite at atomic
 commit. Missing parents and commit-time write failures occur only after input
 validation and snapshot generation.
 
+`fs render` uses the same precedence and atomic commit boundary. It checks an
+already-existing destination before reading the input. Missing parents and
+commit-time write failures occur only after complete validation and HTML
+generation.
+
 Ordinary acceptance cases prove that failed commands leave no partial output.
 A separate child-process fault-injection integration test terminates writers
 after open, write, sync, close, and link, and verifies the hard-link commit
@@ -349,6 +354,49 @@ empty help. Structural refusal reports the input validation and snapshot diff,
 output status `not-created` with reason `structural-nonconformance`, and empty
 help. Operational errors use operation `record-validation` and the shared
 stable error vocabulary.
+
+### Rendered HTML
+
+`fs render` fully validates the input before rendering. Structural
+nonconformance, including an invalid embedded snapshot, prevents output;
+calculation inconsistency and snapshot mismatch do not. Calculation rules and
+the optional validation snapshot affect the reported validation result but
+never the rendered page.
+
+The output is one deterministic UTF-8 HTML document with one final LF. It uses
+the exact `<!doctype html>` document structure and embedded CSS fixed by the
+executable render fixtures. It contains no scripts, external resources, or
+author-controlled HTML. Every author-controlled entity, scope, statement,
+unit, measure, dimension, member, item, and entry-override label is escaped as
+text. Identifiers and descriptions are not displayed.
+
+The page title combines the entity name and scope label. Its body shows that
+metadata, then every statement in document display order. Each statement
+shows its label and unit label, measure, and literal base-ten scale. Values are
+the exact stored decimal strings: rendering performs no numeric conversion,
+rescaling, rounding, aggregation, or calculation.
+
+Each statement is one table. Rows follow `entries`; an item override label
+wins over the referenced item's label. A heading spans the whole table and
+adds no nesting. Columns are period-major: for each listed period in display
+order, enumerate the Cartesian product of listed axes in axis and member
+display order, with the first axis changing slowest. A statement without axes
+has one column per period. Instant headers use the exact date; duration headers
+use `<start> – <end>`. Axis coordinates follow the period, formatted as
+`<dimension label>: <member label>` and separated with ` · `.
+
+A cell lookup uses exactly the item, period, statement unit, and complete axis
+coordinate. A stored value is displayed verbatim, explicit unavailability is
+displayed as `Unavailable`, and an absent coordinate is displayed as
+`Missing`. Dimensionless facts therefore do not fill dimensional cells, and
+facts with unlisted dimensions are not rendered.
+
+Successful rendering reports the input validation and snapshot diff, output
+status `created`, the argument path, and empty help. Structural refusal uses
+the same validation information, output status `not-created` with reason
+`structural-nonconformance`, exits `1`, and leaves the output absent.
+Operational errors use operation `render` and the shared stable error
+vocabulary.
 
 ## Required Cases
 
@@ -466,6 +514,30 @@ Instrument the application boundary to prove preflight-before-read ordering,
 one standard-input read, validation-before-write ordering, and unchanged
 behavior with logging. The shared writer fault and concurrency suite continues
 to own crash atomicity and commit-race behavior.
+
+### `fs render`
+
+Cover exact HTML from a path for the complete presentation fixture and from
+standard input for the minimal example. Cover a calculation-inconsistent,
+snapshot-mismatching input to prove both states remain renderable while their
+content is absent from the HTML. Exact output fixtures prove statement,
+period, axis, member, and row ordering; dimensionless and dimensional lookup;
+exact zero, negative, and fractional decimals; literal scale metadata;
+missing and unavailable cells; entry-label override; heading behavior; and
+escaping of every author-controlled label kind.
+
+Cover malformed input, schema and semantic structural refusal, an invalid
+embedded snapshot, missing input, missing parent, existing output, and the
+combined invalid-input/existing-output precedence case. Cover missing and
+duplicate `--output`, missing and extra input operands, unknown flags, native
+command help, discovery, and root help. Successful output and every refusal
+leave the input unchanged, and every failure creates no output or residue.
+
+Instrument the application boundary to prove preflight-before-read ordering,
+one standard-input read, validation-before-write ordering, unchanged rendered
+bytes with logging, and no render write on structural refusal. The shared
+writer fault and concurrency suite continues to own crash atomicity and
+commit-race behavior.
 
 ## Implementation Gate
 

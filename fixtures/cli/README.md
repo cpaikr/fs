@@ -74,7 +74,8 @@ The revised suite keeps these domain and operational cases:
   missing input;
 - deterministic discovery and exact installed guide, schema, example, and
   created-document bytes, including generated validation snapshots that
-  revalidate as snapshot matches;
+  revalidate as snapshot matches, plus deterministic standalone HTML from the
+  flat presentation model;
 - silent and enabled logging, thresholds, bounded failure context, and I/O
   invariance; and
 - atomic no-overwrite behavior, missing parents, write failures, existing
@@ -90,7 +91,8 @@ The revised grammar and native presentation coverage requires:
 - native help on standard output, a native diagnostic on standard error, and
   exit code `2` for missing or extra operands, unknown commands, unknown flags,
   unknown command values, and invalid log levels;
-- duplicate `--output` rejection for schema, named example, and create;
+- duplicate `--output` rejection for schema, named example, create,
+  snapshot recording, and rendering;
 - canonical local-flag-before-operand invocations without acceptance promises
   for alternate placement or subcommand operands after `--`; and
 - native action short-circuiting without application I/O, without fixing

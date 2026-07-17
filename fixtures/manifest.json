@@ -9,6 +9,7 @@
     { "document": "valid/calculation-errors.json", "calculationStatus": "inconsistent" },
     { "document": "valid/exact-arithmetic.json", "calculationStatus": "consistent" },
     { "document": "valid/scale-boundaries.json", "calculationStatus": "not-defined" },
+    { "document": "valid/render-presentation.json", "calculationStatus": "not-defined" },
     { "document": "valid/snapshot-mismatch-source.json", "calculationStatus": "inconsistent" }
   ],
   "invalidDocuments": [

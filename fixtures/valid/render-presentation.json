@@ -1,0 +1,112 @@
+{
+  "formatVersion": "0.1",
+  "documentId": "render-presentation",
+  "entity": { "name": "A & B <Holdings> \"Quoted\" 'Apostrophe'" },
+  "scope": { "id": "consolidated", "label": "Consolidated & <Scope>" },
+  "items": [
+    { "id": "sales", "label": "Revenue & sales", "description": "Not displayed <description>" },
+    { "id": "expense", "label": "Expense <base>" }
+  ],
+  "units": [
+    { "id": "kusd", "label": "Thousands \"USD\"", "measure": "USD & cents", "scale": 3 },
+    { "id": "usd", "label": "Unlisted alternate unit", "measure": "USD", "scale": 0 }
+  ],
+  "periods": [
+    { "id": "at-2025", "kind": "instant", "date": "2025-12-31" },
+    { "id": "year-2025", "kind": "duration", "start": "2025-01-01", "end": "2025-12-31" }
+  ],
+  "dimensions": [
+    {
+      "id": "region",
+      "label": "Region & territory",
+      "members": [
+        { "id": "north", "label": "North & East" },
+        { "id": "south", "label": "<South>" },
+        { "id": "west", "label": "Unlisted West" }
+      ]
+    },
+    {
+      "id": "channel",
+      "label": "Channel",
+      "members": [
+        { "id": "retail", "label": "\"Retail\"" },
+        { "id": "online", "label": "'Online'" }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "item": "sales",
+      "period": "at-2025",
+      "unit": "kusd",
+      "dimensions": { "region": "north", "channel": "retail" },
+      "value": "0"
+    },
+    {
+      "item": "sales",
+      "period": "at-2025",
+      "unit": "kusd",
+      "dimensions": { "region": "north", "channel": "online" },
+      "unavailable": true
+    },
+    {
+      "item": "sales",
+      "period": "at-2025",
+      "unit": "kusd",
+      "dimensions": { "region": "south", "channel": "retail" },
+      "value": "-0.25"
+    },
+    {
+      "item": "sales",
+      "period": "year-2025",
+      "unit": "kusd",
+      "dimensions": { "region": "north", "channel": "retail" },
+      "value": "1250.5"
+    },
+    {
+      "item": "sales",
+      "period": "at-2025",
+      "unit": "usd",
+      "dimensions": { "region": "north", "channel": "retail" },
+      "value": "999"
+    },
+    {
+      "item": "sales",
+      "period": "at-2025",
+      "unit": "kusd",
+      "dimensions": { "region": "west", "channel": "retail" },
+      "value": "888"
+    },
+    { "item": "expense", "period": "year-2025", "unit": "kusd", "value": "12" },
+    {
+      "item": "expense",
+      "period": "year-2025",
+      "unit": "kusd",
+      "dimensions": { "region": "north" },
+      "value": "777"
+    }
+  ],
+  "statements": [
+    {
+      "id": "by-market",
+      "label": "Performance <by market>",
+      "unit": "kusd",
+      "periods": ["year-2025", "at-2025"],
+      "dimensions": [
+        { "dimension": "channel", "members": ["online", "retail"] },
+        { "dimension": "region", "members": ["south", "north"] }
+      ],
+      "entries": [
+        { "type": "heading", "label": "Operating & results" },
+        { "type": "item", "item": "sales", "label": "Net \"sales\" & <other>" }
+      ]
+    },
+    {
+      "id": "summary",
+      "label": "Summary 'second'",
+      "unit": "kusd",
+      "periods": ["year-2025"],
+      "entries": [{ "type": "item", "item": "expense" }]
+    }
+  ]
+}

@@ -123,6 +123,9 @@ MUST NOT first convert them to binary floating point.
 A statement is a flat presentation over shared facts. It does not own facts,
 materialize missing facts, or imply calculations.
 
+The `statements` array is the display order when a consumer presents more than
+one statement.
+
 `periods` explicitly lists displayed periods in display order. `dimensions`
 MAY list non-period presentation axes and their displayed members in display
 order. A statement MUST NOT list one dimension axis more than once. A statement

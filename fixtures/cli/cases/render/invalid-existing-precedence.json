@@ -1,0 +1,39 @@
+{
+  "id": "render-invalid-existing-precedence",
+  "command": "fs",
+  "arguments": ["render", "--output", "report.html", "input.json"],
+  "workspace": [
+    { "copy": "../raw-input/malformed-json.json.txt", "to": "input.json" },
+    { "copy": "../valid/no-calculation-rules.json", "to": "report.html" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "render" },
+        { "pointer": "/error/code", "equals": "output-exists" },
+        { "pointer": "/error/path", "equals": "report.html" },
+        {
+          "pointer": "/help",
+          "equals": [{ "executable": "fs", "arguments": ["render", "--output", "<new-html>", "input.json"] }]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["input.json", "report.html"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}
