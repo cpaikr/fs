@@ -80,7 +80,7 @@ implement the dimensional fact model. No compatibility path or refactor code
 has been added. The delivery uses two sequential PRs: the completed Phase-0
 contract slice, followed after merge by one coordinated Phase-1-through-6
 machine and runtime cutover. This is the fewest split that preserves the
-contract-only review boundary and the required unmerged runtime cutover.
+contract-only review boundary and the runtime cutover that remains unmerged.
 
 The completed step-9 renderer and snapshot implementation remain the verified
 baseline. Historical delivery evidence stays in the
@@ -122,7 +122,10 @@ The Phase-0 contract slice passes `./scripts/check-docs.sh`, including
 Markdown, links, maintained content, all current schema and fixture integrity,
 and every manifest-listed CLI descriptor. `git diff --check` passes. The
 remaining contract/artifact mismatch is the deliberate Phase-1 cutover
-boundary above.
+boundary above. Codex and CodeRabbit reviews completed and their follow-up
+clarified transition-time tooling, grouping obligations, statement grammar,
+decimal serialization, and closed snapshot-diff forms. The same documentation
+and whitespace gates pass after those changes.
 
 ## Blockers
 

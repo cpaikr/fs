@@ -11,6 +11,12 @@ FS is a file-first interchange format, not an extraction system, accounting
 taxonomy, conversion method, or mutable financial database. It starts after an
 author has chosen the financial meanings and values to represent.
 
+During the active Roadmap step-10 transition, this guide defines the target
+authoring contract but the bundled schemas, examples, and CLI still accept the
+prior model. Do not submit statement-item-row documents to the installed CLI
+until Phases 1–6 complete the coordinated cutover. The
+[active plan](plans/statement-item-row-refactor.md) owns that temporary drift.
+
 ## Authoring Contract
 
 Before encoding begins, the author must supply:
@@ -81,10 +87,12 @@ direct children. Custom grouping values never imply rollups.
 
 ### 5. Validate and deliver
 
-Full validation checks JSON shape plus all semantic invariants and reports
-structural conformance, rollup consistency, and snapshot comparison
-separately. `fs validate <document|->` is the reference operational check;
-passing JSON Schema alone is not full conformance evidence.
+After the coordinated cutover, full validation checks JSON shape plus all
+semantic invariants and reports structural conformance, rollup consistency,
+and snapshot comparison separately. `fs validate <document|->` then becomes
+the reference operational check; until then, neither the bundled schema nor
+the installed validator proves statement-item-row conformance. Passing JSON
+Schema alone is never full conformance evidence.
 
 A reviewable authoring result should include:
 
@@ -109,13 +117,13 @@ reference validator.
 
 ## Working With the Examples
 
-Use [`minimal.json`](../examples/minimal.json) to learn the smallest complete
-shape. It contains illustrative data and is not a partially filled document.
-
-Use [`manufacturing-group.json`](../examples/manufacturing-group.json) for a
-multi-statement example with mixed units, grouping columns, nested reported
-subtotals, and an intentionally inconsistent rollup. It is validator evidence,
-not a prescribed financial-statement template.
+Phase 1 will replace [`minimal.json`](../examples/minimal.json) with the
+smallest complete statement-item-row shape and
+[`manufacturing-group.json`](../examples/manufacturing-group.json) with a
+multi-statement example covering mixed units, grouping columns, nested
+reported subtotals, and an intentionally inconsistent rollup. During Phase 0,
+both checked-in files remain prior-model transition evidence and MUST NOT be
+copied as examples of the contract in this guide.
 
 FS does not provide statement-type or industry templates because their
 meanings and contents remain author-controlled.

@@ -127,7 +127,7 @@ Read a path or standard input (`-`) without modifying it and report structural
 conformance, current rollup status and applications, and comparison with an
 embedded validation snapshot.
 
-Structural conformance and calculation consistency remain separate. A
+Structural conformance and rollup consistency remain separate. A
 document with no rollup parents reports `not-defined`; rollup inconsistency and
 snapshot mismatch remain usable successful results. Structural nonconformance
 reports calculations as `not-run`.
@@ -174,9 +174,10 @@ policy.
 
 - `fs init` does not create a blank document because the V0 contract requires
   meaningful nonempty content.
-- `add-account`, `add-row`, `set-cell`, and `add-item` are not V0
-  commands. Field-by-field mutation creates transient invalid state and makes
-  poor use of an agent-facing interface.
+- `add-account`, `add-row`, `set-cell`, `add-item`, and `add-fact` are not V0
+  commands. The row contract has no top-level fact target, and field-by-field
+  mutation creates transient invalid state and makes poor use of an
+  agent-facing interface.
 - Statement-type templates are absent because FS does not prescribe taxonomy
   or statement contents.
 - `import-xbrl`, `import-sec`, `from-csv`, and source mapping remain outside

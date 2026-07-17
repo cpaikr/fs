@@ -2,12 +2,13 @@
 
 Status: Accepted.
 
-This decision replaces the item/fact/dimension/member model with ordered statement
-item rows. Each row owns its unit, a period-keyed `values` map, a user-keyed
-`groupings` map, and one optional additive `rollupTo` relationship. Keep JSON
-as the canonical authoring format. This is an intentionally smaller model for
-ordinary financial statements, not a general database, taxonomy, or
-multidimensional reporting system.
+This decision replaces the item/fact/dimension/member model with ordered
+statement item rows. Each row owns its unit, a period-keyed `values` map, a
+`groupings` map keyed by the document's declared grouping columns, and one
+optional additive `rollupTo` relationship. Keep JSON as the canonical
+authoring format. This is an intentionally smaller model for ordinary
+financial statements, not a general database, taxonomy, or multidimensional
+reporting system.
 
 This ADR records the accepted replacement decision. Roadmap step 10
 incorporates it into owning contracts and then coordinates the schema,

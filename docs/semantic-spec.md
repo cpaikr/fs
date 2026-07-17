@@ -92,6 +92,17 @@ parent item's unit default tolerance; there is no relationship-level override.
 Each closed unit object contains required `id`, `label`, `measure`, and `scale`
 and optional `defaultTolerance`.
 
+Every decimal field uses one canonical JSON string grammar:
+
+```text
+^(?:0|-?(?:[1-9][0-9]*)(?:\.[0-9]*[1-9])?|-?0\.[0-9]*[1-9])$
+```
+
+This grammar applies to item values and application `actual`, `expected`,
+`difference`, and `tolerance` in current results, snapshots, and diffs.
+`defaultTolerance` and application `tolerance` additionally MUST be
+nonnegative. No decimal field may use a JSON number.
+
 ### 3.2 Periods
 
 An instant period has `kind: "instant"` and one ISO 8601 calendar `date`. A
@@ -111,6 +122,9 @@ Different durations MAY overlap.
 
 A statement owns an ordered collection of item rows and selects the periods
 for which every row stores one cell. All item data is statement-owned.
+
+Every closed statement object contains exactly required `id`, `label`,
+`periods`, and `items`. Its label is a nonempty display string.
 
 Each statement's `periods` array MUST contain unique, resolved period
 identifiers. Every item has:
@@ -144,10 +158,10 @@ Missing is encoded explicitly as `null`, because the exact-key rule makes
 omission nonconforming. Zero is `"0"`. JSON number `0`, an empty string,
 `null`, and an unavailable value are not zero.
 
-Exact decimals use ordinary base-ten notation without exponent, leading plus,
-leading integer zeros, trailing fractional zeros, or negative zero. Consumers
-MUST use decimal arithmetic capable of representing them exactly and MUST NOT
-first convert them to binary floating point.
+The canonical decimal grammar in Section 3.1 forbids exponent, leading plus,
+leading integer zeros, trailing fractional zeros, and negative zero. Consumers
+MUST use decimal arithmetic capable of representing these strings exactly and
+MUST NOT first convert them to binary floating point.
 
 ### 5.2 Grouping maps
 
@@ -327,16 +341,26 @@ A present but structurally invalid snapshot produces exactly:
 }
 ```
 
-Otherwise the closed diff object contains `formatVersion`, status `match` or
-`mismatch`, conformance and calculation comparisons with `recorded` and
-`current` fields, and ordered `applications`. Status is `match` only when
-every compared value matches and `mismatch` otherwise.
+Otherwise the closed diff object contains exactly `formatVersion`, status
+`match` or `mismatch`, `conformance`, `calculations`, and `applications`.
+`conformance` is exactly `{ "recorded": status, "current": status }`, where
+each status is `conforming` or `nonconforming`. `calculations` has the same two
+members, where each value is `not-run`, `not-defined`, `consistent`, or
+`inconsistent`. Status is `match` only when every compared value matches and
+`mismatch` otherwise.
 
-`changed` and `unchanged` entries contain recorded and current applications
-with the same key. `added` contains only current; `removed` contains only
-recorded. Satisfied and unsatisfied comparisons include every numeric field.
-Error comparisons include status, reason, and cell. Human messages are not
-snapshot fields and are not compared. Phase 1 must encode this diff shape in
+Each closed application-change object has one of four exact member sets:
+
+- `unchanged` and `changed`: `change`, `recorded`, and `current`;
+- `added`: `change` and `current`; or
+- `removed`: `change` and `recorded`.
+
+`change` is the matching literal. Every `recorded` and `current` value is one
+complete closed application object from Section 7, including all numeric fields
+for `satisfied` or `unsatisfied`, or `reason` and `cell` for `error`.
+`unchanged` and `changed` applications MUST have the same key. `added` and
+`removed` intentionally omit the absent side. Human messages are not snapshot
+fields and are not compared. Phase 1 must encode these forms in
 [`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json).
 
 ### 8.1 Structural diagnostics

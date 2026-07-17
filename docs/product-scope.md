@@ -37,8 +37,8 @@ Its central boundaries are:
 - One document covers exactly one reporting entity and reporting scope.
 - One document may contain multiple statements and multiple periods.
 - Statements own ordered, document-local items and their period-keyed values.
-- Each item owns one unit and may carry assignments for user-declared grouping
-  columns; the project supplies no accounting taxonomy.
+- Each item owns one unit, and its `groupings` map contains exactly the
+  declared grouping columns; the project supplies no accounting taxonomy.
 - FS may group an item but does not split, allocate, or infer finer detail.
 - All values, including reported subtotal values, are stored explicitly.
   Optional `rollupTo` relationships validate direct additive children but
