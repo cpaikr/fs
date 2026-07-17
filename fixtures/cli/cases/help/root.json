@@ -5,7 +5,27 @@
   "workspace": [],
   "stdin": null,
   "expect": {
-    "stdout": { "encoding": "bytes", "equalsFile": "../../assets/help/fs.md" },
+    "stdout": {
+      "encoding": "native-text",
+      "contains": [
+        "USAGE",
+        "fs",
+        "--help",
+        "--version",
+        "--completions",
+        "<bash|zsh|fish|sh>",
+        "--log-level",
+        "<all|trace|debug|info|warn|warning|error|fatal|none>",
+        "defaults to none",
+        "guide",
+        "schema",
+        "example",
+        "validate",
+        "create"
+      ],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,
     "filesystem": {

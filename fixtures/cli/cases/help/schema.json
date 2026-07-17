@@ -5,7 +5,25 @@
   "workspace": [],
   "stdin": null,
   "expect": {
-    "stdout": { "encoding": "bytes", "equalsFile": "../../assets/help/schema.md" },
+    "stdout": {
+      "encoding": "native-text",
+      "contains": [
+        "USAGE",
+        "fs schema",
+        "name...",
+        "Exactly one",
+        "document",
+        "validation-result",
+        "snapshot-diff",
+        "--output",
+        "--help",
+        "--version",
+        "--completions",
+        "--log-level"
+      ],
+      "excludes": ["--artifact-version", "wizard", "prompt", "interactive"],
+      "ansi": false
+    },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,
     "filesystem": {

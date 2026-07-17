@@ -34,7 +34,7 @@
         {
           "pointer": "/help",
           "equals": [
-            { "executable": "fs", "arguments": ["record-validation","input.json","--output","<new-document>"] }
+            { "executable": "fs", "arguments": ["record-validation","--output","<new-document>","input.json"] }
           ]
         }
       ],

@@ -1,7 +1,7 @@
 {
   "id": "create-path",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
     { "copy": "../raw-input/noncanonical-valid.json", "to": "candidate.json" }
   ],

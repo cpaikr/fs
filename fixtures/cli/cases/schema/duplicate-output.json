@@ -1,7 +1,7 @@
 {
-  "id": "schema-missing-name",
+  "id": "schema-duplicate-output",
   "command": "fs",
-  "arguments": ["schema"],
+  "arguments": ["schema", "--output", "first.json", "--output", "second.json", "document"],
   "workspace": [],
   "stdin": null,
   "expect": {
@@ -11,10 +11,10 @@
       "excludes": ["--artifact-version"],
       "ansi": false
     },
-    "stderr": { "encoding": "native-text", "contains": ["name"], "excludes": [], "ansi": false },
+    "stderr": { "encoding": "native-text", "contains": ["output"], "excludes": [], "ansi": false },
     "exitCode": 2,
     "filesystem": {
-      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "workspace": { "created": [], "unchanged": [], "absent": ["first.json", "second.json"] },
       "home": { "created": [], "unchanged": [], "absent": [] }
     }
   }

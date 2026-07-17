@@ -73,7 +73,7 @@ this plan because the revised contract accepts those built-ins.
 ## Work
 
 - [x] Revise the owning CLI design and acceptance contracts.
-- [ ] Replace affected process fixtures and integrity assertions while
+- [x] Replace affected process fixtures and integrity assertions while
   retaining unchanged domain and filesystem cases.
 - [ ] Define one private Effect command tree using public APIs.
 - [ ] Enforce exact operand cardinality and duplicate command-local flag

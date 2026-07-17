@@ -1,7 +1,7 @@
 {
   "id": "create-semantic-failure",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
     { "copy": "../invalid/unresolved-item.json", "to": "candidate.json" }
   ],

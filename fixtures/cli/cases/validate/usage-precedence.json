@@ -6,22 +6,12 @@
   "stdin": null,
   "expect": {
     "stdout": {
-      "encoding": "json",
-      "members": [
-        { "pointer": "", "equals": ["error", "help"] },
-        { "pointer": "/error", "equals": ["operation", "code", "message"] }
-      ],
-      "equalities": [
-        { "pointer": "/error/operation", "equals": "validate" },
-        { "pointer": "/error/code", "equals": "unknown-flag" },
-        {
-          "pointer": "/help",
-          "equals": [{ "executable": "fs", "arguments": ["validate","missing.json","--format","json"] }]
-        }
-      ],
-      "nonemptyStrings": ["/error/message"]
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs validate", "document...", "Exactly one"],
+      "excludes": ["--format"],
+      "ansi": false
     },
-    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "stderr": { "encoding": "native-text", "contains": ["--unknown"], "excludes": [], "ansi": false },
     "exitCode": 2,
     "filesystem": {
       "workspace": { "created": [], "unchanged": [], "absent": ["missing.json"] },

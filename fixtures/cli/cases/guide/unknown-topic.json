@@ -6,19 +6,12 @@
   "stdin": null,
   "expect": {
     "stdout": {
-      "encoding": "json",
-      "members": [
-        { "pointer": "", "equals": ["error", "help"] },
-        { "pointer": "/error", "equals": ["operation", "code", "message"] }
-      ],
-      "equalities": [
-        { "pointer": "/error/operation", "equals": "guide" },
-        { "pointer": "/error/code", "equals": "unexpected-argument" },
-        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["guide","authoring"] }] }
-      ],
-      "nonemptyStrings": ["/error/message"]
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs guide", "authoring"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
     },
-    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "stderr": { "encoding": "native-text", "contains": ["unknown"], "excludes": [], "ansi": false },
     "exitCode": 2,
     "filesystem": {
       "workspace": { "created": [], "unchanged": [], "absent": [] },

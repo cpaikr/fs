@@ -6,10 +6,10 @@ authoritative for target behavior. The
 [active CLI plan](../../docs/plans/cli-v0.md) is the sole source for migration
 state, validation, blockers, and the next action.
 
-The checked-in suite was completed against the pre-migration Node-core command
-adapter. Its domain, content, logging, and filesystem cases remain evidence;
-its grammar, help, built-in, and usage-presentation cases are a historical
-baseline superseded by the Effect-native contract.
+The checked-in suite retains the pre-migration domain, content, logging, and
+filesystem evidence while encoding the Effect-native grammar, help, built-in,
+and usage-presentation contract. The active plan records whether the current
+implementation satisfies it.
 
 ## Layout
 

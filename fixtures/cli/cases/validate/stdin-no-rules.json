@@ -1,7 +1,7 @@
 {
   "id": "validate-stdin-no-rules",
   "command": "fs",
-  "arguments": ["validate", "-", "--format", "json"],
+  "arguments": ["validate", "-"],
   "workspace": [],
   "stdin": {
     "file": "../valid/no-calculation-rules.json"
@@ -31,7 +31,7 @@
         {
           "pointer": "/help",
           "equals": [
-            { "executable": "fs", "arguments": ["record-validation","-","--output","<new-document>"] }
+            { "executable": "fs", "arguments": ["record-validation","--output","<new-document>","-"] }
           ]
         }
       ],

@@ -1,11 +1,16 @@
 {
-  "id": "schema-validation-result-explicit-version",
+  "id": "help-completions-sh",
   "command": "fs",
-  "arguments": ["schema", "validation-result", "--version", "0.1"],
+  "arguments": ["--completions", "sh"],
   "workspace": [],
   "stdin": null,
   "expect": {
-    "stdout": { "encoding": "bytes", "equalsFile": "../../schema/validation-result.schema.json" },
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["complete -F _fs fs"],
+      "excludes": [],
+      "ansi": false
+    },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,
     "filesystem": {

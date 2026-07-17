@@ -5,7 +5,23 @@
   "workspace": [],
   "stdin": null,
   "expect": {
-    "stdout": { "encoding": "bytes", "equalsFile": "../../assets/help/example.md" },
+    "stdout": {
+      "encoding": "native-text",
+      "contains": [
+        "USAGE",
+        "fs example",
+        "name",
+        "minimal",
+        "manufacturing-group",
+        "--output",
+        "--help",
+        "--version",
+        "--completions",
+        "--log-level"
+      ],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
+    },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,
     "filesystem": {

@@ -1,14 +1,14 @@
 {
-  "id": "help-guide",
+  "id": "help-completions-zsh",
   "command": "fs",
-  "arguments": ["guide", "--help"],
+  "arguments": ["--completions", "zsh"],
   "workspace": [],
   "stdin": null,
   "expect": {
     "stdout": {
       "encoding": "native-text",
-      "contains": ["USAGE", "fs guide", "authoring", "--help", "--version", "--completions", "--log-level"],
-      "excludes": ["wizard", "prompt", "interactive"],
+      "contains": ["#compdef fs"],
+      "excludes": [],
       "ansi": false
     },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },

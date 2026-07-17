@@ -36,23 +36,26 @@ conformance command.
 
 ## Current Validation
 
-The passing pre-migration baseline is `pnpm verify`: strict typecheck, Effect
-diagnostics, 96 unit and fault tests, all 80 packed-process cases, five
-child-process crash points, 16-way writer contention, build, installed-tarball
-npm/npx smoke, and exact checks for 46 packed files. The same baseline passed
-in isolated Linux environments on Node 22.17.0 and 24.15.0; CI enforces both
-versions on Linux, macOS, and Windows. It does not prove Phase 6 complete.
-`./scripts/check-docs.sh` and `git diff --check` pass for the revised contract
-and plan slice.
+The retained pre-migration baseline last passed `pnpm verify`: strict
+typecheck, Effect diagnostics, 96 unit and fault tests, all 80 historical
+packed-process cases, five child-process crash points, 16-way writer
+contention, build, installed-tarball npm/npx smoke, and exact checks for 46
+packed files. The same baseline passed in isolated Linux environments on Node
+22.17.0 and 24.15.0; CI enforces both versions on Linux, macOS, and Windows.
+
+The revised 80-case descriptor suite and its semantic native-text matcher pass
+fixture integrity and `./scripts/check-docs.sh`; `git diff --check` also passes.
+The packed-process suite is expected to remain red until the old adapter is
+replaced and does not yet prove Phase 6 complete.
 
 ## Known Temporary Drift
 
-The CLI design and acceptance contract now define the Effect-native surface.
-The process fixture protocol and cases, exact help assets, `util.parseArgs`
-adapter, and related source and tests still implement the superseded contract
-until Phase 6 migrates them. The maintained authoring guide now uses the
-revised canonical command forms, so the old adapter does not yet execute every
-documented invocation. Artifact semantics, operation results, exact bundled
+The CLI design, acceptance contract, and process fixtures now define the
+Effect-native surface. The exact help assets, `util.parseArgs` adapter, and
+related source and unit tests still implement the superseded contract until
+Phase 6 migrates them. The maintained authoring guide and revised fixtures use
+the canonical command forms, so the old adapter does not yet satisfy the
+packed-process suite. Artifact semantics, operation results, exact bundled
 content, logging, and filesystem behavior are not drifting.
 
 ## Current Blockers
@@ -61,6 +64,7 @@ content, logging, and filesystem behavior are not drifting.
 
 ## Next Action
 
-Replace the affected Phase 1 process fixtures and integrity checks with the
-revised Effect-native help, built-in, usage, cardinality, and flag contracts,
-while retaining unchanged validation, content, logging, and filesystem cases.
+Define the private public-API `effect/unstable/cli` command tree with refined
+operand and command-local flag cardinality, then dispatch its handlers into
+the existing typed application boundary without changing retained operation
+results or filesystem behavior.

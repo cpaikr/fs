@@ -5,7 +5,21 @@
   "workspace": [],
   "stdin": null,
   "expect": {
-    "stdout": { "encoding": "bytes", "equalsFile": "../../assets/help/validate.md" },
+    "stdout": {
+      "encoding": "native-text",
+      "contains": [
+        "USAGE",
+        "fs validate",
+        "document...",
+        "Exactly one",
+        "--help",
+        "--version",
+        "--completions",
+        "--log-level"
+      ],
+      "excludes": ["--format", "wizard", "prompt", "interactive"],
+      "ansi": false
+    },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,
     "filesystem": {

@@ -1,14 +1,14 @@
 {
-  "id": "help-guide",
+  "id": "help-completions-bash",
   "command": "fs",
-  "arguments": ["guide", "--help"],
+  "arguments": ["--completions", "bash"],
   "workspace": [],
   "stdin": null,
   "expect": {
     "stdout": {
       "encoding": "native-text",
-      "contains": ["USAGE", "fs guide", "authoring", "--help", "--version", "--completions", "--log-level"],
-      "excludes": ["wizard", "prompt", "interactive"],
+      "contains": ["complete -F _fs fs"],
+      "excludes": [],
       "ansi": false
     },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },

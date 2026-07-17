@@ -8,19 +8,17 @@
   "stdin": null,
   "expect": {
     "stdout": {
-      "encoding": "json",
-      "members": [
-        { "pointer": "", "equals": ["error", "help"] },
-        { "pointer": "/error", "equals": ["operation", "code", "message"] }
-      ],
-      "equalities": [
-        { "pointer": "/error/operation", "equals": "fs" },
-        { "pointer": "/error/code", "equals": "unknown-command" },
-        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["--help"] }] }
-      ],
-      "nonemptyStrings": ["/error/message"]
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs", "guide", "schema", "example", "validate", "create"],
+      "excludes": ["wizard", "prompt", "interactive"],
+      "ansi": false
     },
-    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "stderr": {
+      "encoding": "native-text",
+      "contains": ["unknown"],
+      "excludes": [],
+      "ansi": false
+    },
     "exitCode": 2,
     "filesystem": {
       "workspace": { "created": [], "unchanged": ["unknown"], "absent": [] },

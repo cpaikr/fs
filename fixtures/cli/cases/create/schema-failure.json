@@ -1,7 +1,7 @@
 {
   "id": "create-schema-failure",
   "command": "fs",
-  "arguments": ["create", "candidate.json", "--output", "result.json"],
+  "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
     { "copy": "../invalid/decimal-number.json", "to": "candidate.json" }
   ],

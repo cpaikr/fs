@@ -1,16 +1,11 @@
 {
-  "id": "help-guide",
+  "id": "help-version-short",
   "command": "fs",
-  "arguments": ["guide", "--help"],
+  "arguments": ["-v"],
   "workspace": [],
   "stdin": null,
   "expect": {
-    "stdout": {
-      "encoding": "native-text",
-      "contains": ["USAGE", "fs guide", "authoring", "--help", "--version", "--completions", "--log-level"],
-      "excludes": ["wizard", "prompt", "interactive"],
-      "ansi": false
-    },
+    "stdout": { "encoding": "native-text", "contains": ["0.1.0"], "excludes": [], "ansi": false },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,
     "filesystem": {

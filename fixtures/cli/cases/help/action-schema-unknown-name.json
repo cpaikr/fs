@@ -1,13 +1,15 @@
 {
-  "id": "help-schema-local-version",
+  "id": "help-action-schema-unknown-name",
   "command": "fs",
-  "arguments": ["schema", "document", "--version", "0.1"],
+  "arguments": ["schema", "unknown", "--help"],
   "workspace": [],
   "stdin": null,
   "expect": {
     "stdout": {
-      "encoding": "bytes",
-      "equalsFile": "../../schema/fs-document.schema.json"
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs schema", "name...", "Exactly one", "--output", "--help"],
+      "excludes": ["--artifact-version", "wizard", "prompt", "interactive"],
+      "ansi": false
     },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,

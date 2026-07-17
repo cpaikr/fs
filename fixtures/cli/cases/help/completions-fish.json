@@ -1,11 +1,16 @@
 {
-  "id": "schema-snapshot-diff-explicit-version",
+  "id": "help-completions-fish",
   "command": "fs",
-  "arguments": ["schema", "snapshot-diff", "--version", "0.1"],
+  "arguments": ["--completions", "fish"],
   "workspace": [],
   "stdin": null,
   "expect": {
-    "stdout": { "encoding": "bytes", "equalsFile": "../../schema/snapshot-diff.schema.json" },
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["complete -c fs"],
+      "excludes": [],
+      "ansi": false
+    },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 0,
     "filesystem": {

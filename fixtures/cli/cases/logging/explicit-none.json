@@ -1,7 +1,7 @@
 {
   "id": "logging-explicit-none",
   "command": "fs",
-  "arguments": ["validate", "input.json", "--log-level", "none"],
+  "arguments": ["--log-level", "none", "validate", "input.json"],
   "workspace": [
     { "copy": "../valid/no-calculation-rules.json", "to": "input.json" }
   ],
@@ -23,7 +23,7 @@
         },
         {
           "pointer": "/help",
-          "equals": [{ "executable": "fs", "arguments": ["record-validation","input.json","--output","<new-document>"] }]
+          "equals": [{ "executable": "fs", "arguments": ["record-validation","--output","<new-document>","input.json"] }]
         }
       ],
       "nonemptyStrings": []
