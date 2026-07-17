@@ -174,7 +174,7 @@ const examples = {
   examples: [
     {
       name: "minimal",
-      purpose: "Smallest complete document with no calculation rules.",
+      purpose: "Smallest complete document with no rollups.",
       calculationStatus: "not-defined"
     },
     {

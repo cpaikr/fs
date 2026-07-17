@@ -4,7 +4,7 @@
   "arguments": ["record-validation", "--output", "parent/recorded.json", "input.json"],
   "workspace": [
     { "copy": "../raw-input/malformed-json.json.txt", "to": "input.json" },
-    { "copy": "../valid/no-calculation-rules.json", "to": "parent" }
+    { "copy": "../valid/no-rollups.json", "to": "parent" }
   ],
   "stdin": null,
   "expect": {

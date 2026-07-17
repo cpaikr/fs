@@ -1,46 +1,55 @@
 {
   "formatVersion": "0.1",
-  "documentId": "snapshot-example",
-  "entity": { "id": "snapshot-co", "name": "Snapshot Co" },
-  "scope": { "id": "separate", "label": "Separate" },
-  "items": [
-    { "id": "assets", "label": "Assets" },
-    { "id": "liabilities", "label": "Liabilities" },
-    { "id": "equity", "label": "Equity" }
-  ],
+  "entity": {
+    "name": "Example Entity"
+  },
+  "scope": {
+    "label": "Consolidated financial statements"
+  },
   "units": [
-    { "id": "eur-thousands", "label": "EUR thousands", "measure": "EUR", "scale": 3, "defaultTolerance": "0.01" }
+    {
+      "id": "usd",
+      "label": "USD",
+      "measure": "USD",
+      "scale": 0
+    }
   ],
-  "periods": [{ "id": "at-2025", "kind": "instant", "date": "2025-12-31" }],
-  "facts": [
-    { "item": "assets", "period": "at-2025", "unit": "eur-thousands", "value": "100" },
-    { "item": "liabilities", "period": "at-2025", "unit": "eur-thousands", "value": "60" },
-    { "item": "equity", "period": "at-2025", "unit": "eur-thousands", "value": "40" }
+  "periods": [
+    {
+      "id": "fy2025",
+      "kind": "duration",
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    }
   ],
   "statements": [
     {
-      "id": "position",
-      "label": "Financial position",
-      "unit": "eur-thousands",
-      "periods": ["at-2025"],
-      "entries": [
-        { "type": "item", "item": "assets" },
-        { "type": "item", "item": "liabilities" },
-        { "type": "item", "item": "equity" }
-      ]
-    }
-  ],
-  "calculationRules": [
-    {
-      "id": "accounting-equation",
-      "kind": "samePeriod",
-      "unit": "eur-thousands",
-      "target": { "item": "assets" },
-      "terms": [
-        { "coefficient": "1", "item": "liabilities" },
-        { "coefficient": "1", "item": "equity" }
+      "id": "statement",
+      "label": "Statement",
+      "periods": [
+        "fy2025"
       ],
-      "scope": { "periods": ["at-2025"] }
+      "items": [
+        {
+          "id": "child",
+          "label": "Child",
+          "unit": "usd",
+          "values": {
+            "fy2025": "10"
+          },
+          "groupings": {},
+          "rollupTo": "total"
+        },
+        {
+          "id": "total",
+          "label": "Total",
+          "unit": "usd",
+          "values": {
+            "fy2025": "10"
+          },
+          "groupings": {}
+        }
+      ]
     }
   ],
   "validationSnapshot": {
@@ -48,12 +57,16 @@
     "calculations": "consistent",
     "applications": [
       {
-        "key": { "rule": "accounting-equation", "period": "at-2025", "dimensions": {} },
+        "key": {
+          "statement": "statement",
+          "parent": "total",
+          "period": "fy2025"
+        },
         "status": "satisfied",
-        "actual": "100",
-        "expected": "100",
+        "actual": "10",
+        "expected": "10",
         "difference": "0",
-        "tolerance": "0.01"
+        "tolerance": "0"
       }
     ]
   }

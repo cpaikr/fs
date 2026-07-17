@@ -1,11 +1,9 @@
 # Statement Item Row Refactor Plan
 
-Status: In progress. Phase 0 is complete; the machine-readable and runtime
-cutover has not started.
+Status: Complete. Roadmap step 10 is implemented and verified.
 
-This file is the concise milestone index and the only owner of live progress,
-temporary drift, blockers, and the next action. Stable phase scope and gates
-live in the linked child plans. The
+This file is the concise milestone index and durable delivery evidence. Stable
+phase scope and gates live in the linked child plans. The
 [semantic specification](../semantic-spec.md) owns current artifact meaning,
 the [CLI acceptance contract](../cli/acceptance.md) owns observable process
 behavior, and [ADR 0001](../adr/0001-replace-dimensional-members-with-item-grouping.md)
@@ -49,12 +47,12 @@ cross-platform release verification, version publication, and npm release.
 | Phase | State | Detailed plan |
 | --- | --- | --- |
 | 0. Contract and remaining decisions | Complete | [Target contract](statement-item-row-refactor/phase-0-contract.md) |
-| 1. Schemas and contract evidence | Not started | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
-| 2. Document model and structural validation | Not started | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
-| 3. Rollups, results, and snapshots | Not started | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
-| 4. Rendering | Not started | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
-| 5. CLI, guidance, and package integration | Not started | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
-| 6. Legacy removal and final gate | Not started | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
+| 1. Schemas and contract evidence | Complete | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
+| 2. Document model and structural validation | Complete | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
+| 3. Rollups, results, and snapshots | Complete | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
+| 4. Rendering | Complete | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
+| 5. CLI, guidance, and package integration | Complete | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
+| 6. Legacy removal and final gate | Complete | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
 
 Phases 2–4 are ordered work packets within one runtime cutover. The shared
 `Document` type is consumed throughout validation, snapshots, rendering, and
@@ -75,12 +73,21 @@ collapses a unit only when every statement item has the same unit identifier,
 and otherwise identifies each row's unit. Render precedence and the row-model
 column and grid accounting are exact.
 
-Schemas, fixtures, examples, generated guidance, and runtime code still
-implement the dimensional fact model. No compatibility path or refactor code
-has been added. The delivery uses two sequential PRs: the completed Phase-0
-contract slice, followed after merge by one coordinated Phase-1-through-6
-machine and runtime cutover. This is the fewest split that preserves the
-contract-only review boundary and the runtime cutover that remains unmerged.
+Schemas, examples, the language-neutral fixture matrix, record-validation
+expected documents, and artifact-sensitive CLI descriptors now implement the
+statement-row model directly. The replacement schemas close result and diff
+variants, encode status/application cardinality, and retain relative schema
+identifiers for Roadmap step 11. The in-process document model, application
+identity, schema diagnostics, and semantic validation now use statement-owned
+rows and statement-local rollup graphs. Calculation, validation results,
+snapshot comparison, and snapshot recording now use direct-child rollups and
+statement-qualified application keys. Rendering now emits ordered statement-row
+tables with flat grouping metadata and the fixed finite output budgets.
+Generated authoring guidance, current README routing, executable CLI evidence,
+and installed-package smoke coverage now project the same contract. No
+compatibility path has been added.
+The delivery uses two sequential PRs: the merged Phase-0 contract slice and
+this coordinated Phase-1-through-6 machine and runtime cutover.
 
 The completed step-9 renderer and snapshot implementation remain the verified
 baseline. Historical delivery evidence stays in the
@@ -96,14 +103,7 @@ phases reuse rather than duplicate earlier evidence.
 
 ## Known Temporary Drift
 
-- The normative prose defines the replacement contract while schemas,
-  examples, fixtures, generated guidance, and implementation still define the
-  prior model. Phase 1 replaces the machine-readable evidence as one set;
-  Phases 2–5 close the runtime and generated projections on the same cutover
-  branch.
-
-This drift is deliberate only while Roadmap step 10 is active. Do not update
-examples or fixtures piecemeal to make summaries appear current.
+None.
 
 ## Validation
 
@@ -127,19 +127,82 @@ clarified transition-time tooling, grouping obligations, statement grammar,
 decimal serialization, and closed snapshot-diff forms. The same documentation
 and whitespace gates pass after those changes.
 
+Phase 1 replaces all three schemas and the complete example and fixture matrix.
+Every valid document and record output passes the replacement document schema;
+semantic-invalid fixtures pass JSON Schema first; schema-invalid fixtures fail
+at that layer. Expected validation and snapshot-diff results pass their closed
+schemas and use unique statement-qualified application keys. Static CLI
+descriptor references and JSON Pointer selections resolve. The documentation
+and whitespace gates pass.
+
+Phase 2 replaces the TypeScript model, application identity, schema diagnostic
+normalization, and semantic validator without a compatibility branch. Targeted
+tests cover every Phase-1 schema and semantic fixture through the public
+validator where calculation or snapshot migration is not yet required. They
+also prove exact diagnostic ordering, root pointers, discriminated period and
+snapshot failures, canonical versus mistyped nested cells, statement-local
+identifier reuse, complete cycle reporting, and semantic map-key validation.
+Fresh review found and closed irrelevant-union diagnostic leakage and
+well-typed cell misclassification. The targeted test and whitespace gates pass.
+
+Phase 3 replaces general calculations with ordered direct-child rollups and
+replaces dimensional snapshot identity with `{statement, parent, period}`.
+Runtime validation results exactly equal the shared Phase-1 result fixtures;
+snapshot tests cover matching, changed, added, removed, invalid, and freshly
+recorded states; record-validation emits the shared exact bytes without
+mutating input. Fresh review found that a numerically contradictory historical
+application was not blocking recording. It now produces structural
+`invalid-value` at that application, a `not-comparable` diff, and explicit
+recording refusal. The targeted calculation, validation, snapshot, recording,
+process, documentation, and whitespace gates pass.
+
+Phase 4 replaces the dimensional renderer and exact HTML fixtures with ordered
+statement-row tables. It proves homogeneous-unit collapse, heterogeneous unit
+columns, flat grouping metadata, null and missing values, full HTML escaping,
+multi-statement order, and exact column, grid-slot, and final-byte boundaries.
+Fresh review found that structural preflight could report an earlier statement's
+grid overflow before a later statement's column overflow and that process-level
+budget coverage was incomplete. The renderer now scans every statement for the
+first column failure before accumulating grid slots, and process tests cover all
+three failures without writing plus each exact boundary. Targeted renderer and
+process tests, TypeScript, Effect diagnostics, documentation, and whitespace
+gates pass.
+
+Phase 5 rewrites the authoritative portable authoring workflow around
+statement-owned items, exact-key value and grouping maps, explicit cell states,
+and confirmed additive rollups. The installed guide and Agent Skill regenerate
+exactly from that source, the skill structure validates, and an independent
+forward-use produced a conforming direct-child rollup document. Current README,
+authoring, and authority routing no longer describe the accepted model as
+future work. Fresh review found that the packed-install smoke omitted
+validation, creation, and snapshot recording. It now executes those commands
+from the installed tarball, checks accepted structured results, preserves exact
+candidate bytes, and matches exact recorded-document bytes. The full repository,
+packed CLI acceptance, writer integration, installed-package, documentation,
+and whitespace gates pass.
+
+Phase 6 removes stale transition prose and legacy-shaped duplicate-member
+input while preserving generic JSON-member terminology and historical plans.
+Independent audits find no legacy runtime, schema, fixture, example, generated
+guidance, compatibility-reader, diagnostic-path, status-literal, grouping, or
+cross-contract gap. Representative minimal and multi-statement documents pass
+schema discovery, parsing, validation, calculation, snapshot recording and
+comparison, rendering, exact creation, CLI acceptance, and packed installation.
+The clean final `pnpm verify`, `./scripts/check-docs.sh`, and
+`git diff --check` gates pass. The required fresh final review reports no
+material finding or unresolved decision. GitHub Codex and CodeRabbit follow-up
+then aligns the CLI matrix fixture name, corrects the example's value-coverage
+claim, and makes validation-snapshot status/application combinations
+unrepresentable by typed producers. Follow-up review also closes mutable aliases
+when refining application arrays into those snapshot states.
+
 ## Blockers
 
-None to beginning Phase 1.
-
-## Next Action
-
-Open and complete the Phase-0 contract PR against `dev`, including review and
-merge. Then create the coordinated Phase-1-through-6 cutover branch from the
-updated `dev` and replace schemas and contract evidence before runtime code.
+None.
 
 ## Completion
 
-Roadmap step 10 is complete only when every phase is complete, no unplanned
-legacy contract path remains, all generated and checked-in artifacts agree,
-the full validation gate passes, and the required code-review pass has no
-unresolved material finding. Release work remains Roadmap step 11.
+Roadmap step 10 is complete: every phase is complete, no unplanned legacy
+contract path remains, generated and checked-in artifacts agree, the full
+validation gate passes, and the required code-review pass has no unresolved
+material finding. Release work remains Roadmap step 11.

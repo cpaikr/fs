@@ -1,8 +1,7 @@
 # CLI Acceptance Fixtures
 
-These cases remain executable evidence for the current `0.1` contract. Their
-artifact-sensitive inputs and outputs change only through the coordinated
-[Roadmap step-10 refactor](../../docs/plans/statement-item-row-refactor.md).
+These cases are executable evidence for the current `0.1` statement-row
+contract and its observable process behavior.
 
 These fixtures provide executable evidence for the observable process contract
 in the [CLI acceptance contract](../../docs/cli/acceptance.md). The contract is
@@ -10,10 +9,9 @@ authoritative for target behavior. The
 [completed step-9 plan](../../docs/plans/agent-guidance-snapshots-rendering.md)
 records its delivery state and validation.
 
-The checked-in suite retains the pre-migration domain, content, logging, and
-filesystem evidence while encoding the Effect-native grammar, help, built-in,
-and usage-presentation contract. The completed plan records the implementation
-evidence that satisfies it.
+Artifact inputs and expected results are referenced from their owning trees so
+the CLI suite exercises the same statement rows, rollups, snapshots, schemas,
+examples, and generated guidance as the language-neutral contract evidence.
 
 ## Layout
 
@@ -79,7 +77,7 @@ The revised suite keeps these domain and operational cases:
 - deterministic discovery and exact installed guide, schema, example, and
   created-document bytes, including generated validation snapshots that
   revalidate as snapshot matches, plus deterministic standalone HTML from the
-  flat presentation model;
+  statement-row presentation model;
 - silent and enabled logging, thresholds, bounded failure context, and I/O
   invariance; and
 - atomic no-overwrite behavior, missing parents, write failures, existing

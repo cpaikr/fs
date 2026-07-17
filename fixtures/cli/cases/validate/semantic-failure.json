@@ -4,7 +4,7 @@
   "arguments": ["validate", "input.json"],
   "workspace": [
     {
-      "copy": "../invalid/unresolved-item.json",
+      "copy": "../invalid/unresolved-rollup.json",
       "to": "input.json"
     }
   ],
@@ -43,7 +43,7 @@
             "file": "../manifest.json",
             "arrayPointer": "/invalidDocuments",
             "wherePointer": "/document",
-            "whereEquals": "invalid/unresolved-item.json",
+            "whereEquals": "invalid/unresolved-rollup.json",
             "valuePointer": "/code"
           }
         },
@@ -53,7 +53,7 @@
             "file": "../manifest.json",
             "arrayPointer": "/invalidDocuments",
             "wherePointer": "/document",
-            "whereEquals": "invalid/unresolved-item.json",
+            "whereEquals": "invalid/unresolved-rollup.json",
             "valuePointer": "/path"
           }
         },

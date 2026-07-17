@@ -3,7 +3,7 @@
   "command": "fs",
   "arguments": ["schema", "--output", "existing.json", "document"],
   "workspace": [
-    { "copy": "../valid/no-calculation-rules.json", "to": "existing.json" }
+    { "copy": "../valid/no-rollups.json", "to": "existing.json" }
   ],
   "stdin": null,
   "expect": {

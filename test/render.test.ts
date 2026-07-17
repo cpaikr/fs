@@ -4,7 +4,7 @@ import { resolve } from "node:path"
 import { describe, expect, it } from "vitest"
 
 import { renderHtml, renderLimits } from "../src/render.js"
-import type { Dimension, Document, Statement } from "../src/validation/model.js"
+import type { Document, Item, Period } from "../src/validation/model.js"
 
 const fixture = (path: string): Document =>
   JSON.parse(readFileSync(resolve(path), "utf8")) as Document
@@ -12,45 +12,46 @@ const fixture = (path: string): Document =>
 const renderBytes = (document: Document): Buffer => {
   const rendered = renderHtml(document)
   expect(rendered.ok).toBe(true)
-  if (!rendered.ok) throw new Error(`unexpected ${rendered.budget} limit`)
+  if (!rendered.ok) throw new Error(`Unexpected ${rendered.budget} limit`)
   return rendered.bytes
 }
 
-const dimension = (id: string, memberCount: number): Dimension => ({
-  id,
-  label: `Dimension ${id}`,
-  members: Array.from({ length: memberCount }, (_, index) => ({
-    id: `${id}-member-${index}`,
-    label: `Member ${index}`
+const tableDocument = (periodCount: number, itemCount: number): Document => {
+  const periods: Array<Period> = []
+  const periodIds: Array<string> = []
+  for (let index = 0; index < periodCount; index += 1) {
+    const id = `p${index}`
+    periods.push({ id, kind: "instant", date: "2025-12-31" })
+    periodIds.push(id)
+  }
+  const values = Object.fromEntries(periodIds.map((period) => [period, "1"]))
+  const items: Array<Item> = Array.from({ length: itemCount }, (_, index) => ({
+    id: `item${index}`,
+    label: `Item ${index}`,
+    unit: "usd",
+    values,
+    groupings: {}
   }))
-})
-
-const withPresentation = (
-  dimensions: ReadonlyArray<Dimension>,
-  statement: Partial<Statement>
-): Document => {
-  const document = fixture("examples/minimal.json")
   return {
-    ...document,
-    dimensions,
-    statements: [{ ...document.statements[0] as Statement, ...statement }]
+    formatVersion: "0.1",
+    entity: { name: "Grid boundary" },
+    scope: { label: "Rendering" },
+    units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],
+    periods,
+    statements: [{ id: "statement", label: "Statement", periods: periodIds, items }]
   }
 }
 
 describe("HTML rendering", () => {
   it.each([
     [
-      "complete presentation",
+      "complete statement rows",
       "fixtures/valid/render-presentation.json",
       "fixtures/cli/expected/render/render-presentation.html"
     ],
+    ["minimal statement", "examples/minimal.json", "fixtures/cli/expected/render/minimal.html"],
     [
-      "minimal presentation",
-      "examples/minimal.json",
-      "fixtures/cli/expected/render/minimal.html"
-    ],
-    [
-      "calculation and snapshot content",
+      "rollup and snapshot content",
       "fixtures/valid/snapshot-mismatch-source.json",
       "fixtures/cli/expected/render/snapshot-mismatch.html"
     ]
@@ -58,84 +59,54 @@ describe("HTML rendering", () => {
     expect(renderBytes(fixture(input))).toEqual(readFileSync(resolve(expected)))
   })
 
-  it("uses exact coordinates without leaking non-presentation content", () => {
+  it("renders grouping columns as flat metadata without rollup styling", () => {
     const document = fixture("fixtures/valid/render-presentation.json")
     const original = JSON.stringify(document)
     const html = renderBytes(document).toString("utf8")
 
-    expect(html).not.toContain("999")
-    expect(html).not.toContain("888")
-    expect(html).not.toContain("777")
-    expect(html).not.toContain("Unlisted alternate unit")
-    expect(html).not.toContain("Unlisted West")
-    expect(html).not.toContain("Not displayed")
-    expect(html.match(/<td class="heading"/gu)).toHaveLength(2)
-    expect(html).not.toContain('<th class="heading"')
-    expect(html).not.toContain('scope="rowgroup"')
+    expect(html).toContain('<th scope="col">valuation</th>')
+    expect(html).toContain('<td class="metadata">Working &lt;Capital&gt;</td>')
+    expect(html).not.toContain("colspan")
+    expect(html).not.toContain("heading")
+    expect(html).not.toContain("rowgroup")
     expect(JSON.stringify(document)).toBe(original)
   })
 
-  it("excludes calculation rules and validation snapshots", () => {
+  it("excludes rollup and validation metadata", () => {
     const html = renderBytes(fixture("fixtures/valid/snapshot-mismatch-source.json")).toString("utf8")
 
-    expect(html).not.toContain("subtotal")
-    expect(html).not.toContain("parts-agree")
-    expect(html).not.toContain("retired-rule")
+    expect(html).not.toContain("rollupTo")
+    expect(html).not.toContain("validationSnapshot")
+    expect(html).not.toContain("unsatisfied")
+    expect(html).not.toContain("difference")
   })
 
-  it("rejects Cartesian expansion before allocating coordinates", () => {
-    const dimensions = Array.from({ length: 10 }, (_, index) => dimension(`axis-${index}`, 2))
-    const document = withPresentation(dimensions, {
-      dimensions: dimensions.map((definition) => ({
-        dimension: definition.id,
-        members: definition.members.map((member) => member.id)
-      }))
-    })
+  it("escapes every HTML-sensitive author-text character", () => {
+    const document = fixture("examples/minimal.json")
+    const html = renderBytes({
+      ...document,
+      entity: { ...document.entity, name: "&<>\"'" }
+    }).toString("utf8")
 
-    expect(renderHtml(document)).toEqual({
+    expect(html).toContain("&amp;&lt;&gt;&quot;&#39;")
+    expect(html).not.toContain("&<>\"'")
+  })
+
+  it("rejects the Phase-1 over-wide fixture before rendering cells", () => {
+    expect(renderHtml(fixture("fixtures/valid/render-column-limit-exceeded.json"))).toEqual({
       ok: false,
       budget: "columns",
       limit: renderLimits.columns
     })
   })
 
-  it("rejects many singleton axes while streaming header measurement", () => {
-    const longLabel = "x".repeat(1_000)
-    const dimensions: ReadonlyArray<Dimension> = Array.from({ length: 10_000 }, (_, index) => ({
-      id: `axis-${index}`,
-      label: longLabel,
-      members: [{ id: `member-${index}`, label: longLabel }]
-    }))
-    const document = withPresentation(dimensions, {
-      dimensions: dimensions.map((definition) => ({
-        dimension: definition.id,
-        members: [definition.members[0]?.id as string]
-      }))
-    })
-
-    expect(renderHtml(document)).toEqual({
-      ok: false,
-      budget: "html-bytes",
-      limit: renderLimits.htmlBytes
-    })
-  })
-
   it("allows the total-column boundary", () => {
-    const axis = dimension("axis", renderLimits.columns - 1)
-    const rendered = renderHtml(withPresentation([axis], {
-      dimensions: [{ dimension: axis.id, members: axis.members.map((member) => member.id) }]
-    }))
-
+    const rendered = renderHtml(tableDocument(renderLimits.columns - 1, 1))
     expect(rendered.ok).toBe(true)
   })
 
   it("rejects documents beyond the total grid-slot budget", () => {
-    const axis = dimension("axis", 99)
-    const document = withPresentation([axis], {
-      dimensions: [{ dimension: axis.id, members: axis.members.map((member) => member.id) }],
-      entries: Array.from({ length: 1_000 }, () => ({ type: "item", item: "cash" } as const))
-    })
-
+    const document = tableDocument(99, 1_000)
     expect(renderHtml(document)).toEqual({
       ok: false,
       budget: "grid-slots",
@@ -143,26 +114,38 @@ describe("HTML rendering", () => {
     })
   })
 
-  it("allows the total grid-slot boundary", () => {
-    const axis = dimension("axis", 99)
-    const rendered = renderHtml(withPresentation([axis], {
-      dimensions: [{ dimension: axis.id, members: axis.members.map((member) => member.id) }],
-      entries: Array.from({ length: 999 }, () => ({ type: "item", item: "cash" } as const))
-    }))
+  it("gives any statement column failure precedence over document grid accumulation", () => {
+    const gridExceeded = tableDocument(99, 1_000)
+    const columnsExceeded = tableDocument(1_000, 1)
+    expect(renderHtml({
+      ...columnsExceeded,
+      statements: [
+        gridExceeded.statements[0] as Document["statements"][number],
+        columnsExceeded.statements[0] as Document["statements"][number]
+      ]
+    })).toEqual({
+      ok: false,
+      budget: "columns",
+      limit: renderLimits.columns
+    })
+  })
 
+  it("allows the total grid-slot boundary", () => {
+    const rendered = renderHtml(tableDocument(99, 999))
     expect(rendered.ok).toBe(true)
   })
 
   it("allows the exact encoded HTML byte boundary", () => {
     const document = fixture("examples/minimal.json")
-    const fact = document.facts[0] as Document["facts"][number]
     const baseline = renderBytes(document).length
     const valueLength = renderLimits.htmlBytes - baseline + 1
+    const first = document.statements[0]?.items[0]
+    if (first === undefined) throw new Error("Minimal fixture lost its first item")
     const rendered = renderHtml({
       ...document,
-      facts: [{
-        ...fact,
-        value: `1${"0".repeat(valueLength - 1)}`
+      statements: [{
+        ...document.statements[0] as Document["statements"][number],
+        items: [{ ...first, values: { fy2025: `1${"0".repeat(valueLength - 1)}` } }]
       }]
     })
 
@@ -186,13 +169,15 @@ describe("HTML rendering", () => {
 
   it("rejects an oversized decimal without materializing a cell string", () => {
     const document = fixture("examples/minimal.json")
-    const fact = document.facts[0] as Document["facts"][number]
+    const statement = document.statements[0]
+    const first = statement?.items[0]
+    if (statement === undefined || first === undefined) throw new Error("Minimal fixture lost its first item")
 
     expect(renderHtml({
       ...document,
-      facts: [{
-        ...fact,
-        value: `1${"0".repeat(renderLimits.htmlBytes)}`
+      statements: [{
+        ...statement,
+        items: [{ ...first, values: { fy2025: `1${"0".repeat(renderLimits.htmlBytes)}` } }]
       }]
     })).toEqual({
       ok: false,

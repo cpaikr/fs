@@ -1,11 +1,14 @@
 {
-  "id": "validate-stdin-no-rules",
+  "id": "validate-path-no-rollups",
   "command": "fs",
-  "arguments": ["validate", "-"],
-  "workspace": [],
-  "stdin": {
-    "file": "../valid/no-calculation-rules.json"
-  },
+  "arguments": ["validate", "input.json"],
+  "workspace": [
+    {
+      "copy": "../valid/no-rollups.json",
+      "to": "input.json"
+    }
+  ],
+  "stdin": null,
   "expect": {
     "stdout": {
       "encoding": "json",
@@ -19,7 +22,7 @@
         {
           "pointer": "/validation",
           "equalsFile": {
-            "file": "../calculation-results/no-rules.json"
+            "file": "../calculation-results/no-rollups.json"
           }
         },
         {
@@ -30,7 +33,7 @@
         },
         {
           "pointer": "/help",
-          "equals": [{ "executable": "fs", "arguments": ["record-validation", "--output", "<new-document>", "-"] }]
+          "equals": [{ "executable": "fs", "arguments": ["record-validation", "--output", "<new-document>", "input.json"] }]
         }
       ],
       "nonemptyStrings": []
@@ -43,7 +46,7 @@
     "filesystem": {
       "workspace": {
         "created": [],
-        "unchanged": [],
+        "unchanged": ["input.json"],
         "absent": []
       },
       "home": {

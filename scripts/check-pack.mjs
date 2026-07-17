@@ -40,6 +40,23 @@ const assertNativeHelp = (result, label) => {
   }
 }
 
+const successfulJson = (result, label) => {
+  if (result.status !== 0 || result.stderr !== "") {
+    throw new Error(result.stderr || `${label} failed with status ${String(result.status)}`)
+  }
+  try {
+    return JSON.parse(result.stdout)
+  } catch {
+    throw new Error(`${label} did not return JSON`)
+  }
+}
+
+const assertJsonEqual = (actual, expected, label) => {
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error(`${label} differs from the accepted value`)
+  }
+}
+
 try {
   const packed = run(
     npm,
@@ -113,13 +130,63 @@ try {
 
   const shim = join(installDirectory, "node_modules", ".bin", process.platform === "win32" ? "fs.cmd" : "fs")
   if (!existsSync(shim)) throw new Error("installed fs shim is missing")
-  const discovery = run(shim, [], { cwd: installDirectory, encoding: "utf8" })
-  if (discovery.status !== 0 || discovery.stderr !== "") {
-    throw new Error(discovery.stderr || "installed fs discovery failed")
-  }
+  const discovery = successfulJson(
+    run(shim, [], { cwd: installDirectory, encoding: "utf8" }),
+    "installed fs discovery"
+  )
   const expectedDiscovery = JSON.parse(readFileSync("fixtures/cli/expected/discovery.json", "utf8"))
-  if (JSON.stringify(JSON.parse(discovery.stdout)) !== JSON.stringify(expectedDiscovery)) {
-    throw new Error("installed fs discovery differs from the accepted value")
+  assertJsonEqual(discovery, expectedDiscovery, "installed fs discovery")
+
+  const noRollupsPath = join(process.cwd(), "fixtures", "valid", "no-rollups.json")
+  const expectedValidation = JSON.parse(
+    readFileSync("fixtures/calculation-results/no-rollups.json", "utf8")
+  )
+  const expectedNotRecorded = JSON.parse(
+    readFileSync("fixtures/snapshot-diffs/not-recorded.json", "utf8")
+  )
+  const validation = successfulJson(
+    run(shim, ["validate", noRollupsPath], { cwd: installDirectory, encoding: "utf8" }),
+    "installed fs validate"
+  )
+  assertJsonEqual(validation.validation, expectedValidation, "installed fs validation result")
+  assertJsonEqual(validation.snapshotDiff, expectedNotRecorded, "installed fs validation snapshot diff")
+
+  const createdPath = join(temporaryDirectory, "installed-created.json")
+  const creation = successfulJson(
+    run(shim, ["create", "--output", createdPath, noRollupsPath], {
+      cwd: installDirectory,
+      encoding: "utf8"
+    }),
+    "installed fs create"
+  )
+  if (creation.output?.status !== "created" || creation.output.path !== createdPath) {
+    throw new Error("installed fs create did not report the accepted output")
+  }
+  if (!readFileSync(createdPath).equals(readFileSync(noRollupsPath))) {
+    throw new Error("installed fs create did not preserve candidate bytes")
+  }
+
+  const recordedPath = join(temporaryDirectory, "installed-recorded.json")
+  const recording = successfulJson(
+    run(shim, ["record-validation", "--output", recordedPath, noRollupsPath], {
+      cwd: installDirectory,
+      encoding: "utf8"
+    }),
+    "installed fs record-validation"
+  )
+  if (
+    recording.snapshotDiff?.status !== "match" ||
+    recording.output?.status !== "created" ||
+    recording.output.path !== recordedPath
+  ) {
+    throw new Error("installed fs record-validation did not report the accepted output")
+  }
+  if (
+    !readFileSync(recordedPath).equals(
+      readFileSync("fixtures/cli/expected/record-validation/no-rollups.json")
+    )
+  ) {
+    throw new Error("installed fs record-validation bytes differ from the accepted value")
   }
 
   const renderedPath = join(temporaryDirectory, "installed-render.html")

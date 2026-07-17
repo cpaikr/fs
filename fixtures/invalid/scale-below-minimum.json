@@ -1,10 +1,45 @@
 {
   "formatVersion": "0.1",
-  "entity": { "name": "Scale Below Minimum" },
-  "scope": { "label": "Separate" },
-  "items": [{ "id": "value", "label": "Value" }],
-  "units": [{ "id": "unit", "label": "Unit", "measure": "pure", "scale": -9007199254740992 }],
-  "periods": [{ "id": "year-end", "kind": "instant", "date": "2025-12-31" }],
-  "facts": [{ "item": "value", "period": "year-end", "unit": "unit", "value": "1" }],
-  "statements": [{ "id": "statement", "label": "Statement", "unit": "unit", "periods": ["year-end"], "entries": [{ "type": "item", "item": "value" }] }]
+  "entity": {
+    "name": "Example Entity"
+  },
+  "scope": {
+    "label": "Consolidated financial statements"
+  },
+  "units": [
+    {
+      "id": "usd",
+      "label": "USD",
+      "measure": "USD",
+      "scale": -9007199254740992
+    }
+  ],
+  "periods": [
+    {
+      "id": "fy2025",
+      "kind": "duration",
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    }
+  ],
+  "statements": [
+    {
+      "id": "statement",
+      "label": "Statement",
+      "periods": [
+        "fy2025"
+      ],
+      "items": [
+        {
+          "id": "cash",
+          "label": "Cash",
+          "unit": "usd",
+          "values": {
+            "fy2025": "1"
+          },
+          "groupings": {}
+        }
+      ]
+    }
+  ]
 }

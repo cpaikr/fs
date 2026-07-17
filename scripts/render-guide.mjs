@@ -27,7 +27,7 @@ description: >-
   Encode and validate complete FS financial-statement documents from
   author-resolved models. Use when an agent must create or repair an FS JSON
   document without inferring missing financial meanings, values, taxonomy,
-  calculations, or source mappings.
+  rollups, groupings, or source mappings.
 ---
 
 `;

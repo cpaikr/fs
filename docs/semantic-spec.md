@@ -1,10 +1,8 @@
 # FS V0 Semantic Specification
 
 This specification defines the current `0.1` FS document contract independently
-of any implementation language. It is self-contained while the coordinated
-[Roadmap step-10 refactor](plans/statement-item-row-refactor.md) replaces the
-temporarily drifting schemas and fixtures in Phase 1. The replacement
-[JSON Schema](../schema/fs-document.schema.json) must enforce this JSON shape;
+of any implementation language. The
+[JSON Schema](../schema/fs-document.schema.json) enforces this JSON shape;
 requirements concerning uniqueness, references, dates, nested-map keys,
 rollups, snapshots, or ordering remain normative where JSON Schema cannot
 express them.
@@ -46,8 +44,8 @@ when `groupingColumns` is omitted or empty, `groupings` MUST be `{}`.
 
 Objects are closed: properties not declared by the grammar below are
 nonconforming. This specification is the complete source for required fields,
-JSON types, meaning, and cross-object invariants. Phase 1 must encode the same
-closed grammar in the schemas without adding another contract.
+JSON types, meaning, and cross-object invariants. The schemas encode the same
+closed grammar without adding another contract.
 
 ## 2. Identifiers, references, and order
 
@@ -291,8 +289,8 @@ applications when status is `consistent` or `inconsistent`. For
 applications are empty. For `conforming`, `errors` is empty. These objects are
 closed, and each error contains exactly `code`, `path`, and `message`.
 
-Phase 1 must encode this language-neutral result shape in
-[`validation-result.schema.json`](../schema/validation-result.schema.json).
+[`validation-result.schema.json`](../schema/validation-result.schema.json)
+encodes this language-neutral result shape.
 
 ## 8. Validation snapshots and deterministic diffs
 
@@ -360,8 +358,9 @@ complete closed application object from Section 7, including all numeric fields
 for `satisfied` or `unsatisfied`, or `reason` and `cell` for `error`.
 `unchanged` and `changed` applications MUST have the same key. `added` and
 `removed` intentionally omit the absent side. Human messages are not snapshot
-fields and are not compared. Phase 1 must encode these forms in
-[`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json).
+fields and are not compared.
+[`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json) encodes
+these forms.
 
 ### 8.1 Structural diagnostics
 
@@ -375,7 +374,8 @@ code. These are the complete current codes and path rules:
   member.
 - `invalid-type`: a value has the wrong JSON type; the path is that value.
 - `invalid-value`: a typed value violates its enum, constant, pattern,
-  cardinality, or closed union; the path is that value or collection.
+  cardinality, closed union, or a recorded numeric application's arithmetic
+  and status relationship; the path is that value, application, or collection.
 - `decimal-string-required`: an item value uses a JSON number instead of an
   exact decimal string; the path is that value cell.
 - `invalid-tolerance`: `defaultTolerance` is malformed or negative; the path
@@ -429,9 +429,8 @@ the exact HTML and finite-output behavior.
 
 ## 10. Conformance fixture contract
 
-After the Phase-1 coordinated cutover, files under `examples/` and
-`fixtures/valid/` MUST conform to the document schema and every semantic
-invariant above. Each file under `fixtures/invalid/`
+Files under `examples/` and `fixtures/valid/` MUST conform to the document
+schema and every semantic invariant above. Each file under `fixtures/invalid/`
 is intentionally nonconforming and has a matching entry in
 [`manifest.json`](../fixtures/manifest.json) naming its expected failure.
 

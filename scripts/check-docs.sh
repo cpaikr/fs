@@ -86,7 +86,6 @@ jq -e '
     ((.document | type) == "string") and
     ((.document | length) > 0) and
     ((.calculationStatus == "not-defined") or
-      (.calculationStatus == "not-evaluated") or
       (.calculationStatus == "consistent") or
       (.calculationStatus == "inconsistent"))) and
   all(.invalidDocuments[];
@@ -100,7 +99,9 @@ jq -e '
   (([.validDocuments[].document] | length) ==
     ([.validDocuments[].document] | unique | length)) and
   (([.invalidDocuments[].document] | length) ==
-    ([.invalidDocuments[].document] | unique | length))
+    ([.invalidDocuments[].document] | unique | length)) and
+  ([.validDocuments[].document] == ([.validDocuments[].document] | sort)) and
+  ([.invalidDocuments[].document] == ([.invalidDocuments[].document] | sort))
 ' fixtures/manifest.json >/dev/null
 
 temporary_directory="$(mktemp -d "${TMPDIR:-/tmp}/fs-docs.XXXXXX")"
@@ -257,5 +258,36 @@ echo "Validating expected results"
   -s schema/snapshot-diff.schema.json \
   -r schema/fs-document.schema.json \
   -d 'fixtures/snapshot-diffs/*.json'
+
+echo "Checking stable application identities"
+for result in fixtures/calculation-results/*.json; do
+  jq -e '
+    [.calculations.applications[].key |
+      [.statement, .parent, .period] | @json] as $keys |
+    ($keys | length) == ($keys | unique | length)
+  ' "$result" >/dev/null
+done
+
+for document in examples/*.json fixtures/valid/*.json \
+  fixtures/cli/expected/record-validation/*.json; do
+  jq -e '
+    [.validationSnapshot.applications[]?.key |
+      [.statement, .parent, .period] | @json] as $keys |
+    ($keys | length) == ($keys | unique | length)
+  ' "$document" >/dev/null
+done
+
+for diff in fixtures/snapshot-diffs/*.json; do
+  jq -e '
+    all(.applications[]?;
+      if .change == "unchanged" or .change == "changed"
+      then .recorded.key == .current.key
+      else true
+      end) and
+    ([.applications[]? | (.recorded.key? // .current.key) |
+      [.statement, .parent, .period] | @json] as $keys |
+      ($keys | length) == ($keys | unique | length))
+  ' "$diff" >/dev/null
+done
 
 echo "Documentation checks passed"

@@ -5,8 +5,8 @@ This roadmap owns strategic sequence only. The
 [completed step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md)
 records its delivery decisions and validation.
 
-The accepted statement-item-row redesign is planned in the active
-[refactor plan](docs/plans/statement-item-row-refactor.md).
+The completed [statement-item-row refactor plan](docs/plans/statement-item-row-refactor.md)
+records the redesign's delivery decisions and validation.
 
 ## Reference CLI
 
@@ -30,7 +30,7 @@ scope and validation are maintained in the
    `effect/unstable/cli` runner.
 9. [x] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.
-10. [ ] Replace the dimensional fact model with statement-owned item rows,
+10. [x] Replace the dimensional fact model with statement-owned item rows,
     nested value and grouping maps, and additive rollup validation.
 11. [ ] Replace placeholder schema identifiers, run cross-platform package
     verification, and release V0.

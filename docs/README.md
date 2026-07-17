@@ -15,7 +15,7 @@ one primary responsibility.
   [CLI acceptance contract](cli/acceptance.md)
 - Review the accepted replacement model:
   [statement item rows](adr/0001-replace-dimensional-members-with-item-grouping.md)
-- Continue Roadmap step 10:
+- Inspect completed Roadmap step 10:
   [Statement item row refactor](plans/statement-item-row-refactor.md)
 - Review the accepted independent rendering policy:
   [Finite rendering limits](adr/0002-bound-render-output.md)
@@ -38,18 +38,17 @@ When documents overlap, use this order:
 2. The CLI design defines command intent and boundaries. The CLI acceptance
    contract defines observable arguments, streams, results, exit codes, and
    filesystem effects.
-3. The roadmap owns strategic sequence. The completed step-9 plan records its
-   delivery decisions, gates, and validation; it is not a normative product
-   contract.
+3. The roadmap owns strategic sequence. Completed milestone plans record their
+   delivery decisions, gates, and validation; they are not normative product
+   contracts.
 
 The product scope and glossary explain intent and terminology but do not
 override the semantic specification.
 
-ADR 0001 fixes the accepted replacement target but does not override the
-current semantic, schema, fixture, or CLI contracts until Roadmap step 10
-incorporates it into those owning documents. Its active plan owns transition
-state and temporary drift. Proposed ADRs have no contract authority until
-accepted and incorporated.
+ADR 0001 records the accepted replacement decision now incorporated into the
+semantic, schema, fixture, and CLI contracts. Its completed plan records the
+delivery evidence. Proposed ADRs have no contract authority until accepted and
+incorporated.
 
 ## Maintenance
 

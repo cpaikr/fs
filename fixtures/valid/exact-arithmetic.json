@@ -1,40 +1,85 @@
 {
   "formatVersion": "0.1",
-  "entity": { "name": "Exact Arithmetic Co" },
-  "scope": { "label": "Separate" },
-  "items": [
-    { "id": "target", "label": "Target" },
-    { "id": "operand", "label": "Operand" }
-  ],
+  "entity": {
+    "name": "Example Entity"
+  },
+  "scope": {
+    "label": "Consolidated financial statements"
+  },
   "units": [
-    { "id": "units", "label": "Units", "measure": "pure", "scale": 0, "defaultTolerance": "0.5" }
+    {
+      "id": "usd",
+      "label": "USD",
+      "measure": "USD",
+      "scale": 0,
+      "defaultTolerance": "0.1"
+    }
   ],
   "periods": [
-    { "id": "fy2025", "kind": "duration", "start": "2025-01-01", "end": "2025-12-31" }
-  ],
-  "facts": [
-    { "item": "target", "period": "fy2025", "unit": "units", "value": "-1.5" },
-    { "item": "operand", "period": "fy2025", "unit": "units", "value": "2" }
+    {
+      "id": "fy2025",
+      "kind": "duration",
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    }
   ],
   "statements": [
     {
-      "id": "values",
-      "label": "Values",
-      "unit": "units",
-      "periods": ["fy2025"],
-      "entries": [
-        { "type": "item", "item": "operand" },
-        { "type": "item", "item": "target" }
-      ]
-    }
-  ],
-  "calculationRules": [
-    {
-      "id": "absolute-tolerance-boundary",
-      "kind": "assertion",
-      "target": { "item": "target", "period": "fy2025", "unit": "units" },
-      "terms": [
-        { "coefficient": "-0.5", "fact": { "item": "operand", "period": "fy2025", "unit": "units" } }
+      "id": "statement",
+      "label": "Statement",
+      "periods": [
+        "fy2025"
+      ],
+      "items": [
+        {
+          "id": "part-a",
+          "label": "Part A",
+          "unit": "usd",
+          "values": {
+            "fy2025": "0.1"
+          },
+          "groupings": {},
+          "rollupTo": "subtotal"
+        },
+        {
+          "id": "part-b",
+          "label": "Part B",
+          "unit": "usd",
+          "values": {
+            "fy2025": "0.2"
+          },
+          "groupings": {},
+          "rollupTo": "subtotal"
+        },
+        {
+          "id": "subtotal",
+          "label": "Subtotal",
+          "unit": "usd",
+          "values": {
+            "fy2025": "0.3"
+          },
+          "groupings": {},
+          "rollupTo": "grand-total"
+        },
+        {
+          "id": "adjustment",
+          "label": "Adjustment",
+          "unit": "usd",
+          "values": {
+            "fy2025": "0.7"
+          },
+          "groupings": {},
+          "rollupTo": "grand-total"
+        },
+        {
+          "id": "grand-total",
+          "label": "Grand total",
+          "unit": "usd",
+          "values": {
+            "fy2025": "1.1"
+          },
+          "groupings": {}
+        }
       ]
     }
   ]

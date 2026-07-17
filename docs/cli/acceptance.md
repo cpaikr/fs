@@ -65,7 +65,7 @@ An illustrative case descriptor is:
 
 ```json
 {
-  "id": "validate-path-no-rules",
+  "id": "validate-path-no-rollups",
   "command": "fs",
   "arguments": ["validate", "input.json"],
   "workspace": [
@@ -454,7 +454,7 @@ language-neutral semantic fixture. Paths in the table are relative to
 | Recorded snapshot match | `valid/recorded-snapshot.json` | 0 |
 | Recorded snapshot mismatch | `valid/snapshot-mismatch-source.json` | 0 |
 | JSON Schema failure | `invalid/decimal-number.json` | 1 |
-| Semantic structural failure | `invalid/unresolved-item.json` | 1 |
+| Semantic structural failure | `invalid/unresolved-rollup.json` | 1 |
 | Invalid embedded snapshot | `duplicate-snapshot-application-key.json` | 1 |
 | Out-of-range unit scale | `invalid/scale-above-maximum.json` | 1 |
 | Malformed JSON | `raw-input/malformed-json.json.txt` | 1 |

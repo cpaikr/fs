@@ -3,7 +3,7 @@
   "command": "fs",
   "arguments": ["render", "--output", "report.html", "input.json", "extra.json"],
   "workspace": [
-    { "copy": "../valid/no-calculation-rules.json", "to": "input.json" }
+    { "copy": "../valid/no-rollups.json", "to": "input.json" }
   ],
   "stdin": null,
   "expect": {
