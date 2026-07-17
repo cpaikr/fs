@@ -235,6 +235,35 @@ const recordValidation = Command.make(
   )
 )
 
+const render = Command.make(
+  "render",
+  {
+    output: outputFlag("Create the standalone HTML presentation at this new path."),
+    document: exactDocument
+  },
+  ({ output, document }) =>
+    Effect.gen(function*() {
+      const path = firstOutput(output)
+      if (path === undefined) {
+        return yield* failWithUsage(
+          ["fs", "render"],
+          new CliError.MissingOption({ option: "output" })
+        )
+      }
+      const logLevel = yield* currentLogLevel
+      yield* dispatch({
+        command: "render",
+        input: document,
+        output: path,
+        logLevel
+      })
+    })
+).pipe(
+  Command.withDescription(
+    "Validate and atomically create a standalone HTML presentation."
+  )
+)
+
 const noOperands = Argument.string("operand").pipe(
   Argument.withDescription("No operands are accepted."),
   Argument.variadic(),
@@ -257,9 +286,9 @@ const guide = Command.make("guide", {}, () =>
 
 const root = Command.make("fs", {}, () => dispatch({ command: "fs" })).pipe(
   Command.withDescription(
-    "Inspect, validate, snapshot, and safely create FS documents. Diagnostic logging defaults to none."
+    "Inspect, validate, snapshot, render, and safely create FS documents. Diagnostic logging defaults to none."
   ),
-  Command.withSubcommands([guide, schema, example, validate, create, recordValidation])
+  Command.withSubcommands([guide, schema, example, validate, create, recordValidation, render])
 )
 
 export const noColorOutput = CliOutput.layer(CliOutput.defaultFormatter({ colors: false }))

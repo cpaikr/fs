@@ -174,6 +174,33 @@ describe("Effect CLI boundary", () => {
     expect(observations[2]?.observed.stderr.length).toBeGreaterThan(0)
   })
 
+  it("keeps render results, bytes, and I/O order invariant with logging", () => {
+    const observations = [
+      [],
+      ["--log-level", "none"],
+      ["--log-level", "debug"]
+    ].map((loggingArgs) => {
+      const calls: Array<string> = []
+      const written: Array<Buffer> = []
+      const observed = runCli(
+        [...loggingArgs, "render", "--output", "result.html", "-"],
+        ioWithCalls(calls, undefined, written)
+      )
+      expect(observed.exitCode).toBe(0)
+      expect(calls).toEqual(["output-exists", "read-stdin", "write-file"])
+      expect(written).toHaveLength(1)
+      return { observed, written: written[0] }
+    })
+
+    expect(observations[1]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
+    expect(observations[2]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
+    expect(observations[1]?.written).toEqual(observations[0]?.written)
+    expect(observations[2]?.written).toEqual(observations[0]?.written)
+    expect(observations[0]?.observed.stderr).toEqual(Buffer.alloc(0))
+    expect(observations[1]?.observed.stderr).toEqual(Buffer.alloc(0))
+    expect(observations[2]?.observed.stderr.length).toBeGreaterThan(0)
+  })
+
   it("normalizes the all logging alias before validation dispatch", () => {
     const calls: Array<string> = []
     const observed = runCli(

@@ -58,10 +58,10 @@ V0 release remain out of scope.
   fixture and fault/integration gates.
 - [x] Phase 3: fix deterministic `render` HTML and failure behavior in
   acceptance prose and fixtures.
-- [ ] Phase 4: implement the packed `render` command and pass its fixture and
-  fault/integration gates. In progress.
+- [x] Phase 4: implement the packed `render` command and pass its fixture and
+  fault/integration gates.
 - [ ] Phase 5: complete full repository validation and review proving every
-  step-9 deliverable.
+  step-9 deliverable. In progress.
 
 ## Current State
 
@@ -74,15 +74,16 @@ command. Snapshot recording replaces an existing valid snapshot, refuses
 structural nonconformance, reports the created document as a snapshot match,
 and preserves input and destination safety.
 
-The render contract and 17 executable cases fix standalone bytes, metadata,
-flat table ordering, cell lookup and display, escaping, validation gates,
-process envelopes, filesystem precedence, discovery, and help. The suite has
-117 total descriptors. Implementation now begins against that fixed boundary.
+The packed CLI now includes deterministic standalone HTML rendering through a
+pure renderer, complete presentation model types, the shared validated-output
+lifecycle, and the Effect command surface. Its 17 executable cases fix and
+pass standalone bytes, metadata, flat table ordering, cell lookup and display,
+escaping, validation gates, process envelopes, filesystem precedence,
+discovery, and help. The suite has 117 total descriptors.
 
 ## Known Temporary Drift
 
-- Discovery, root help, and render cases intentionally fail the implementation
-  gate until the new command is wired and packed.
+None.
 
 ## Validation
 
@@ -92,9 +93,9 @@ The completed step-8 baseline is recorded in the
 deterministic generated-byte checks, exact-version acceptance and rejection,
 the Skill validator in an ephemeral PyYAML environment, and
 `./scripts/check-docs.sh`. A fresh-context refusal test also stopped on an
-incomplete financial model without inventing decisions. Later step-9 gates
-include targeted tests, `pnpm verify`, packed-install execution, and repeat
-documentation and whitespace checks.
+incomplete financial model without inventing decisions. The final step-9 gate
+repeats repository, documentation, and whitespace checks after the last state
+update.
 
 The completed `record-validation` slice passes `pnpm verify`: typecheck, zero
 strict Effect diagnostics, 100 unit and boundary tests, all 100 packed-process
@@ -105,11 +106,18 @@ revalidate as snapshot matches, and `git diff --check` passes.
 
 The render contract slice passes `./scripts/check-docs.sh`, including all 117
 CLI descriptors and the new conforming presentation fixture, plus
-`git diff --check`. Its expected implementation-gate failure is limited to
-the absent `render` discovery and command surface. Contract review strengthened
-the presentation fixture so reversed and subset display order, exact unit and
-dimension matching, and dimensionless lookup cannot pass accidentally through
-definition-order or wildcard implementations.
+`git diff --check`. Contract review strengthened the presentation fixture so
+reversed and subset display order, exact unit and dimension matching, and
+dimensionless lookup cannot pass accidentally through definition-order or
+wildcard implementations. Its expected pre-implementation discovery and
+command failures are now closed by the implementation slice.
+
+The render implementation slice passes `pnpm verify`: typecheck, zero strict
+Effect diagnostics, 109 unit and boundary tests, all 117 packed-process cases,
+five writer crash points, early contender-exit detection, 16-way writer
+contention, and installed-tarball smoke across 43 packed files. The tarball
+smoke executes `render` and compares its exact HTML. Focused implementation
+review found no correctness, regression, architecture, or validation gaps.
 
 ## Blockers
 
@@ -117,6 +125,6 @@ None.
 
 ## Next Action
 
-Implement a pure deterministic HTML renderer, complete the validated document
-model needed by presentation, wire the Effect command through the shared
-process and atomic writer boundaries, and satisfy the 17 render cases.
+Run the final step-9 repository and documentation gates, audit every milestone
+deliverable and commit, confirm no Roadmap step-10 work entered scope, then
+close this plan without starting release work.
