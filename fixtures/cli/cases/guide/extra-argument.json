@@ -14,7 +14,7 @@
       "equalities": [
         { "pointer": "/error/operation", "equals": "guide" },
         { "pointer": "/error/code", "equals": "unexpected-argument" },
-        { "pointer": "/help", "equals": ["fs guide authoring"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["guide","authoring"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

@@ -1,7 +1,7 @@
 {
-  "id": "help-reject-version",
+  "id": "help-reject-invalid-schema-name",
   "command": "fs",
-  "arguments": ["--version"],
+  "arguments": ["schema", "unknown", "--help"],
   "workspace": [],
   "stdin": null,
   "expect": {
@@ -12,9 +12,9 @@
         { "pointer": "/error", "equals": ["operation", "code", "message"] }
       ],
       "equalities": [
-        { "pointer": "/error/operation", "equals": "fs" },
-        { "pointer": "/error/code", "equals": "unknown-flag" },
-        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["--help"] }] }
+        { "pointer": "/error/operation", "equals": "schema" },
+        { "pointer": "/error/code", "equals": "unknown-schema" },
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["schema", "document", "--version", "0.1"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

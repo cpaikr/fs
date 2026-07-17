@@ -20,7 +20,7 @@
         { "pointer": "/error/path", "equals": "result.json" },
         {
           "pointer": "/help",
-          "equals": ["fs create candidate.json --output <new-document>"]
+          "equals": [{ "executable": "fs", "arguments": ["create","candidate.json","--output","<new-document>"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

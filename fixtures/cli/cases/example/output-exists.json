@@ -17,7 +17,7 @@
         { "pointer": "/error/operation", "equals": "example" },
         { "pointer": "/error/code", "equals": "output-exists" },
         { "pointer": "/error/path", "equals": "existing.json" },
-        { "pointer": "/help", "equals": ["fs example minimal --output <new-path>"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["example","minimal","--output","<new-path>"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

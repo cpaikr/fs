@@ -11,7 +11,16 @@ import {
   type ExampleName,
   type SchemaName
 } from "./assets.js"
-import { commandHelp, parseArguments, type CommandName, type LogLevel, type UsageFailure } from "./arguments.js"
+import {
+  commandHelp,
+  commandSuggestion,
+  commandSuggestionWithOperand,
+  parseArguments,
+  type CommandName,
+  type CommandSuggestion,
+  type LogLevel,
+  type UsageFailure
+} from "./arguments.js"
 import { decodeJson } from "./json.js"
 import { DiagnosticLogger } from "./logger.js"
 import { validateDocument } from "./validation/validate.js"
@@ -43,7 +52,7 @@ const bytesResult = (stdout: Buffer): ProcessResult => ({ stdout, stderr: empty,
 const commandError = (
   operation: CommandName | "fs",
   code: string,
-  help: ReadonlyArray<string>,
+  help: ReadonlyArray<CommandSuggestion>,
   exitCode: 1 | 2,
   path?: string,
   message = "The requested operation could not be completed.",
@@ -82,10 +91,10 @@ const discovery = {
     { name: "create", access: "write" }
   ],
   help: [
-    "fs guide authoring",
-    "fs schema document --version 0.1",
-    "fs example",
-    "fs validate <document|-> --format json"
+    commandSuggestion("guide", "authoring"),
+    commandSuggestion("schema", "document", "--version", "0.1"),
+    commandSuggestion("example"),
+    commandSuggestion("validate", "<document|->", "--format", "json")
   ]
 } as const
 
@@ -93,13 +102,16 @@ const writeFailure = (
   operation: "schema" | "example" | "create",
   failure: WriteFailure,
   path: string,
-  help: ReadonlyArray<string>
+  help: ReadonlyArray<CommandSuggestion>
 ): ProcessResult => commandError(operation, failure, help, 1, path)
 
 const runGuide = (operands: ReadonlyArray<string>, help: boolean): ProcessResult => {
+  if (operands.length > 1 || (operands.length === 1 && operands[0] !== "authoring")) {
+    return commandError("guide", "unexpected-argument", commandHelp("guide"), 2)
+  }
   if (help) return bytesResult(helpAsset(operands[0] === "authoring" ? "guide-authoring" : "guide"))
   if (operands.length === 1 && operands[0] === "authoring") return bytesResult(authoringGuide())
-  return commandError("guide", "unexpected-argument", ["fs guide authoring"], 2)
+  return commandError("guide", "unexpected-argument", commandHelp("guide"), 2)
 }
 
 const runSchema = (
@@ -109,27 +121,36 @@ const runSchema = (
   help: boolean,
   context: ProcessContext
 ): ProcessResult => {
-  if (help) return bytesResult(helpAsset("schema"))
-  if (operands.length === 0) {
+  if (operands.length > 1) return commandError("schema", "unexpected-argument", commandHelp("schema"), 2)
+  const name = operands[0]
+  if (name !== undefined && !schemaNames.some((candidate) => candidate === name)) {
+    return commandError("schema", "unknown-schema", commandHelp("schema"), 2)
+  }
+  if (version !== undefined && version !== "0.1") {
     return commandError(
       "schema",
-      "missing-argument",
-      ["fs schema <document|validation-result|snapshot-diff>"],
+      "unsupported-version",
+      name === undefined
+        ? commandHelp("schema")
+        : [commandSuggestion("schema", name, "--version", "0.1")],
       2
     )
   }
-  if (operands.length > 1) return commandError("schema", "unexpected-argument", commandHelp("schema"), 2)
-  const name = operands[0]
-  if (!schemaNames.some((candidate) => candidate === name)) {
-    return commandError("schema", "unknown-schema", ["fs schema document --version 0.1"], 2)
-  }
-  if (version !== undefined && version !== "0.1") {
-    return commandError("schema", "unsupported-version", ["fs schema document --version 0.1"], 2)
+  if (help) return bytesResult(helpAsset("schema"))
+  if (name === undefined) {
+    return commandError(
+      "schema",
+      "missing-argument",
+      [commandSuggestion("schema", "<document|validation-result|snapshot-diff>")],
+      2
+    )
   }
   const bytes = schemaAsset(name as SchemaName)
   if (output === undefined) return bytesResult(bytes)
   const failure = (context.writeFile ?? writeNewFile)(resolve(context.cwd, output), bytes)
-  if (failure !== null) return writeFailure("schema", failure, output, ["fs schema document --output <new-path>"])
+  if (failure !== null) {
+    return writeFailure("schema", failure, output, [commandSuggestion("schema", name, "--output", "<new-path>")])
+  }
   return jsonResult({ output: { status: "created", path: output } }, 0)
 }
 
@@ -146,7 +167,7 @@ const examples = {
       calculationStatus: "inconsistent"
     }
   ],
-  help: ["fs example minimal", "fs example manufacturing-group"]
+  help: [commandSuggestion("example", "minimal"), commandSuggestion("example", "manufacturing-group")]
 } as const
 
 const runExample = (
@@ -155,27 +176,30 @@ const runExample = (
   help: boolean,
   context: ProcessContext
 ): ProcessResult => {
+  if (operands.length > 1) return commandError("example", "unexpected-argument", commandHelp("example"), 2)
+  const name = operands[0]
+  if (name !== undefined && !exampleNames.some((candidate) => candidate === name)) {
+    return commandError("example", "unknown-example", commandHelp("example"), 2)
+  }
   if (help) return bytesResult(helpAsset("example"))
   if (operands.length === 0) {
     if (output !== undefined) {
       return commandError(
         "example",
         "missing-argument",
-        [`fs example <minimal|manufacturing-group> --output ${output}`],
+        [commandSuggestion("example", "<minimal|manufacturing-group>", `--output=${output}`)],
         2
       )
     }
     return jsonResult(examples, 0)
   }
-  if (operands.length > 1) return commandError("example", "unexpected-argument", commandHelp("example"), 2)
-  const name = operands[0]
-  if (!exampleNames.some((candidate) => candidate === name)) {
-    return commandError("example", "unknown-example", ["fs example minimal"], 2)
-  }
+  if (name === undefined) throw new Error("Validated example name disappeared")
   const bytes = exampleAsset(name as ExampleName)
   if (output === undefined) return bytesResult(bytes)
   const failure = (context.writeFile ?? writeNewFile)(resolve(context.cwd, output), bytes)
-  if (failure !== null) return writeFailure("example", failure, output, ["fs example minimal --output <new-path>"])
+  if (failure !== null) {
+    return writeFailure("example", failure, output, [commandSuggestion("example", name, "--output", "<new-path>")])
+  }
   return jsonResult({ output: { status: "created", path: output } }, 0)
 }
 
@@ -203,8 +227,8 @@ const readInput = (
       code,
       code === "input-not-found"
         ? operation === "validate"
-          ? ["fs validate <existing-document> --format json"]
-          : ["fs create <existing-candidate> --output <new-document>"]
+          ? [commandSuggestion("validate", "<existing-document>", "--format", "json")]
+          : [commandSuggestion("create", "<existing-candidate>", "--output", "<new-document>")]
         : [],
       1,
       input
@@ -215,13 +239,20 @@ const readInput = (
 const runValidate = (
   operands: ReadonlyArray<string>,
   logLevel: LogLevel,
+  helpRequested: boolean,
   context: ProcessContext
 ): ProcessResult => {
-  if (operands.length === 0) {
-    return commandError("validate", "missing-argument", ["fs validate <existing-document> --format json"], 2)
-  }
   if (operands.length > 1) {
-    return commandError("validate", "unexpected-argument", [`fs validate ${operands[0]} --format json`], 2)
+    return commandError("validate", "unexpected-argument", commandHelp("validate", operands[0]), 2)
+  }
+  if (helpRequested) return bytesResult(helpAsset("validate"))
+  if (operands.length === 0) {
+    return commandError(
+      "validate",
+      "missing-argument",
+      [commandSuggestion("validate", "<existing-document>", "--format", "json")],
+      2
+    )
   }
   const input = operands[0]
   if (input === undefined) throw new Error("Validated operand disappeared")
@@ -249,7 +280,7 @@ const runValidate = (
   })
   const help =
     result.validation.conformance.status === "conforming" && result.snapshotDiff.status === "not-recorded"
-      ? [`fs record-validation ${input} --output <new-document>`]
+      ? [commandSuggestionWithOperand("record-validation", input, "--output", "<new-document>")]
       : []
   return jsonResult(
     { validation: result.validation, snapshotDiff: result.snapshotDiff, help },
@@ -261,21 +292,23 @@ const runValidate = (
 const runCreate = (
   operands: ReadonlyArray<string>,
   output: string | undefined,
+  help: boolean,
   context: ProcessContext
 ): ProcessResult => {
+  if (operands.length > 1) {
+    return commandError("create", "unexpected-argument", commandHelp("create", operands[0]), 2)
+  }
+  if (help) return bytesResult(helpAsset("create"))
   if (operands.length === 0) {
-    return commandError("create", "missing-argument", ["fs create <candidate|-> --output <new-document>"], 2)
+    return commandError("create", "missing-argument", commandHelp("create"), 2)
   }
   const input = operands[0]
   if (input === undefined) throw new Error("Validated candidate disappeared")
-  if (operands.length > 1) {
-    return commandError("create", "unexpected-argument", [`fs create ${input} --output <new-document>`], 2)
-  }
   if (output === undefined) {
-    return commandError("create", "missing-argument", [`fs create ${input} --output <new-document>`], 2)
+    return commandError("create", "missing-argument", commandHelp("create", input), 2)
   }
   const destination = resolve(context.cwd, output)
-  const outputHelp = [`fs create ${input} --output <new-document>`]
+  const outputHelp = commandHelp("create", input)
   try {
     if ((context.outputExists ?? outputEntryExists)(destination)) {
       return commandError("create", "output-exists", outputHelp, 1, output)
@@ -327,13 +360,12 @@ const run = (
   if (command === "guide") return runGuide(operands, help)
   if (command === "schema") return runSchema(operands, version, output, help, context)
   if (command === "example") return runExample(operands, output, help, context)
-  if (help) return bytesResult(helpAsset(command))
 
   if (format !== undefined && format !== "json") {
     return commandError(command, "unsupported-format", commandHelp(command, operands[0]), 2)
   }
-  if (command === "validate") return runValidate(operands, logLevel, context)
-  if (command === "create") return runCreate(operands, output, context)
+  if (command === "validate") return runValidate(operands, logLevel, help, context)
+  if (command === "create") return runCreate(operands, output, help, context)
   return commandError(
     command,
     "internal-error",

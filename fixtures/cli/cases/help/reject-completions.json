@@ -14,7 +14,7 @@
       "equalities": [
         { "pointer": "/error/operation", "equals": "fs" },
         { "pointer": "/error/code", "equals": "unknown-flag" },
-        { "pointer": "/help", "equals": ["fs --help"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["--help"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

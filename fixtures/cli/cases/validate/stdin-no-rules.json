@@ -31,7 +31,7 @@
         {
           "pointer": "/help",
           "equals": [
-            "fs record-validation - --output <new-document>"
+            { "executable": "fs", "arguments": ["record-validation","-","--output","<new-document>"] }
           ]
         }
       ],

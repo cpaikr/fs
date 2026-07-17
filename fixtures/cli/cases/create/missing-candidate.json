@@ -18,7 +18,7 @@
         { "pointer": "/error/code", "equals": "missing-argument" },
         {
           "pointer": "/help",
-          "equals": ["fs create <candidate|-> --output <new-document>"]
+          "equals": [{ "executable": "fs", "arguments": ["create","<candidate|->","--output","<new-document>"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

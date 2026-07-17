@@ -14,7 +14,7 @@
       "equalities": [
         { "pointer": "/error/operation", "equals": "example" },
         { "pointer": "/error/code", "equals": "unknown-example" },
-        { "pointer": "/help", "equals": ["fs example minimal"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["example","minimal"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

@@ -167,6 +167,9 @@ with validated, non-overwriting output over stateful commands.
 - Document-reading commands accept a path or standard input where shown.
 - Unknown commands, arguments, flags, names, versions, and formats are
   rejected rather than ignored.
+- Help relaxes only absent command requirements in an otherwise-valid command
+  prefix. Every supplied operand, name, version, format, and option is
+  validated before help is rendered, so `--help` cannot mask invalid syntax.
 - Result ordering is deterministic and empty or absent states are explicit.
 - Errors identify the operation and a concrete correction without exposing
   dependency output or internal failures.

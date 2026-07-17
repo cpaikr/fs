@@ -36,17 +36,122 @@ describe("process boundary", () => {
     })
   })
 
-  it("does not read stdin before grammar succeeds", () => {
-    const result = execute(["schema", "document", "extra", "-"], {
+  it("does not enter input or output boundaries before grammar succeeds", () => {
+    const calls: Array<string> = []
+    const context = {
       cwd: process.cwd(),
       readStdin: () => {
-        throw new Error("stdin should not be read")
+        calls.push("read")
+        return Buffer.alloc(0)
+      },
+      outputExists: () => {
+        calls.push("exists")
+        return false
+      },
+      writeFile: () => {
+        calls.push("write")
+        return null
       }
+    } as const
+
+    const validate = execute(["validate", "-", "extra"], context)
+    const create = execute(["create", "-", "extra", "--output", "result.json"], context)
+    const global = execute(["--unknown", "validate", "-"], context)
+
+    expect([validate.exitCode, create.exitCode, global.exitCode]).toEqual([2, 2, 2])
+    expect(calls).toEqual([])
+  })
+
+  it("retains command context and missing-value errors when strict parsing fails", () => {
+    const separate = execute(["--log-level", "debug", "validate", "missing.json", "--unknown"])
+    const inline = execute(["--log-level=debug", "validate", "missing.json", "--unknown"])
+    for (const result of [separate, inline]) {
+      expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+        error: { operation: "validate", code: "unknown-flag" },
+        help: [{ executable: "fs", arguments: ["validate", "missing.json", "--format", "json"] }]
+      })
+    }
+
+    for (const [args, operation] of [
+      [["create", "candidate.json", "--output"], "create"],
+      [["schema", "document", "--version"], "schema"],
+      [["validate", "input.json", "--format"], "validate"],
+      [["create", "candidate.json", "--output=", "--help"], "create"],
+      [["schema", "document", "--output", "", "--help"], "schema"],
+      [["example", "minimal", "--output=", "--help"], "example"]
+    ] as const) {
+      const result = execute(args)
+      expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+        error: { operation, code: "missing-argument" }
+      })
+    }
+    expect(JSON.parse(execute(["--version"]).stdout.toString("utf8"))).toMatchObject({
+      error: { operation: "fs", code: "unknown-flag" }
     })
+    expect(
+      JSON.parse(execute(["validate", "input.json", "--help=true", "--format"]).stdout.toString("utf8"))
+    ).toMatchObject({
+      error: { operation: "validate", code: "unknown-flag" }
+    })
+  })
+
+  it.each([
+    [["guide", "unknown", "--help"], "guide", "unexpected-argument"],
+    [["schema", "unknown", "--help"], "schema", "unknown-schema"],
+    [["schema", "document", "--version", "1.0", "--help"], "schema", "unsupported-version"],
+    [["example", "unknown", "--help"], "example", "unknown-example"],
+    [["validate", "input.json", "extra", "--help"], "validate", "unexpected-argument"],
+    [["validate", "input.json", "--format", "toon", "--help"], "validate", "unsupported-format"],
+    [["create", "input.json", "extra", "--help"], "create", "unexpected-argument"]
+  ] as const)("does not let help mask invalid supplied syntax for %j", (args, operation, code) => {
+    const result = execute(args)
 
     expect(result.exitCode).toBe(2)
-    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
-      error: { operation: "schema", code: "unexpected-argument" }
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({ error: { operation, code } })
+  })
+
+  it("emits shell-independent argv suggestions for hostile paths", () => {
+    const input = "- candidate;echo unsafe"
+    const output = "- result;echo unsafe"
+    const create = execute(["create", "--", input])
+    const example = execute(["example", `--output=${output}`])
+
+    expect(JSON.parse(create.stdout.toString("utf8"))).toMatchObject({
+      help: [
+        {
+          executable: "fs",
+          arguments: ["create", "--output", "<new-document>", "--", input]
+        }
+      ]
+    })
+    expect(JSON.parse(example.stdout.toString("utf8"))).toMatchObject({
+      help: [
+        {
+          executable: "fs",
+          arguments: ["example", "<minimal|manufacturing-group>", `--output=${output}`]
+        }
+      ]
+    })
+  })
+
+  it("preserves non-default content names in corrective help", () => {
+    const unsupported = execute(["schema", "snapshot-diff", "--version", "1.0"])
+    expect(JSON.parse(unsupported.stdout.toString("utf8"))).toMatchObject({
+      help: [{ executable: "fs", arguments: ["schema", "snapshot-diff", "--version", "0.1"] }]
+    })
+
+    const context = {
+      cwd: process.cwd(),
+      readStdin: () => Buffer.alloc(0),
+      writeFile: () => "write-failed" as const
+    }
+    const schema = execute(["schema", "validation-result", "--output", "result.json"], context)
+    const example = execute(["example", "manufacturing-group", "--output", "result.json"], context)
+    expect(JSON.parse(schema.stdout.toString("utf8"))).toMatchObject({
+      help: [{ executable: "fs", arguments: ["schema", "validation-result", "--output", "<new-path>"] }]
+    })
+    expect(JSON.parse(example.stdout.toString("utf8"))).toMatchObject({
+      help: [{ executable: "fs", arguments: ["example", "manufacturing-group", "--output", "<new-path>"] }]
     })
   })
 

@@ -16,7 +16,7 @@
         { "pointer": "/error/code", "equals": "missing-argument" },
         {
           "pointer": "/help",
-          "equals": ["fs schema <document|validation-result|snapshot-diff>"]
+          "equals": [{ "executable": "fs", "arguments": ["schema","<document|validation-result|snapshot-diff>"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

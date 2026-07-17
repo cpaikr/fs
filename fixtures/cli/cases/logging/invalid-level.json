@@ -18,7 +18,7 @@
         { "pointer": "/error/code", "equals": "unsupported-log-level" },
         {
           "pointer": "/help",
-          "equals": ["fs validate input.json --format json"]
+          "equals": [{ "executable": "fs", "arguments": ["validate","input.json","--format","json"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

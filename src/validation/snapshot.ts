@@ -1,5 +1,6 @@
 import { isDeepStrictEqual } from "node:util"
 
+import { Decimal } from "./decimal.js"
 import { applicationKey } from "./identity.js"
 import type { ApplicationResult, ValidationSnapshot } from "./model.js"
 
@@ -30,9 +31,22 @@ export type SnapshotDiff =
       >
     }
 
+const isApplicationValid = (application: ApplicationResult): boolean => {
+  if (application.status !== "satisfied" && application.status !== "unsatisfied") return true
+  try {
+    const difference = Decimal.parse(application.actual).subtract(Decimal.parse(application.expected))
+    if (difference.toString() !== Decimal.parse(application.difference).toString()) return false
+    const satisfied = difference.absolute().lessThanOrEqual(Decimal.parse(application.tolerance))
+    return application.status === (satisfied ? "satisfied" : "unsatisfied")
+  } catch {
+    return false
+  }
+}
+
 export const isSnapshotValid = (snapshot: ValidationSnapshot): boolean => {
   const keys = snapshot.applications.map((application) => applicationKey(application.key))
   if (new Set(keys).size !== keys.length) return false
+  if (!snapshot.applications.every(isApplicationValid)) return false
   if (snapshot.conformance === "nonconforming") {
     return snapshot.calculations === "not-run" && snapshot.applications.length === 0
   }

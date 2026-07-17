@@ -23,7 +23,7 @@
         },
         {
           "pointer": "/help",
-          "equals": ["fs record-validation input.json --output <new-document>"]
+          "equals": [{ "executable": "fs", "arguments": ["record-validation","input.json","--output","<new-document>"] }]
         }
       ],
       "nonemptyStrings": []

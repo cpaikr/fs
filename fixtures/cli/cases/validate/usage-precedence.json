@@ -16,7 +16,7 @@
         { "pointer": "/error/code", "equals": "unknown-flag" },
         {
           "pointer": "/help",
-          "equals": ["fs validate missing.json --format json"]
+          "equals": [{ "executable": "fs", "arguments": ["validate","missing.json","--format","json"] }]
         }
       ],
       "nonemptyStrings": ["/error/message"]

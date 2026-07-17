@@ -2,6 +2,34 @@ export type JsonDecodeResult =
   | { readonly ok: true; readonly value: unknown }
   | { readonly ok: false; readonly message: string }
 
+const maximumBoundaryInteger = "9007199254740992"
+
+const exactIntegerMagnitude = (lexeme: string): string | null => {
+  const match = /^-?(\d+)(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/u.exec(lexeme)
+  if (match === null) return null
+  const whole = match[1] ?? ""
+  const fraction = match[2] ?? ""
+  const digits = `${whole}${fraction}`
+  if (!/[1-9]/u.test(digits)) return "0"
+
+  const exponentLexeme = match[3] ?? "0"
+  const exponentNegative = exponentLexeme.startsWith("-")
+  const exponentDigits = exponentLexeme.replace(/^[+-]?0*/u, "") || "0"
+  if (exponentDigits.length > 15) return null
+  const exponentMagnitude = Number(exponentDigits)
+  if (!Number.isSafeInteger(exponentMagnitude)) return null
+  const exponent = exponentNegative ? -exponentMagnitude : exponentMagnitude
+  const decimalIndex = whole.length + exponent
+  if (decimalIndex <= 0) return null
+  if (/[1-9]/u.test(digits.slice(decimalIndex))) return null
+
+  const integerDigits =
+    decimalIndex >= digits.length
+      ? `${digits}${"0".repeat(decimalIndex - digits.length)}`
+      : digits.slice(0, decimalIndex)
+  return integerDigits.replace(/^0+/u, "") || "0"
+}
+
 class JsonScanner {
   private index = 0
 
@@ -44,15 +72,18 @@ class JsonScanner {
   private number(lexeme: string): void {
     const numeric = Number(lexeme)
     if (!Number.isFinite(numeric)) throw new Error("JSON number is outside the supported finite range.")
-    if (/^-?\d+$/u.test(lexeme)) {
-      const integer = BigInt(lexeme)
-      const magnitude = integer < 0n ? -integer : integer
-      // The adjacent out-of-range scale fixtures deliberately require
-      // ±(MAX_SAFE_INTEGER + 1) to reach schema normalization. Larger integer
-      // lexemes cannot survive the JavaScript number boundary exactly.
-      if (magnitude > 9007199254740992n) {
-        throw new Error("JSON integer cannot be represented without precision loss.")
-      }
+    if (!Number.isInteger(numeric)) return
+
+    const magnitude = exactIntegerMagnitude(lexeme)
+    // The adjacent out-of-range scale fixtures deliberately require
+    // ±(MAX_SAFE_INTEGER + 1) to reach schema normalization. Any other token
+    // that rounds to an integer could otherwise bypass the schema boundary.
+    if (
+      magnitude === null ||
+      magnitude.length > maximumBoundaryInteger.length ||
+      (magnitude.length === maximumBoundaryInteger.length && magnitude > maximumBoundaryInteger)
+    ) {
+      throw new Error("JSON number cannot be represented without precision loss.")
     }
   }
 

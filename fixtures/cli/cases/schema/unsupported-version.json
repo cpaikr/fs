@@ -14,7 +14,7 @@
       "equalities": [
         { "pointer": "/error/operation", "equals": "schema" },
         { "pointer": "/error/code", "equals": "unsupported-version" },
-        { "pointer": "/help", "equals": ["fs schema document --version 0.1"] }
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["schema","document","--version","0.1"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },

@@ -17,10 +17,34 @@ export interface ParsedArguments {
 
 export interface UsageFailure {
   readonly operation: CommandName | "fs"
-  readonly code: "unknown-command" | "unknown-flag" | "unexpected-argument" | "unsupported-log-level"
-  readonly help: ReadonlyArray<string>
+  readonly code:
+    | "missing-argument"
+    | "unknown-command"
+    | "unknown-flag"
+    | "unexpected-argument"
+    | "unsupported-log-level"
+  readonly help: ReadonlyArray<CommandSuggestion>
   readonly message: string
 }
+
+export interface CommandSuggestion {
+  readonly executable: "fs"
+  readonly arguments: ReadonlyArray<string>
+}
+
+export const commandSuggestion = (...arguments_: ReadonlyArray<string>): CommandSuggestion => ({
+  executable: "fs",
+  arguments: arguments_
+})
+
+export const commandSuggestionWithOperand = (
+  command: CommandName | "record-validation",
+  operand: string,
+  ...options: ReadonlyArray<string>
+): CommandSuggestion =>
+  operand !== "-" && operand.startsWith("-")
+    ? commandSuggestion(command, ...options, "--", operand)
+    : commandSuggestion(command, operand, ...options)
 
 export type ParseResult =
   | { readonly ok: true; readonly value: ParsedArguments }
@@ -29,29 +53,74 @@ export type ParseResult =
 const isCommand = (value: string | undefined): value is CommandName =>
   commandNames.some((name) => name === value)
 
+const stringOptionNames = ["log-level", "version", "output", "format"] as const
+type StringOptionName = (typeof stringOptionNames)[number]
+
+const separateStringOption = (argument: string): StringOptionName | undefined =>
+  stringOptionNames.find((name) => argument === `--${name}`)
+
+interface RawInspection {
+  readonly operation: CommandName | "fs"
+  readonly operand: string | undefined
+  readonly missing: StringOptionName | undefined
+}
+
+const inspectRawArguments = (args: ReadonlyArray<string>): RawInspection => {
+  const positionals: Array<string> = []
+  let terminated = false
+  let invalidValueSeen = false
+  let missing: StringOptionName | undefined
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index]
+    if (argument === undefined) continue
+    if (!terminated && argument === "--") {
+      terminated = true
+      continue
+    }
+    if (!terminated) {
+      if (argument.startsWith("--help=")) {
+        invalidValueSeen = true
+        continue
+      }
+      const option = separateStringOption(argument)
+      if (option !== undefined) {
+        const value = args[index + 1]
+        if (value === undefined || value.startsWith("-")) {
+          if (!invalidValueSeen) missing ??= option
+          invalidValueSeen = true
+        } else {
+          index += 1
+        }
+        continue
+      }
+      if (argument.startsWith("-")) continue
+    }
+    positionals.push(argument)
+  }
+  const [candidate, ...operands] = positionals
+  return isCommand(candidate)
+    ? { operation: candidate, operand: operands[0], missing }
+    : { operation: "fs", operand: undefined, missing }
+}
+
 export const commandHelp = (
   operation: CommandName | "fs",
   operand?: string
-): ReadonlyArray<string> => {
+): ReadonlyArray<CommandSuggestion> => {
   switch (operation) {
     case "validate":
-      return [`fs validate ${operand ?? "<document|->"} --format json`]
+      return [commandSuggestionWithOperand("validate", operand ?? "<document|->", "--format", "json")]
     case "create":
-      return [`fs create ${operand ?? "<candidate|->"} --output <new-document>`]
+      return [commandSuggestionWithOperand("create", operand ?? "<candidate|->", "--output", "<new-document>")]
     case "schema":
-      return ["fs schema document --version 0.1"]
+      return [commandSuggestion("schema", "document", "--version", "0.1")]
     case "example":
-      return ["fs example minimal"]
+      return [commandSuggestion("example", "minimal")]
     case "guide":
-      return ["fs guide authoring"]
+      return [commandSuggestion("guide", "authoring")]
     case "fs":
-      return ["fs --help"]
+      return [commandSuggestion("--help")]
   }
-}
-
-const operationFromRaw = (args: ReadonlyArray<string>): CommandName | "fs" => {
-  const candidate = args.find((argument) => !argument.startsWith("-"))
-  return isCommand(candidate) ? candidate : "fs"
 }
 
 const normalizeLogLevel = (value: string | undefined): LogLevel | null => {
@@ -91,18 +160,28 @@ const parseRawArguments = (args: ReadonlyArray<string>) =>
   })
 
 export const parseArguments = (args: ReadonlyArray<string>): ParseResult => {
-  const rawOperation = operationFromRaw(args)
   let parsed: ReturnType<typeof parseRawArguments>
   try {
     parsed = parseRawArguments(args)
-  } catch {
+  } catch (error) {
+    const context = inspectRawArguments(args)
+    const missing =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "ERR_PARSE_ARGS_INVALID_OPTION_VALUE"
+        ? context.missing
+        : undefined
+    const isAllowedMissing = missing !== undefined && allowedOptions[context.operation].has(missing)
     return {
       ok: false,
       error: {
-        operation: rawOperation,
-        code: "unknown-flag",
-        message: "An option is not supported for this command.",
-        help: commandHelp(rawOperation, args.find((argument, index) => index > 0 && !argument.startsWith("-")))
+        operation: context.operation,
+        code: isAllowedMissing ? "missing-argument" : "unknown-flag",
+        message: isAllowedMissing
+          ? "A required option value was not supplied."
+          : "An option is not supported for this command.",
+        help: commandHelp(context.operation, context.operand)
       }
     }
   }
@@ -163,6 +242,19 @@ export const parseArguments = (args: ReadonlyArray<string>): ParseResult => {
         operation,
         code: "unexpected-argument",
         message: "An option was supplied more than once.",
+        help: commandHelp(operation, operands[0])
+      }
+    }
+  }
+
+  const emptyOption = stringOptionNames.find((name) => parsed.values[name] === "")
+  if (emptyOption !== undefined) {
+    return {
+      ok: false,
+      error: {
+        operation,
+        code: "missing-argument",
+        message: "A required option value was not supplied.",
         help: commandHelp(operation, operands[0])
       }
     }

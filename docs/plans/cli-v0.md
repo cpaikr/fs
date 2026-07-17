@@ -32,9 +32,10 @@ command.
 
 ## Current Validation
 
-`pnpm verify` passes strict typecheck, Effect diagnostics, 83 unit and fault
-tests, all 76 packed-process cases, build, installed-tarball npm/npx smoke, and
-exact checks for 46 packed files. The same gate passes in isolated Linux
+`pnpm verify` passes strict typecheck, Effect diagnostics, 96 unit and fault
+tests, all 80 packed-process cases, five child-process crash points, 16-way
+writer contention, build, installed-tarball npm/npx smoke, and exact checks
+for 46 packed files. The same gate passes in isolated Linux
 environments on Node 22.17.0 and 24.15.0; CI enforces both versions on Linux,
 macOS, and Windows. `./scripts/check-docs.sh` and `git diff --check` pass.
 

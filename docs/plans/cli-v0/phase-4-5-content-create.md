@@ -61,6 +61,8 @@ competing-destination failures. After commit, persistent temp unlink failure
 retains success and may leave only a private-mode complete hard link; it never
 retracts or partially exposes the synced destination. The suite also proves
 exact bytes, no ordinary overwrite, single reads, and stable read-before-write
-ordering across logging settings. `pnpm verify` passes on macOS and isolated
-Linux Node 22.17.0 and 24.15.0; CI runs the same gate on Linux, macOS, and
-Windows.
+ordering across logging settings. A real child-process integration harness
+crashes after open, write, sync, close, and link to verify the commit boundary,
+then races 16 writers to prove exactly one complete winner and ordinary temp
+cleanup. `pnpm verify` passes on macOS and isolated Linux Node 22.17.0 and
+24.15.0; CI runs the same gate on Linux, macOS, and Windows.

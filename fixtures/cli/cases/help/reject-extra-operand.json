@@ -1,9 +1,9 @@
 {
-  "id": "create-unknown-flag",
+  "id": "help-reject-extra-operand",
   "command": "fs",
-  "arguments": ["create", "missing.json", "--output", "result.json", "--unknown"],
+  "arguments": ["create", "candidate.json", "extra.json", "--output", "result.json", "--help"],
   "workspace": [
-    { "copy": "../valid/no-calculation-rules.json", "to": "result.json" }
+    { "copy": "../valid/no-calculation-rules.json", "to": "candidate.json" }
   ],
   "stdin": null,
   "expect": {
@@ -15,22 +15,15 @@
       ],
       "equalities": [
         { "pointer": "/error/operation", "equals": "create" },
-        { "pointer": "/error/code", "equals": "unknown-flag" },
-        {
-          "pointer": "/help",
-          "equals": [{ "executable": "fs", "arguments": ["create","missing.json","--output","<new-document>"] }]
-        }
+        { "pointer": "/error/code", "equals": "unexpected-argument" },
+        { "pointer": "/help", "equals": [{ "executable": "fs", "arguments": ["create", "candidate.json", "--output", "<new-document>"] }] }
       ],
       "nonemptyStrings": ["/error/message"]
     },
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 2,
     "filesystem": {
-      "workspace": {
-        "created": [],
-        "unchanged": ["result.json"],
-        "absent": ["missing.json"]
-      },
+      "workspace": { "created": [], "unchanged": ["candidate.json"], "absent": ["result.json"] },
       "home": { "created": [], "unchanged": [], "absent": [] }
     }
   }

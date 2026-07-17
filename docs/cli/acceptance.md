@@ -77,7 +77,15 @@ An illustrative case descriptor is:
         {
           "pointer": "/help",
           "equals": [
-            "fs record-validation input.json --output <new-document>"
+            {
+              "executable": "fs",
+              "arguments": [
+                "record-validation",
+                "input.json",
+                "--output",
+                "<new-document>"
+              ]
+            }
           ]
         }
       ]
@@ -174,7 +182,7 @@ nonempty; and calculations are `not-run` with no applications. This does not
 create a duplicate semantic expected-result file merely for the CLI layer.
 
 When a structurally conforming document has no recorded snapshot, `help`
-contains one complete `fs record-validation` command template. It carries
+contains one structured `fs record-validation` argv suggestion. It carries
 forward the path input or `-` and uses `<new-document>` for the required output
 path. When a snapshot exists, or when structural nonconformance prevents
 recording, `help` is empty.
@@ -197,7 +205,12 @@ object instead of a validation envelope:
     "message": "The input path does not exist.",
     "path": "missing.json"
   },
-  "help": ["fs validate <existing-document> --format json"]
+  "help": [
+    {
+      "executable": "fs",
+      "arguments": ["validate", "<existing-document>", "--format", "json"]
+    }
+  ]
 }
 ```
 
@@ -219,14 +232,23 @@ must still use their specific tagged error rather than collapse into this
 fallback.
 
 Messages are concise and nonempty but are not compared word-for-word. `help`
-is always an array and contains only complete command templates that can
-correct the error; it is empty when no such correction exists. Dependency
+is always an array and contains only structured command suggestions that can
+correct the error; it is empty when no such correction exists. Each suggestion
+has an `executable` and an `arguments` array. Consumers invoke those values
+directly without shell parsing; paths and metacharacters remain one argument,
+leading-dash operands follow `--`, and placeholder values such as
+`<new-document>` occupy one argument to replace before invocation. Dependency
 names, raw operating-system messages, stack traces, and partial payloads are
 never exposed.
 
 Command and flag usage is validated before any input is read or output path is
 modified. A usage error therefore takes precedence over parsing, validation,
 and filesystem errors.
+
+`--help` relaxes only absent command requirements in an otherwise-valid command
+prefix. Supplied extra operands, unknown names or topics, unsupported versions
+or formats, and invalid or valueless options remain usage errors with exit code
+`2`, even when `--help` is also present.
 
 ## Exit Codes
 
@@ -265,8 +287,10 @@ enforce no-overwrite at the atomic commit boundary so the preflight check does
 not introduce a race.
 
 Ordinary acceptance cases prove that failed commands leave no partial output.
-Crash-level atomicity requires a separate fault-injection integration test; a
-post-execution fixture alone cannot prove it.
+A separate child-process fault-injection integration test terminates writers
+after open, write, sync, close, and link, and verifies the hard-link commit
+boundary. A concurrent-writer case verifies exactly one complete winner and
+no ordinary temporary-file residue.
 
 Successful creation reports:
 
@@ -340,6 +364,10 @@ plus a success case proving that
 schema version flag. This also locks a documented positional-then-flag
 invocation so a dependency upgrade cannot silently narrow the accepted
 grammar.
+
+Add `--help` precedence cases proving that invalid supplied names, versions,
+formats, and extra operands remain errors. Help succeeds for valid invocations,
+including otherwise-valid prefixes with absent command requirements.
 
 ### Discovery and read-only content
 
