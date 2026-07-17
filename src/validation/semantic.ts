@@ -1,6 +1,7 @@
 import { applicationKey, compareDiagnostics } from "./identity.js"
 import type { Document, Period } from "./model.js"
 import type { StructuralError } from "./schema.js"
+import { isApplicationValid } from "./snapshot.js"
 
 const diagnostic = (code: string, path: string): StructuralError => ({
   code,
@@ -180,6 +181,9 @@ export const validateSemantics = (document: Document): ReadonlyArray<StructuralE
       errors.push(diagnostic("duplicate-application-key", `/validationSnapshot/applications/${index}/key`))
     }
     snapshotKeys.add(key)
+    if (!isApplicationValid(application)) {
+      errors.push(diagnostic("invalid-value", `/validationSnapshot/applications/${index}`))
+    }
   })
 
   return errors.sort(compareDiagnostics)

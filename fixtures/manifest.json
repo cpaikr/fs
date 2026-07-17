@@ -48,6 +48,12 @@
   ],
   "invalidDocuments": [
     {
+      "document": "invalid/contradictory-snapshot-application.json",
+      "layer": "semantic",
+      "code": "invalid-value",
+      "path": "/validationSnapshot/applications/0"
+    },
+    {
       "document": "invalid/cyclic-rollup.json",
       "layer": "semantic",
       "code": "cyclic-rollup",

@@ -12,8 +12,8 @@ describe("validation snapshot recording", () => {
   it.each([
     [
       "without an existing snapshot",
-      "fixtures/valid/no-calculation-rules.json",
-      "fixtures/cli/expected/record-validation/no-rules.json"
+      "fixtures/valid/no-rollups.json",
+      "fixtures/cli/expected/record-validation/no-rollups.json"
     ],
     [
       "while replacing a mismatching snapshot",
@@ -38,16 +38,14 @@ describe("validation snapshot recording", () => {
   })
 
   it("preserves arbitrary parsed top-level member order before the appended snapshot", () => {
-    const decoded = decodeJson(readFileSync(resolve("fixtures/valid/no-calculation-rules.json")))
+    const decoded = decodeJson(readFileSync(resolve("fixtures/valid/no-rollups.json")))
     expect(decoded.ok).toBe(true)
     if (!decoded.ok) return
     const source = decoded.value as Document
     const reordered: Document = {
       statements: source.statements,
-      facts: source.facts,
       periods: source.periods,
       units: source.units,
-      items: source.items,
       scope: source.scope,
       entity: source.entity,
       formatVersion: source.formatVersion
@@ -58,10 +56,8 @@ describe("validation snapshot recording", () => {
     const recorded = recordValidationSnapshot(reordered, validation)
     const expectedOrder = [
       "statements",
-      "facts",
       "periods",
       "units",
-      "items",
       "scope",
       "entity",
       "formatVersion",

@@ -2,7 +2,7 @@ import { isDeepStrictEqual } from "node:util"
 
 import { Decimal } from "./decimal.js"
 import { applicationKey } from "./identity.js"
-import type { ApplicationResult, ValidationSnapshot } from "./model.js"
+import type { ApplicationResult, CalculationStatus, ValidationSnapshot } from "./model.js"
 
 export interface ValidationResult {
   readonly formatVersion: "0.1"
@@ -11,10 +11,15 @@ export interface ValidationResult {
     readonly errors: ReadonlyArray<{ readonly code: string; readonly path: string; readonly message: string }>
   }
   readonly calculations: {
-    readonly status: "not-run" | "not-defined" | "not-evaluated" | "consistent" | "inconsistent"
+    readonly status: CalculationStatus
     readonly applications: ReadonlyArray<ApplicationResult>
   }
 }
+
+type ApplicationChange =
+  | { readonly change: "unchanged" | "changed"; readonly recorded: ApplicationResult; readonly current: ApplicationResult }
+  | { readonly change: "added"; readonly current: ApplicationResult }
+  | { readonly change: "removed"; readonly recorded: ApplicationResult }
 
 export type SnapshotDiff =
   | { readonly formatVersion: "0.1"; readonly status: "not-recorded" }
@@ -22,17 +27,16 @@ export type SnapshotDiff =
   | {
       readonly formatVersion: "0.1"
       readonly status: "match" | "mismatch"
-      readonly conformance: { readonly recorded: string; readonly current: string }
-      readonly calculations: { readonly recorded: string; readonly current: string }
-      readonly applications: ReadonlyArray<
-        | { readonly change: "unchanged" | "changed"; readonly recorded: ApplicationResult; readonly current: ApplicationResult }
-        | { readonly change: "added"; readonly current: ApplicationResult }
-        | { readonly change: "removed"; readonly recorded: ApplicationResult }
-      >
+      readonly conformance: {
+        readonly recorded: "conforming" | "nonconforming"
+        readonly current: "conforming" | "nonconforming"
+      }
+      readonly calculations: { readonly recorded: CalculationStatus; readonly current: CalculationStatus }
+      readonly applications: ReadonlyArray<ApplicationChange>
     }
 
-const isApplicationValid = (application: ApplicationResult): boolean => {
-  if (application.status !== "satisfied" && application.status !== "unsatisfied") return true
+export const isApplicationValid = (application: ApplicationResult): boolean => {
+  if (application.status === "error") return true
   try {
     const difference = Decimal.parse(application.actual).subtract(Decimal.parse(application.expected))
     if (difference.toString() !== Decimal.parse(application.difference).toString()) return false
@@ -52,16 +56,13 @@ export const isSnapshotValid = (snapshot: ValidationSnapshot): boolean => {
   }
   if (snapshot.calculations === "not-run") return false
   if (snapshot.calculations === "not-defined") return snapshot.applications.length === 0
-  if (snapshot.calculations === "not-evaluated") {
-    return snapshot.applications.length > 0 && snapshot.applications.every((result) => result.status === "skipped")
-  }
   if (snapshot.calculations === "consistent") {
-    return (
-      snapshot.applications.some((result) => result.status === "satisfied") &&
-      snapshot.applications.every((result) => result.status === "satisfied" || result.status === "skipped")
-    )
+    return snapshot.applications.length > 0 && snapshot.applications.every(({ status }) => status === "satisfied")
   }
-  return snapshot.applications.some((result) => result.status === "unsatisfied" || result.status === "error")
+  return (
+    snapshot.applications.length > 0 &&
+    snapshot.applications.some(({ status }) => status === "unsatisfied" || status === "error")
+  )
 }
 
 export const compareSnapshot = (
@@ -73,34 +74,31 @@ export const compareSnapshot = (
     return { formatVersion: "0.1", status: "not-comparable", reason: "invalid-snapshot" }
   }
 
-  const recorded = new Map(snapshot.applications.map((result) => [applicationKey(result.key), result]))
-  const changes: Array<
-    | { readonly change: "unchanged" | "changed"; readonly recorded: ApplicationResult; readonly current: ApplicationResult }
-    | { readonly change: "added"; readonly current: ApplicationResult }
-    | { readonly change: "removed"; readonly recorded: ApplicationResult }
-  > = []
+  const remaining = new Map(snapshot.applications.map((application) => [applicationKey(application.key), application]))
+  const changes: Array<ApplicationChange> = []
   for (const application of current.calculations.applications) {
-    const key = applicationKey(application.key)
-    const prior = recorded.get(key)
+    const prior = remaining.get(applicationKey(application.key))
     if (prior === undefined) {
       changes.push({ change: "added", current: application })
-    } else {
-      changes.push({
-        change: isDeepStrictEqual(prior, application) ? "unchanged" : "changed",
-        recorded: prior,
-        current: application
-      })
-      recorded.delete(key)
+      continue
     }
+    changes.push({
+      change: isDeepStrictEqual(prior, application) ? "unchanged" : "changed",
+      recorded: prior,
+      current: application
+    })
+    remaining.delete(applicationKey(application.key))
   }
   for (const application of snapshot.applications) {
-    if (recorded.has(applicationKey(application.key))) changes.push({ change: "removed", recorded: application })
+    if (remaining.has(applicationKey(application.key))) {
+      changes.push({ change: "removed", recorded: application })
+    }
   }
 
   const status =
     snapshot.conformance === current.conformance.status &&
     snapshot.calculations === current.calculations.status &&
-    changes.every((change) => change.change === "unchanged")
+    changes.every(({ change }) => change === "unchanged")
       ? "match"
       : "mismatch"
   return {

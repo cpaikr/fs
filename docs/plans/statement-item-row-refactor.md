@@ -1,6 +1,6 @@
 # Statement Item Row Refactor Plan
 
-Status: In progress. Phases 0–2 are complete; rollups and snapshots are next.
+Status: In progress. Phases 0–3 are complete; rendering is next.
 
 This file is the concise milestone index and the only owner of live progress,
 temporary drift, blockers, and the next action. Stable phase scope and gates
@@ -50,7 +50,7 @@ cross-platform release verification, version publication, and npm release.
 | 0. Contract and remaining decisions | Complete | [Target contract](statement-item-row-refactor/phase-0-contract.md) |
 | 1. Schemas and contract evidence | Complete | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
 | 2. Document model and structural validation | Complete | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
-| 3. Rollups, results, and snapshots | Not started | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
+| 3. Rollups, results, and snapshots | Complete | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
 | 4. Rendering | Not started | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
 | 5. CLI, guidance, and package integration | Not started | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
 | 6. Legacy removal and final gate | Not started | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
@@ -80,11 +80,12 @@ statement-row model directly. The replacement schemas close result and diff
 variants, encode status/application cardinality, and retain relative schema
 identifiers for Roadmap step 11. The in-process document model, application
 identity, schema diagnostics, and semantic validation now use statement-owned
-rows and statement-local rollup graphs. Calculation, snapshot, rendering, and
-generated guidance code still implement the dimensional fact model; no
-compatibility path has been added. The delivery uses two sequential PRs: the
-merged Phase-0 contract slice and this coordinated Phase-1-through-6 machine
-and runtime cutover.
+rows and statement-local rollup graphs. Calculation, validation results,
+snapshot comparison, and snapshot recording now use direct-child rollups and
+statement-qualified application keys. Rendering and generated guidance still
+implement the dimensional fact model; no compatibility path has been added.
+The delivery uses two sequential PRs: the merged Phase-0 contract slice and
+this coordinated Phase-1-through-6 machine and runtime cutover.
 
 The completed step-9 renderer and snapshot implementation remain the verified
 baseline. Historical delivery evidence stays in the
@@ -101,11 +102,11 @@ phases reuse rather than duplicate earlier evidence.
 ## Known Temporary Drift
 
 - The normative prose and machine-readable evidence define the replacement
-  contract. The shared runtime model and structural validation also use it,
-  while calculation, snapshot, rendering, their direct tests, exact HTML, and
-  generated guidance still define the prior model. Phases 3–5 close those
-  projections on this cutover branch. Typecheck is consequently red only at
-  those remaining direct consumers of removed model fields and statuses.
+  contract. Runtime validation, rollup calculation, results, snapshot
+  comparison, and recording also use it, while rendering, its direct tests,
+  exact HTML, and generated guidance still define the prior model. Phases 4–5
+  close those projections on this cutover branch. Typecheck is consequently
+  red only in the renderer and its tests.
 
 This drift is deliberate only while Roadmap step 10 is active. Do not update
 examples or fixtures piecemeal to make summaries appear current.
@@ -150,14 +151,25 @@ identifier reuse, complete cycle reporting, and semantic map-key validation.
 Fresh review found and closed irrelevant-union diagnostic leakage and
 well-typed cell misclassification. The targeted test and whitespace gates pass.
 
+Phase 3 replaces general calculations with ordered direct-child rollups and
+replaces dimensional snapshot identity with `{statement, parent, period}`.
+Runtime validation results exactly equal the shared Phase-1 result fixtures;
+snapshot tests cover matching, changed, added, removed, invalid, and freshly
+recorded states; record-validation emits the shared exact bytes without
+mutating input. Fresh review found that a numerically contradictory historical
+application was not blocking recording. It now produces structural
+`invalid-value` at that application, a `not-comparable` diff, and explicit
+recording refusal. The targeted calculation, validation, snapshot, recording,
+process, documentation, and whitespace gates pass.
+
 ## Blockers
 
-None to beginning Phase 3.
+None to beginning Phase 4.
 
 ## Next Action
 
-Replace general calculation evaluation and dimensional snapshot identity with
-direct additive rollups and statement-qualified snapshot comparison in Phase 3.
+Replace the renderer and exact HTML fixtures with ordered statement-row tables
+while preserving every preflight and final-byte output budget in Phase 4.
 
 ## Completion
 

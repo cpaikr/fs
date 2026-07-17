@@ -375,7 +375,8 @@ code. These are the complete current codes and path rules:
   member.
 - `invalid-type`: a value has the wrong JSON type; the path is that value.
 - `invalid-value`: a typed value violates its enum, constant, pattern,
-  cardinality, or closed union; the path is that value or collection.
+  cardinality, closed union, or a recorded numeric application's arithmetic
+  and status relationship; the path is that value, application, or collection.
 - `decimal-string-required`: an item value uses a JSON number instead of an
   exact decimal string; the path is that value cell.
 - `invalid-tolerance`: `defaultTolerance` is malformed or negative; the path

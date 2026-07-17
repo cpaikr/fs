@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs"
 
 import { describe, expect, it } from "vitest"
 
-import type { Document } from "../src/validation/model.js"
+import type { ApplicationResult, Document, ValidationSnapshot } from "../src/validation/model.js"
+import { compareSnapshot, type ValidationResult } from "../src/validation/snapshot.js"
 import { validateDocument } from "../src/validation/validate.js"
 
 const document = (path: string): Document =>
@@ -10,14 +11,48 @@ const document = (path: string): Document =>
 
 describe("snapshot comparison", () => {
   it.each([
-    ["fixtures/valid/no-calculation-rules.json", "fixtures/snapshot-diffs/not-recorded.json"],
+    ["fixtures/valid/no-rollups.json", "fixtures/snapshot-diffs/not-recorded.json"],
     ["fixtures/valid/recorded-snapshot.json", "fixtures/snapshot-diffs/match.json"],
     ["fixtures/valid/snapshot-mismatch-source.json", "fixtures/snapshot-diffs/mismatch.json"],
-    ["fixtures/invalid/duplicate-snapshot-application-key.json", "fixtures/snapshot-diffs/invalid-snapshot.json"]
+    ["fixtures/invalid/duplicate-snapshot-application-key.json", "fixtures/snapshot-diffs/invalid-snapshot.json"],
+    [
+      "fixtures/cli/expected/record-validation/snapshot-mismatch.json",
+      "fixtures/snapshot-diffs/recorded-snapshot-mismatch.json"
+    ]
   ] as const)("matches %s", (documentPath, expectedPath) => {
     expect(validateDocument(document(documentPath)).snapshotDiff).toEqual(
       JSON.parse(readFileSync(expectedPath, "utf8")) as unknown
     )
+  })
+
+  it("orders current additions before recorded removals", () => {
+    const expected = JSON.parse(readFileSync("fixtures/snapshot-diffs/application-set-changes.json", "utf8")) as {
+      readonly applications: ReadonlyArray<
+        | { readonly change: "added"; readonly current: ApplicationResult }
+        | { readonly change: "removed"; readonly recorded: ApplicationResult }
+      >
+    }
+    const added = expected.applications.find(
+      (change): change is { readonly change: "added"; readonly current: ApplicationResult } =>
+        change.change === "added"
+    )
+    const removed = expected.applications.find(
+      (change): change is { readonly change: "removed"; readonly recorded: ApplicationResult } =>
+        change.change === "removed"
+    )
+    if (added === undefined || removed === undefined) throw new Error("Application-set fixture lost a change")
+
+    const snapshot: ValidationSnapshot = {
+      conformance: "conforming",
+      calculations: "consistent",
+      applications: [removed.recorded]
+    }
+    const current: ValidationResult = {
+      formatVersion: "0.1",
+      conformance: { status: "conforming", errors: [] },
+      calculations: { status: "inconsistent", applications: [added.current] }
+    }
+    expect(compareSnapshot(snapshot, current)).toEqual(expected)
   })
 
   it("does not traverse a schema-invalid snapshot", () => {
@@ -33,7 +68,7 @@ describe("snapshot comparison", () => {
     })
   })
 
-  it("rejects a contradictory numeric snapshot application", () => {
+  it("rejects contradictory numeric snapshot applications as structural nonconformance", () => {
     for (const application of [
       { status: "unsatisfied", difference: "999" },
       { status: "satisfied", difference: "-1" }
@@ -44,7 +79,7 @@ describe("snapshot comparison", () => {
         calculations: application.status === "satisfied" ? "consistent" : "inconsistent",
         applications: [
           {
-            key: { rule: "historical-rule", period: "historical-period", dimensions: {} },
+            key: { statement: "historical", parent: "total", period: "historical" },
             status: application.status,
             actual: "1",
             expected: "2",
@@ -55,12 +90,16 @@ describe("snapshot comparison", () => {
       }
 
       const result = validateDocument(value)
-      expect(result.validation.conformance).toMatchObject({
+      expect(result.validation.conformance).toEqual({
         status: "nonconforming",
-        errors: expect.arrayContaining([
-          expect.objectContaining({ code: "invalid-snapshot", path: "/validationSnapshot" })
-        ])
+        errors: [
+          expect.objectContaining({
+            code: "invalid-value",
+            path: "/validationSnapshot/applications/0"
+          })
+        ]
       })
+      expect(result.validation.calculations).toEqual({ status: "not-run", applications: [] })
       expect(result.snapshotDiff).toEqual({
         formatVersion: "0.1",
         status: "not-comparable",

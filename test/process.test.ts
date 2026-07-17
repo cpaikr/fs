@@ -107,7 +107,7 @@ describe("application process boundary", () => {
         makeIO(root, {
           readStdin: Effect.sync(() => {
             reads += 1
-            return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+            return readFileSync(resolve("fixtures/valid/no-rollups.json"))
           })
         })
       )
@@ -117,6 +117,44 @@ describe("application process boundary", () => {
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
+  })
+
+  it("refuses to replace an internally contradictory snapshot", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "record-validation",
+        input: "fixtures/invalid/contradictory-snapshot-application.json",
+        output: "recorded.json",
+        logLevel: "none"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.succeed(false),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      validation: {
+        conformance: {
+          status: "nonconforming",
+          errors: [
+            {
+              code: "invalid-value",
+              path: "/validationSnapshot/applications/0"
+            }
+          ]
+        },
+        calculations: { status: "not-run", applications: [] }
+      },
+      snapshotDiff: { status: "not-comparable", reason: "invalid-snapshot" },
+      output: { status: "not-created", reason: "structural-nonconformance" }
+    })
+    expect(calls).toEqual([])
   })
 
   it("reads stdin exactly once when rendering", () => {
@@ -319,7 +357,7 @@ describe("application process boundary", () => {
         }),
         readStdin: Effect.sync(() => {
           calls.push("read")
-          return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+          return readFileSync(resolve("fixtures/valid/no-rollups.json"))
         }),
         writeFile: (_path, contents) => Effect.sync(() => {
           calls.push("write")
@@ -332,7 +370,7 @@ describe("application process boundary", () => {
     expect(result.exitCode).toBe(0)
     expect(calls).toEqual(["exists", "read", "write"])
     expect(written).toEqual(
-      readFileSync(resolve("fixtures/cli/expected/record-validation/no-rules.json"))
+      readFileSync(resolve("fixtures/cli/expected/record-validation/no-rollups.json"))
     )
   })
 
@@ -384,7 +422,7 @@ describe("application process boundary", () => {
         }),
         readStdin: Effect.sync(() => {
           calls.push("read")
-          return readFileSync(resolve("fixtures/invalid/unresolved-item.json"))
+          return readFileSync(resolve("fixtures/invalid/unresolved-rollup.json"))
         }),
         writeFile: () => Effect.sync(() => {
           calls.push("write")
