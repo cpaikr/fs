@@ -36,12 +36,13 @@ conformance command.
 
 ## Current Validation
 
-The committed Effect-native implementation passes `pnpm verify` on supported
-Node 22.17.0: strict typecheck, zero strict Effect diagnostics, 91 unit and
-fault tests, all 80 revised packed-process cases, five child-process crash
-points, 16-way writer contention, and installed-tarball npm/npx smoke for 39
-cleanly built packed files. The packed help checks include the production
-entry point with color-capable terminal state and reject CSI and OSC escapes.
+The current Effect-native implementation passes `pnpm verify` on supported
+Node 22.17.0: strict typecheck, zero strict Effect diagnostics, 92 unit and
+fault tests, all 81 revised packed-process cases, five child-process crash
+points, early contender-exit detection, 16-way writer contention, and
+installed-tarball npm/npx smoke for 39 cleanly built packed files. The packed
+help checks include the production entry point with color-capable terminal
+state and reject CSI and OSC escapes.
 
 The same full suite passed locally on Node 24.15.0 before the final
 packaging-test hardening; the final pack check passes on both supported Node
@@ -59,10 +60,10 @@ remain unchanged.
 
 ## Current Blockers
 
-- The committed migration has not run on the configured Windows CI matrix.
-  Running that external check requires pushing the local commits.
+- The current PR head has not completed the GitHub-hosted Linux, macOS, and
+  Windows CI matrix.
 
 ## Next Action
 
-Push the committed migration, require all six supported Node/platform CI legs
-to pass, then close Phase 6 and Roadmap step 8.
+Require all six supported Node/platform CI legs and the documentation check to
+pass, then close Phase 6 and Roadmap step 8.
