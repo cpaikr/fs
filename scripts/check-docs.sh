@@ -6,7 +6,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 echo "Linting Markdown"
-pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist'
+pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist' '#CHANGELOG.md'
 
 echo "Checking Markdown links"
 while IFS= read -r -d '' document; do
@@ -18,6 +18,7 @@ done < <(
   find . \
     -path './.git' -prune -o \
     -path './node_modules' -prune -o \
+    -path './CHANGELOG.md' -prune -o \
     -name '*.md' -print0
 )
 
