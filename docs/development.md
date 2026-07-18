@@ -1,8 +1,8 @@
 # Development
 
 This guide owns source-repository setup, local execution, and validation
-commands. The [active release plan](plans/v0-release-candidate.md) owns live
-release status and the next action.
+commands. The completed [V0 release plan](plans/v0-release-candidate.md) records
+release evidence; future active plans own their live status and next action.
 
 ## Prerequisites
 
@@ -94,6 +94,12 @@ tarball inventory and retained asset bytes, install the tarball in isolation,
 and exercise its CLI. Use `pnpm release:check` only for an authorized release
 candidate validation; publication, tagging, and release creation are separate
 actions.
+
+The dependent CI publication check runs npm's publication dry run while the
+package version is unpublished. Once that version exists, it compares the
+local dry-run pack SHA-1 and SHA-512 integrity with npm. Matching bytes confirm
+the published artifact; changed bytes confirm packing still succeeds and
+require Release Please to assign the next version before publication.
 
 ## Release management
 

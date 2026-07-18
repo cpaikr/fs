@@ -5,7 +5,7 @@ one primary responsibility.
 
 ## Start by task
 
-- Check live release status or the next action:
+- Inspect the completed V0 release:
   [V0 release candidate](plans/v0-release-candidate.md)
 - Set up, run, test, or package the repository:
   [Development guide](development.md)
