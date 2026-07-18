@@ -1,10 +1,21 @@
 import { Decimal } from "./decimal.js"
-import type { ApplicationKey, ApplicationResult, Document, Item, Unit, ValueCell } from "./model.js"
+import {
+  inconsistentApplications,
+  type ApplicationKey,
+  type ApplicationResult,
+  type ConsistentApplications,
+  type Document,
+  type InconsistentApplications,
+  type Item,
+  type SatisfiedApplication,
+  type Unit,
+  type ValueCell
+} from "./model.js"
 
-export interface CalculationResult {
-  readonly status: "not-defined" | "consistent" | "inconsistent"
-  readonly applications: ReadonlyArray<ApplicationResult>
-}
+export type CalculationResult =
+  | { readonly status: "not-defined"; readonly applications: readonly [] }
+  | { readonly status: "consistent"; readonly applications: ConsistentApplications }
+  | { readonly status: "inconsistent"; readonly applications: InconsistentApplications }
 
 const key = (statement: string, parent: string, period: string): ApplicationKey => ({
   statement,
@@ -14,6 +25,9 @@ const key = (statement: string, parent: string, period: string): ApplicationKey 
 
 const isUnavailable = (cell: ValueCell): cell is { readonly unavailable: true } =>
   typeof cell === "object" && cell !== null
+
+const isSatisfied = (application: ApplicationResult): application is SatisfiedApplication =>
+  application.status === "satisfied"
 
 const cellFailure = (
   applicationKey: ApplicationKey,
@@ -61,12 +75,13 @@ const evaluate = (
 
   const parentValue = parent.values[period]
   if (typeof parentValue !== "string") throw new Error("Validated parent cell lost its decimal value")
-  let expected = Decimal.zero()
+  const childValues: Array<Decimal> = []
   for (const child of children) {
     const value = child.values[period]
     if (typeof value !== "string") throw new Error("Validated child cell lost its decimal value")
-    expected = expected.add(Decimal.parse(value))
+    childValues.push(Decimal.parse(value))
   }
+  const expected = Decimal.sum(childValues)
   const actual = Decimal.parse(parentValue)
   const difference = actual.subtract(expected)
   const tolerance = Decimal.parse(toleranceFor(parent, units))
@@ -101,11 +116,17 @@ export const calculate = (document: Document): CalculationResult => {
     }
   }
 
-  if (applications.length === 0) return { status: "not-defined", applications }
+  if (applications.length === 0) return { status: "not-defined", applications: [] }
+  const inconsistent = inconsistentApplications(applications)
+  if (inconsistent !== undefined) return { status: "inconsistent", applications: inconsistent }
+  if (!applications.every(isSatisfied)) {
+    throw new Error("A defined consistent calculation lost its satisfied application")
+  }
+  const [first, ...rest] = applications
+  if (first === undefined) throw new Error("A defined calculation lost its applications")
+  const consistent: ConsistentApplications = [first, ...rest]
   return {
-    status: applications.some(({ status }) => status === "unsatisfied" || status === "error")
-      ? "inconsistent"
-      : "consistent",
-    applications
+    status: "consistent",
+    applications: consistent
   }
 }

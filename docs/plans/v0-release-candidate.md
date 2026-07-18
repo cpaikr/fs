@@ -1,9 +1,9 @@
 # V0 Release Candidate Plan
 
-Status: Active. The first complete implementation is present on `dev`, and
-the whole-codebase review is complete. Its safe follow-up passes the current
-pre-publication gates. The remaining remediation decisions are confirmed but
-not yet implemented; the package remains unpublished.
+Status: Active. The first complete implementation and its review follow-up are
+present on `dev`. Phases 0–2 of boundary remediation are implemented on the
+bounded-CLI checkpoint branch and await review and integration; Phase 3 has
+not begun. The package remains unpublished.
 
 This plan owns live Roadmap step-11 state, decisions, validation, blockers,
 and the next action. The [semantic specification](../semantic-spec.md) owns
@@ -73,6 +73,11 @@ publish, tag, or create a GitHub release.
 - Keep `cpaikr/fs` private through remediation. During the authorized release
   workflow, make it public immediately before npm publication and verify the
   package's repository metadata through anonymous access.
+- Deliver the Phase 0 contract and executable descriptors before their runtime
+  implementation as separate commits in one Phases 0–2 boundary-remediation
+  PR. Required CI executes every descriptor, so a contract-only PR cannot be a
+  green integration checkpoint. The PR preserves phase order internally and
+  no Phase 3 work begins before it is reviewed and merged into updated `dev`.
 
 ## Delivered Candidate
 
@@ -111,12 +116,15 @@ The review applied these contract-preserving safe fixes:
 
 ## Remediation Plan
 
-The phases are sequential. Each phase updates its owning contract before or
-with implementation, passes focused validation, receives code review, and is
-merged into updated `dev` before the next phase begins. No compatibility slice
-or parallel old path is permitted.
+The integration checkpoints are sequential. Phase 0 contract commits precede
+the Phase 1–2 implementation in their combined checkpoint. Each checkpoint
+passes focused validation, receives code review, and is merged into updated
+`dev` before the next checkpoint begins. No compatibility slice or parallel
+old path is permitted.
 
 ### Phase 0: Fix the operational contract
+
+Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
 
 - Define bounded input behavior in the CLI design and acceptance contract.
   Select byte, nesting, and computational limits from representative artifacts,
@@ -136,6 +144,8 @@ or parallel old path is permitted.
 
 ### Phase 1: Bound parsing and exact arithmetic
 
+Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
+
 - Replace recursive JSON descent with an iterative duplicate-aware scanner
   that retains UTF-8, trailing-content, duplicate-member, numeric-precision,
   and syntax guarantees while enforcing the confirmed operational limits.
@@ -151,6 +161,8 @@ or parallel old path is permitted.
   materially change calculation cost or results.
 
 ### Phase 2: Deepen application boundaries
+
+Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
 
 - Parse native actions and discovery without constructing application I/O.
   Acquire the current directory lazily for path-dependent operations and keep
@@ -168,6 +180,8 @@ or parallel old path is permitted.
   equally reliable; otherwise record retention of the tested platform layer.
 
 ### Phase 3: Seal packaging and hermeticize required gates
+
+Status: Not started. Begin only after the bounded-CLI checkpoint merges.
 
 - Add an `exports` allowlist for the CLI-only package and an installed-tarball
   negative test proving implementation deep imports are unavailable.
@@ -203,12 +217,17 @@ or parallel old path is permitted.
 
 ## Known Temporary Drift
 
-The artifact contract has no known drift. The confirmed operational and
-package policies above intentionally precede implementation: the current CLI
-does not yet enforce explicit input limits, guarantee action behavior without
-a working directory, expose the new stable failure vocabulary, seal deep
-imports, or run documentation tools entirely from the lockfile. These gaps are
-the work of Phases 0–3, not accepted V0 behavior.
+The artifact contract has no known drift. The bounded-CLI checkpoint now
+implements the operational policies: bounded reads and iterative scanning,
+decimal budgets and order-stable aggregation, lazy working-directory access,
+owned redacted failures, typed validation outcomes, pathless loading, and lazy
+AJV compilation. Until that checkpoint merges, `dev` still lacks those
+guarantees. Package deep imports remain unsealed and documentation tools still
+run outside the lockfile; those are the work of Phase 3.
+
+The preserved review follow-up was merged to `dev` by PR #11 as merge commit
+`6741e34`. Phase 0 contract work now precedes its Phase 1–2 implementation in
+the boundary-remediation checkpoint described above.
 
 ## Validation
 
@@ -226,8 +245,29 @@ production dependency audit reports no known vulnerability, and
 `git diff --check` passes. Independent final-diff review found and closed one
 package-README routing issue, then reported no remaining material finding.
 
-This decision-only plan update passes `./scripts/check-docs.sh` and
-`git diff --check`; it does not claim implementation of the remediation phases.
+The bounded-CLI checkpoint passes type checking, strict Effect diagnostics,
+unit and adversarial boundary tests, packed-process acceptance, writer crash
+and concurrency integration, and installed-tarball verification. Exact and
+first-excess cases cover byte, nesting, value, and decimal budgets; unavailable
+working-directory cases cover native actions, discovery, bundled content,
+standard input, absolute paths, and relative-path failure. The complete
+`pnpm release:check` gate and npm publication dry run pass on the checkpoint;
+the production dependency audit reports no known vulnerability, and
+`git diff --check` passes.
+
+Independent implementation review found two boundary errors: invalid syntax
+at the exact JSON-value ceiling could be mislabeled as a limit failure, and the
+executable still provisioned application I/O for pathless invocations. Both
+were corrected with focused regressions; rereview reported no remaining
+material finding.
+
+The smaller Node adapter assessment selected
+`@effect/platform-node-shared`: it exposes the same filesystem, path, stdio,
+terminal, child-process, and signal runtime implementations used by the prior
+aggregate package while removing the unused Redis peer dependency. A clean
+installed candidate fell from about 111 MiB to 60 MiB. Repeated process startup
+measurements improved from roughly 400 ms on Node.js 22 and 370 ms on Node.js
+24 to roughly 200 ms on both supported lines for native help and version.
 
 ## Blockers
 
@@ -237,7 +277,6 @@ authorized.
 
 ## Next Action
 
-When implementation is requested, begin Phase 0 with the CLI design and
-acceptance-contract slice. Do not change runtime behavior until resource
-limits, stable error codes, working-directory independence, package exports,
-and precedence are fixed in executable contract evidence.
+Complete final validation and code review for the bounded-CLI checkpoint, open
+its PR against updated `dev`, address all material feedback, and merge with
+commit preservation. Begin Phase 3 only from the resulting updated `dev`.

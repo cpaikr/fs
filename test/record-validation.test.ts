@@ -117,7 +117,7 @@ describe("validation snapshot recording", () => {
     const recorded = recordValidationSnapshot(input, validation)
     const snapshot = structuredClone(recorded.document.validationSnapshot)
 
-    const sourceApplications = validation.calculations.applications as Array<ApplicationResult>
+    const sourceApplications = validation.calculations.applications as unknown as Array<ApplicationResult>
     sourceApplications.splice(0)
 
     expect(recorded.document.validationSnapshot).toEqual(snapshot)

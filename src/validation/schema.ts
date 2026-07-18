@@ -9,9 +9,15 @@ export interface StructuralError {
   readonly message: string
 }
 
-const documentSchema = JSON.parse(schemaAsset("document").toString("utf8")) as object
-const ajv = new Ajv2020({ allErrors: true, strict: false })
-const validate: ValidateFunction = ajv.compile(documentSchema)
+let compiledValidator: ValidateFunction | undefined
+
+const documentValidator = (): ValidateFunction => {
+  if (compiledValidator !== undefined) return compiledValidator
+  const documentSchema = JSON.parse(schemaAsset("document").toString("utf8")) as object
+  const ajv = new Ajv2020({ allErrors: true, strict: false })
+  compiledValidator = ajv.compile(documentSchema)
+  return compiledValidator
+}
 
 const escapePointer = (value: string): string => value.replaceAll("~", "~0").replaceAll("/", "~1")
 
@@ -73,6 +79,7 @@ const normalize = (error: ErrorObject): StructuralError | undefined => {
 }
 
 export const validateSchema = (value: unknown): ReadonlyArray<StructuralError> => {
+  const validate = documentValidator()
   if (validate(value)) return []
   const raw = validate.errors ?? []
   const decimalNumberPaths = new Set(

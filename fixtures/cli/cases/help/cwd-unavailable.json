@@ -1,0 +1,22 @@
+{
+  "id": "help-cwd-unavailable",
+  "command": "fs",
+  "workingDirectory": "unavailable",
+  "arguments": ["--help"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "native-text",
+      "contains": ["USAGE", "fs", "--help", "--version", "--completions", "validate"],
+      "excludes": ["sensitive unavailable working directory detail"],
+      "ansi": false
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

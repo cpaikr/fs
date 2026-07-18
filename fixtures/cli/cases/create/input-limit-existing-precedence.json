@@ -1,0 +1,47 @@
+{
+  "id": "create-input-limit-existing-precedence",
+  "command": "fs",
+  "arguments": ["create", "--output", "result.json", "candidate.json"],
+  "workspace": [
+    {
+      "generated": [{ "utf8": " ", "count": 16777217 }],
+      "to": "candidate.json"
+    },
+    { "copy": "../valid/no-rollups.json", "to": "result.json" }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "create" },
+        { "pointer": "/error/code", "equals": "output-exists" },
+        { "pointer": "/error/path", "equals": "result.json" },
+        {
+          "pointer": "/help",
+          "equals": [
+            {
+              "executable": "fs",
+              "arguments": ["create", "--output", "<new-document>", "candidate.json"]
+            }
+          ]
+        }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": {
+        "created": [],
+        "unchanged": ["candidate.json", "result.json"],
+        "absent": []
+      },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

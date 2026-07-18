@@ -1,12 +1,18 @@
-import { NodeServices } from "@effect/platform-node"
 import { Console as EffectConsole, Effect, Layer, Result, Runtime, Sink, Stdio, Stream } from "effect"
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 
 import { describe, expect, it } from "vitest"
 
+import { ApplicationExecutor, type ApplicationRequest } from "../src/application.js"
 import { noColorOutput, program } from "../src/cli.js"
-import { ApplicationIO, type ApplicationIOService } from "../src/process.js"
+import { executeContentWithIO } from "../src/content.js"
+import { nodeServices } from "../src/node-services.js"
+import {
+  ApplicationIO,
+  executeWithIO,
+  type ApplicationIOService
+} from "../src/process.js"
 
 interface CliObservation {
   readonly stdout: Buffer
@@ -20,7 +26,7 @@ const buffer = (value: string | Uint8Array): Buffer =>
 const runCli = (
   args: ReadonlyArray<string>,
   io: ApplicationIOService
-): CliObservation => {
+): Promise<CliObservation> => {
   const stdout: Array<Buffer> = []
   const stderr: Array<Buffer> = []
   const stdio = Stdio.layerTest({
@@ -43,22 +49,34 @@ const runCli = (
       return typeof value === "function" ? value.bind(target) : value
     }
   }) as EffectConsole.Console
-  const result = Effect.runSync(
+  const executor = {
+    execute: (request: ApplicationRequest) => {
+      const effect = request.command === "schema" || request.command === "example"
+        ? executeContentWithIO(request)
+        : request.command === "validate" ||
+            request.command === "create" ||
+            request.command === "record-validation" ||
+            request.command === "render"
+          ? executeWithIO(request)
+          : Effect.die("Pathless request escaped the test executor")
+      return effect.pipe(Effect.provideService(ApplicationIO, io))
+    }
+  }
+  return Effect.runPromise(
     Effect.result(
       program.pipe(Effect.provide(Layer.mergeAll(
-        NodeServices.layer,
+        nodeServices,
         stdio,
         Layer.succeed(EffectConsole.Console, captureConsole),
         noColorOutput,
-        Layer.succeed(ApplicationIO, io)
+        Layer.succeed(ApplicationExecutor, executor)
       )))
     )
-  )
-  return {
+  ).then((result) => ({
     stdout: Buffer.concat(stdout),
     stderr: Buffer.concat(stderr),
     exitCode: Result.isSuccess(result) ? 0 : Runtime.getErrorExitCode(result.failure)
-  }
+  }))
 }
 
 const ioWithCalls = (
@@ -66,7 +84,7 @@ const ioWithCalls = (
   stdin = readFileSync(resolve("examples/minimal.json")),
   written: Array<Buffer> = []
 ): ApplicationIOService => ({
-  cwd: process.cwd(),
+  cwd: Effect.succeed(process.cwd()),
   readFile: (path) => Effect.sync(() => {
     calls.push(`read-file:${path}`)
     return readFileSync(path)
@@ -87,9 +105,9 @@ const ioWithCalls = (
 })
 
 describe("Effect CLI boundary", () => {
-  it("rejects grammar before application I/O and uses native streams with exit 2", () => {
+  it("rejects grammar before application I/O and uses native streams with exit 2", async () => {
     const calls: Array<string> = []
-    const observed = runCli(["validate", "input.json", "extra.json"], ioWithCalls(calls))
+    const observed = await runCli(["validate", "input.json", "extra.json"], ioWithCalls(calls))
 
     expect(observed.exitCode).toBe(2)
     expect(observed.stdout.toString("utf8")).toContain("USAGE")
@@ -98,9 +116,9 @@ describe("Effect CLI boundary", () => {
     expect(calls).toEqual([])
   })
 
-  it("reports a missing guide topic through native help and diagnostics", () => {
+  it("reports a missing guide topic through native help and diagnostics", async () => {
     const calls: Array<string> = []
-    const observed = runCli(["guide"], ioWithCalls(calls))
+    const observed = await runCli(["guide"], ioWithCalls(calls))
 
     expect(observed.exitCode).toBe(2)
     expect(observed.stdout.toString("utf8")).toContain("fs guide")
@@ -109,9 +127,9 @@ describe("Effect CLI boundary", () => {
     expect(calls).toEqual([])
   })
 
-  it("lets a native action short-circuit invalid ordinary values without application I/O", () => {
+  it("lets a native action short-circuit invalid ordinary values without application I/O", async () => {
     const calls: Array<string> = []
-    const observed = runCli(
+    const observed = await runCli(
       ["create", "--output", "result.json", "candidate.json", "extra.json", "--help"],
       ioWithCalls(calls)
     )
@@ -122,8 +140,8 @@ describe("Effect CLI boundary", () => {
     expect(calls).toEqual([])
   })
 
-  it("keeps generated help ANSI-free through the configured formatter", () => {
-    const observed = runCli(["--help"], ioWithCalls([]))
+  it("keeps generated help ANSI-free through the configured formatter", async () => {
+    const observed = await runCli(["--help"], ioWithCalls([]))
 
     expect(observed.exitCode).toBe(0)
     expect(observed.stdout.toString("utf8")).toContain("USAGE")
@@ -136,9 +154,9 @@ describe("Effect CLI boundary", () => {
     ["omitted", []],
     ["none", ["--log-level", "none"]],
     ["debug", ["--log-level", "debug"]]
-  ] as const)("preserves create I/O order with %s logging", (_name, loggingArgs) => {
+  ] as const)("preserves create I/O order with %s logging", async (_name, loggingArgs) => {
     const calls: Array<string> = []
-    const observed = runCli(
+    const observed = await runCli(
       [...loggingArgs, "create", "--output", "result.json", "-"],
       ioWithCalls(calls)
     )
@@ -147,15 +165,15 @@ describe("Effect CLI boundary", () => {
     expect(calls).toEqual(["output-exists", "read-stdin", "write-file"])
   })
 
-  it("keeps snapshot results, bytes, and I/O order invariant with logging", () => {
-    const observations = [
+  it("keeps snapshot results, bytes, and I/O order invariant with logging", async () => {
+    const observations = await Promise.all([
       [],
       ["--log-level", "none"],
       ["--log-level", "debug"]
-    ].map((loggingArgs) => {
+    ].map(async (loggingArgs) => {
       const calls: Array<string> = []
       const written: Array<Buffer> = []
-      const observed = runCli(
+      const observed = await runCli(
         [...loggingArgs, "record-validation", "--output", "result.json", "-"],
         ioWithCalls(calls, undefined, written)
       )
@@ -163,7 +181,7 @@ describe("Effect CLI boundary", () => {
       expect(calls).toEqual(["output-exists", "read-stdin", "write-file"])
       expect(written).toHaveLength(1)
       return { observed, written: written[0] }
-    })
+    }))
 
     expect(observations[1]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
     expect(observations[2]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
@@ -174,15 +192,15 @@ describe("Effect CLI boundary", () => {
     expect(observations[2]?.observed.stderr.length).toBeGreaterThan(0)
   })
 
-  it("keeps render results, bytes, and I/O order invariant with logging", () => {
-    const observations = [
+  it("keeps render results, bytes, and I/O order invariant with logging", async () => {
+    const observations = await Promise.all([
       [],
       ["--log-level", "none"],
       ["--log-level", "debug"]
-    ].map((loggingArgs) => {
+    ].map(async (loggingArgs) => {
       const calls: Array<string> = []
       const written: Array<Buffer> = []
-      const observed = runCli(
+      const observed = await runCli(
         [...loggingArgs, "render", "--output", "result.html", "-"],
         ioWithCalls(calls, undefined, written)
       )
@@ -190,7 +208,7 @@ describe("Effect CLI boundary", () => {
       expect(calls).toEqual(["output-exists", "read-stdin", "write-file"])
       expect(written).toHaveLength(1)
       return { observed, written: written[0] }
-    })
+    }))
 
     expect(observations[1]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
     expect(observations[2]?.observed.stdout).toEqual(observations[0]?.observed.stdout)
@@ -201,9 +219,9 @@ describe("Effect CLI boundary", () => {
     expect(observations[2]?.observed.stderr.length).toBeGreaterThan(0)
   })
 
-  it("normalizes the all logging alias before validation dispatch", () => {
+  it("normalizes the all logging alias before validation dispatch", async () => {
     const calls: Array<string> = []
-    const observed = runCli(
+    const observed = await runCli(
       ["--log-level", "all", "validate", "-"],
       ioWithCalls(calls)
     )
@@ -218,9 +236,9 @@ describe("Effect CLI boundary", () => {
     expect(calls).toEqual(["read-stdin"])
   })
 
-  it("renders an escaped invalid built-in log level through the active command help", () => {
+  it("renders an escaped invalid built-in log level through the active command help", async () => {
     const calls: Array<string> = []
-    const observed = runCli(
+    const observed = await runCli(
       ["--log-level", "verbose", "validate", "input.json"],
       ioWithCalls(calls)
     )

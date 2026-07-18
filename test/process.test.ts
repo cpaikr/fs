@@ -5,12 +5,17 @@ import { join, resolve } from "node:path"
 
 import { describe, expect, it } from "vitest"
 
+import type { ContentWriteRequest, DocumentRequest } from "../src/application.js"
+import { executeContentWithIO } from "../src/content.js"
+import { inputLimits } from "../src/limits.js"
+import { nodeServices } from "../src/node-services.js"
+import { runPathless } from "../src/pathless.js"
 import {
   ApplicationIO,
   ApplicationIOError,
   execute,
-  type ApplicationIOService,
-  type ApplicationRequest
+  executeWithIO,
+  type ApplicationIOService
 } from "../src/process.js"
 import { renderHtml, renderLimits } from "../src/render.js"
 import type { Document, Item, Period } from "../src/validation/model.js"
@@ -20,7 +25,7 @@ const makeIO = (
   cwd: string,
   overrides: Partial<ApplicationIOService> = {}
 ): ApplicationIOService => ({
-  cwd,
+  cwd: Effect.succeed(cwd),
   readFile: (path) =>
     Effect.try({
       try: () => readFileSync(path),
@@ -38,9 +43,17 @@ const makeIO = (
 })
 
 const run = (
-  request: ApplicationRequest,
+  request: DocumentRequest,
   io: ApplicationIOService = makeIO(process.cwd())
-) => Effect.runSync(execute(request).pipe(Effect.provideService(ApplicationIO, io)))
+) => Effect.runSync(executeWithIO(request).pipe(
+  Effect.provideService(ApplicationIO, io),
+  Effect.provide(nodeServices)
+))
+
+const runContent = (
+  request: ContentWriteRequest,
+  io: ApplicationIOService
+) => Effect.runSync(executeContentWithIO(request).pipe(Effect.provideService(ApplicationIO, io)))
 
 const tableDocument = (periodCount: number, itemCount: number): Document => {
   const periods: Array<Period> = []
@@ -75,24 +88,34 @@ const tableDocument = (periodCount: number, itemCount: number): Document => {
 
 const exactByteDocument = (): Document => {
   const document = JSON.parse(readFileSync(resolve("examples/minimal.json"), "utf8")) as Document
-  const baseline = renderHtml(document)
-  if (!baseline.ok) throw new Error("Minimal fixture unexpectedly exceeded a render budget")
   const statement = document.statements[0]
   const first = statement?.items[0]
   if (statement === undefined || first === undefined) throw new Error("Minimal fixture lost its first item")
-  const length = renderLimits.htmlBytes - baseline.bytes.length + 1
-  return {
+  const baselineDocument: Document = {
     ...document,
+    entity: { ...document.entity, name: "x" },
+    statements: [{ ...statement, items: [{ ...first, label: "x" }] }]
+  }
+  const baseline = renderHtml(baselineDocument)
+  if (!baseline.ok) throw new Error("Minimal fixture unexpectedly exceeded a render budget")
+  const remaining = renderLimits.htmlBytes - baseline.bytes.length
+  return {
+    ...baselineDocument,
+    entity: {
+      ...baselineDocument.entity,
+      name: `x${"a".repeat(Math.floor(remaining / 2))}`
+    },
     statements: [{
       ...statement,
-      items: [{ ...first, values: { fy2025: `1${"0".repeat(length - 1)}` } }]
+      items: [{ ...first, label: `x${"a".repeat(remaining % 2)}` }]
     }]
   }
 }
 
 describe("application process boundary", () => {
   it("reports deterministic discovery without entering I/O", () => {
-    const result = run({ command: "fs" })
+    const result = runPathless({ command: "fs" })
+    if (result === undefined) throw new Error("Discovery lost its pathless result")
 
     expect(result.exitCode).toBe(0)
     expect(result.stderr).toEqual(Buffer.alloc(0))
@@ -105,11 +128,11 @@ describe("application process boundary", () => {
     const io = makeIO(process.cwd(), {
       writeFile: () => Effect.succeed("write-failed")
     })
-    const schema = run(
+    const schema = runContent(
       { command: "schema", name: "validation-result", output: "result.json" },
       io
     )
-    const example = run(
+    const example = runContent(
       { command: "example", name: "manufacturing-group", output: "result.json" },
       io
     )
@@ -120,6 +143,82 @@ describe("application process boundary", () => {
     expect(JSON.parse(example.stdout.toString("utf8"))).toMatchObject({
       help: [{ executable: "fs", arguments: ["example", "--output", "<new-path>", "manufacturing-group"] }]
     })
+  })
+
+  it("acquires a working directory only for relative paths", () => {
+    let cwdCalls = 0
+    const unavailable = makeIO(process.cwd(), {
+      cwd: Effect.sync(() => {
+        cwdCalls += 1
+      }).pipe(
+        Effect.flatMap(() => Effect.fail(new ApplicationIOError({ operation: "working-directory" })))
+      ),
+      readFile: () => Effect.succeed(readFileSync(resolve("examples/minimal.json"))),
+      readStdin: Effect.succeed(readFileSync(resolve("examples/minimal.json"))),
+      outputExists: () => Effect.succeed(false),
+      writeFile: () => Effect.succeed(null)
+    })
+
+    expect(run({ command: "validate", input: "-", logLevel: "none" }, unavailable).exitCode).toBe(0)
+    expect(run({
+      command: "validate",
+      input: resolve("examples/minimal.json"),
+      logLevel: "none"
+    }, unavailable).exitCode).toBe(0)
+    expect(run({
+      command: "create",
+      input: "-",
+      output: resolve("result.json")
+    }, unavailable).exitCode).toBe(0)
+    expect(runContent({
+      command: "schema",
+      name: "document",
+      output: resolve("schema.json")
+    }, unavailable).exitCode).toBe(0)
+    expect(cwdCalls).toBe(0)
+
+    const relative = run({ command: "validate", input: "input.json", logLevel: "none" }, unavailable)
+    expect(relative.exitCode).toBe(1)
+    expect(JSON.parse(relative.stdout.toString("utf8"))).toMatchObject({
+      error: { code: "working-directory-unavailable" },
+      help: []
+    })
+    expect(cwdCalls).toBe(1)
+  })
+
+  it("accepts an exact-limit file and rejects its first excess byte", () => {
+    const root = mkdtempSync(join(tmpdir(), "fs-input-limit-"))
+    const path = join(root, "input.json")
+    const runLive = () => Effect.runSync(execute({
+      command: "validate",
+      input: path,
+      logLevel: "none"
+    }).pipe(
+      Effect.provide(nodeServices)
+    ))
+    try {
+      writeFileSync(path, Buffer.concat([
+        Buffer.alloc(inputLimits.bytes - 2, 0x20),
+        Buffer.from("{}")
+      ]))
+      const exact = runLive()
+      expect(exact.exitCode).toBe(1)
+      expect(JSON.parse(exact.stdout.toString("utf8"))).toMatchObject({
+        validation: { conformance: { status: "nonconforming" } }
+      })
+
+      writeFileSync(path, Buffer.alloc(inputLimits.bytes + 1, 0x20))
+      const excess = runLive()
+      expect(JSON.parse(excess.stdout.toString("utf8"))).toMatchObject({
+        error: {
+          code: "input-limit-exceeded",
+          budget: "input-bytes",
+          limit: inputLimits.bytes
+        }
+      })
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 
   it.each(["validate", "create"] as const)("reads stdin exactly once for %s", (command) => {

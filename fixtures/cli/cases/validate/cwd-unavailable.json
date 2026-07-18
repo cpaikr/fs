@@ -1,0 +1,29 @@
+{
+  "id": "validate-cwd-unavailable",
+  "command": "fs",
+  "workingDirectory": "unavailable",
+  "arguments": ["validate", "input.json"],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "validate" },
+        { "pointer": "/error/code", "equals": "working-directory-unavailable" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": ["input.json"] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

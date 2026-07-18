@@ -1,0 +1,31 @@
+{
+  "id": "validate-input-byte-limit-stdin",
+  "command": "fs",
+  "arguments": ["validate", "-"],
+  "workspace": [],
+  "stdin": { "generated": [{ "utf8": " ", "count": 16777217 }] },
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path", "budget", "limit"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "validate" },
+        { "pointer": "/error/code", "equals": "input-limit-exceeded" },
+        { "pointer": "/error/path", "equals": "-" },
+        { "pointer": "/error/budget", "equals": "input-bytes" },
+        { "pointer": "/error/limit", "equals": 16777216 },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}
