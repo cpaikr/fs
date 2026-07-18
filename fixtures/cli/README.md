@@ -1,13 +1,10 @@
 # CLI Acceptance Fixtures
 
-These cases are executable evidence for the current `0.1` statement-row
-contract and its observable process behavior.
-
-These fixtures provide executable evidence for the observable process contract
-in the [CLI acceptance contract](../../docs/cli/acceptance.md). The contract is
-authoritative for target behavior. The
-[completed step-9 plan](../../docs/plans/agent-guidance-snapshots-rendering.md)
-records its delivery state and validation.
+These fixtures provide executable evidence for the current `0.1` statement-row
+process contract in the
+[CLI acceptance contract](../../docs/cli/acceptance.md). That contract owns
+observable behavior; the descriptors and manifest own its maintained process
+evidence.
 
 Artifact inputs and expected results are referenced from their owning trees so
 the CLI suite exercises the same statement rows, rollups, snapshots, schemas,
@@ -66,9 +63,9 @@ Black-box descriptors cannot prove injected I/O order, commit races, crash
 atomicity, platform permission faults, or global log redaction. Retained
 integration tests own those guarantees.
 
-## Required Coverage
+## Maintained Coverage
 
-The revised suite keeps these domain and operational cases:
+The suite keeps these domain and operational boundaries:
 
 - validation by path and standard input, every calculation aggregate,
   snapshot match and mismatch, structural failures, invalid snapshots,
@@ -83,7 +80,7 @@ The revised suite keeps these domain and operational cases:
 - atomic no-overwrite behavior, missing parents, write failures, existing
   destinations, commit races, and invalid-input/existing-output precedence.
 
-The revised grammar and native presentation coverage requires:
+Grammar and native-presentation coverage includes:
 
 - semantic top-level and per-command help, representative `-h` aliases, exact
   installed version identity, and nonempty completions for every documented
@@ -100,8 +97,5 @@ The revised grammar and native presentation coverage requires:
 - native action short-circuiting without application I/O, without fixing
   precedence among combined action flags or valueless completions behavior.
 
-The migration removes the old unsupported-format and artifact-version cases,
-converts rejected version and completion cases into successes, replaces exact
-help assets with semantic assertions, and removes invalid-syntax-plus-help
-precedence guarantees. It retains the existing artifact, validation, content,
-logging, and filesystem evidence rather than recreating those matrices.
+The manifest is the exact case inventory. This guide describes responsibilities
+and matcher behavior without duplicating that volatile list.

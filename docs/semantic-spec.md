@@ -18,10 +18,8 @@ The document does not encode extraction provenance, an accounting taxonomy,
 policy, source mappings, or multi-entity alignment. Filenames have no semantic
 meaning.
 
-`formatVersion` MUST be `"0.1"`. Because V0 is unreleased, the statement-item
-contract directly uses the unreleased version rather than introducing a
-compatibility version. Validation results and snapshot diffs likewise use
-`formatVersion: "0.1"`.
+`formatVersion` MUST be `"0.1"`. Validation results and snapshot diffs likewise
+use `formatVersion: "0.1"`.
 
 An FS document MAY contain a top-level `$schema` member. When present, its
 value MUST be exactly

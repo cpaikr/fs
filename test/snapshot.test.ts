@@ -69,6 +69,27 @@ describe("snapshot comparison", () => {
     })
   })
 
+  it("compares a valid snapshot when an unrelated property shares its name prefix", () => {
+    const result = validateDocument(
+      document("fixtures/invalid/validation-snapshot-prefix-property.json")
+    )
+    expect(result.validation.conformance).toEqual({
+      status: "nonconforming",
+      errors: [
+        expect.objectContaining({
+          code: "unknown-property",
+          path: "/validationSnapshotExtra"
+        })
+      ]
+    })
+    expect(result.snapshotDiff).toMatchObject({
+      status: "mismatch",
+      conformance: { recorded: "conforming", current: "nonconforming" },
+      calculations: { recorded: "consistent", current: "not-run" },
+      applications: [{ change: "removed" }]
+    })
+  })
+
   it("rejects contradictory numeric snapshot applications as structural nonconformance", () => {
     for (const application of [
       { status: "unsatisfied", difference: "999" },

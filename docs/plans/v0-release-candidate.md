@@ -1,162 +1,243 @@
 # V0 Release Candidate Plan
 
-Status: Active. The V0 release candidate is verified through all
-pre-publication gates; publication remains out of scope.
+Status: Active. The first complete implementation is present on `dev`, and
+the whole-codebase review is complete. Its safe follow-up passes the current
+pre-publication gates. The remaining remediation decisions are confirmed but
+not yet implemented; the package remains unpublished.
 
-This plan owns live step-11 progress, validation, blockers, and the next
-action. The [semantic specification](../semantic-spec.md) owns artifact
-meaning, the [CLI design](../cli/design.md) owns command intent, the
+This plan owns live Roadmap step-11 state, decisions, validation, blockers,
+and the next action. The [semantic specification](../semantic-spec.md) owns
+artifact meaning, the [CLI design](../cli/design.md) owns command intent, the
 [CLI acceptance contract](../cli/acceptance.md) owns observable process
-behavior, and the [roadmap](../../ROADMAP.md) owns strategic sequence. The
-[completed step-10 plan](statement-item-row-refactor.md) remains the verified
-starting point.
+behavior, and the [roadmap](../../ROADMAP.md) owns strategic sequence.
+Completed plans are historical delivery evidence, not current status.
 
 ## Milestone
 
-Prepare the complete `@cpai/fs@0.1.0` release candidate on `dev`. Replace
-placeholder schema identifiers, resolve the optional document `$schema`
-contract, publish exact versioned schemas to the approved public host, complete
-package and release metadata and configuration, and prove the packed package
-across every supported operating system and Node.js line.
+Prepare `@cpai/fs@0.1.0` as a robust CLI-only V0 release for untrusted and
+agent-generated input. Close the review findings, deepen the implementation
+where its interfaces permit invalid states or leak boundary concerns, and
+prove the exact packed candidate on every supported runtime.
 
-Stop with an unpublished release candidate. Do not change `cpaikr/fs`
-visibility, merge or promote `dev` to `main`, publish to npm, create a tag or
-GitHub release, or mark Roadmap step 11 complete.
+Keep candidate remediation separate from release. The source repository stays
+private while remediation is in progress. A separately authorized release
+workflow will promote the verified candidate, make the repository public
+immediately before npm publication, verify anonymous access, and only then
+publish, tag, or create a GitHub release.
 
 ## Fixed Decisions
 
+### Existing V0 contract
+
 - The npm identity is `@cpai/fs`; V0 uses package version `0.1.0` and artifact
   `formatVersion: "0.1"`.
-- The owner confirms control of the CPAI npm scope. Credentials must not be
-  committed or supplied to release-candidate validation.
-- V0 is licensed under Apache-2.0, selected by the owner for permissive use
-  with an explicit patent grant.
-- The public schema host is the dedicated public
-  `cpaikr/cpaikr.github.io` repository served by HTTPS GitHub Pages. The
-  private `cpaikr/fs` repository stays private during this milestone.
+- V0 uses Apache-2.0.
 - The immutable V0 schema base is
-  `https://cpaikr.github.io/fs/schema/0.1/`. The document, validation-result,
-  and snapshot-diff schemas each receive an absolute canonical `$id` under
-  that base.
-- An FS document may carry an optional top-level `$schema` property. When
-  present, its value is exactly the document schema's canonical URL. It aids
-  discovery only: full validation continues to use the bundled schema and
-  semantic validator without network access.
-- Published V0 schema bytes must exactly match the reviewed repository
-  schemas. After V0 publication, the `0.1` URLs are immutable; an incompatible
-  schema requires a new versioned path.
-- The same public Pages site serves the normative semantic specification at
-  `https://cpaikr.github.io/fs/spec/0.1/`; packaged guidance must not route
-  public users into the private source repository.
-- Delivery uses two substantial sequential PRs into `dev`: first the schema
-  publication contract, then release metadata and cross-platform candidate
-  verification. Each branch starts from updated `dev`; the PRs are not
-  stacked.
-- Cross-platform CI uses Blacksmith 2-vCPU Ubuntu and Windows runners. Because
-  Blacksmith does not offer a 2-vCPU macOS runner, macOS uses its smallest
-  supported 6-vCPU runner while retaining both supported Node.js lines.
+  `https://cpaikr.github.io/fs/schema/0.1/`. The document,
+  validation-result, and snapshot-diff schemas have canonical `$id` values
+  under that base.
+- An optional document `$schema`, when present, is exactly the document schema
+  URL. Validation remains offline against bundled schemas and semantic rules.
+- Published schema bytes must match the repository schemas. An incompatible
+  change requires a new versioned path.
+- The public specification is
+  `https://cpaikr.github.io/fs/spec/0.1/`; package-facing guidance must not
+  require access to a private source repository.
+- Supported runtime proof covers every declared Node.js line on Linux, macOS,
+  and Windows, followed by an npm publication dry run.
 
-## Phase State
+### Confirmed remediation policy
 
-- [x] Phase 0: establish the active plan, public host, decisions, and baseline.
-- [x] Phase 1: align canonical schema identifiers and optional `$schema`
-  across semantic prose, schemas, models, fixtures, examples, generated
-  guidance, tests, and checks.
-- [x] Phase 2: merge the reviewed schema slice; publish its exact schema bytes
-  and versioned semantic specification; verify every public HTTPS resource
-  before starting later work.
-- [x] Phase 3: complete npm package, licensing, repository, support, and
-  release configuration without publishing.
-- [x] Phase 4: make packed-package verification release-grade across every
-  supported operating system and Node.js line.
-- [x] Phase 5: complete review and a requirement-by-requirement release
-  candidate audit on updated `dev` while leaving Roadmap step 11 open.
+- The public CLI treats input as untrusted. Resource use and failures must be
+  bounded, deterministic, and redacted for agent-generated and external
+  documents.
+- Resource limits are operational CLI policy, not artifact conformance rules.
+  Exceeding a CLI limit produces an explicit stable operational result; it
+  does not make the FS document semantically nonconforming.
+- V0 is CLI-only. Package exports must seal implementation modules rather than
+  create an accidental JavaScript or TypeScript library contract.
+- Help, version, completions, and discovery do not depend on a valid current
+  working directory. Path-dependent commands translate an unavailable working
+  directory into a stable operational result.
+- Required documentation executables belong in the lockfile and run from a
+  frozen, lifecycle-disabled installation. Required CI does not download fresh
+  executable packages through `npx`.
+- The unpublished `0.1` CLI contract, error vocabulary, executable fixtures,
+  and implementation may be revised directly. Artifact-format changes are not
+  implied by the operational limit policy. Do not add legacy readers, aliases,
+  deprecated paths, dual behavior, or compatibility layers.
+- All justified internal hardening in this plan lands before V0. Retain the
+  current Node platform package unless a smaller adapter proves simpler and
+  equally reliable across signals, streams, terminals, exit codes, and every
+  supported platform.
+- Keep `cpaikr/fs` private through remediation. During the authorized release
+  workflow, make it public immediately before npm publication and verify the
+  package's repository metadata through anonymous access.
 
-## Current State
+## Delivered Candidate
 
-PR #9 merged Phases 0 and 1 into `dev` as merge commit `11bd7d2`, preserving
-the slice's individual commits. Pages commit `63b13ad` publishes the exact
-merged document, validation-result, and snapshot-diff schemas and the
-versioned semantic specification. Every public resource returns HTTPS 200;
-the schemas use `application/json`, allow cross-origin reads, and are
-byte-identical to the repository files. AJV validates all maintained result
-and diff fixtures against the downloaded schemas and their relative
-cross-schema references.
+- The semantic contract, schemas, examples, fixtures, generated guidance,
+  validator, snapshot workflow, renderer, atomic writer, and CLI are
+  implemented and aligned.
+- Versioned schemas and the semantic specification are deployed at their
+  public HTTPS URLs. The deployed schemas were verified byte-for-byte against
+  the repository and their cross-schema references were validated.
+- Package metadata, licensing, exact packed-package verification, installed
+  CLI smoke coverage, cross-platform CI, and npm publication dry-run coverage
+  are present.
+- The schema-publication and release-candidate pull requests were merged into
+  `dev` with commit preservation. The resulting candidate is merge commit
+  `f21aebf`; post-merge CI run `29626105088` succeeded on that commit.
+- As last verified during the review, `cpaikr/fs` is private with `main` as its
+  default branch, no tag or GitHub release exists, and npm does not have
+  `@cpai/fs@0.1.0`.
 
-The second slice defines Apache-2.0 licensing and complete public npm
-metadata, replaces private and unpacked README routes with public resources,
-and adds an npm publication dry run. Packed-package verification now executes
-the real `prepack` lifecycle, requires an exact inventory, verifies retained
-asset bytes and installed metadata, and exercises the installed CLI. The
-cross-platform matrix remains the proof boundary for Phase 4; its new
-release-candidate job waits for every OS/Node cell and documentation gate
-before running npm's publication dry run.
+Roadmap step 11 remains open because a verified candidate is not a release.
+
+## Review Follow-up Delivered
+
+The review applied these contract-preserving safe fixes:
+
+- Snapshot diagnostics classify only `/validationSnapshot` and its descendants
+  as an invalid embedded snapshot. An unrelated property sharing that prefix
+  retains normal snapshot comparison, with unit and packed-process coverage.
+- Unused decimal multiplication, an unused result alias, and an unused test
+  dependency were removed.
+- Required GitHub Action revisions were pinned to already-audited commits.
+- Package-facing README routes no longer point public readers to repository-only
+  files.
+- Repository documentation was reconciled around this plan as the sole owner
+  of live release status.
+
+## Remediation Plan
+
+The phases are sequential. Each phase updates its owning contract before or
+with implementation, passes focused validation, receives code review, and is
+merged into updated `dev` before the next phase begins. No compatibility slice
+or parallel old path is permitted.
+
+### Phase 0: Fix the operational contract
+
+- Define bounded input behavior in the CLI design and acceptance contract.
+  Select byte, nesting, and computational limits from representative artifacts,
+  adversarial measurements, and supported-runtime evidence rather than
+  arbitrary convenience values.
+- Add explicit stable and redacted result codes for resource-limit and
+  working-directory failures. Fix their stream roles, exit codes, logging
+  context, help, filesystem effects, and precedence against parsing,
+  validation, output preflight, and writer failures.
+- Specify that native actions and discovery complete without application path
+  context. Only path-dependent operations may acquire a working directory.
+- Specify the CLI-only package boundary: supported entry points are the
+  executable, packaged assets exposed through commands, and deliberately
+  allowed package metadata—not deep implementation imports.
+- Update executable descriptors before implementation. Replace the current
+  unpublished behavior in place without aliases or fallback envelopes.
+
+### Phase 1: Bound parsing and exact arithmetic
+
+- Replace recursive JSON descent with an iterative duplicate-aware scanner
+  that retains UTF-8, trailing-content, duplicate-member, numeric-precision,
+  and syntax guarantees while enforcing the confirmed operational limits.
+- Bound both file and standard-input reads so excessive input is stopped at
+  the boundary rather than fully accumulated before rejection.
+- Redact unexpected scanner and runtime failures; only stable owned messages
+  may reach the operation result.
+- Normalize exact decimals without per-zero large-integer division. Aggregate
+  rollup children without repeatedly rescaling an accumulator according to
+  author order.
+- Add adversarial cancellation, high-scale ordering, excessive-input, nesting,
+  and stable-error regressions. Equivalent valid child order must not
+  materially change calculation cost or results.
+
+### Phase 2: Deepen application boundaries
+
+- Parse native actions and discovery without constructing application I/O.
+  Acquire the current directory lazily for path-dependent operations and keep
+  a true outer defect boundary around service construction and execution.
+- Load command implementation and compile the AJV document validator only when
+  a document operation requires them. Measure help and version startup before
+  and after the change.
+- Model calculation and validation outcomes as discriminated unions whose
+  status fixes the permitted applications. Carry the validated `Document` on
+  conforming branches so consumers do not cast or rebuild proof.
+- Return typed input and output failures through orchestration. Encode once at
+  the process edge; logging must not parse serialized standard output.
+- Assess a smaller Node adapter with installed size, startup, and full behavior
+  evidence. Change dependencies only if the alternative is both simpler and
+  equally reliable; otherwise record retention of the tested platform layer.
+
+### Phase 3: Seal packaging and hermeticize required gates
+
+- Add an `exports` allowlist for the CLI-only package and an installed-tarball
+  negative test proving implementation deep imports are unavailable.
+- Keep exact tarball inventory, retained asset bytes, native help, document
+  operations, and package metadata under installed-package smoke coverage.
+- Add documentation tools as exact development dependencies, update the
+  lockfile, replace `npx` execution with `pnpm exec`, and make the documentation
+  CI job use the same frozen, lifecycle-disabled installation boundary as
+  other required jobs.
+- Keep GitHub Actions SHA-pinned and production dependency auditing explicit.
+
+### Phase 4: Prove the remediated candidate
+
+- Run focused contract, parser, decimal, startup, process, package-boundary,
+  and documentation tests for every changed seam.
+- Run `pnpm release:check`, the production dependency audit, and
+  `git diff --check` on the integrated candidate.
+- Run the complete supported OS and Node.js matrix, followed by its dependent
+  npm publication dry run on the exact candidate head.
+- Perform independent implementation, design, complexity, security, package,
+  and documentation review. Close every material finding or record a new
+  explicit owner decision in this plan.
+
+### Phase 5: Release handoff
+
+- Keep the verified candidate unchanged while release authorization is sought.
+- In the authorized release workflow, promote the verified candidate with
+  commit preservation, make `cpaikr/fs` public, and verify anonymous source,
+  license, issue, homepage, and package-repository routes.
+- Publish the exact verified tarball only after repository visibility succeeds.
+  Tagging, the GitHub release, and Roadmap completion follow successful npm
+  publication; none are candidate-remediation actions.
 
 ## Known Temporary Drift
 
-None.
+The artifact contract has no known drift. The confirmed operational and
+package policies above intentionally precede implementation: the current CLI
+does not yet enforce explicit input limits, guarantee action behavior without
+a working directory, expose the new stable failure vocabulary, seal deep
+imports, or run documentation tools entirely from the lockfile. These gaps are
+the work of Phases 0–3, not accepted V0 behavior.
 
 ## Validation
 
-The clean step-10 baseline is recorded in the
-[completed plan](statement-item-row-refactor.md). The Phase-0 planning slice
-passes `./scripts/check-docs.sh`, including Markdown, links, maintained
-guidance, schemas, examples, fixtures, and the CLI descriptor matrix.
-`git diff --check` also passes. Every later contract or documentation slice
-must repeat those gates; implementation and package slices must additionally
-pass the full repository gate.
+The merged candidate passed the full repository and release-candidate gates,
+including documentation, type checking, strict Effect diagnostics, unit and
+boundary tests, packed-process acceptance, writer crash and concurrency
+integration, installed-tarball smoke, the supported OS/Node matrix, and npm's
+publication dry run.
 
-The Phase-1 schema cutover passes focused schema and recording tests, then the
-full `pnpm verify` gate: TypeScript, strict Effect diagnostics, unit and
-boundary tests, packed-process acceptance, writer integration, and installed
-tarball smoke. `./scripts/check-docs.sh` passes with exact generated guidance,
-canonical-ID and optional-pointer assertions, every schema and fixture, and
-the complete CLI descriptor matrix. `git diff --check` passes. Fresh contract
-review applied two wording and example clarity fixes and then found no
-remaining material correctness, design, validation, or plan-coverage gap.
+The integrated review follow-up passes `pnpm release:check`: documentation and
+contract artifacts, type checking, strict Effect diagnostics, unit and
+boundary tests, packed-process acceptance, writer crash and concurrency
+integration, installed-tarball smoke, and npm's publication dry run. The
+production dependency audit reports no known vulnerability, and
+`git diff --check` passes. Independent final-diff review found and closed one
+package-README routing issue, then reported no remaining material finding.
 
-PR #9 received completed Codex and CodeRabbit review. Codex reported no
-finding. CodeRabbit's three findings are fixed in `6aa8991`, validated with the
-focused and full gates, replied to, and resolved. Its final CI run
-`29623796785` passed documentation and all six Blacksmith OS/Node matrix cells
-on head `c4ed1fc`. A final local code-review pass found no material issue in
-the runner migration.
-
-Pages deployment `29624021568` succeeded for commit `63b13ad`. Direct
-downloads confirmed the public schemas' status, content type, CORS header,
-byte identity, and cross-file reference behavior before this second branch
-started from updated `dev`.
-
-The Phase-3 and local Phase-4 slice passes `pnpm release:check`: documentation
-and fixture contracts, TypeScript, strict Effect diagnostics, 163 tests, all
-121 packed-process acceptance cases, writer crash and concurrency integration,
-the exact 44-file installed tarball, and npm's publication dry run. The
-Apache-2.0 file matches the canonical Apache text, workflow YAML parses, and
-`git diff --check` passes. Independent implementation and design review found
-no Bucket-I or Bucket-II issue; the remaining risk is intentionally delegated
-to the PR's exact-head Blacksmith matrix and dependent dry-run job.
-
-PR #10 received completed Codex and CodeRabbit review. Codex approved with no
-finding. CodeRabbit's two findings are fixed in `a075fab`, validated, replied
-to, confirmed by CodeRabbit, and resolved. Final CI run `29625815109` passes
-documentation, all six Blacksmith OS/Node cells, and the dependent npm
-publication dry run on exact head `a075fab`.
-
-The final requirement audit confirms the reviewed head is mergeable into
-unchanged `dev` and covers every requested pre-publication deliverable. The
-source repository remains private with `main` still its default branch; no tag
-or GitHub release exists; `@cpai/fs` remains unpublished; Roadmap step 11
-remains open; and all four public specification and schema resources return
-HTTPS 200. Merging PR #10 with commit preservation makes this exact audited
-head the release candidate on `dev` without performing a prohibited release
-action.
+This decision-only plan update passes `./scripts/check-docs.sh` and
+`git diff --check`; it does not claim implementation of the remediation phases.
 
 ## Blockers
 
-None.
+No product decision is blocked. Publication remains intentionally blocked
+until Phases 0–4 are implemented and verified and a separate release action is
+authorized.
 
 ## Next Action
 
-No publication action is authorized. Preserve the reviewed candidate on
-`dev`; promotion to `main`, npm publication, tagging, a GitHub release, and
-Roadmap completion each require a separately authorized release step.
+When implementation is requested, begin Phase 0 with the CLI design and
+acceptance-contract slice. Do not change runtime behavior until resource
+limits, stable error codes, working-directory independence, package exports,
+and precedence are fixed in executable contract evidence.

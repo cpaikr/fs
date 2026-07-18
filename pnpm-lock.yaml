@@ -27,9 +27,6 @@ importers:
       '@effect/language-service':
         specifier: 0.87.0
         version: 0.87.0
-      '@effect/vitest':
-        specifier: 4.0.0-beta.98
-        version: 4.0.0-beta.98(effect@4.0.0-beta.98)(vitest@4.1.10(@types/node@24.10.0)(vite@8.1.5(@types/node@24.10.0)(yaml@2.9.0)))
       '@types/node':
         specifier: 24.10.0
         version: 24.10.0
@@ -61,12 +58,6 @@ packages:
     peerDependencies:
       effect: ^4.0.0-beta.98
       ioredis: ^5.7.0
-
-  '@effect/vitest@4.0.0-beta.98':
-    resolution: {integrity: sha512-uXRPuN8Y6v43/OVmQwKOd/VFDh+dipaxGKdWPr1bdnM+4bl8NZlYYRJi5omgXLFZ6ZbleduXKcmLM3NeePe69w==}
-    peerDependencies:
-      effect: ^4.0.0-beta.98
-      vitest: ^3.0.0 || ^4.0.0
 
   '@emnapi/core@1.11.1':
     resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
@@ -698,11 +689,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
-
-  '@effect/vitest@4.0.0-beta.98(effect@4.0.0-beta.98)(vitest@4.1.10(@types/node@24.10.0)(vite@8.1.5(@types/node@24.10.0)(yaml@2.9.0)))':
-    dependencies:
-      effect: 4.0.0-beta.98
-      vitest: 4.1.10(@types/node@24.10.0)(vite@8.1.5(@types/node@24.10.0)(yaml@2.9.0))
 
   '@emnapi/core@1.11.1':
     dependencies:

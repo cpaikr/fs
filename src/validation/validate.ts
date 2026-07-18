@@ -20,7 +20,9 @@ export const validateDocument = (value: unknown): DocumentValidation => {
   if (schemaErrors.length > 0) {
     const validation = nonconforming(schemaErrors)
     const hasSnapshot = typeof value === "object" && value !== null && "validationSnapshot" in value
-    const invalidSnapshot = schemaErrors.some((error) => error.path.startsWith("/validationSnapshot"))
+    const invalidSnapshot = schemaErrors.some(
+      (error) => error.path === "/validationSnapshot" || error.path.startsWith("/validationSnapshot/")
+    )
     if (hasSnapshot && invalidSnapshot) {
       return {
         validation,

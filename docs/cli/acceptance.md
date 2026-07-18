@@ -438,11 +438,11 @@ encoded-byte budget follows structural preflight. Every budget failure
 precedes output-parent inspection and commit-time writer failures. Rollup
 inconsistency and snapshot mismatch never prevent or reorder rendering.
 
-## Required Cases
+## Maintained Coverage
 
 ### `fs validate`
 
-Start the suite with these integration seams rather than repeating every
+The suite uses these integration seams rather than repeating every
 language-neutral semantic fixture. Paths in the table are relative to
 `fixtures/`; a bare filename resolves by its unique basename under that tree.
 
@@ -468,18 +468,18 @@ Every validation case asserts an unchanged workspace and no created path.
 
 ### Native actions, grammar, and logging
 
-Add semantic text cases for top-level and per-command `--help` and
-representative `-h` aliases. Generated help identifies the active command,
-required operands, command-local flags, and the accepted help, version,
-completions, and log-level built-ins. It contains no ANSI control sequences and
-does not expose wizard, prompt, or interactive surfaces. Add success cases for
-`--version`, `-v`, and each documented completion shell.
+Semantic text cases cover top-level and per-command `--help`, representative
+`-h` aliases, `--version`, `-v`, and each documented completion shell.
+Generated help identifies the active command, required operands, command-local
+flags, and the accepted help, version, completions, and log-level built-ins. It
+contains no ANSI control sequences and does not expose wizard, prompt, or
+interactive surfaces.
 
 The fixed fixture environment disables color. A separate integration test
 provides a color-capable terminal and still requires generated help to contain
 no ANSI control sequences.
 
-Add grammar cases that prove:
+Grammar cases prove:
 
 - missing operands, extra operands, unknown commands, unknown flags, and
   unknown command values use native help and diagnostics with exit code `2`;
@@ -492,7 +492,7 @@ Add grammar cases that prove:
   I/O. Combined action-flag precedence and valueless completions behavior are
   not fixed.
 
-Add logging cases that prove:
+Logging cases prove:
 
 - omitted and explicit `none` logging produce identical standard output and
   empty standard error;
@@ -502,19 +502,18 @@ Add logging cases that prove:
   context; and
 - an unknown log level fails as usage and leaves the workspace unchanged.
 
-Instrument the I/O boundaries in integration tests to prove that omitted,
-`none`, and enabled logging preserve the same input-read and write-call order,
-and that grammar failures and native actions invoke neither application
-boundary.
+I/O-boundary integration tests prove that omitted, `none`, and enabled logging
+preserve the same input-read and write-call order, and that grammar failures
+and native actions invoke neither application boundary.
 
 ### Discovery and read-only content
 
-After validation, add cases in this order:
+Discovery and bundled-content cases cover:
 
 1. `fs` with no arguments: exact discovery JSON, stable executable and npm
    package identities, no selected input, supported artifact version and
    serialization, read/write classification including `record-validation`, and
-   complete next commands. Also reject an unknown command.
+   complete next commands, plus rejection of an unknown command.
 2. `fs guide authoring`: exact generated standalone Markdown and rejection of
    unknown topics or arguments.
 3. `fs schema`: all three supported names, exact standard-output payload,
@@ -530,36 +529,36 @@ touch the requested path.
 
 ### `fs create`
 
-Cover valid path and standard-input creation, rollup-inconsistent
-creation, malformed input, schema and semantic structural refusal, missing
-`--output`, duplicate `--output`, unknown arguments and flags, missing parent,
-existing output, and the combined invalid-input/existing-output precedence
-case. Successful output must be byte-for-byte equal to the candidate.
+Cases cover valid path and standard-input creation, rollup-inconsistent
+creation, malformed input, schema and semantic structural refusal, missing or
+duplicate `--output`, unknown arguments and flags, missing parents, existing
+output, and combined invalid-input/existing-output precedence. Successful
+output is byte-for-byte equal to the candidate.
 
 ### `fs record-validation`
 
-Cover path and standard-input success without a prior snapshot, replacement of
-a mismatching snapshot, rollup-inconsistent success, and exact generated
-document bytes. Re-validating every expected generated document must produce
-snapshot status `match`.
+Cases cover path and standard-input success without a prior snapshot,
+replacement of a mismatching snapshot, rollup-inconsistent success, and exact
+generated document bytes. Re-validating every expected generated document
+produces snapshot status `match`.
 
-Cover malformed input, schema and semantic structural refusal, an invalid
-embedded snapshot, missing input, missing parent, existing output, and the
-combined invalid-input/existing-output precedence case. Cover missing and
-duplicate `--output`, missing and extra input operands, unknown flags, and
-native command help. Successful output and every refusal leave the input
-unchanged, and every failure creates no output or residue.
+Failure and grammar cases cover malformed input, schema and semantic structural
+refusal, an invalid embedded snapshot, missing input or parent, existing
+output, combined invalid-input/existing-output precedence, missing or duplicate
+`--output`, missing or extra input operands, unknown flags, and native command
+help. Successful output and every refusal leave the input unchanged, and every
+failure creates no output or residue.
 
-Instrument the application boundary to prove preflight-before-read ordering,
-one standard-input read, validation-before-write ordering, and unchanged
-behavior with logging. The shared writer fault and concurrency suite continues
-to own crash atomicity and commit-race behavior.
+Application-boundary tests prove preflight-before-read ordering, one
+standard-input read, validation-before-write ordering, and unchanged behavior
+with logging. The shared writer fault and concurrency suite owns crash
+atomicity and commit-race behavior.
 
 ### `fs render`
 
-Cover exact HTML from a path for the complete presentation fixture and from
-standard input for the minimal example. Cover a rollup-inconsistent,
-snapshot-mismatching input to prove both states remain renderable while their
+Cases cover exact HTML from a path for the complete presentation fixture and
+from standard input for the minimal example. A rollup-inconsistent,
+snapshot-mismatching input proves both states remain renderable while their
 content is absent from the HTML. Exact output fixtures prove statement, item,
 period, unit, and grouping-column order independent of definition order;
 homogeneous-unit collapsing and heterogeneous row units; exact zero, negative,
@@ -568,30 +567,29 @@ cells; null and string grouping values; and escaping of every displayed
 author-controlled text kind. They also prove that grouping values and rollups
 create no hierarchy, merged cells, or subtotal styling.
 
-Cover malformed input, schema and semantic structural refusal, an invalid
-embedded snapshot, missing input, missing parent, existing output, and the
-combined invalid-input/existing-output precedence case. Cover missing and
-duplicate `--output`, missing and extra input operands, unknown flags, native
-command help, discovery, and root help. Successful output and every refusal
-leave the input unchanged, and every failure creates no output or residue.
+Failure and grammar cases cover malformed input, schema and semantic structural
+refusal, an invalid embedded snapshot, missing input or parent, existing
+output, combined invalid-input/existing-output precedence, missing or duplicate
+`--output`, missing or extra input operands, unknown flags, native command
+help, discovery, and root help. Successful output and every refusal leave the
+input unchanged, and every failure creates no output or residue.
 
-Cover a non-directory output parent with both malformed and conforming input.
-Cover checked rejection beyond the column, grid-slot, and encoded-byte budgets
-and success at each boundary; prove that over-limit rendering never enters the
+Non-directory-parent cases use both malformed and conforming input. Boundary
+cases cover checked rejection beyond the column, grid-slot, and encoded-byte
+budgets and success at each limit; over-limit rendering never enters the
 writer.
 
-Instrument the application boundary to prove preflight-before-read ordering,
-one standard-input read, validation-before-write ordering, unchanged rendered
+Application-boundary tests prove preflight-before-read ordering, one
+standard-input read, validation-before-write ordering, unchanged rendered
 bytes with logging, and no render write on structural refusal. The shared
-writer fault and concurrency suite continues to own crash atomicity and
-commit-race behavior.
+writer fault and concurrency suite owns crash atomicity and commit-race
+behavior.
 
-## Implementation Gate
+## Repository Gate
 
-The packed CLI must satisfy the complete contract. Intermediate migrations
-either remain internal or fail closed; they must not weaken semantic
-validation, exact content, logging, filesystem safety, or defect redaction.
-The command boundary must own every accepted output and translate unexpected
-application defects to `internal-error` without leaking raw causes. Pending
-cases remain visible, and no temporary output shape becomes part of the
-acceptance contract.
+The packed CLI must continue to satisfy the complete descriptor set. Contract
+changes update acceptance prose and visible descriptors before implementation;
+intermediate states remain internal or fail closed. The command boundary owns
+every accepted output and translates unexpected application defects to
+`internal-error` without leaking raw causes. No temporary output shape becomes
+part of the acceptance contract.

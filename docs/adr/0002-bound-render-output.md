@@ -62,10 +62,10 @@ Any of these violations returns:
 - no output file; and
 - no automated help suggestion.
 
-The CLI acceptance contract must define this error's precedence relative to
-other render failures when the ADR is accepted. Arithmetic overflow while
-computing a count is itself over-limit; it must not wrap, allocate, or require
-the exact expanded count to be representable.
+The CLI acceptance contract defines this error's precedence relative to other
+render failures. Arithmetic overflow while computing a count is itself
+over-limit; it must not wrap, allocate, or require the exact expanded count to
+be representable.
 
 ## Consequences
 

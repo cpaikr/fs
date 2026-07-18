@@ -180,6 +180,12 @@
       "path": "/statements/0/items/0/unit"
     },
     {
+      "document": "invalid/validation-snapshot-prefix-property.json",
+      "layer": "schema",
+      "code": "unknown-property",
+      "path": "/validationSnapshotExtra"
+    },
+    {
       "document": "invalid/wrong-grouping-cell-type.json",
       "layer": "schema",
       "code": "invalid-type",

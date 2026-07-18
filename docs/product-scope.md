@@ -79,7 +79,7 @@ for their use.
 
 ## Deliverables
 
-The first usable release should contain:
+The V0 product consists of:
 
 1. A semantic specification and canonical JSON mapping.
 2. A JSON Schema and language-neutral conformance fixtures.
