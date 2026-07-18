@@ -1,9 +1,8 @@
 # V0 Release Candidate Plan
 
-Status: Active. The first complete implementation and its review follow-up are
-present on `dev`. Phases 0–2 of boundary remediation are implemented on the
-bounded-CLI checkpoint branch and await review and integration; Phase 3 has
-not begun. The package remains unpublished.
+Status: Active. The first complete implementation, its review follow-up, and
+Phases 0–2 of boundary remediation are present on `dev`. Phase 3 packaging and
+hermetic-gate work is in progress. The package remains unpublished.
 
 This plan owns live Roadmap step-11 state, decisions, validation, blockers,
 and the next action. The [semantic specification](../semantic-spec.md) owns
@@ -124,7 +123,7 @@ old path is permitted.
 
 ### Phase 0: Fix the operational contract
 
-Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
+Status: Complete on `dev` through PR #12.
 
 - Define bounded input behavior in the CLI design and acceptance contract.
   Select byte, nesting, and computational limits from representative artifacts,
@@ -144,7 +143,7 @@ Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
 
 ### Phase 1: Bound parsing and exact arithmetic
 
-Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
+Status: Complete on `dev` through PR #12.
 
 - Replace recursive JSON descent with an iterative duplicate-aware scanner
   that retains UTF-8, trailing-content, duplicate-member, numeric-precision,
@@ -162,7 +161,7 @@ Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
 
 ### Phase 2: Deepen application boundaries
 
-Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
+Status: Complete on `dev` through PR #12.
 
 - Parse native actions and discovery without constructing application I/O.
   Acquire the current directory lazily for path-dependent operations and keep
@@ -181,7 +180,8 @@ Status: Implemented in the bounded-CLI checkpoint; awaiting review and merge.
 
 ### Phase 3: Seal packaging and hermeticize required gates
 
-Status: Not started. Begin only after the bounded-CLI checkpoint merges.
+Status: Implemented on the hermetic-package checkpoint; awaiting PR review and
+integration into `dev`.
 
 - Add an `exports` allowlist for the CLI-only package and an installed-tarball
   negative test proving implementation deep imports are unavailable.
@@ -217,17 +217,19 @@ Status: Not started. Begin only after the bounded-CLI checkpoint merges.
 
 ## Known Temporary Drift
 
-The artifact contract has no known drift. The bounded-CLI checkpoint now
-implements the operational policies: bounded reads and iterative scanning,
-decimal budgets and order-stable aggregation, lazy working-directory access,
-owned redacted failures, typed validation outcomes, pathless loading, and lazy
-AJV compilation. Until that checkpoint merges, `dev` still lacks those
-guarantees. Package deep imports remain unsealed and documentation tools still
-run outside the lockfile; those are the work of Phase 3.
+The artifact-format and operational-policy contracts have no known drift.
+`dev` implements bounded reads and iterative scanning, decimal budgets and
+order-stable aggregation, lazy working-directory access, owned redacted
+failures, typed validation outcomes, pathless loading, and lazy AJV
+compilation. Packaging and CI drift does remain on `dev`: deep imports are
+unsealed and documentation tools run outside the lockfile until the active
+Phase 3 checkpoint closes both issues.
 
 The preserved review follow-up was merged to `dev` by PR #11 as merge commit
-`6741e34`. Phase 0 contract work now precedes its Phase 1–2 implementation in
-the boundary-remediation checkpoint described above.
+`6741e34`. The ordered Phase 0 contract and Phase 1–2 implementation commits
+were merged by PR #12 as merge commit `8b15542` after the complete required
+matrix, dependent npm dry run, and independent reviews reported no remaining
+material finding.
 
 ## Validation
 
@@ -269,6 +271,14 @@ installed candidate fell from about 111 MiB to 60 MiB. Repeated process startup
 measurements improved from roughly 400 ms on Node.js 22 and 370 ms on Node.js
 24 to roughly 200 ms on both supported lines for native help and version.
 
+The Phase 3 checkpoint passes the complete `pnpm release:check` gate on Node.js
+24.15.0 and the installed-tarball package-boundary check on both supported
+Node.js lines. Its lockfile-backed documentation gate and frozen,
+lifecycle-disabled install pass; the explicit production dependency audit
+reports no known vulnerability, and `git diff --check` passes. Independent
+package and CI review reported no material finding. The required cross-platform
+CI matrix and its dependent npm dry run remain the integration proof.
+
 ## Blockers
 
 No product decision is blocked. Publication remains intentionally blocked
@@ -277,6 +287,7 @@ authorized.
 
 ## Next Action
 
-Complete final validation and code review for the bounded-CLI checkpoint, open
-its PR against updated `dev`, address all material feedback, and merge with
-commit preservation. Begin Phase 3 only from the resulting updated `dev`.
+Open the Phase 3 checkpoint PR against updated `dev`, complete its required CI
+and automated reviews, address every material finding, and merge with commit
+preservation. Begin the final Phase 4 proof only from the resulting updated
+`dev`.

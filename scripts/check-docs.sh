@@ -6,11 +6,11 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 echo "Linting Markdown"
-npx --yes markdownlint-cli2@0.18.1 '**/*.md' '#node_modules' '#dist'
+pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist'
 
 echo "Checking Markdown links"
 while IFS= read -r -d '' document; do
-  npx --yes markdown-link-check@3.13.7 \
+  pnpm exec markdown-link-check \
     --quiet \
     --config scripts/markdown-link-check.json \
     "$document"
@@ -93,7 +93,7 @@ if rg -n 'https://fs\.example' .; then
   exit 1
 fi
 
-ajv=(npx --yes ajv-cli@5.0.0 validate --spec=draft2020)
+ajv=(pnpm exec ajv validate --spec=draft2020)
 
 echo "Checking fixture manifest"
 jq -e '
