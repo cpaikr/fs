@@ -16,6 +16,7 @@ import { pathToFileURL } from "node:url"
 
 const fixtureRoot = resolve("fixtures/cli")
 const manifest = JSON.parse(readFileSync(join(fixtureRoot, "manifest.json"), "utf8"))
+const packageName = JSON.parse(readFileSync("package.json", "utf8")).name
 const pattern = process.env.FS_CASE_PATTERN ? new RegExp(process.env.FS_CASE_PATTERN) : null
 const selectedCases = manifest.cases.filter((path) => {
   if (pattern === null) return true
@@ -264,7 +265,7 @@ try {
     installRoot,
     join(temporaryRoot, filename)
   ])
-  const entrypoint = join(installRoot, "node_modules", "@cpai", "fs", "dist", "bin.js")
+  const entrypoint = join(installRoot, "node_modules", ...packageName.split("/"), "dist", "bin.js")
 
   const failures = []
   for (const casePath of selectedCases) {

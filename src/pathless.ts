@@ -23,7 +23,7 @@ const bytesResult = (stdout: Buffer): ProcessResult => ({ stdout, stderr: empty,
 
 const discovery = {
   executable: "fs",
-  package: "@cpai/fs",
+  package: "@sjunepark/fs",
   input: null,
   artifact: {
     versions: ["0.1"],

@@ -8,8 +8,8 @@ the next action. Completed milestone plans linked from the
 
 ## Reference CLI
 
-Steps 1–8 define the completed reference CLI sequence. Detailed historical
-scope and validation are maintained in the
+The completed reference CLI sequence and its historical validation are
+maintained in the
 [V0 CLI plan](docs/plans/cli-v0.md).
 
 ## Release Sequence

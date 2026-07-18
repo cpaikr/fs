@@ -68,9 +68,13 @@ schemas, examples, or fixtures.
 The [documentation index](README.md) identifies the owner for each contract.
 Change the owning document first and update summaries by reference.
 
-`content/guide/authoring.md.template` is the maintained source for the bundled
-authoring guide and repository-distributed Agent Skill. The renderer exposes
-the exact installed and version-pinned forms:
+`docs/authoring.md` owns the authoring decision boundary and durable policy.
+`content/guide/authoring.md.template` owns the exact portable operational
+procedure shared by the bundled authoring guide and repository-distributed
+Agent Skill.
+`scripts/render-guide.mjs` owns Skill-only frontmatter, OpenAI metadata, and
+the exact npm command and availability note. The renderer exposes the installed
+and version-pinned forms:
 
 ```sh
 node scripts/render-guide.mjs --installed > assets/guide/authoring.md
@@ -79,8 +83,9 @@ node scripts/render-guide.mjs --skill-version "$package_version" \
   > skills/author-fs/SKILL.md
 ```
 
-After regenerating the maintained files, run `pnpm check:docs`. Do not edit
-generated guidance independently of the template.
+After regenerating the maintained files, run `pnpm check:docs`. It also checks
+the package-facing README's pinned identity and version against `package.json`.
+Do not edit generated guidance independently of the template.
 
 ## Package boundary
 

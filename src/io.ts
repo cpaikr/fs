@@ -90,7 +90,7 @@ const readStdin = Effect.gen(function*() {
 })
 
 export class ApplicationIO extends Context.Service<ApplicationIO, ApplicationIOService>()(
-  "@cpai/fs/ApplicationIO"
+  "@sjunepark/fs/ApplicationIO"
 ) {
   static readonly live = Layer.succeed(ApplicationIO, {
     cwd: Effect.try({

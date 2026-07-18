@@ -80,6 +80,6 @@ const execute = (request: ApplicationRequest): Effect.Effect<ProcessResult, neve
 export class ApplicationExecutor extends Context.Service<
   ApplicationExecutor,
   ApplicationExecutorService
->()("@cpai/fs/ApplicationExecutor") {
+>()("@sjunepark/fs/ApplicationExecutor") {
   static readonly live = Layer.succeed(ApplicationExecutor, { execute })
 }

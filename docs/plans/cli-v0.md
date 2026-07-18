@@ -16,6 +16,9 @@ snapshot comparison, and atomic exact-byte document creation. It then replaced
 the initial Node-core grammar adapter and maintained help assets with a command
 tree and runner built from the public `effect/unstable/cli` API.
 
+The package was renamed after this milestone. The
+[active release plan](v0-release-candidate.md) owns the current npm identity.
+
 Agent Skill generation, validation-snapshot recording, rendering, and release
 preparation were delivered by later roadmap milestones.
 

@@ -99,8 +99,8 @@ Whether every rollup application agrees within the applicable unit tolerance.
 It is independent of structural conformance.
 
 **Calculation status**:
-The derived aggregate outcome: not run, not defined, consistent, or
-inconsistent. It is never stored as current document state.
+The derived aggregate outcome: `not-run`, `not-defined`, `consistent`, or
+`inconsistent`. It is never stored as current document state.
 
 **Validation result**:
 The current outcome produced by evaluating structural conformance and rollup

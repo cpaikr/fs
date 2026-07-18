@@ -3,7 +3,8 @@
 `fs` is a working title. The [roadmap](../ROADMAP.md) records strategic
 delivery milestones.
 
-This document describes the current V0 statement-item-row contract.
+This document summarizes the V0 product boundary. The
+[semantic specification](semantic-spec.md) owns the exact artifact contract.
 
 ## Summary
 
@@ -36,13 +37,13 @@ Its central boundaries are:
 - JSON is the canonical serialization.
 - One document covers exactly one reporting entity and reporting scope.
 - One document may contain multiple statements and multiple periods.
-- Statements own ordered, document-local items and their period-keyed values.
-- Each item owns one unit, and its `groupings` map contains exactly the
-  declared grouping columns; the project supplies no accounting taxonomy.
+- Statements own ordered, document-local items and their stored period values.
+- Items carry author-declared units and flat groupings; the project supplies no
+  accounting taxonomy.
 - FS may group an item but does not split, allocate, or infer finer detail.
 - All values, including reported subtotal values, are stored explicitly.
-  Optional `rollupTo` relationships validate direct additive children but
-  never create, replace, or materialize values.
+  Optional additive rollups validate direct children but never create, replace,
+  or materialize values.
 - Rollup inconsistency is reportable without making structurally usable data
   nonconforming.
 - Source and provenance metadata are entirely outside the specification.

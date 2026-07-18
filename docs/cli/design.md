@@ -22,9 +22,11 @@ source material, choose item meanings, prescribe statement contents, infer
 values, convert units, or repair financial ambiguity.
 
 The [semantic specification](../semantic-spec.md) defines artifact behavior,
-the [authoring guide](../authoring.md) defines the document-encoding workflow,
-and the [acceptance contract](acceptance.md) defines exact process behavior.
-Schemas and fixtures provide machine-readable evidence for those contracts.
+the [authoring policy](../authoring.md) defines the financial-decision boundary,
+the [portable workflow](../../content/guide/authoring.md.template) defines the
+exact create-and-repair procedure, and the
+[acceptance contract](acceptance.md) defines exact process behavior. Schemas
+and fixtures provide machine-readable evidence for those contracts.
 
 Canonical FS documents, schemas, and examples remain JSON. Structured V0
 operation results and operational errors also use JSON. Framework help,
@@ -50,7 +52,7 @@ Help includes command descriptions, required operands, accepted flags,
 choices, defaults, subcommands, and examples. That semantic inventory is the
 contract; formatter wording, spacing, and section layout are not independent
 product content. Exact-one operand descriptions begin with `Exactly one` even
-when the pinned beta's consume-all refinement causes native usage to show a
+when the pinned CLI's consume-all refinement causes native usage to show a
 variadic ellipsis; that formatter detail never relaxes runtime cardinality.
 Version, completions, and help are non-interactive action flags and may
 complete without running ordinary command validation or a command handler.
@@ -66,22 +68,11 @@ causes, stack traces, timestamps, or runtime identifiers.
 
 ## Operational Boundaries
 
-The public CLI treats every document input as untrusted. These finite V0
-budgets bound work performed by the process without changing artifact
-conformance:
-
-- raw file or standard-input bytes: 16 MiB (16,777,216 bytes);
-- simultaneously open JSON object and array containers: 64, with a root
-  container at level 1;
-- JSON values: 200,000, counting the root and each object-member or array value,
-  including container values;
-- JSON values in a nonconforming document: 256 before complete diagnostics are
-  refused; large conforming documents retain the general JSON-value budget;
-- encoded structural diagnostics: 1 MiB (1,048,576 bytes);
-- digits in one schema-conforming exact decimal: 1,000, excluding a sign and
-  decimal point; and
-- digits across all schema-conforming exact decimals in one document:
-  1,000,000.
+The public CLI treats every document input as untrusted. Finite V0 budgets
+bound raw input, JSON nesting and value counts, nonconforming diagnostic work,
+encoded diagnostics, and exact-decimal work without changing artifact
+conformance. The [acceptance contract](acceptance.md#operational-errors) owns
+the exact thresholds, counting rules, stable results, and precedence.
 
 The byte boundary is enforced while reading, before UTF-8 decoding, and stops
 at the first excess byte. JSON nesting and value budgets are enforced by a
@@ -131,16 +122,15 @@ document identity from filenames.
 
 ### `fs guide authoring`
 
-Present the prerequisites, artifact workflow, refusal to infer missing
-financial decisions, and validation loop from the
-[authoring guide](../authoring.md). The installed command and Agent Skill must
-be generated or checked from one maintained source so their guidance cannot
+Implement the prerequisites and decision boundaries in the
+[authoring policy](../authoring.md). The installed command and Agent Skill are
+generated from one portable source so their exact operational procedure cannot
 drift.
 
 The [portable template](../../content/guide/authoring.md.template) is that
 source. Its [installed rendering](../../assets/guide/authoring.md) uses `fs`;
 the deterministic renderer accepts an exact package version and fixes the
-`npx -y @cpai/fs@<version>` prefix and visible version-basis note for Agent
+`npx -y @sjunepark/fs@<version>` prefix and visible version-basis note for Agent
 Skill generation.
 
 Generated routes and commands do not assume a repository checkout. The guide
@@ -290,8 +280,9 @@ loop. Static Skill guidance and `fs guide authoring` share one source.
 
 Publish the Skill from the repository's root `skills/` catalog. Installed CLI
 guidance uses `fs`. Generated Skill commands name an exact npm package version
-as `npx -y @cpai/fs@<version>` and state that version as their basis. This is a
-generated-command reproducibility rule, not evidence of package availability.
+as `npx -y @sjunepark/fs@<version>` and state that version as their basis. This
+is a generated-command reproducibility rule, not evidence of package
+availability.
 
 ## Implementation Evidence
 

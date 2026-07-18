@@ -23,15 +23,18 @@ done < <(
 
 echo "Checking maintained CLI content"
 node scripts/render-guide.mjs --check-installed
+node scripts/render-guide.mjs --check-readme
 node scripts/render-guide.mjs --check-skill
-npx_guide="$(node scripts/render-guide.mjs --npx-version 0.1.0)"
+package_name="$(node -p 'require("./package.json").name')"
+package_version="$(node -p 'require("./package.json").version')"
+npx_guide="$(node scripts/render-guide.mjs --npx-version "$package_version")"
 for expected_command in \
   'schema document' \
   'example' \
   'example minimal' \
   'validate candidate.json' \
   'create --output statement.fs.json candidate.json'; do
-  if [[ "$npx_guide" != *"npx -y @cpai/fs@0.1.0 $expected_command"* ]]; then
+  if [[ "$npx_guide" != *"npx -y $package_name@$package_version $expected_command"* ]]; then
     echo "Pinned npx guide rendering lost an expected command" >&2
     exit 1
   fi
@@ -51,7 +54,7 @@ if [[ "$npx_guide" == *'{{'* ]]; then
 fi
 node scripts/render-guide.mjs --npx-version 1.0.0+build.1 >/dev/null
 skill_guide="$(node scripts/render-guide.mjs --skill-version 1.0.0+build.1)"
-if [[ "$skill_guide" != *'This Skill is based on `@cpai/fs` version `1.0.0+build.1`.'* ]]; then
+if [[ "$skill_guide" != *"This Skill uses \`$package_name@1.0.0+build.1\`."* ]]; then
   echo "Agent Skill rendering lost its package-version basis" >&2
   exit 1
 fi

@@ -1,42 +1,41 @@
 # Authoring FS Documents
 
-Use this workflow only after the financial model is resolved. FS encodes one
-entity and reporting scope; it does not extract source material, choose
-financial meanings, map a taxonomy, convert units, or invent values.
+Encode only an author-resolved financial model. One FS document covers one
+entity and reporting scope.
 
-## Prerequisites
+## Resolve Inputs
 
-Before encoding, obtain all of these from the author:
+For a new document, confirm all of these inputs before encoding:
 
-- the reporting entity and exact reporting scope;
-- every statement's item meanings, order, and stable local identifiers;
-- units, scales, selected periods, and one cell state for every item-period;
-- any grouping-column names and each item's assignments;
-- the intended distinction between zero, missing, and unavailable values; and
-- every confirmed additive parent-child relationship and unit tolerance.
+- entity `name` and optional `id`, scope `label` and optional `id`, and any
+  optional `documentId`;
+- units with `id`, `label`, `measure`, `scale`, and optional canonical,
+  nonnegative `defaultTolerance`; omission means exact zero, and the parent
+  item's unit controls each rollup tolerance;
+- periods with `id`, `kind`, and either `date` for an instant or inclusive
+  `start` and `end` for a duration;
+- statements with `id`, `label`, ordered period identifiers, and ordered
+  items; each item has `id`, `label`, `unit`, `values`, and `groupings`, plus
+  any optional `description` or `rollupTo`;
+- grouping-column identifiers and, for every item, a nonempty string or JSON
+  `null` assignment for each column;
+- one deliberate value state for every item-period: an exact decimal, zero,
+  missing, or unavailable; and
+- confirmed rollups whose child and parent are in the same statement, use the
+  same unit, add with coefficient one and stored signs unchanged, and form an
+  acyclic graph.
 
-Stop and request missing or contradictory inputs. Do not infer a meaning,
-choose a sign, aggregate items, map a taxonomy, or invent a value.
+For a repair, treat the candidate's financial meanings, values, units,
+periods, groupings, and rollups as authoritative. Repair syntax, shape, and
+reference encoding. Ask for author input only when a diagnostic exposes a
+missing or contradictory financial decision.
+
+Proceed when every required choice is present and internally consistent.
+Otherwise request the exact unresolved input.
 
 ## Workflow
 
-1. Create one document for exactly one entity and reporting scope.
-2. Define units and periods before statements reference them. Declare any
-   custom grouping purposes once in `groupingColumns`; they are flat metadata,
-   not hierarchies or value coordinates.
-3. Place ordered items directly in each statement. Give every item one unit, a
-   `values` map whose keys exactly match the statement periods, and a
-   `groupings` map whose keys exactly match `groupingColumns`.
-4. Encode each cell deliberately: use normalized exact decimal strings for
-   values, `"0"` for zero, JSON `null` for missing, and
-   `{ "unavailable": true }` only for explicit unavailability. Never omit a
-   selected period key.
-5. Set `rollupTo` on a child only for a confirmed additive relationship to a
-   same-unit parent in the same statement. Parent values remain explicit;
-   validation checks direct children and never materializes a subtotal.
-6. Validate the complete candidate before creating a document.
-
-## Contract Discovery
+### 1. Load the Exact Contract
 
 ```sh
 fs schema document
@@ -44,27 +43,83 @@ fs example
 fs example minimal
 ```
 
-The [FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/)
-defines meaning beyond JSON shape. Passing the schema alone is not full
-conformance evidence. A document may include the exact optional discovery
-pointer `"$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"`;
-validation still uses the bundled contract and does not require network
-access.
+Continue only when all three commands succeed and their artifacts are
+available. The [FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/)
+defines meaning beyond JSON shape. Consult it when an invariant or repair is
+uncertain.
 
-## Validate and Create
+Contract discovery is complete when the schema, example catalog, and minimal
+example are available from the exact command version.
+
+### 2. Prepare the Candidate
+
+Choose one branch:
+
+- **Create:** encode the complete author-resolved model with the rules below.
+- **Repair:** preserve the supplied candidate unchanged through its first
+  validation in Step 3. Use the rules below as repair constraints after the
+  validator establishes the baseline diagnostics.
+
+For either branch, apply these encoding constraints:
+
+- Set `"formatVersion": "0.1"`. The only allowed optional discovery pointer
+  is `"$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"`.
+- Define entity, scope, units, periods, and any grouping columns before
+  statements reference them. Keep objects closed and every identifier and
+  reference exact.
+- Give each statement an ordered, nonempty period list and ordered, nonempty
+  item list. Each item's `values` keys exactly match its statement periods;
+  its `groupings` keys exactly match the document's `groupingColumns`.
+- Encode values as canonical decimal strings: no exponent or leading `+`, no
+  unnecessary leading integer zeros or trailing fractional zeros, and no
+  negative zero. Use `"0"` for zero, JSON `null` for missing, and
+  `{ "unavailable": true }` for explicit unavailability.
+- Use a nonempty string for a grouping assignment and JSON `null` for no
+  assignment. With no grouping columns, every item's `groupings` is `{}`.
+- Set `rollupTo` only on a confirmed child. Every relationship is
+  same-statement, same-unit, coefficient-one, stored-sign, and acyclic. The
+  parent remains explicit; validation compares direct children and never
+  derives a subtotal.
+
+Create preparation is complete when every required member, selected-period
+cell, grouping assignment, identifier, reference, and confirmed rollup is
+present without inventing a financial choice. Repair preparation is complete
+when the original candidate is staged unchanged and its author-resolved
+financial choices are fixed as invariants.
+
+### 3. Validate and Repair to Conformance
 
 ```sh
 fs validate candidate.json
+```
+
+For a repair, run this command on the unchanged candidate first. When
+it returns `error.code: "invalid-json"`, repair syntax, trailing content, or
+duplicate members only when one correction preserves the supplied financial
+choice; otherwise request that choice. Re-run until the command returns a
+structured validation result. When
+`validation.conformance.status` is `"nonconforming"`, repair each
+structural diagnostic by its stable `code` and JSON Pointer `path`, then
+validate the complete candidate again. Change only encoding. If repair needs a
+financial decision, stop and request that decision. Repeat until
+`validation.conformance.status` is `"conforming"`.
+
+Structural conformance, `calculations`, and `snapshotDiff` are separate
+results. A conforming document may have inconsistent rollups; preserve the
+reported values and do not force calculation consistency.
+
+Validation is complete only with a conforming status and the unabridged
+structured output retained.
+
+### 4. Create and Deliver
+
+```sh
 fs create --output statement.fs.json candidate.json
 ```
 
-If validation reports structural nonconformance, use each diagnostic's stable
-code and JSON Pointer path to correct the encoding, then validate the complete
-candidate again. Do not invent a missing financial decision during repair.
-Run `create` only after validation reports structural conformance.
+Use a new output path whose parent directory already exists. `create` copies
+the candidate's exact bytes atomically and never overwrites a path.
 
-Structural conformance, rollup calculation consistency, and snapshot
-comparison are separate results. A rollup inconsistency may still be a
-successful usable validation result and does not prevent `create`; structural
-nonconformance does. `create` copies the candidate's exact bytes atomically and
-never overwrites an existing path or creates a missing parent directory.
+Finish only when `output.status` is `"created"`. Deliver the created FS JSON
+and the complete structured validation output, including `validation` and
+`snapshotDiff`.

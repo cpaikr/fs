@@ -55,7 +55,7 @@ assert the active command path, required operands, command-local flags, Effect
 built-ins, relevant offending token, and absence of ANSI control sequences.
 They do not copy formatter prose, wrapping, spacing, or section layout into
 independent expected files. Exact-one operand descriptions must contain the
-literal `Exactly one`. A native variadic ellipsis produced by the beta.98
+literal `Exactly one`. A native variadic ellipsis produced by the pinned CLI's
 consume-all refinement is not interpreted as accepting extras. Version cases
 assert the exact installed package version, and completion cases assert a
 nonempty script for the requested shell; completion metadata does not expand
@@ -426,8 +426,9 @@ the exact `<!doctype html>` document structure and embedded CSS fixed by the
 executable render fixtures. It contains no scripts, external resources, or
 author-controlled HTML. Every displayed entity, scope, statement, item, unit,
 measure, grouping-column name, and grouping value is escaped as text.
-`documentId`, optional metadata identifiers, period and item identifiers,
-descriptions, `rollupTo`, validation results, and snapshots are not displayed.
+`documentId`, optional metadata identifiers, statement, period, item, and unit
+identifiers, descriptions, `rollupTo`, validation results, and snapshots are
+not displayed.
 
 The page title combines the entity name and scope label. Its body shows that
 metadata, then every statement in document order. Each statement is one flat
@@ -466,11 +467,11 @@ vocabulary.
 
 Rendering computes finite structural budgets with checked arithmetic before
 constructing rows or cells. A rendered statement may contain at most 1,000
-logical columns including every item, conditional unit, grouping, and period
-column. Across the document, rendered tables may occupy at most 100,000
-logical grid slots after spans are expanded. A statement with `C` total
-columns and `R` item rows consumes `C * (R + 1)` slots, including its header
-row. Arithmetic that cannot stay within a budget is over-limit without
+logical columns including the item-label column and every conditional unit,
+grouping, and period column. Across the document, rendered tables may occupy
+at most 100,000 logical grid slots after spans are expanded. A statement with
+`C` total columns and `R` item rows consumes `C * (R + 1)` slots, including its
+header row. Arithmetic that cannot stay within a budget is over-limit without
 requiring the exact expanded count to be representable.
 
 After structural preflight, rendering uses a bounded sink and rejects final

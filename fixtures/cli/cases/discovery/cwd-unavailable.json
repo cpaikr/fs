@@ -11,7 +11,7 @@
       "members": [{ "pointer": "", "equals": ["executable", "package", "input", "artifact", "commands", "help"] }],
       "equalities": [
         { "pointer": "/executable", "equals": "fs" },
-        { "pointer": "/package", "equals": "@cpai/fs" },
+        { "pointer": "/package", "equals": "@sjunepark/fs" },
         { "pointer": "/input", "equals": null },
         { "pointer": "/artifact", "equalsFile": { "file": "expected/discovery.json", "pointer": "/artifact" } },
         { "pointer": "/commands", "equalsFile": { "file": "expected/discovery.json", "pointer": "/commands" } },

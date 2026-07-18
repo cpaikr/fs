@@ -96,7 +96,7 @@ const assertPackagedMarkdownLinks = (installedRoot, markdownPaths) => {
 }
 
 const expectedReleaseMetadata = {
-  name: "@cpai/fs",
+  name: "@sjunepark/fs",
   version: "0.1.0",
   keywords: ["financial-statements", "json-schema", "validation", "cli"],
   homepage: "https://cpaikr.github.io/fs/spec/0.1/",
@@ -197,15 +197,25 @@ try {
     throw new Error(installed.stderr || installed.stdout || "packed install failed")
   }
 
-  const installedRoot = join(installDirectory, "node_modules", "@cpai", "fs")
+  const installedRoot = join(
+    installDirectory,
+    "node_modules",
+    ...expectedReleaseMetadata.name.split("/")
+  )
   const installedPackageJson = JSON.parse(readFileSync(join(installedRoot, "package.json"), "utf8"))
   assertReleaseMetadata(installedPackageJson, "installed package metadata")
-  const metadataExport = resolveInstalledExport("@cpai/fs/package.json", installDirectory)
+  const metadataExport = resolveInstalledExport(
+    `${expectedReleaseMetadata.name}/package.json`,
+    installDirectory
+  )
   if (metadataExport.status !== 0 || metadataExport.stderr !== "") {
     throw new Error(metadataExport.stderr || "installed package metadata export is unavailable")
   }
-  assertExportUnavailable("@cpai/fs", installDirectory)
-  assertExportUnavailable("@cpai/fs/dist/validation/validate.js", installDirectory)
+  assertExportUnavailable(expectedReleaseMetadata.name, installDirectory)
+  assertExportUnavailable(
+    `${expectedReleaseMetadata.name}/dist/validation/validate.js`,
+    installDirectory
+  )
   for (const path of retainedAssets) {
     const source = readFileSync(path)
     const packedAsset = readFileSync(join(installedRoot, path))

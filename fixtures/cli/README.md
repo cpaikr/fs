@@ -94,8 +94,8 @@ Grammar and native-presentation coverage includes:
 - semantic top-level and per-command help, representative `-h` aliases, exact
   installed version identity, and nonempty completions for every documented
   shell;
-- exact-one operand descriptions containing `Exactly one` to clarify
-  beta.98's native variadic ellipsis without weakening runtime cardinality;
+- exact-one operand descriptions containing `Exactly one` to clarify the pinned
+  CLI's native variadic ellipsis without weakening runtime cardinality;
 - native help on standard output, a native diagnostic on standard error, and
   exit code `2` for missing or extra operands, unknown commands, unknown flags,
   unknown command values, and invalid log levels;

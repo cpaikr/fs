@@ -1,6 +1,6 @@
-# `@cpai/fs`
+# `@sjunepark/fs`
 
-`@cpai/fs` is the reference CLI for FS, a versioned JSON format for clean,
+`@sjunepark/fs` is the reference CLI for FS, a versioned JSON format for clean,
 structured financial statements. FS gives people and agents one predictable
 artifact to produce after financial data has been extracted or authored.
 
@@ -20,13 +20,13 @@ reference does not attest to current npm publication availability.
 Run without a global installation:
 
 ```sh
-npx -y @cpai/fs@0.1.0 --help
+npx -y @sjunepark/fs@0.1.0 --help
 ```
 
 Or install the `fs` executable globally:
 
 ```sh
-npm install --global @cpai/fs@0.1.0
+npm install --global @sjunepark/fs@0.1.0
 fs --help
 ```
 
@@ -34,17 +34,17 @@ Common workflows:
 
 ```sh
 # Read the bundled authoring guide.
-npx -y @cpai/fs@0.1.0 guide authoring
+npx -y @sjunepark/fs@0.1.0 guide authoring
 
 # Write the document schema or a bundled example to stdout.
-npx -y @cpai/fs@0.1.0 schema document
-npx -y @cpai/fs@0.1.0 example minimal
+npx -y @sjunepark/fs@0.1.0 schema document
+npx -y @sjunepark/fs@0.1.0 example minimal
 
 # Validate a document and calculate its results.
-npx -y @cpai/fs@0.1.0 validate statement.fs.json
+npx -y @sjunepark/fs@0.1.0 validate statement.fs.json
 
 # Render a deterministic standalone HTML table.
-npx -y @cpai/fs@0.1.0 render --output statement.html statement.fs.json
+npx -y @sjunepark/fs@0.1.0 render --output statement.html statement.fs.json
 ```
 
 The package bundles its schemas, guide, and examples. Validation does not
