@@ -22,7 +22,6 @@ const cases = [
 describe("exact decimal", () => {
   it("normalizes exact arithmetic without binary conversion", () => {
     expect(Decimal.parse("-1.5").subtract(Decimal.parse("-1")).toString()).toBe("-0.5")
-    expect(Decimal.parse("0.10").multiply(Decimal.parse("10")).toString()).toBe("1")
   })
 })
 

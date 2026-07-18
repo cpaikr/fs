@@ -65,7 +65,6 @@ export type ApplicationResult =
       readonly cell: CellIdentity
     }
 
-export type FailedApplication = Exclude<ApplicationResult, SatisfiedApplication>
 export type ConsistentApplications = readonly [SatisfiedApplication, ...SatisfiedApplication[]]
 declare const inconsistentApplicationsBrand: unique symbol
 export type InconsistentApplications = readonly [ApplicationResult, ...ApplicationResult[]] & {

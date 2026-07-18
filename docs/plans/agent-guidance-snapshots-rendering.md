@@ -2,20 +2,22 @@
 
 Status: Complete.
 
-This plan records decisions, gates, and validation for completed Roadmap step
-9. The [semantic specification](../semantic-spec.md)
-owns artifact meaning, the [CLI design](../cli/design.md) owns command intent,
-the [CLI acceptance contract](../cli/acceptance.md) owns observable process
+This plan preserves completion-time decisions and validation for Roadmap step
+9. The [semantic specification](../semantic-spec.md) owns current artifact
+meaning, the [CLI design](../cli/design.md) owns command intent, the
+[CLI acceptance contract](../cli/acceptance.md) owns observable process
 behavior, and the [roadmap](../../ROADMAP.md) owns strategic sequence.
 
-## Milestone
+## Milestone Boundary
 
-Deliver an installable Agent Skill generated from the portable authoring
-source, then add `fs record-validation` and `fs render` through separate
-contract-first slices. Preserve the completed Effect-native command,
-validation, logging, and atomic-write guarantees. Stop before Roadmap step 10:
-placeholder schema identifiers, release-wide cross-platform verification, and
-V0 release remain out of scope.
+Step 9 delivered a repository-distributed Agent Skill generated from the
+portable authoring source, then added `fs record-validation` and `fs render`
+through separate contract-first slices. It preserved the existing
+Effect-native command, validation, logging, and atomic-write guarantees.
+
+The milestone ended before the later statement-item-row redesign and release
+preparation. That completion boundary is historical; current status is routed
+through the [documentation index](../README.md).
 
 ## Decisions
 
@@ -24,8 +26,7 @@ V0 release remain out of scope.
   package version and states that version as its basis.
 - The repository-distributed Skill lives at
   `skills/author-fs/SKILL.md`. The root `skills/` catalog is the installable
-  repository distribution; the Skill is not duplicated in the npm tarball,
-  and package publication remains Roadmap step-10 release work.
+  repository distribution, and the Skill is not duplicated in the npm tarball.
 - The Skill stays concise and routes to published contracts and bundled CLI
   discovery instead of embedding schemas, examples, or the semantic
   specification in default agent context.
@@ -39,99 +40,38 @@ V0 release remain out of scope.
   existing `validationSnapshot`; it does not retain history or mutate the
   input.
 - Rendering is a deterministic, standalone HTML projection of the flat
-  presentation model. It must not infer hierarchy, calculations, missing
-  facts, taxonomy, or financial meaning.
-- Rendered tables follow semantic presentation order. Columns are
-  period-major with the first listed axis changing slowest; exact stored
-  decimals are not rescaled, and missing and unavailable cells stay distinct.
+  presentation model. It does not infer hierarchy, calculations, taxonomy, or
+  financial meaning.
 - The HTML has fixed embedded styling and no scripts or external resources.
-  All author-controlled displayed text is escaped; rules, snapshots,
-  identifiers, and descriptions are not displayed.
-- Statement headings are visual separator cells only; they have no table
-  header scope, row-group semantics, or presentation nesting.
+  All displayed author-controlled text is escaped.
 
-## Phase State
+## Delivered
 
-- [x] Phase 0: generate and validate the installable Agent Skill from the
-  shared source.
-- [x] Phase 1: fix `record-validation` grammar, results, streams, and
-  filesystem effects in acceptance prose and fixtures.
-- [x] Phase 2: implement the packed `record-validation` command and pass its
-  fixture and fault/integration gates.
-- [x] Phase 3: fix deterministic `render` HTML and failure behavior in
-  acceptance prose and fixtures.
-- [x] Phase 4: implement the packed `render` command and pass its fixture and
-  fault/integration gates.
-- [x] Phase 5: complete full repository validation and review proving every
-  step-9 deliverable.
-
-## Current State
-
-Roadmap steps 1–8, the step-9 Agent Skill, and the `record-validation`
-contract and implementation slices are complete. The
-repository-distributed `author-fs` Skill is generated from the shared portable
-authoring template with exact-version `npx` commands. The package contains the
-complete validator, atomic no-overwrite writer, and packed snapshot-recording
-command. Snapshot recording replaces an existing valid snapshot, refuses
-structural nonconformance, reports the created document as a snapshot match,
-and preserves input and destination safety.
-
-Roadmap step 9 is complete. The packed CLI includes deterministic standalone
-HTML rendering through a pure renderer, complete presentation model types,
-the shared validated-output lifecycle, and the Effect command surface. Its 17
-executable cases fix and
-pass standalone bytes, metadata, flat table ordering, cell lookup and display,
-escaping, validation gates, process envelopes, filesystem precedence,
-discovery, and help. The suite has 117 total descriptors.
-
-## Known Temporary Drift
-
-None.
+- Generated and validated the installed guide and `author-fs` Skill from one
+  portable template.
+- Fixed `record-validation` grammar, results, stream roles, and filesystem
+  effects in acceptance prose and executable descriptors before implementing
+  the packed command.
+- Reused the validated-output lifecycle and atomic no-overwrite writer for
+  snapshot recording, including replacement of an existing valid snapshot.
+- Fixed deterministic standalone HTML, validation gates, output limits, and
+  failure precedence before implementing the packed renderer.
+- Completed repository review after both commands passed their focused and
+  full gates.
 
 ## Validation
 
-The completed step-8 baseline is recorded in the
-[CLI milestone index](cli-v0.md). The initial plan-routing slice passes
-`./scripts/check-docs.sh` and `git diff --check`. The Agent Skill slice passes
-deterministic generated-byte checks, exact-version acceptance and rejection,
-root-catalog discovery through `bunx skills add ./skills/author-fs --list`, the
-Skill validator in an ephemeral PyYAML environment, and `./scripts/check-docs.sh`.
-A fresh-context refusal test also stopped on an incomplete financial model
-without inventing decisions. The final step-9 gate repeats repository,
-documentation, and whitespace checks after the last state update.
+- Generated bytes, exact-version command rendering, repository Skill discovery,
+  and Skill validation passed against the shared authoring source.
+- Snapshot fixtures revalidated as matches, while structural refusal and
+  calculation-inconsistency behavior passed unit and packed-process coverage.
+- Render fixtures proved exact standalone bytes, ordering, cell display,
+  escaping, validation gates, finite-output failures, and writer precedence.
+- `pnpm verify` passed type checking, strict Effect diagnostics, unit and
+  boundary tests, packed-process acceptance, writer crash and contention
+  integration, and installed-tarball smoke.
+- `./scripts/check-docs.sh` and `git diff --check` passed at closure.
 
-The completed `record-validation` slice passes `pnpm verify`: typecheck, zero
-strict Effect diagnostics, 100 unit and boundary tests, all 100 packed-process
-cases, five writer crash points, early contender-exit detection, 16-way writer
-contention, and installed-tarball npm/npx smoke for 41 cleanly built packed
-files. `./scripts/check-docs.sh` passes with exact generated documents that
-revalidate as snapshot matches, and `git diff --check` passes.
-
-The render contract slice passes `./scripts/check-docs.sh`, including all 117
-CLI descriptors and the new conforming presentation fixture, plus
-`git diff --check`. Contract review strengthened the presentation fixture so
-reversed and subset display order, exact unit and dimension matching, and
-dimensionless lookup cannot pass accidentally through definition-order or
-wildcard implementations. Its expected pre-implementation discovery and
-command failures are now closed by the implementation slice.
-
-The render implementation slice and final repository gate pass `pnpm verify`:
-typecheck, zero strict Effect diagnostics, 110 unit and boundary tests, all 117
-packed-process cases, five writer crash points, early contender-exit
-detection, 16-way writer contention, and installed-tarball smoke across 43
-packed files. The tarball smoke executes `render` and compares its exact HTML.
-Focused implementation review found no correctness, regression, architecture,
-or validation gaps.
-Final `./scripts/check-docs.sh` and `git diff --check` pass. The six incremental
-step-9 commits cover the plan, Agent Skill, snapshot contract, snapshot
-implementation, render contract, and render implementation. No Roadmap step-10
-schema-identifier, cross-platform release, or publishing work began.
-
-## Blockers
-
-None.
-
-## Closure
-
-No step-9 action remains. Roadmap step 10 requires a new explicitly authorized
-plan; this work stops before release preparation.
+All step-9 phases closed with no recorded temporary drift or blocker. Later
+milestones own subsequent contract and release changes; this plan carries no
+live next action.

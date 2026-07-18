@@ -5,6 +5,10 @@ one primary responsibility.
 
 ## Start by task
 
+- Check live release status or the next action:
+  [V0 release candidate](plans/v0-release-candidate.md)
+- Set up, run, test, or package the repository:
+  [Development guide](development.md)
 - Understand the product boundary: [Product scope](product-scope.md)
 - Use the canonical vocabulary: [Domain glossary](glossary.md)
 - Encode a document: [Authoring guide](authoring.md)
@@ -15,13 +19,11 @@ one primary responsibility.
   [CLI acceptance contract](cli/acceptance.md)
 - Review the accepted replacement model:
   [statement item rows](adr/0001-replace-dimensional-members-with-item-grouping.md)
-- Inspect completed Roadmap step 10:
-  [Statement item row refactor](plans/statement-item-row-refactor.md)
-- Track active Roadmap step 11:
-  [V0 release candidate](plans/v0-release-candidate.md)
 - Review the accepted independent rendering policy:
   [Finite rendering limits](adr/0002-bound-render-output.md)
 - See strategic milestones: [Roadmap](../ROADMAP.md)
+- Inspect completed Roadmap step 10:
+  [Statement item row refactor](plans/statement-item-row-refactor.md)
 - Inspect completed Roadmap step 9:
   [Agent guidance, snapshots, and rendering plan](plans/agent-guidance-snapshots-rendering.md)
 - Inspect the completed Effect-native CLI milestone:
@@ -44,6 +46,10 @@ When documents overlap, use this order:
    delivery decisions, gates, and validation; they are not normative product
    contracts.
 
+Source, configuration, tests, and built artifacts provide implementation
+evidence. Contract prose defines required behavior but does not prove that a
+particular checkout or package implements it.
+
 The product scope and glossary explain intent and terminology but do not
 override the semantic specification.
 
@@ -57,6 +63,6 @@ incorporated.
 - Change the owning document and link to it from summaries instead of
   repeating decisions.
 - Keep live status and the next action only in the applicable active plan when
-  later roadmap work is explicitly started.
+  roadmap work is active.
 - Run `./scripts/check-docs.sh` after changing documentation or contract
   artifacts.

@@ -117,6 +117,7 @@
     "cases/validate/semantic-failure.json",
     "cases/validate/snapshot-match.json",
     "cases/validate/snapshot-mismatch.json",
+    "cases/validate/snapshot-prefix-property.json",
     "cases/validate/stdin-no-rollups.json",
     "cases/validate/trailing-content.json",
     "cases/validate/unknown-flag.json",

@@ -38,10 +38,6 @@ export class Decimal {
     return this.add(Decimal.normalize(-other.coefficient, other.scale))
   }
 
-  multiply(other: Decimal): Decimal {
-    return Decimal.normalize(this.coefficient * other.coefficient, this.scale + other.scale)
-  }
-
   absolute(): Decimal {
     return this.coefficient < 0n ? Decimal.normalize(-this.coefficient, this.scale) : this
   }

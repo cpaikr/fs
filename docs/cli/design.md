@@ -5,9 +5,9 @@ contract. The CLI projects the document contract without adding a second data
 model.
 
 The CLI is the packaged reference consumer and authoring aid for complete FS
-documents. The
-[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
-records Roadmap step 9 implementation and validation.
+documents. This design does not attest to implementation or release
+availability. Verify implementation in source and the built package; use the
+[active release plan](../plans/v0-release-candidate.md) for live release status.
 
 ## Boundary
 
@@ -90,10 +90,9 @@ the deterministic renderer accepts an exact package version and fixes the
 `npx -y @cpai/fs@<version>` prefix and visible version-basis note for Agent
 Skill generation.
 
-Generated routes and commands do not assume a repository checkout. Package
-publication remains release work. The guide routes to schemas, examples, and
-the semantic specification without embedding the whole contract in default
-agent context.
+Generated routes and commands do not assume a repository checkout. The guide
+routes to schemas, examples, and the semantic specification without embedding
+the whole contract in default agent context.
 
 ### `fs schema [--output <path>] <name>`
 
@@ -235,13 +234,12 @@ loop. Static Skill guidance and `fs guide authoring` share one source.
 
 Publish the Skill from the repository's root `skills/` catalog. Installed CLI
 guidance uses `fs`. Generated Skill commands name an exact npm package version
-as `npx -y @cpai/fs@<version>` and state that version as their basis; package
-publication remains separate release work.
+as `npx -y @cpai/fs@<version>` and state that version as their basis. This is a
+generated-command reproducibility rule, not evidence of package availability.
 
-## Delivery
+## Implementation Evidence
 
-The
-[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
-records the implementation phases and validation gates. The
-[completed V0 CLI plan](../plans/cli-v0.md) retains the selected runtime,
-package, dependency constraints, and step-8 validation evidence.
+The [development guide](../development.md) owns repository validation commands,
+and the [active release plan](../plans/v0-release-candidate.md) owns live status.
+Completed milestone plans linked from the [documentation index](../README.md)
+retain historical implementation decisions and gate evidence.

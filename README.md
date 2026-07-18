@@ -12,9 +12,12 @@ or financial-policy engine. Authors remain responsible for those decisions.
 - Node.js `22.17.0` or later in the Node.js 22 line, or Node.js `24.15.0` or
   later in the Node.js 24 line.
 
-## Run the CLI
+## Package command forms
 
-Run the pinned V0 release without a global installation:
+The pinned V0 package interface uses the following commands. This command
+reference does not attest to current npm publication availability.
+
+Run without a global installation:
 
 ```sh
 npx -y @cpai/fs@0.1.0 --help
@@ -46,6 +49,12 @@ npx -y @cpai/fs@0.1.0 render --output statement.html statement.fs.json
 
 The package bundles its schemas, guide, and examples. Validation does not
 depend on network access.
+
+## Develop from source
+
+In a source checkout, `docs/development.md` owns repository setup, local CLI
+execution, validation, generated content, and package checks. That
+repository-only guide is not part of the npm package.
 
 ## Format contract
 
