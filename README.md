@@ -1,40 +1,64 @@
-# fs
+# `@cpai/fs`
 
-Status: The current V0 artifact uses statement-owned item rows, and the packed
-reference CLI through `fs render` exists. `fs` is a working title.
+`@cpai/fs` is the reference CLI for FS, a versioned JSON format for clean,
+structured financial statements. FS gives people and agents one predictable
+artifact to produce after financial data has been extracted or authored.
 
-`fs` is a public format for clean, structured financial statements. It gives
-people and agents one predictable artifact to produce after extracting or
-authoring financial data, regardless of whether the source was a PDF,
-spreadsheet, website, or manual entry.
+FS is not an extraction system, accounting taxonomy, source-mapping service,
+or financial-policy engine. Authors remain responsible for those decisions.
 
-The core product is a standalone JSON document and its validation semantics.
-It is not an extraction system, accounting taxonomy, or financial-policy
-engine.
+## Requirements
 
-## Start Here
+- Node.js `22.17.0` or later in the Node.js 22 line, or Node.js `24.15.0` or
+  later in the Node.js 24 line.
 
-- To encode an author-resolved financial model, use the
-  [authoring guide](docs/authoring.md).
-- To implement or evaluate the format, use the normative
-  [semantic specification](docs/semantic-spec.md).
-- To understand the product and its boundaries, read the
-  [product scope](docs/product-scope.md).
-- For every document and its authority, use the
-  [documentation index](docs/README.md).
-- To review the completed statement-item-row delivery, use the
-  [step-10 plan](docs/plans/statement-item-row-refactor.md).
+## Run the CLI
 
-## Repository State
+Run the pinned V0 release without a global installation:
 
-The V0 semantic contract, schemas, examples, language-neutral fixtures, full
-validator, bundled discovery/content commands, and exact-byte non-overwriting
-creation and validation-snapshot recording use the statement-item-row model.
-The packed CLI runs that contract through `effect/unstable/cli` and renders
-deterministic standalone HTML tables.
+```sh
+npx -y @cpai/fs@0.1.0 --help
+```
 
-The [roadmap](ROADMAP.md) shows strategic milestones. The
-[step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md) records its
-delivery decisions and validation. The
-[step-10 plan](docs/plans/statement-item-row-refactor.md) records its delivery
-decisions and validation.
+Or install the `fs` executable globally:
+
+```sh
+npm install --global @cpai/fs@0.1.0
+fs --help
+```
+
+Common workflows:
+
+```sh
+# Read the bundled authoring guide.
+npx -y @cpai/fs@0.1.0 guide authoring
+
+# Write the document schema or a bundled example to stdout.
+npx -y @cpai/fs@0.1.0 schema document
+npx -y @cpai/fs@0.1.0 example minimal
+
+# Validate a document and calculate its results.
+npx -y @cpai/fs@0.1.0 validate statement.fs.json
+
+# Render a deterministic standalone HTML table.
+npx -y @cpai/fs@0.1.0 render --output statement.html statement.fs.json
+```
+
+The package bundles its schemas, guide, and examples. Validation does not
+depend on network access.
+
+## Format contract
+
+V0 documents use `formatVersion: "0.1"`. The normative
+[FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/) and
+[versioned document schema](https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json)
+define the public contract.
+
+## Support
+
+Report package or specification problems through the
+[public issue tracker](https://github.com/cpaikr/cpaikr.github.io/issues).
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).

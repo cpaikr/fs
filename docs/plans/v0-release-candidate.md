@@ -1,6 +1,7 @@
 # V0 Release Candidate Plan
 
-Status: Active. Roadmap step 11 pre-publication work is in progress.
+Status: Active. The V0 release candidate is verified through all
+pre-publication gates; publication remains out of scope.
 
 This plan owns live step-11 progress, validation, blockers, and the next
 action. The [semantic specification](../semantic-spec.md) owns artifact
@@ -26,8 +27,10 @@ GitHub release, or mark Roadmap step 11 complete.
 
 - The npm identity is `@cpai/fs`; V0 uses package version `0.1.0` and artifact
   `formatVersion: "0.1"`.
-- CPAI owns the npm scope. Authenticated ownership evidence is still required
-  before the final candidate gate; credentials must not be committed.
+- The owner confirms control of the CPAI npm scope. Credentials must not be
+  committed or supplied to release-candidate validation.
+- V0 is licensed under Apache-2.0, selected by the owner for permissive use
+  with an explicit patent grant.
 - The public schema host is the dedicated public
   `cpaikr/cpaikr.github.io` repository served by HTTPS GitHub Pages. The
   private `cpaikr/fs` repository stays private during this milestone.
@@ -59,39 +62,39 @@ GitHub release, or mark Roadmap step 11 complete.
 - [x] Phase 1: align canonical schema identifiers and optional `$schema`
   across semantic prose, schemas, models, fixtures, examples, generated
   guidance, tests, and checks.
-- [ ] Phase 2: merge the reviewed schema slice; publish its exact schema bytes
+- [x] Phase 2: merge the reviewed schema slice; publish its exact schema bytes
   and versioned semantic specification; verify every public HTTPS resource
   before starting later work.
-- [ ] Phase 3: complete npm package, licensing, repository, support, and
+- [x] Phase 3: complete npm package, licensing, repository, support, and
   release configuration without publishing.
-- [ ] Phase 4: make packed-package verification release-grade across every
+- [x] Phase 4: make packed-package verification release-grade across every
   supported operating system and Node.js line.
-- [ ] Phase 5: complete review and a requirement-by-requirement release
+- [x] Phase 5: complete review and a requirement-by-requirement release
   candidate audit on updated `dev` while leaving Roadmap step 11 open.
 
 ## Current State
 
-The completed step-10 state on `dev` is the baseline. This active plan and its
-documentation-index route are established. The dedicated public
-`cpaikr/cpaikr.github.io` repository now exists and GitHub Pages is enabled at
-`https://cpaikr.github.io/` with enforced HTTPS. It does not yet publish FS
-schemas. The Phase-1 source cutover assigns all three shipped schema IDs,
-removes the unnecessary internal CLI descriptor ID, permits only the optional
-exact document pointer, preserves it through recording, and aligns the owning
-prose, generated guidance, example, invalid fixture, tests, and checks.
-The public semantic specification is deployed from Pages commit `ac0d330` and
-returns HTTPS 200 at its versioned URL.
+PR #9 merged Phases 0 and 1 into `dev` as merge commit `11bd7d2`, preserving
+the slice's individual commits. Pages commit `63b13ad` publishes the exact
+merged document, validation-result, and snapshot-diff schemas and the
+versioned semantic specification. Every public resource returns HTTPS 200;
+the schemas use `application/json`, allow cross-origin reads, and are
+byte-identical to the repository files. AJV validates all maintained result
+and diff fixtures against the downloaded schemas and their relative
+cross-schema references.
 
-The first PR owns Phases 0 and 1. After it is reviewed and merged, the
-reviewed schema bytes will be copied to the public host and verified before a
-fresh second branch starts from updated `dev`.
+The second slice defines Apache-2.0 licensing and complete public npm
+metadata, replaces private and unpacked README routes with public resources,
+and adds an npm publication dry run. Packed-package verification now executes
+the real `prepack` lifecycle, requires an exact inventory, verifies retained
+asset bytes and installed metadata, and exercises the installed CLI. The
+cross-platform matrix remains the proof boundary for Phase 4; its new
+release-candidate job waits for every OS/Node cell and documentation gate
+before running npm's publication dry run.
 
 ## Known Temporary Drift
 
-- Public schema URLs do not serve the repository schemas yet.
-
-This drift is confined to the reviewed publication boundary. It must be closed
-immediately after the first PR merges and before the second branch starts.
+None.
 
 ## Validation
 
@@ -112,22 +115,48 @@ the complete CLI descriptor matrix. `git diff --check` passes. Fresh contract
 review applied two wording and example clarity fixes and then found no
 remaining material correctness, design, validation, or plan-coverage gap.
 
-PR #9 receives completed Codex and CodeRabbit review. Codex reports no
+PR #9 received completed Codex and CodeRabbit review. Codex reported no
 finding. CodeRabbit's three findings are fixed in `6aa8991`, validated with the
-focused and full gates, replied to, and resolved. The documentation job and
-both Windows/Node matrix cells pass on the reviewed head. The initial
-GitHub-hosted Linux and macOS cells could not start because of an organization
-billing limit. The owner directed the full matrix to Blacksmith; the replacement
-run must pass before merge.
+focused and full gates, replied to, and resolved. Its final CI run
+`29623796785` passed documentation and all six Blacksmith OS/Node matrix cells
+on head `c4ed1fc`. A final local code-review pass found no material issue in
+the runner migration.
+
+Pages deployment `29624021568` succeeded for commit `63b13ad`. Direct
+downloads confirmed the public schemas' status, content type, CORS header,
+byte identity, and cross-file reference behavior before this second branch
+started from updated `dev`.
+
+The Phase-3 and local Phase-4 slice passes `pnpm release:check`: documentation
+and fixture contracts, TypeScript, strict Effect diagnostics, 163 tests, all
+121 packed-process acceptance cases, writer crash and concurrency integration,
+the exact 44-file installed tarball, and npm's publication dry run. The
+Apache-2.0 file matches the canonical Apache text, workflow YAML parses, and
+`git diff --check` passes. Independent implementation and design review found
+no Bucket-I or Bucket-II issue; the remaining risk is intentionally delegated
+to the PR's exact-head Blacksmith matrix and dependent dry-run job.
+
+PR #10 received completed Codex and CodeRabbit review. Codex approved with no
+finding. CodeRabbit's two findings are fixed in `a075fab`, validated, replied
+to, confirmed by CodeRabbit, and resolved. Final CI run `29625815109` passes
+documentation, all six Blacksmith OS/Node cells, and the dependent npm
+publication dry run on exact head `a075fab`.
+
+The final requirement audit confirms the reviewed head is mergeable into
+unchanged `dev` and covers every requested pre-publication deliverable. The
+source repository remains private with `main` still its default branch; no tag
+or GitHub release exists; `@cpai/fs` remains unpublished; Roadmap step 11
+remains open; and all four public specification and schema resources return
+HTTPS 200. Merging PR #10 with commit preservation makes this exact audited
+head the release candidate on `dev` without performing a prohibited release
+action.
 
 ## Blockers
 
-The repository contains no licensing decision or license file. The owner must
-select the public release license before Phase 3 can complete; no license will
-be inferred.
+None.
 
 ## Next Action
 
-Validate and push the Blacksmith runner migration, confirm every PR #9 matrix
-cell is green, and merge it into `dev`. Then publish and verify the exact
-schema bytes before starting Phase 2.
+No publication action is authorized. Preserve the reviewed candidate on
+`dev`; promotion to `main`, npm publication, tagging, a GitHub release, and
+Roadmap completion each require a separately authorized release step.

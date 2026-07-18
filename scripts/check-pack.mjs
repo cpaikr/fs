@@ -57,49 +57,88 @@ const assertJsonEqual = (actual, expected, label) => {
   }
 }
 
+const expectedReleaseMetadata = {
+  name: "@cpai/fs",
+  version: "0.1.0",
+  keywords: ["financial-statements", "json-schema", "validation", "cli"],
+  homepage: "https://cpaikr.github.io/fs/spec/0.1/",
+  bugs: { url: "https://github.com/cpaikr/cpaikr.github.io/issues" },
+  repository: { type: "git", url: "git+https://github.com/cpaikr/fs.git" },
+  author: "CPAI",
+  license: "Apache-2.0",
+  type: "module",
+  bin: { fs: "dist/bin.js" },
+  engines: { node: "^22.17.0 || ^24.15.0" },
+  publishConfig: { access: "public", registry: "https://registry.npmjs.org/" }
+}
+
+const assertReleaseMetadata = (manifest, label) => {
+  for (const [field, expected] of Object.entries(expectedReleaseMetadata)) {
+    assertJsonEqual(manifest[field], expected, `${label} ${field}`)
+  }
+}
+
 try {
   const packed = run(
     npm,
-    ["pack", "--ignore-scripts", "--json", "--pack-destination", temporaryDirectory],
+    ["pack", "--json", "--pack-destination", temporaryDirectory],
     { encoding: "utf8" }
   )
   if (packed.status !== 0) {
     throw new Error(packed.stderr || packed.stdout || "npm pack failed")
   }
 
-  const [{ filename, files }] = JSON.parse(packed.stdout)
+  // npm forwards prepack output before its JSON payload, so parse the final
+  // JSON document rather than requiring the lifecycle to stay silent.
+  const jsonStart = packed.stdout.lastIndexOf("\n[")
+  const packJson = jsonStart === -1 ? packed.stdout : packed.stdout.slice(jsonStart + 1)
+  const [{ filename, files }] = JSON.parse(packJson)
   const paths = files.map((entry) => entry.path).sort()
-  const required = [
+  const compiledModules = [
+    "assets",
+    "bin",
+    "cli",
+    "json",
+    "logger",
+    "process",
+    "record-validation",
+    "render",
+    "validation/calculate",
+    "validation/decimal",
+    "validation/identity",
+    "validation/model",
+    "validation/schema",
+    "validation/semantic",
+    "validation/snapshot",
+    "validation/validate",
+    "writer"
+  ]
+  const retainedAssets = [
+    "LICENSE",
+    "README.md",
     "assets/guide/authoring.md",
-    "dist/bin.js",
-    "dist/cli.js",
-    "dist/process.js",
-    "dist/render.js",
+    "examples/README.md",
     "examples/manufacturing-group.json",
     "examples/minimal.json",
-    "package.json",
     "schema/fs-document.schema.json",
     "schema/snapshot-diff.schema.json",
     "schema/validation-result.schema.json"
   ]
-
-  for (const path of required) {
-    if (!paths.includes(path)) throw new Error(`packed file missing: ${path}`)
-  }
-  for (const path of paths) {
-    if (
-      path.startsWith(".agents/") ||
-      path.startsWith("skills/") ||
-      path.startsWith("src/") ||
-      path.startsWith("test/") ||
-      path.startsWith("fixtures/")
-    ) {
-      throw new Error(`repository-only path was packed: ${path}`)
-    }
+  const expectedPaths = [
+    ...retainedAssets,
+    ...compiledModules.flatMap((module) => [`dist/${module}.js`, `dist/${module}.js.map`]),
+    "package.json"
+  ].sort()
+  if (JSON.stringify(paths) !== JSON.stringify(expectedPaths)) {
+    const missing = expectedPaths.filter((path) => !paths.includes(path))
+    const unexpected = paths.filter((path) => !expectedPaths.includes(path))
+    throw new Error(
+      `packed inventory drifted (missing=${JSON.stringify(missing)}, unexpected=${JSON.stringify(unexpected)})`
+    )
   }
 
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
-  if (packageJson.bin?.fs !== "dist/bin.js") throw new Error("packed bin mapping drifted")
+  assertReleaseMetadata(packageJson, "source package metadata")
   if (!filename.endsWith(".tgz")) throw new Error("npm pack did not produce a tarball")
 
   const tarball = join(temporaryDirectory, filename)
@@ -114,7 +153,9 @@ try {
   }
 
   const installedRoot = join(installDirectory, "node_modules", "@cpai", "fs")
-  for (const path of required.filter((entry) => !entry.startsWith("dist/") && entry !== "package.json")) {
+  const installedPackageJson = JSON.parse(readFileSync(join(installedRoot, "package.json"), "utf8"))
+  assertReleaseMetadata(installedPackageJson, "installed package metadata")
+  for (const path of retainedAssets) {
     const source = readFileSync(path)
     const packedAsset = readFileSync(join(installedRoot, path))
     if (!source.equals(packedAsset)) throw new Error(`packed bytes differ: ${path}`)
