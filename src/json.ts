@@ -1,7 +1,7 @@
 import { inputLimitFailure, inputLimits, type InputLimitFailure } from "./limits.js"
 
 export type JsonDecodeResult =
-  | { readonly ok: true; readonly value: unknown }
+  | { readonly ok: true; readonly value: unknown; readonly values: number }
   | { readonly ok: false; readonly kind: "invalid-json"; readonly message: string }
   | ({ readonly ok: false; readonly kind: "input-limit" } & InputLimitFailure)
 
@@ -68,7 +68,7 @@ class JsonScanner {
 
   constructor(private readonly text: string) {}
 
-  scan(): void {
+  scan(): number {
     this.whitespace()
     this.value()
     while (!this.rootComplete) {
@@ -79,6 +79,7 @@ class JsonScanner {
     }
     this.whitespace()
     if (this.index !== this.text.length) owned("JSON contains trailing content.")
+    return this.values
   }
 
   private whitespace(): void {
@@ -274,8 +275,8 @@ export const decodeJson = (bytes: Buffer): JsonDecodeResult => {
   }
 
   try {
-    new JsonScanner(text).scan()
-    return { ok: true, value: JSON.parse(text) as unknown }
+    const values = new JsonScanner(text).scan()
+    return { ok: true, value: JSON.parse(text) as unknown, values }
   } catch (error) {
     if (error instanceof JsonLimitError) {
       return { ok: false, kind: "input-limit", ...error.failure }

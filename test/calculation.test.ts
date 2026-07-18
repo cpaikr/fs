@@ -44,14 +44,14 @@ describe("exact decimal", () => {
       ...document,
       statements: [{ ...statement, items: [{ ...item, values: { fy2025: exact } }] }]
     }
-    expect(validateDocumentBounded(atPerDecimalLimit)).toMatchObject({ ok: true })
+    expect(validateDocumentBounded(atPerDecimalLimit, 0)).toMatchObject({ ok: true })
     expect(validateDocumentBounded({
       ...atPerDecimalLimit,
       statements: [{
         ...statement,
         items: [{ ...item, values: { fy2025: `${exact}0` } }]
       }]
-    })).toMatchObject({
+    }, 0)).toMatchObject({
       ok: false,
       budget: "decimal-digits",
       limit: inputLimits.decimalDigits
@@ -78,14 +78,14 @@ describe("exact decimal", () => {
         applications
       }
     }
-    expect(validateDocumentBounded(aggregateDocument)).toMatchObject({ ok: true })
+    expect(validateDocumentBounded(aggregateDocument, 0)).toMatchObject({ ok: true })
     expect(validateDocumentBounded({
       ...aggregateDocument,
       units: [{
         ...document.units[0],
         defaultTolerance: `1${"0".repeat(666)}`
       }]
-    })).toMatchObject({
+    }, 0)).toMatchObject({
       ok: false,
       budget: "total-decimal-digits",
       limit: inputLimits.totalDecimalDigits

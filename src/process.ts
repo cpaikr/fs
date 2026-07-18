@@ -180,12 +180,13 @@ const decodeFailure = (input: string, decoded: Exclude<ReturnType<typeof decodeJ
 
 const validateDecoded = (
   value: unknown,
+  jsonValues: number,
   input: string
 ): { readonly ok: true; readonly result: DocumentValidation } | {
   readonly ok: false
   readonly failure: OperationalFailure
 } => {
-  const bounded = validateDocumentBounded(value)
+  const bounded = validateDocumentBounded(value, jsonValues)
   return bounded.ok
     ? { ok: true, result: bounded.result }
     : {
@@ -250,7 +251,7 @@ const runValidate = (
       })
       return commandError("validate", failure, [], logger.bytes())
     }
-    const validated = validateDecoded(decoded.value, input)
+    const validated = validateDecoded(decoded.value, decoded.values, input)
     if (!validated.ok) {
       logger.emit("error", "input-failed", "validate", {
         code: validated.failure.code,
@@ -297,7 +298,7 @@ const runCreate = (
     }
     const decoded = decodeJson(read.bytes)
     if (!decoded.ok) return commandError("create", decodeFailure(input, decoded), [])
-    const validated = validateDecoded(decoded.value, input)
+    const validated = validateDecoded(decoded.value, decoded.values, input)
     if (!validated.ok) return commandError("create", validated.failure, [])
     const result = validated.result
     if (result.validation.conformance.status === "nonconforming") {
@@ -392,7 +393,7 @@ const runValidatedOutput = (
       })
       return commandError(operation, failure, [], logger.bytes())
     }
-    const validated = validateDecoded(decoded.value, input)
+    const validated = validateDecoded(decoded.value, decoded.values, input)
     if (!validated.ok) {
       logger.emit("error", "input-failed", operation, {
         code: validated.failure.code,

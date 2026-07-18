@@ -1,8 +1,8 @@
 # V0 Release Candidate Plan
 
-Status: Active. The first complete implementation, its review follow-up, and
-Phases 0–2 of boundary remediation are present on `dev`. Phase 3 packaging and
-hermetic-gate work is in progress. The package remains unpublished.
+Status: Active. Phases 0–3 are complete on `dev`. The Phase 4 final-proof
+checkpoint implements and verifies the material findings from independent
+review and awaits PR integration. The package remains private and unpublished.
 
 This plan owns live Roadmap step-11 state, decisions, validation, blockers,
 and the next action. The [semantic specification](../semantic-spec.md) owns
@@ -180,8 +180,7 @@ Status: Complete on `dev` through PR #12.
 
 ### Phase 3: Seal packaging and hermeticize required gates
 
-Status: Implemented on the hermetic-package checkpoint; awaiting PR review and
-integration into `dev`.
+Status: Complete on `dev` through PR #13.
 
 - Add an `exports` allowlist for the CLI-only package and an installed-tarball
   negative test proving implementation deep imports are unavailable.
@@ -194,6 +193,9 @@ integration into `dev`.
 - Keep GitHub Actions SHA-pinned and production dependency auditing explicit.
 
 ### Phase 4: Prove the remediated candidate
+
+Status: Implemented on the final-proof checkpoint; awaiting PR review and
+integration into `dev`.
 
 - Run focused contract, parser, decimal, startup, process, package-boundary,
   and documentation tests for every changed seam.
@@ -217,19 +219,24 @@ integration into `dev`.
 
 ## Known Temporary Drift
 
-The artifact-format and operational-policy contracts have no known drift.
-`dev` implements bounded reads and iterative scanning, decimal budgets and
-order-stable aggregation, lazy working-directory access, owned redacted
-failures, typed validation outcomes, pathless loading, and lazy AJV
-compilation. Packaging and CI drift does remain on `dev`: deep imports are
-unsealed and documentation tools run outside the lockfile until the active
-Phase 3 checkpoint closes both issues.
+The artifact-format contract has no known drift. `dev` implements the Phase 3
+package exports and hermetic gates. Independent Phase 4 review did identify
+temporary operational drift on `dev`: pathless asset defects can escape their
+stable result, invalid structural diagnostics can amplify compact input, and
+shipped example guidance contains repository-only links. The final-proof
+checkpoint closes each issue and adds executable regressions; integration of
+that checkpoint removes the known drift.
 
 The preserved review follow-up was merged to `dev` by PR #11 as merge commit
 `6741e34`. The ordered Phase 0 contract and Phase 1–2 implementation commits
 were merged by PR #12 as merge commit `8b15542` after the complete required
 matrix, dependent npm dry run, and independent reviews reported no remaining
 material finding.
+
+The package-sealing and hermetic-gate checkpoint was merged by PR #13 as merge
+commit `4f4fef7`. Exact push run `29638095553` passed the complete OS and Node.js
+matrix, documentation, production audit, and dependent npm dry run on that
+integrated commit.
 
 ## Validation
 
@@ -276,18 +283,31 @@ The Phase 3 checkpoint passes the complete `pnpm release:check` gate on Node.js
 Node.js lines. Its lockfile-backed documentation gate and frozen,
 lifecycle-disabled install pass; the explicit production dependency audit
 reports no known vulnerability, and `git diff --check` passes. Independent
-package and CI review reported no material finding. The required cross-platform
-CI matrix and its dependent npm dry run remain the integration proof.
+review found one ambiguous drift statement, which was corrected before the
+exact cross-platform integration proof passed.
+
+The Phase 4 checkpoint passes `pnpm release:check` on Node.js 24.15.0,
+installed-tarball checks on both supported Node.js lines, the production audit,
+and `git diff --check`. Independent implementation, design, complexity,
+security, package, and documentation review found broken shipped-document
+routes, an escaping pathless asset defect, schema and semantic diagnostic
+amplification, and a snapshot-decimal path around the intended budgets. Each
+finding is fixed with focused exact-boundary or installed-package evidence;
+rereview reports no material residual finding. A measured 50,000-item invalid
+input now returns a 202-byte stable refusal in about 0.3 seconds instead of
+roughly 31 MiB in 11.7 seconds, while maintained large conforming input remains
+accepted. The final exact cross-platform CI and dependent npm dry run remain
+the PR integration proof.
 
 ## Blockers
 
 No product decision is blocked. Publication remains intentionally blocked
-until Phases 0–4 are implemented and verified and a separate release action is
-authorized.
+until the Phase 4 checkpoint is integrated and audited and a separate release
+action is authorized.
 
 ## Next Action
 
-Open the Phase 3 checkpoint PR against updated `dev`, complete its required CI
-and automated reviews, address every material finding, and merge with commit
-preservation. Begin the final Phase 4 proof only from the resulting updated
-`dev`.
+Complete PR #14's required CI and automated reviews, address every material
+finding, and merge with commit preservation. Audit the exact integrated `dev`
+candidate, then stop before Phase 5 while release authorization remains
+absent.

@@ -10,13 +10,23 @@ export interface StructuralError {
 }
 
 let compiledValidator: ValidateFunction | undefined
+let compiledConformanceValidator: ValidateFunction | undefined
+
+const compileDocumentValidator = (allErrors: boolean): ValidateFunction => {
+  const documentSchema = JSON.parse(schemaAsset("document").toString("utf8")) as object
+  return new Ajv2020({ allErrors, strict: false }).compile(documentSchema)
+}
 
 const documentValidator = (): ValidateFunction => {
   if (compiledValidator !== undefined) return compiledValidator
-  const documentSchema = JSON.parse(schemaAsset("document").toString("utf8")) as object
-  const ajv = new Ajv2020({ allErrors: true, strict: false })
-  compiledValidator = ajv.compile(documentSchema)
+  compiledValidator = compileDocumentValidator(true)
   return compiledValidator
+}
+
+const conformanceValidator = (): ValidateFunction => {
+  if (compiledConformanceValidator !== undefined) return compiledConformanceValidator
+  compiledConformanceValidator = compileDocumentValidator(false)
+  return compiledConformanceValidator
 }
 
 const escapePointer = (value: string): string => value.replaceAll("~", "~0").replaceAll("/", "~1")
@@ -108,3 +118,5 @@ export const validateSchema = (value: unknown): ReadonlyArray<StructuralError> =
   normalized.forEach((error) => unique.set(`${error.path}\u0000${error.code}`, error))
   return [...unique.values()].sort(compareDiagnostics)
 }
+
+export const conformsToSchema = (value: unknown): boolean => conformanceValidator()(value) as boolean
