@@ -56,7 +56,7 @@ const examples = {
     },
     {
       name: "manufacturing-group",
-      purpose: "Representative multi-statement document with a deliberate calculation inconsistency.",
+      purpose: "Representative multi-statement document with a deliberate rollup inconsistency.",
       calculationStatus: "inconsistent"
     }
   ],

@@ -1,10 +1,10 @@
 # V0 Release Candidate Plan
 
 Status: In progress. The working tree based on `dev` contains the reviewed npm
-identity, documentation system, and Agent Skill. The complete local release
-gate passes on both supported Node.js lines on macOS, but this exact revision
-has no integrated cross-platform proof. Publication is outside this
-documentation run.
+identity, documentation system, Agent Skill, and PR review follow-up. The
+complete local release gate passes on the active supported Node.js line on
+macOS, but this exact revision has no integrated cross-platform proof.
+Publication is outside this documentation run.
 
 This plan owns the live V0 release-candidate state, release decisions,
 validation, blockers, and next action. The
@@ -94,7 +94,11 @@ The working tree based on `dev`:
   contract first, and gates completion on structural conformance and successful
   output creation;
 - derives Skill package identity and version from `package.json` and validates
-  generated guide, Skill, and metadata parity; and
+  generated guide, Skill, and metadata parity;
+- defines the excluded value period globally so the extra-value fixture
+  isolates the statement map-key mismatch, keeps recorded empty application
+  arrays independent, tests the first excess JSON value, and uses rollup
+  terminology in example discovery; and
 - preserves the artifact format, operational CLI contract, public schema and
   specification URLs, and repository identity.
 
@@ -102,10 +106,10 @@ On 2026-07-18, live checks found `cpaikr/fs` private with `main` as its default
 branch, no tag or GitHub release, and no published
 `@sjunepark/fs@0.1.0`. This is the expected pre-release state.
 
-The prior cross-platform run does not prove the revised package identity or
-Skill. Documentation harmonization and the current code-review pass have no
-unresolved material findings. This revision becomes a verified candidate only
-after commit and fresh exact-head CI.
+The prior cross-platform run does not prove these review-follow-up bytes.
+Codex completed review without findings, and the CodeRabbit findings are
+addressed in this working tree. This revision becomes a verified candidate
+only after commit and fresh exact-head CI.
 
 ## Remaining Work
 
@@ -134,7 +138,7 @@ After the candidate proof succeeds and release is explicitly authorized:
 
 The current working tree passes:
 
-- `pnpm release:check` on both supported Node.js lines on macOS;
+- `pnpm release:check` on the active supported Node.js line on macOS;
 - `pnpm audit:prod`;
 - generated guide, Agent Skill, and metadata parity checks within
   `pnpm check:docs`;

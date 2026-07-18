@@ -122,4 +122,25 @@ describe("validation snapshot recording", () => {
 
     expect(recorded.document.validationSnapshot).toEqual(snapshot)
   })
+
+  it.each([
+    ["not-run", "fixtures/invalid/extra-value-key.json"],
+    ["not-defined", "examples/minimal.json"]
+  ] as const)("does not retain a mutable alias for %s application arrays", (status, inputPath) => {
+    const input = JSON.parse(readFileSync(inputPath, "utf8")) as Document
+    const validation = validateDocument(input).validation
+    expect(validation.calculations.status).toBe(status)
+    const recorded = recordValidationSnapshot(input, validation)
+    const snapshot = structuredClone(recorded.document.validationSnapshot)
+
+    const sourceApplications = validation.calculations.applications as unknown as Array<ApplicationResult>
+    sourceApplications.push({
+      key: { statement: "mutated", parent: "mutated", period: "mutated" },
+      status: "error",
+      reason: "missing-value",
+      cell: { statement: "mutated", item: "mutated", period: "mutated" }
+    })
+
+    expect(recorded.document.validationSnapshot).toEqual(snapshot)
+  })
 })

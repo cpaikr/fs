@@ -11,14 +11,14 @@ const snapshotFromValidation = (validation: ValidationResult): ValidationSnapsho
     return {
       conformance: "nonconforming",
       calculations: validation.calculations.status,
-      applications: validation.calculations.applications
+      applications: []
     }
   }
   if (validation.calculations.status === "not-defined") {
     return {
       conformance: "conforming",
       calculations: validation.calculations.status,
-      applications: validation.calculations.applications
+      applications: []
     }
   }
   if (validation.calculations.status === "consistent") {

@@ -53,7 +53,7 @@ describe("JSON boundary", () => {
       ok: false,
       kind: "invalid-json"
     })
-    expect(decodeJson(Buffer.from(`[${exactValues},null]`))).toMatchObject({
+    expect(decodeJson(Buffer.from(`[${exactValues}]`))).toMatchObject({
       ok: false,
       kind: "input-limit",
       budget: "json-values",
