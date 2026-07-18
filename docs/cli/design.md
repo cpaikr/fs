@@ -73,7 +73,7 @@ conformance:
 - raw file or standard-input bytes: 16 MiB (16,777,216 bytes);
 - simultaneously open JSON object and array containers: 64, with a root
   container at level 1;
-- JSON values: 100,000, counting the root and each object-member or array value,
+- JSON values: 200,000, counting the root and each object-member or array value,
   including container values;
 - digits in one schema-conforming exact decimal: 1,000, excluding a sign and
   decimal point; and

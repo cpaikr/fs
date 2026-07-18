@@ -250,7 +250,7 @@ The fixed V0 input budgets are:
 | --- | ---: | --- |
 | `input-bytes` | 16,777,216 | Raw bytes before UTF-8 decoding |
 | `json-nesting` | 64 | Active object/array containers; root container is 1 |
-| `json-values` | 100,000 | Root plus every member or element value |
+| `json-values` | 200,000 | Root plus every member or element value |
 | `decimal-digits` | 1,000 | Digits in one schema-conforming exact decimal |
 | `total-decimal-digits` | 1,000,000 | Digits across conforming exact decimals |
 
