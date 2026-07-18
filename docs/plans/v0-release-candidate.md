@@ -1,6 +1,7 @@
 # V0 Release Candidate Plan
 
-Status: Active. Roadmap step 11 pre-publication work is in progress.
+Status: Active. The V0 release candidate is verified through all
+pre-publication gates; publication remains out of scope.
 
 This plan owns live step-11 progress, validation, blockers, and the next
 action. The [semantic specification](../semantic-spec.md) owns artifact
@@ -66,9 +67,9 @@ GitHub release, or mark Roadmap step 11 complete.
   before starting later work.
 - [x] Phase 3: complete npm package, licensing, repository, support, and
   release configuration without publishing.
-- [ ] Phase 4: make packed-package verification release-grade across every
+- [x] Phase 4: make packed-package verification release-grade across every
   supported operating system and Node.js line.
-- [ ] Phase 5: complete review and a requirement-by-requirement release
+- [x] Phase 5: complete review and a requirement-by-requirement release
   candidate audit on updated `dev` while leaving Roadmap step 11 open.
 
 ## Current State
@@ -135,12 +136,27 @@ Apache-2.0 file matches the canonical Apache text, workflow YAML parses, and
 no Bucket-I or Bucket-II issue; the remaining risk is intentionally delegated
 to the PR's exact-head Blacksmith matrix and dependent dry-run job.
 
+PR #10 received completed Codex and CodeRabbit review. Codex approved with no
+finding. CodeRabbit's two findings are fixed in `a075fab`, validated, replied
+to, confirmed by CodeRabbit, and resolved. Final CI run `29625815109` passes
+documentation, all six Blacksmith OS/Node cells, and the dependent npm
+publication dry run on exact head `a075fab`.
+
+The final requirement audit confirms the reviewed head is mergeable into
+unchanged `dev` and covers every requested pre-publication deliverable. The
+source repository remains private with `main` still its default branch; no tag
+or GitHub release exists; `@cpai/fs` remains unpublished; Roadmap step 11
+remains open; and all four public specification and schema resources return
+HTTPS 200. Merging PR #10 with commit preservation makes this exact audited
+head the release candidate on `dev` without performing a prohibited release
+action.
+
 ## Blockers
 
 None.
 
 ## Next Action
 
-Complete local release-gate validation and review, then open the second PR and
-prove its exact head through every Blacksmith OS/Node matrix cell, the
-documentation gate, and the dependent npm publication dry run.
+No publication action is authorized. Preserve the reviewed candidate on
+`dev`; promotion to `main`, npm publication, tagging, a GitHub release, and
+Roadmap completion each require a separately authorized release step.
