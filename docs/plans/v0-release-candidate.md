@@ -73,6 +73,11 @@ publish, tag, or create a GitHub release.
 - Keep `cpaikr/fs` private through remediation. During the authorized release
   workflow, make it public immediately before npm publication and verify the
   package's repository metadata through anonymous access.
+- Deliver the Phase 0 contract and executable descriptors before their runtime
+  implementation as separate commits in one Phases 0–2 boundary-remediation
+  PR. Required CI executes every descriptor, so a contract-only PR cannot be a
+  green integration checkpoint. The PR preserves phase order internally and
+  no Phase 3 work begins before it is reviewed and merged into updated `dev`.
 
 ## Delivered Candidate
 
@@ -210,6 +215,10 @@ a working directory, expose the new stable failure vocabulary, seal deep
 imports, or run documentation tools entirely from the lockfile. These gaps are
 the work of Phases 0–3, not accepted V0 behavior.
 
+The preserved review follow-up was merged to `dev` by PR #11 as merge commit
+`6741e34`. Phase 0 contract work now precedes its Phase 1–2 implementation in
+the boundary-remediation checkpoint described above.
+
 ## Validation
 
 The merged candidate passed the full repository and release-candidate gates,
@@ -237,7 +246,8 @@ authorized.
 
 ## Next Action
 
-When implementation is requested, begin Phase 0 with the CLI design and
-acceptance-contract slice. Do not change runtime behavior until resource
-limits, stable error codes, working-directory independence, package exports,
-and precedence are fixed in executable contract evidence.
+Complete Phase 0 executable descriptors for the fixed limits,
+working-directory independence, stable errors, package boundary, and
+precedence. Commit that contract evidence before implementing Phases 1–2; do
+not begin Phase 3 until the combined boundary-remediation PR is reviewed and
+merged into updated `dev`.

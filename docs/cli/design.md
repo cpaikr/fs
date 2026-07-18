@@ -64,6 +64,48 @@ ordering, or filesystem effects. When enabled, it emits bounded deterministic
 JSON Lines diagnostics without document contents, raw dependency errors,
 causes, stack traces, timestamps, or runtime identifiers.
 
+## Operational Boundaries
+
+The public CLI treats every document input as untrusted. These finite V0
+budgets bound work performed by the process without changing artifact
+conformance:
+
+- raw file or standard-input bytes: 16 MiB (16,777,216 bytes);
+- simultaneously open JSON object and array containers: 64, with a root
+  container at level 1;
+- JSON values: 100,000, counting the root and each object-member or array value,
+  including container values;
+- digits in one schema-conforming exact decimal: 1,000, excluding a sign and
+  decimal point; and
+- digits across all schema-conforming exact decimals in one document:
+  1,000,000.
+
+The byte boundary is enforced while reading, before UTF-8 decoding, and stops
+at the first excess byte. JSON nesting and value budgets are enforced by a
+non-recursive scanner before materialization. Decimal budgets run only after
+schema conformance and before semantic snapshot or rollup arithmetic. A limit
+failure is an operational refusal, not evidence that the same document is
+nonconforming for another FS implementation.
+
+These limits retain substantial headroom over the maintained corpus while
+bounding measured adversarial costs on every supported Node.js line.
+Supported-runtime measurements found recursive descent failing at different
+depths and large exact-decimal cancellation changing work materially with
+author order. The selected boundaries avoid those runtime-dependent failure
+regions while Phase 1 aggregation makes valid child order cost-stable.
+
+Native help, version, and completion actions are parsed and completed without
+loading document-command implementation or acquiring application path context.
+Root discovery and pathless bundled content do the same. Standard input and
+absolute paths also require no current directory. A relative input or output
+path acquires the current directory lazily; if it is unavailable, the operation
+returns the stable working-directory failure instead of exposing a Node error.
+
+V0 is CLI-only. Supported package entry points are the `fs` executable,
+packaged assets exposed through commands, and the explicitly allowed
+`./package.json` metadata entry. Implementation modules are private package
+internals, not a JavaScript or TypeScript library API.
+
 ## Command Surface
 
 ### `fs`
@@ -128,9 +170,9 @@ conforming but deliberately rollup-inconsistent.
 
 ### `fs validate <document|->`
 
-Read a path or standard input (`-`) without modifying it and report structural
-conformance, current rollup status and applications, and comparison with an
-embedded validation snapshot.
+Read a path or standard input (`-`) within the published operational budgets
+without modifying it and report structural conformance, current rollup status
+and applications, and comparison with an embedded validation snapshot.
 
 Structural conformance and rollup consistency remain separate. A
 document with no rollup parents reports `not-defined`; rollup inconsistency and
@@ -148,9 +190,9 @@ accepted encoding and its process contract exist.
 
 ### `fs create --output <document> <candidate|->`
 
-Validate a complete candidate and atomically copy its exact bytes to the
-requested new path. This is the authoring commit boundary, not a document
-generator.
+Validate a complete candidate within the published operational budgets and
+atomically copy its exact bytes to the requested new path. This is the
+authoring commit boundary, not a document generator.
 
 The command writes only a structurally conforming document, but may write one
 with inconsistent rollups. It never modifies the candidate, overwrites a
@@ -213,6 +255,9 @@ with validated, non-overwriting output over stateful commands.
   command-value validation. Only the documented action forms are contracted;
   a valueless completions flag and combined action flags are framework-owned
   unsupported workflows.
+- Native actions, root discovery, pathless bundled content, standard input,
+  and absolute paths do not require a current working directory. Only resolving
+  a relative input or output path may acquire it.
 - Result ordering is deterministic and empty or absent states are explicit.
 - Errors identify the operation and a concrete correction without exposing
   dependency output or internal failures.

@@ -1,0 +1,29 @@
+{
+  "id": "discovery-cwd-unavailable",
+  "command": "fs",
+  "workingDirectory": "unavailable",
+  "arguments": [],
+  "workspace": [],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [{ "pointer": "", "equals": ["executable", "package", "input", "artifact", "commands", "help"] }],
+      "equalities": [
+        { "pointer": "/executable", "equals": "fs" },
+        { "pointer": "/package", "equals": "@cpai/fs" },
+        { "pointer": "/input", "equals": null },
+        { "pointer": "/artifact", "equalsFile": { "file": "expected/discovery.json", "pointer": "/artifact" } },
+        { "pointer": "/commands", "equalsFile": { "file": "expected/discovery.json", "pointer": "/commands" } },
+        { "pointer": "/help", "equalsFile": { "file": "expected/discovery.json", "pointer": "/help" } }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

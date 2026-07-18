@@ -26,9 +26,12 @@ inside the repository and resolve to regular files.
 ## Target Protocol
 
 The harness invokes `command` with the exact `arguments` array and no shell.
-It creates a fresh workspace and fixed empty home, copies `workspace` entries,
-supplies optional exact standard-input bytes, and fixes locale, timezone,
-non-interactive terminal state, and disabled color.
+It creates a fresh workspace and fixed empty home, copies or deterministically
+generates `workspace` entries, supplies optional exact or generated
+standard-input bytes, and fixes locale, timezone, non-interactive terminal
+state, and disabled color. A case may replace `process.cwd` with a throwing
+boundary before importing the installed executable to prove behavior when the
+current directory is unavailable consistently across supported platforms.
 
 Standard output supports three comparisons:
 
@@ -71,6 +74,12 @@ The suite keeps these domain and operational boundaries:
   snapshot match and mismatch, structural failures, invalid snapshots,
   malformed input, trailing content, duplicate members, unsafe scale, and
   missing input;
+- bounded file and standard-input reads, iterative JSON nesting and value
+  limits, stable redacted limit results, and existing-output precedence over
+  oversized candidate input;
+- current-directory-independent native help, discovery, bundled schema access,
+  and standard-input validation, plus the stable relative-path failure when the
+  current directory is unavailable;
 - deterministic discovery and exact installed guide, schema, example, and
   created-document bytes, including generated validation snapshots that
   revalidate as snapshot matches, plus deterministic standalone HTML from the

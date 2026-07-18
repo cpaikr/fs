@@ -229,12 +229,44 @@ instead of a validation envelope:
 Fixtures fix the exact fields appropriate to each error. Stable V0 usage codes
 are not part of the JSON vocabulary; grammar failures use Effect-native text.
 Stable operational codes are `input-not-found`, `input-unreadable`,
-`invalid-json`, `output-exists`, `output-parent-not-found`,
-`output-limit-exceeded`, `write-failed`, and `internal-error`.
+`input-limit-exceeded`, `invalid-json`, `working-directory-unavailable`,
+`output-exists`, `output-parent-not-found`, `output-limit-exceeded`,
+`write-failed`, and `internal-error`.
 
 Malformed syntax, trailing content, and duplicate object members all produce
 `invalid-json` before JSON Schema validation. Duplicate members are never
 resolved with first-value-wins or last-value-wins behavior.
+
+`input-limit-exceeded` reports a raw-byte, JSON-nesting, JSON-value,
+per-decimal-digit, or total-decimal-digit budget violation. It has exit code
+`1`, includes the input operand in `path` (`-` for standard input), has empty
+`help`, and creates no output. The message names the violated budget and its
+limit without echoing document content. Diagnostic logging may include only
+`code`, `source`, `budget`, and `limit` for this failure.
+
+The fixed V0 input budgets are:
+
+| Budget | Limit | Counting rule |
+| --- | ---: | --- |
+| `input-bytes` | 16,777,216 | Raw bytes before UTF-8 decoding |
+| `json-nesting` | 64 | Active object/array containers; root container is 1 |
+| `json-values` | 100,000 | Root plus every member or element value |
+| `decimal-digits` | 1,000 | Digits in one schema-conforming exact decimal |
+| `total-decimal-digits` | 1,000,000 | Digits across conforming exact decimals |
+
+The byte reader accepts exactly the limit only after reaching EOF and stops at
+the first excess byte. The scanner is iterative. It applies syntax, duplicate,
+nesting, and value checks from left to right, so the first encountered owned
+failure wins. UTF-8 failure precedes scanning after the byte boundary succeeds.
+Decimal budgets are checked after complete schema conformance and before
+semantic validation or arithmetic.
+
+`working-directory-unavailable` applies only when an operation must resolve a
+relative path and the process has no usable current directory. It has exit code
+`1`, no `path`, empty `help`, and a generic bounded message. Native help,
+version, and completions; root discovery; pathless guide, schema, and example
+reads; standard input; and absolute input or output paths never acquire the
+current directory.
 
 An unexpected implementation defect is translated at the outermost process
 boundary to `internal-error`, exit code `1`, and a bounded generic message. The
@@ -260,6 +292,16 @@ completions may short-circuit ordinary operand, cardinality, and command-value
 validation without entering application I/O. Precedence among combined action
 flags, and behavior when `--completions` has no shell value, are
 framework-defined and are not supported workflows.
+
+After grammar and native-action handling, relative path resolution precedes
+application preflight because no path operation can proceed without it. For
+write commands whose paths resolve, an existing destination precedes all input
+reads and limits. Input read failures precede byte and decoding results. The
+byte boundary precedes UTF-8 and JSON; scanner failures follow their
+left-to-right encounter order; schema conformance precedes decimal budgets;
+decimal budgets precede semantics and calculations. Render budgets and
+missing-parent or commit-time write failures occur only after valid input and
+generated output, preserving the filesystem precedence below.
 
 ## Exit Codes
 
