@@ -87,6 +87,7 @@ jq -e --arg id "$schema_base/fs-document.schema.json" '
 jq -e --arg id "$schema_base/fs-document.schema.json" \
   '."$schema" == $id' examples/manufacturing-group.json >/dev/null
 jq -e 'has("$schema") | not' examples/minimal.json >/dev/null
+jq -e 'has("$id") | not' fixtures/cli/case.schema.json >/dev/null
 if rg -n 'https://fs\.example' .; then
   echo "Repository contains an unresolved placeholder schema identifier" >&2
   exit 1

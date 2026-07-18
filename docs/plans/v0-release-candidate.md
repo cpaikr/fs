@@ -117,5 +117,5 @@ be inferred.
 
 ## Next Action
 
-Commit and open the Phase-1 PR into `dev`, then complete its required reviews
-and merge before publishing the exact schema bytes.
+Complete the Phase-1 PR's required reviews and merge it into `dev`, then
+publish and verify the exact schema bytes before starting Phase 2.
