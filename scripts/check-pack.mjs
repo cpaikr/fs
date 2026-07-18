@@ -57,6 +57,26 @@ const assertJsonEqual = (actual, expected, label) => {
   }
 }
 
+const resolveInstalledExport = (specifier, cwd) =>
+  run(
+    process.execPath,
+    [
+      "--input-type=module",
+      "--eval",
+      `import { createRequire } from "node:module"; createRequire(import.meta.url).resolve(${JSON.stringify(specifier)})`
+    ],
+    { cwd, encoding: "utf8" }
+  )
+
+const assertExportUnavailable = (specifier, cwd) => {
+  const result = resolveInstalledExport(specifier, cwd)
+  if (result.status === 0 || !result.stderr.includes("ERR_PACKAGE_PATH_NOT_EXPORTED")) {
+    throw new Error(
+      `${specifier} unexpectedly resolved through the installed package exports (status=${String(result.status)}, stderr=${result.stderr})`
+    )
+  }
+}
+
 const expectedReleaseMetadata = {
   name: "@cpai/fs",
   version: "0.1.0",
@@ -68,6 +88,7 @@ const expectedReleaseMetadata = {
   license: "Apache-2.0",
   type: "module",
   bin: { fs: "dist/bin.js" },
+  exports: { "./package.json": "./package.json" },
   engines: { node: "^22.17.0 || ^24.15.0" },
   publishConfig: { access: "public", registry: "https://registry.npmjs.org/" }
 }
@@ -161,6 +182,12 @@ try {
   const installedRoot = join(installDirectory, "node_modules", "@cpai", "fs")
   const installedPackageJson = JSON.parse(readFileSync(join(installedRoot, "package.json"), "utf8"))
   assertReleaseMetadata(installedPackageJson, "installed package metadata")
+  const metadataExport = resolveInstalledExport("@cpai/fs/package.json", installDirectory)
+  if (metadataExport.status !== 0 || metadataExport.stderr !== "") {
+    throw new Error(metadataExport.stderr || "installed package metadata export is unavailable")
+  }
+  assertExportUnavailable("@cpai/fs", installDirectory)
+  assertExportUnavailable("@cpai/fs/dist/validation/validate.js", installDirectory)
   for (const path of retainedAssets) {
     const source = readFileSync(path)
     const packedAsset = readFileSync(join(installedRoot, path))

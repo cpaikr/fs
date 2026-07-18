@@ -22,6 +22,9 @@
   "bin": {
     "fs": "dist/bin.js"
   },
+  "exports": {
+    "./package.json": "./package.json"
+  },
   "files": [
     "LICENSE",
     "dist",
@@ -41,6 +44,7 @@
   "packageManager": "pnpm@10.28.0",
   "scripts": {
     "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.build.json",
+    "audit:prod": "pnpm audit --prod",
     "check": "pnpm check:docs && pnpm verify",
     "check:docs": "./scripts/check-docs.sh",
     "check:effect": "effect-language-service diagnostics --project tsconfig.json --format text --strict",
@@ -61,7 +65,10 @@
   "devDependencies": {
     "@effect/language-service": "0.87.0",
     "@types/node": "24.10.0",
+    "ajv-cli": "5.0.0",
     "cross-spawn": "7.0.6",
+    "markdown-link-check": "3.13.7",
+    "markdownlint-cli2": "0.18.1",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
   },

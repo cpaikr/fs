@@ -44,6 +44,7 @@ pnpm typecheck
 pnpm check:effect
 pnpm test
 pnpm check:docs
+pnpm audit:prod
 
 # Implementation-only and complete repository gates:
 pnpm verify
@@ -55,9 +56,12 @@ git diff --check
 acceptance, writer integration, and installed-package checks. `pnpm check`
 adds the documentation and contract-artifact gate. `pnpm release:check` also
 runs npm's publication dry run; it does not publish the package.
+`pnpm audit:prod` is the explicit production-dependency vulnerability gate.
 
 `pnpm check:docs` invokes the repository-required `./scripts/check-docs.sh`.
-Run it after changing documentation, schemas, examples, or fixtures.
+Its executables are exact lockfile dependencies and require the repository's
+frozen, lifecycle-disabled install. Run it after changing documentation,
+schemas, examples, or fixtures.
 
 ## Documentation and generated guidance
 
