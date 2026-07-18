@@ -88,8 +88,8 @@ publish, tag, or create a GitHub release.
 - The schema-publication and release-candidate pull requests were merged into
   `dev` with commit preservation. The resulting candidate is merge commit
   `f21aebf`; post-merge CI run `29626105088` succeeded on that commit.
-- As last verified during the review, `cpaikr/fs` is private with `main` as its
-  default branch, no tag or GitHub release exists, and npm does not have
+- As verified on 2026-07-18, `cpaikr/fs` is private with `main` as its default
+  branch, no tag or GitHub release exists, and npm does not have
   `@cpai/fs@0.1.0`.
 
 Roadmap step 11 remains open because a verified candidate is not a release.

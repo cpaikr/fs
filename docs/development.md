@@ -56,6 +56,9 @@ acceptance, writer integration, and installed-package checks. `pnpm check`
 adds the documentation and contract-artifact gate. `pnpm release:check` also
 runs npm's publication dry run; it does not publish the package.
 
+`pnpm check:docs` invokes the repository-required `./scripts/check-docs.sh`.
+Run it after changing documentation, schemas, examples, or fixtures.
+
 ## Documentation and generated guidance
 
 The [documentation index](README.md) identifies the owner for each contract.
