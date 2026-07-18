@@ -238,11 +238,12 @@ Malformed syntax, trailing content, and duplicate object members all produce
 resolved with first-value-wins or last-value-wins behavior.
 
 `input-limit-exceeded` reports a raw-byte, JSON-nesting, JSON-value,
-per-decimal-digit, or total-decimal-digit budget violation. It has exit code
-`1`, includes the input operand in `path` (`-` for standard input), has empty
-`help`, and creates no output. The message names the violated budget and its
-limit without echoing document content. Diagnostic logging may include only
-`code`, `source`, `budget`, and `limit` for this failure.
+nonconforming-document-value, encoded-diagnostic-byte, per-decimal-digit, or
+total-decimal-digit budget violation. It has exit code `1`, includes the input
+operand in `path` (`-` for standard input), has empty `help`, and creates no
+output. The message names the violated budget and its limit without echoing
+document content. Diagnostic logging may include only `code`, `source`,
+`budget`, and `limit` for this failure.
 
 The fixed V0 input budgets are:
 
@@ -251,6 +252,8 @@ The fixed V0 input budgets are:
 | `input-bytes` | 16,777,216 | Raw bytes before UTF-8 decoding |
 | `json-nesting` | 64 | Active object/array containers; root container is 1 |
 | `json-values` | 200,000 | Root plus every member or element value |
+| `invalid-document-values` | 256 | Values in nonconforming input |
+| `validation-diagnostic-bytes` | 1,048,576 | Encoded diagnostics |
 | `decimal-digits` | 1,000 | Digits in one schema-conforming exact decimal |
 | `total-decimal-digits` | 1,000,000 | Digits across conforming exact decimals |
 
@@ -258,8 +261,13 @@ The byte reader accepts exactly the limit only after reaching EOF and stops at
 the first excess byte. The scanner is iterative. It applies syntax, duplicate,
 nesting, and value checks from left to right, so the first encountered owned
 failure wins. UTF-8 failure precedes scanning after the byte boundary succeeds.
-Decimal budgets are checked after complete schema conformance and before
-semantic validation or arithmetic.
+When a document exceeds the nonconforming-value budget, a fail-fast schema or
+semantic pass still permits it if it is conforming but refuses it before
+complete diagnostics if it is not. The diagnostic-byte budget is checked
+before a validation envelope is encoded. Decimal budgets are checked after
+schema conformance and before semantic validation or arithmetic. A
+schema-valid snapshot is also decimal-bounded before comparison when an
+unrelated structural error makes the containing document nonconforming.
 
 `working-directory-unavailable` applies only when an operation must resolve a
 relative path and the process has no usable current directory. It has exit code

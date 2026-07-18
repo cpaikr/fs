@@ -75,6 +75,9 @@ conformance:
   container at level 1;
 - JSON values: 200,000, counting the root and each object-member or array value,
   including container values;
+- JSON values in a nonconforming document: 256 before complete diagnostics are
+  refused; large conforming documents retain the general JSON-value budget;
+- encoded structural diagnostics: 1 MiB (1,048,576 bytes);
 - digits in one schema-conforming exact decimal: 1,000, excluding a sign and
   decimal point; and
 - digits across all schema-conforming exact decimals in one document:
@@ -82,17 +85,25 @@ conformance:
 
 The byte boundary is enforced while reading, before UTF-8 decoding, and stops
 at the first excess byte. JSON nesting and value budgets are enforced by a
-non-recursive scanner before materialization. Decimal budgets run only after
-schema conformance and before semantic snapshot or rollup arithmetic. A limit
-failure is an operational refusal, not evidence that the same document is
-nonconforming for another FS implementation.
+non-recursive scanner before materialization. A larger document receives a
+fast conformance pass: conforming input continues normally, while
+nonconforming input is refused before complete diagnostic generation. Complete
+structural diagnostics remain deterministic within their value and
+encoded-byte budgets. Decimal budgets run after schema conformance and before
+semantic snapshot or rollup arithmetic. When another structural error prevents
+whole-document conformance, snapshot decimals are still bounded before a
+schema-valid snapshot is compared. A limit failure is an operational refusal,
+not evidence that the same document is nonconforming for another FS
+implementation.
 
 These limits retain substantial headroom over the maintained corpus while
 bounding measured adversarial costs on every supported Node.js line.
 Supported-runtime measurements found recursive descent failing at different
-depths and large exact-decimal cancellation changing work materially with
-author order. The selected boundaries avoid those runtime-dependent failure
-regions while Phase 1 aggregation makes valid child order cost-stable.
+depths, schema diagnostic fanout amplifying a compact invalid input into tens
+of megabytes of output, and large exact-decimal cancellation changing work
+materially with author order. The selected boundaries avoid those
+runtime-dependent failure regions while preserving large conforming documents
+and making valid child order cost-stable.
 
 Native help, version, and completion actions are parsed and completed without
 loading document-command implementation or acquiring application path context.

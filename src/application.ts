@@ -46,7 +46,7 @@ export interface ApplicationExecutorService {
   ) => Effect.Effect<ProcessResult, never, Stdio.Stdio>
 }
 
-const internalError = (request: ApplicationRequest): ProcessResult => ({
+export const internalError = (request: ApplicationRequest): ProcessResult => ({
   stdout: Buffer.from(`${JSON.stringify({
     error: {
       operation: request.command,

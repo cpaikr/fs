@@ -75,8 +75,8 @@ The suite keeps these domain and operational boundaries:
   malformed input, trailing content, duplicate members, unsafe scale, and
   missing input;
 - bounded file and standard-input reads, iterative JSON nesting and value
-  limits, stable redacted limit results, and existing-output precedence over
-  oversized candidate input;
+  limits, bounded diagnostic fanout and bytes, stable redacted limit results,
+  and existing-output precedence over oversized candidate input;
 - current-directory-independent native help, discovery, bundled schema access,
   and standard-input validation, plus the stable relative-path failure when the
   current directory is unavailable;

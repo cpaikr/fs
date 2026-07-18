@@ -1,6 +1,6 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs"
+import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { dirname, join, resolve, sep } from "node:path"
 import spawn from "cross-spawn"
 import { pathToFileURL } from "node:url"
 
@@ -74,6 +74,24 @@ const assertExportUnavailable = (specifier, cwd) => {
     throw new Error(
       `${specifier} unexpectedly resolved through the installed package exports (status=${String(result.status)}, stderr=${result.stderr})`
     )
+  }
+}
+
+const assertPackagedMarkdownLinks = (installedRoot, markdownPaths) => {
+  const root = resolve(installedRoot)
+  for (const markdownPath of markdownPaths) {
+    const markdown = readFileSync(join(installedRoot, markdownPath), "utf8")
+    for (const match of markdown.matchAll(/\]\(([^)]+)\)/g)) {
+      const target = match[1].trim().split(/\s+/, 1)[0].replace(/^<|>$/g, "")
+      if (target.startsWith("#") || /^[a-z][a-z0-9+.-]*:/iu.test(target)) continue
+      const linkedPath = resolve(
+        dirname(join(installedRoot, markdownPath)),
+        target.split(/[?#]/u, 1)[0]
+      )
+      if (!linkedPath.startsWith(`${root}${sep}`) || !existsSync(linkedPath)) {
+        throw new Error(`packed Markdown link is unavailable: ${markdownPath} -> ${target}`)
+      }
+    }
   }
 }
 
@@ -193,6 +211,10 @@ try {
     const packedAsset = readFileSync(join(installedRoot, path))
     if (!source.equals(packedAsset)) throw new Error(`packed bytes differ: ${path}`)
   }
+  assertPackagedMarkdownLinks(
+    installedRoot,
+    retainedAssets.filter((path) => path.endsWith(".md"))
+  )
 
   const installedBin = join(installedRoot, "dist", "bin.js")
   if (!readFileSync(installedBin, "utf8").startsWith("#!/usr/bin/env node\n")) {
@@ -204,6 +226,32 @@ try {
 
   const shim = join(installDirectory, "node_modules", ".bin", process.platform === "win32" ? "fs.cmd" : "fs")
   if (!existsSync(shim)) throw new Error("installed fs shim is missing")
+  const installedSchema = join(installedRoot, "schema", "fs-document.schema.json")
+  const missingSchema = `${installedSchema}.missing`
+  renameSync(installedSchema, missingSchema)
+  try {
+    const missingAsset = run(shim, ["schema", "document"], {
+      cwd: installDirectory,
+      encoding: "utf8"
+    })
+    if (missingAsset.status !== 1 || missingAsset.stderr !== "") {
+      throw new Error("missing installed asset did not produce a bounded process failure")
+    }
+    assertJsonEqual(
+      JSON.parse(missingAsset.stdout),
+      {
+        error: {
+          operation: "schema",
+          code: "internal-error",
+          message: "The requested operation could not be completed."
+        },
+        help: []
+      },
+      "missing installed asset failure"
+    )
+  } finally {
+    renameSync(missingSchema, installedSchema)
+  }
   const discovery = successfulJson(
     run(shim, [], { cwd: installDirectory, encoding: "utf8" }),
     "installed fs discovery"

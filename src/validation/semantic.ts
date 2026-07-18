@@ -3,6 +3,8 @@ import type { Document, Period } from "./model.js"
 import type { StructuralError } from "./schema.js"
 import { isApplicationValid } from "./snapshot.js"
 
+type AddDiagnostic = (error: StructuralError) => void
+
 const diagnostic = (code: string, path: string): StructuralError => ({
   code,
   path,
@@ -24,11 +26,11 @@ const isGregorianDate = (value: string): boolean => {
 const duplicateDefinitions = (
   definitions: ReadonlyArray<{ readonly id: string }>,
   basePath: string,
-  errors: Array<StructuralError>
+  add: AddDiagnostic
 ): void => {
   const ids = new Set<string>()
   definitions.forEach((definition, index) => {
-    if (ids.has(definition.id)) errors.push(diagnostic("duplicate-id", `${basePath}/${index}/id`))
+    if (ids.has(definition.id)) add(diagnostic("duplicate-id", `${basePath}/${index}/id`))
     ids.add(definition.id)
   })
 }
@@ -36,11 +38,11 @@ const duplicateDefinitions = (
 const duplicateReferences = (
   references: ReadonlyArray<string>,
   basePath: string,
-  errors: Array<StructuralError>
+  add: AddDiagnostic
 ): void => {
   const values = new Set<string>()
   references.forEach((reference, index) => {
-    if (values.has(reference)) errors.push(diagnostic("duplicate-reference", `${basePath}/${index}`))
+    if (values.has(reference)) add(diagnostic("duplicate-reference", `${basePath}/${index}`))
     values.add(reference)
   })
 }
@@ -48,11 +50,11 @@ const duplicateReferences = (
 const duplicateIdentifiers = (
   identifiers: ReadonlyArray<string>,
   basePath: string,
-  errors: Array<StructuralError>
+  add: AddDiagnostic
 ): void => {
   const values = new Set<string>()
   identifiers.forEach((identifier, index) => {
-    if (values.has(identifier)) errors.push(diagnostic("duplicate-id", `${basePath}/${index}`))
+    if (values.has(identifier)) add(diagnostic("duplicate-id", `${basePath}/${index}`))
     values.add(identifier)
   })
 }
@@ -61,10 +63,10 @@ const reference = (
   registry: ReadonlySet<string>,
   value: string,
   path: string,
-  errors: Array<StructuralError>
+  add: AddDiagnostic
 ): boolean => {
   if (registry.has(value)) return true
-  errors.push(diagnostic("unresolved-reference", path))
+  add(diagnostic("unresolved-reference", path))
   return false
 }
 
@@ -101,13 +103,11 @@ const cyclicItems = (parents: ReadonlyMap<string, string>): ReadonlySet<string> 
   return cyclic
 }
 
-export const validateSemantics = (document: Document): ReadonlyArray<StructuralError> => {
-  const errors: Array<StructuralError> = []
-
-  duplicateDefinitions(document.units, "/units", errors)
-  duplicateDefinitions(document.periods, "/periods", errors)
-  duplicateDefinitions(document.statements, "/statements", errors)
-  duplicateIdentifiers(document.groupingColumns ?? [], "/groupingColumns", errors)
+const scanSemantics = (document: Document, add: AddDiagnostic): void => {
+  duplicateDefinitions(document.units, "/units", add)
+  duplicateDefinitions(document.periods, "/periods", add)
+  duplicateDefinitions(document.statements, "/statements", add)
+  duplicateIdentifiers(document.groupingColumns ?? [], "/groupingColumns", add)
 
   const units = new Set(document.units.map(({ id }) => id))
   const periods = new Set(document.periods.map(({ id }) => id))
@@ -116,60 +116,60 @@ export const validateSemantics = (document: Document): ReadonlyArray<StructuralE
   const periodValues = new Set<string>()
   document.periods.forEach((period, index) => {
     if (period.kind === "instant") {
-      if (!isGregorianDate(period.date)) errors.push(diagnostic("invalid-date", `/periods/${index}/date`))
+      if (!isGregorianDate(period.date)) add(diagnostic("invalid-date", `/periods/${index}/date`))
     } else {
-      if (!isGregorianDate(period.start)) errors.push(diagnostic("invalid-date", `/periods/${index}/start`))
-      if (!isGregorianDate(period.end)) errors.push(diagnostic("invalid-date", `/periods/${index}/end`))
-      if (period.start > period.end) errors.push(diagnostic("invalid-duration", `/periods/${index}`))
+      if (!isGregorianDate(period.start)) add(diagnostic("invalid-date", `/periods/${index}/start`))
+      if (!isGregorianDate(period.end)) add(diagnostic("invalid-date", `/periods/${index}/end`))
+      if (period.start > period.end) add(diagnostic("invalid-duration", `/periods/${index}`))
     }
     const definition = periodDefinitionKey(period)
     if (periodValues.has(definition)) {
-      errors.push(diagnostic("duplicate-period-definition", `/periods/${index}`))
+      add(diagnostic("duplicate-period-definition", `/periods/${index}`))
     }
     periodValues.add(definition)
   })
 
   document.statements.forEach((statement, statementIndex) => {
     const statementPath = `/statements/${statementIndex}`
-    duplicateReferences(statement.periods, `${statementPath}/periods`, errors)
+    duplicateReferences(statement.periods, `${statementPath}/periods`, add)
     statement.periods.forEach((period, periodIndex) => {
-      reference(periods, period, `${statementPath}/periods/${periodIndex}`, errors)
+      reference(periods, period, `${statementPath}/periods/${periodIndex}`, add)
     })
 
-    duplicateDefinitions(statement.items, `${statementPath}/items`, errors)
+    duplicateDefinitions(statement.items, `${statementPath}/items`, add)
     const items = new Map(statement.items.map((item) => [item.id, item]))
     const rollupParents = new Map<string, string>()
 
     statement.items.forEach((item, itemIndex) => {
       const itemPath = `${statementPath}/items/${itemIndex}`
-      reference(units, item.unit, `${itemPath}/unit`, errors)
+      reference(units, item.unit, `${itemPath}/unit`, add)
       if (!sameKeys(item.values, statement.periods)) {
-        errors.push(diagnostic("map-key-mismatch", `${itemPath}/values`))
+        add(diagnostic("map-key-mismatch", `${itemPath}/values`))
       }
       if (!sameKeys(item.groupings, groupingColumns)) {
-        errors.push(diagnostic("map-key-mismatch", `${itemPath}/groupings`))
+        add(diagnostic("map-key-mismatch", `${itemPath}/groupings`))
       }
 
       if (item.rollupTo === undefined) return
       if (item.rollupTo === item.id) {
-        errors.push(diagnostic("self-rollup", `${itemPath}/rollupTo`))
+        add(diagnostic("self-rollup", `${itemPath}/rollupTo`))
         return
       }
       const parent = items.get(item.rollupTo)
       if (parent === undefined) {
-        errors.push(diagnostic("unresolved-reference", `${itemPath}/rollupTo`))
+        add(diagnostic("unresolved-reference", `${itemPath}/rollupTo`))
         return
       }
       rollupParents.set(item.id, parent.id)
       if (item.unit !== parent.unit) {
-        errors.push(diagnostic("unit-mismatch", `${itemPath}/rollupTo`))
+        add(diagnostic("unit-mismatch", `${itemPath}/rollupTo`))
       }
     })
 
     const cycles = cyclicItems(rollupParents)
     statement.items.forEach((item, itemIndex) => {
       if (item.rollupTo !== undefined && cycles.has(item.id)) {
-        errors.push(diagnostic("cyclic-rollup", `${statementPath}/items/${itemIndex}/rollupTo`))
+        add(diagnostic("cyclic-rollup", `${statementPath}/items/${itemIndex}/rollupTo`))
       }
     })
   })
@@ -178,13 +178,31 @@ export const validateSemantics = (document: Document): ReadonlyArray<StructuralE
   document.validationSnapshot?.applications.forEach((application, index) => {
     const key = applicationKey(application.key)
     if (snapshotKeys.has(key)) {
-      errors.push(diagnostic("duplicate-application-key", `/validationSnapshot/applications/${index}/key`))
+      add(diagnostic("duplicate-application-key", `/validationSnapshot/applications/${index}/key`))
     }
     snapshotKeys.add(key)
     if (!isApplicationValid(application)) {
-      errors.push(diagnostic("invalid-value", `/validationSnapshot/applications/${index}`))
+      add(diagnostic("invalid-value", `/validationSnapshot/applications/${index}`))
     }
   })
+}
 
+export const validateSemantics = (document: Document): ReadonlyArray<StructuralError> => {
+  const errors: Array<StructuralError> = []
+  scanSemantics(document, (error) => errors.push(error))
   return errors.sort(compareDiagnostics)
+}
+
+class SemanticNonconformance extends Error {}
+
+export const conformsSemantically = (document: Document): boolean => {
+  try {
+    scanSemantics(document, () => {
+      throw new SemanticNonconformance()
+    })
+    return true
+  } catch (error) {
+    if (error instanceof SemanticNonconformance) return false
+    throw error
+  }
 }

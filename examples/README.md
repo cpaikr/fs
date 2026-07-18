@@ -1,9 +1,10 @@
 # V0 Examples
 
 These examples provide conformance evidence for the current `0.1`
-[semantic specification](../docs/semantic-spec.md). They demonstrate complete
-artifacts rather than acting as partially completed authoring templates. See
-the [authoring guide](../docs/authoring.md) for the encoding workflow.
+[semantic specification](https://cpaikr.github.io/fs/spec/0.1/). They
+demonstrate complete artifacts rather than acting as partially completed
+authoring templates. See the [bundled authoring guide](../assets/guide/authoring.md)
+for the encoding workflow.
 
 ## Files
 

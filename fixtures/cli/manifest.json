@@ -115,6 +115,8 @@
     "cases/validate/extra-argument.json",
     "cases/validate/input-byte-limit-path.json",
     "cases/validate/input-byte-limit-stdin.json",
+    "cases/validate/invalid-document-value-limit-exact.json",
+    "cases/validate/invalid-document-value-limit.json",
     "cases/validate/invalid-snapshot.json",
     "cases/validate/json-nesting-limit.json",
     "cases/validate/json-value-limit.json",
