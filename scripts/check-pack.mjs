@@ -66,6 +66,7 @@ const expectedReleaseMetadata = {
   repository: { type: "git", url: "git+https://github.com/cpaikr/fs.git" },
   author: "CPAI",
   license: "Apache-2.0",
+  type: "module",
   bin: { fs: "dist/bin.js" },
   engines: { node: "^22.17.0 || ^24.15.0" },
   publishConfig: { access: "public", registry: "https://registry.npmjs.org/" }
