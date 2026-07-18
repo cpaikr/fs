@@ -2,7 +2,12 @@ import { readFileSync } from "node:fs"
 
 import { describe, expect, it } from "vitest"
 
-import type { ApplicationResult, Document, ValidationSnapshot } from "../src/validation/model.js"
+import {
+  inconsistentApplications,
+  type ApplicationResult,
+  type Document,
+  type ValidationSnapshot
+} from "../src/validation/model.js"
 import { compareSnapshot, type ValidationResult } from "../src/validation/snapshot.js"
 import { validateDocument } from "../src/validation/validate.js"
 
@@ -48,10 +53,12 @@ describe("snapshot comparison", () => {
       calculations: "consistent",
       applications: [removed.recorded]
     }
+    const inconsistent = inconsistentApplications([added.current])
+    if (inconsistent === undefined) throw new Error("Added application must be inconsistent")
     const current: ValidationResult = {
       formatVersion: "0.1",
       conformance: { status: "conforming", errors: [] },
-      calculations: { status: "inconsistent", applications: [added.current] }
+      calculations: { status: "inconsistent", applications: inconsistent }
     }
     expect(compareSnapshot(snapshot, current)).toEqual(expected)
   })

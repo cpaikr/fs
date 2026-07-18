@@ -18,13 +18,12 @@ export class Decimal {
 
   private static normalize(coefficient: bigint, scale: number): Decimal {
     if (coefficient === 0n) return Decimal.zero()
-    let normalized = coefficient
-    let places = scale
-    while (places > 0 && normalized % 10n === 0n) {
-      normalized /= 10n
-      places -= 1
-    }
-    return new Decimal(normalized, places)
+    const negative = coefficient < 0n
+    const digits = (negative ? -coefficient : coefficient).toString()
+    const removable = Math.min(scale, digits.length - digits.replace(/0+$/u, "").length)
+    if (removable === 0) return new Decimal(coefficient, scale)
+    const normalized = BigInt(digits.slice(0, -removable)) * (negative ? -1n : 1n)
+    return new Decimal(normalized, scale - removable)
   }
 
   add(other: Decimal): Decimal {
@@ -32,6 +31,16 @@ export class Decimal {
     const left = this.coefficient * 10n ** BigInt(scale - this.scale)
     const right = other.coefficient * 10n ** BigInt(scale - other.scale)
     return Decimal.normalize(left + right, scale)
+  }
+
+  static sum(values: ReadonlyArray<Decimal>): Decimal {
+    if (values.length === 0) return Decimal.zero()
+    const scale = values.reduce((maximum, value) => Math.max(maximum, value.scale), 0)
+    const coefficient = values.reduce(
+      (total, value) => total + value.coefficient * 10n ** BigInt(scale - value.scale),
+      0n
+    )
+    return Decimal.normalize(coefficient, scale)
   }
 
   subtract(other: Decimal): Decimal {

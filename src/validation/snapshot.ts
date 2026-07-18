@@ -2,19 +2,29 @@ import { isDeepStrictEqual } from "node:util"
 
 import { Decimal } from "./decimal.js"
 import { applicationKey } from "./identity.js"
+import type { CalculationResult } from "./calculate.js"
 import type { ApplicationResult, CalculationStatus, ValidationSnapshot } from "./model.js"
 
-export interface ValidationResult {
-  readonly formatVersion: "0.1"
-  readonly conformance: {
-    readonly status: "conforming" | "nonconforming"
-    readonly errors: ReadonlyArray<{ readonly code: string; readonly path: string; readonly message: string }>
-  }
-  readonly calculations: {
-    readonly status: CalculationStatus
-    readonly applications: ReadonlyArray<ApplicationResult>
-  }
+interface ValidationError {
+  readonly code: string
+  readonly path: string
+  readonly message: string
 }
+
+export type ValidationResult =
+  | {
+      readonly formatVersion: "0.1"
+      readonly conformance: {
+        readonly status: "nonconforming"
+        readonly errors: readonly [ValidationError, ...ValidationError[]]
+      }
+      readonly calculations: { readonly status: "not-run"; readonly applications: readonly [] }
+    }
+  | {
+      readonly formatVersion: "0.1"
+      readonly conformance: { readonly status: "conforming"; readonly errors: readonly [] }
+      readonly calculations: CalculationResult
+    }
 
 type ApplicationChange =
   | { readonly change: "unchanged" | "changed"; readonly recorded: ApplicationResult; readonly current: ApplicationResult }

@@ -95,11 +95,17 @@ try {
   const [{ filename, files }] = JSON.parse(packJson)
   const paths = files.map((entry) => entry.path).sort()
   const compiledModules = [
+    "application",
     "assets",
     "bin",
     "cli",
+    "content",
+    "io",
     "json",
+    "limits",
     "logger",
+    "node-services",
+    "pathless",
     "process",
     "record-validation",
     "render",

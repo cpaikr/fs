@@ -10,8 +10,13 @@ import {
 
 import packageMetadata from "../package.json" with { type: "json" }
 import { exampleNames, schemaNames, type ExampleName, type SchemaName } from "./assets.js"
+import {
+  ApplicationExecutor,
+  type ApplicationRequest,
+  type ProcessResult
+} from "./application.js"
 import { type LogLevel } from "./logger.js"
-import { execute, type ApplicationRequest, type ProcessResult } from "./process.js"
+import { runPathless } from "./pathless.js"
 
 class ReportedExit extends Data.TaggedError("ReportedExit")<{
   readonly exitCode: 1 | 2
@@ -44,7 +49,10 @@ const writeResult = (result: ProcessResult): Effect.Effect<void, ReportedExit, S
 
 const dispatch = (request: ApplicationRequest) =>
   Effect.gen(function*() {
-    const result = yield* execute(request)
+    const immediate = runPathless(request)
+    const result = immediate ?? (yield* ApplicationExecutor.pipe(
+      Effect.flatMap((executor) => executor.execute(request))
+    ))
     yield* writeResult(result)
   })
 

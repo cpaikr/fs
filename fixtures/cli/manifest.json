@@ -109,6 +109,8 @@
     "cases/validate/calculation-inconsistent.json",
     "cases/validate/cwd-unavailable-stdin.json",
     "cases/validate/cwd-unavailable.json",
+    "cases/validate/decimal-digit-limit-exact.json",
+    "cases/validate/decimal-digit-limit.json",
     "cases/validate/duplicate-members.json",
     "cases/validate/extra-argument.json",
     "cases/validate/input-byte-limit-path.json",
