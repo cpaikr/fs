@@ -60,42 +60,59 @@ const assertJsonEqual = (actual, expected, label) => {
 try {
   const packed = run(
     npm,
-    ["pack", "--ignore-scripts", "--json", "--pack-destination", temporaryDirectory],
+    ["pack", "--json", "--pack-destination", temporaryDirectory],
     { encoding: "utf8" }
   )
   if (packed.status !== 0) {
     throw new Error(packed.stderr || packed.stdout || "npm pack failed")
   }
 
-  const [{ filename, files }] = JSON.parse(packed.stdout)
+  // npm forwards prepack output before its JSON payload, so parse the final
+  // JSON document rather than requiring the lifecycle to stay silent.
+  const jsonStart = packed.stdout.lastIndexOf("\n[")
+  const packJson = jsonStart === -1 ? packed.stdout : packed.stdout.slice(jsonStart + 1)
+  const [{ filename, files }] = JSON.parse(packJson)
   const paths = files.map((entry) => entry.path).sort()
-  const required = [
+  const compiledModules = [
+    "assets",
+    "bin",
+    "cli",
+    "json",
+    "logger",
+    "process",
+    "record-validation",
+    "render",
+    "validation/calculate",
+    "validation/decimal",
+    "validation/identity",
+    "validation/model",
+    "validation/schema",
+    "validation/semantic",
+    "validation/snapshot",
+    "validation/validate",
+    "writer"
+  ]
+  const retainedAssets = [
+    "README.md",
     "assets/guide/authoring.md",
-    "dist/bin.js",
-    "dist/cli.js",
-    "dist/process.js",
-    "dist/render.js",
+    "examples/README.md",
     "examples/manufacturing-group.json",
     "examples/minimal.json",
-    "package.json",
     "schema/fs-document.schema.json",
     "schema/snapshot-diff.schema.json",
     "schema/validation-result.schema.json"
   ]
-
-  for (const path of required) {
-    if (!paths.includes(path)) throw new Error(`packed file missing: ${path}`)
-  }
-  for (const path of paths) {
-    if (
-      path.startsWith(".agents/") ||
-      path.startsWith("skills/") ||
-      path.startsWith("src/") ||
-      path.startsWith("test/") ||
-      path.startsWith("fixtures/")
-    ) {
-      throw new Error(`repository-only path was packed: ${path}`)
-    }
+  const expectedPaths = [
+    ...retainedAssets,
+    ...compiledModules.flatMap((module) => [`dist/${module}.js`, `dist/${module}.js.map`]),
+    "package.json"
+  ].sort()
+  if (JSON.stringify(paths) !== JSON.stringify(expectedPaths)) {
+    const missing = expectedPaths.filter((path) => !paths.includes(path))
+    const unexpected = paths.filter((path) => !expectedPaths.includes(path))
+    throw new Error(
+      `packed inventory drifted (missing=${JSON.stringify(missing)}, unexpected=${JSON.stringify(unexpected)})`
+    )
   }
 
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
@@ -114,7 +131,7 @@ try {
   }
 
   const installedRoot = join(installDirectory, "node_modules", "@cpai", "fs")
-  for (const path of required.filter((entry) => !entry.startsWith("dist/") && entry !== "package.json")) {
+  for (const path of retainedAssets) {
     const source = readFileSync(path)
     const packedAsset = readFileSync(join(installedRoot, path))
     if (!source.equals(packedAsset)) throw new Error(`packed bytes differ: ${path}`)
