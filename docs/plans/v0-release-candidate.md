@@ -1,8 +1,8 @@
 # V0 Release Candidate Plan
 
-Status: Active. Phases 0–3 are complete on `dev`. The Phase 4 final-proof
-checkpoint implements and verifies the material findings from independent
-review and awaits PR integration. The package remains private and unpublished.
+Status: Verified candidate. Phases 0–4 are complete on `dev`. The repository
+remains private and the CLI-only package unpublished while separate Phase 5
+release authorization is absent.
 
 This plan owns live Roadmap step-11 state, decisions, validation, blockers,
 and the next action. The [semantic specification](../semantic-spec.md) owns
@@ -89,9 +89,10 @@ publish, tag, or create a GitHub release.
 - Package metadata, licensing, exact packed-package verification, installed
   CLI smoke coverage, cross-platform CI, and npm publication dry-run coverage
   are present.
-- The schema-publication and release-candidate pull requests were merged into
-  `dev` with commit preservation. The resulting candidate is merge commit
-  `f21aebf`; post-merge CI run `29626105088` succeeded on that commit.
+- The schema-publication, release-candidate, and remediation pull requests were
+  merged into `dev` with commit preservation. Phase 4 was integrated by PR #14
+  as merge commit `8d5f617`; exact push run `29639266777` passed every required
+  gate on that integrated commit.
 - As verified on 2026-07-18, `cpaikr/fs` is private with `main` as its default
   branch, no tag or GitHub release exists, and npm does not have
   `@cpai/fs@0.1.0`.
@@ -194,8 +195,7 @@ Status: Complete on `dev` through PR #13.
 
 ### Phase 4: Prove the remediated candidate
 
-Status: Implemented on the final-proof checkpoint; awaiting PR review and
-integration into `dev`.
+Status: Complete on `dev` through PR #14.
 
 - Run focused contract, parser, decimal, startup, process, package-boundary,
   and documentation tests for every changed seam.
@@ -219,13 +219,11 @@ integration into `dev`.
 
 ## Known Temporary Drift
 
-The artifact-format contract has no known drift. `dev` implements the Phase 3
-package exports and hermetic gates. Independent Phase 4 review did identify
-temporary operational drift on `dev`: pathless asset defects can escape their
-stable result, invalid structural diagnostics can amplify compact input, and
-shipped example guidance contains repository-only links. The final-proof
-checkpoint closes each issue and adds executable regressions; integration of
-that checkpoint removes the known drift.
+No known artifact-format, operational-contract, package-boundary, or shipped-
+documentation drift remains in the candidate. Phase 4 closed the pathless
+asset defect, structural-diagnostic amplification, snapshot-decimal budget
+bypass, and repository-only shipped-document routes with focused executable
+regressions.
 
 The preserved review follow-up was merged to `dev` by PR #11 as merge commit
 `6741e34`. The ordered Phase 0 contract and Phase 1–2 implementation commits
@@ -237,6 +235,11 @@ The package-sealing and hermetic-gate checkpoint was merged by PR #13 as merge
 commit `4f4fef7`. Exact push run `29638095553` passed the complete OS and Node.js
 matrix, documentation, production audit, and dependent npm dry run on that
 integrated commit.
+
+The final-proof checkpoint was merged by PR #14 as merge commit `8d5f617`.
+Exact push run `29639266777` passed the complete Linux, macOS, and Windows
+matrix on Node.js 22.17.0 and 24.15.0, documentation, production audit, and the
+dependent npm publication dry run on that integrated commit.
 
 ## Validation
 
@@ -296,18 +299,16 @@ finding is fixed with focused exact-boundary or installed-package evidence;
 rereview reports no material residual finding. A measured 50,000-item invalid
 input now returns a 202-byte stable refusal in about 0.3 seconds instead of
 roughly 31 MiB in 11.7 seconds, while maintained large conforming input remains
-accepted. The final exact cross-platform CI and dependent npm dry run remain
-the PR integration proof.
+accepted. Exact integrated-commit cross-platform CI and the dependent npm dry
+run provide the integration proof.
 
 ## Blockers
 
-No product decision is blocked. Publication remains intentionally blocked
-until the Phase 4 checkpoint is integrated and audited and a separate release
-action is authorized.
+No product decision is blocked. Release actions remain intentionally blocked
+until a separate Phase 5 action is authorized.
 
 ## Next Action
 
-Complete PR #14's required CI and automated reviews, address every material
-finding, and merge with commit preservation. Audit the exact integrated `dev`
-candidate, then stop before Phase 5 while release authorization remains
-absent.
+Keep the exact verified candidate unchanged and stop before Phase 5 while
+release authorization remains absent. A later authorized release workflow may
+promote this candidate without modifying it.
