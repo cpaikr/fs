@@ -17,6 +17,8 @@ one primary responsibility.
   [statement item rows](adr/0001-replace-dimensional-members-with-item-grouping.md)
 - Inspect completed Roadmap step 10:
   [Statement item row refactor](plans/statement-item-row-refactor.md)
+- Track active Roadmap step 11:
+  [V0 release candidate](plans/v0-release-candidate.md)
 - Review the accepted independent rendering policy:
   [Finite rendering limits](adr/0002-bound-render-output.md)
 - See strategic milestones: [Roadmap](../ROADMAP.md)

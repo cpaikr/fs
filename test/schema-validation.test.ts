@@ -15,6 +15,7 @@ const manifest = JSON.parse(readFileSync("fixtures/manifest.json", "utf8")) as {
 }
 
 interface MutableDocument {
+  $schema?: string
   periods: Array<Record<string, unknown>>
   groupingColumns?: Array<string>
   statements: Array<{ items: Array<{ values: Record<string, unknown>; groupings: Record<string, unknown> }> }>
@@ -25,6 +26,21 @@ const minimal = (): MutableDocument =>
   JSON.parse(readFileSync("examples/minimal.json", "utf8")) as MutableDocument
 
 describe("document schema validation", () => {
+  it("accepts only the optional canonical schema discovery pointer", () => {
+    const withoutPointer = minimal()
+    expect(validateSchema(withoutPointer)).toEqual([])
+
+    const withPointer = minimal()
+    withPointer.$schema = "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+    expect(validateSchema(withPointer)).toEqual([])
+
+    const wrongPointer = minimal()
+    wrongPointer.$schema = "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json"
+    expect(validateSchema(wrongPointer)).toEqual([
+      expect.objectContaining({ code: "invalid-value", path: "/$schema" })
+    ])
+  })
+
   it.each(manifest.invalidDocuments.filter((entry) => entry.layer === "schema"))(
     "normalizes $document",
     (entry) => {

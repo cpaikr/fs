@@ -68,6 +68,49 @@ describe("validation snapshot recording", () => {
     expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)
   })
 
+  it("preserves the optional schema pointer in its author-chosen position", () => {
+    const source = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
+    if (
+      source.$schema === undefined ||
+      source.documentId === undefined ||
+      source.groupingColumns === undefined
+    ) {
+      throw new Error("Manufacturing example lost its optional discovery members")
+    }
+    const input: Document = {
+      formatVersion: source.formatVersion,
+      documentId: source.documentId,
+      entity: source.entity,
+      $schema: source.$schema,
+      scope: source.scope,
+      units: source.units,
+      periods: source.periods,
+      groupingColumns: source.groupingColumns,
+      statements: source.statements
+    }
+    const validation = validateDocument(input).validation
+    const recorded = recordValidationSnapshot(input, validation)
+    const expectedOrder = [
+      "formatVersion",
+      "documentId",
+      "entity",
+      "$schema",
+      "scope",
+      "units",
+      "periods",
+      "groupingColumns",
+      "statements",
+      "validationSnapshot"
+    ]
+
+    expect(recorded.document.$schema).toBe(
+      "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+    )
+    expect(Object.keys(recorded.document)).toEqual(expectedOrder)
+    expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)
+    expect(validateDocument(recorded.document).snapshotDiff.status).toBe("match")
+  })
+
   it("does not retain a mutable alias to refined application arrays", () => {
     const input = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
     const validation = validateDocument(input).validation

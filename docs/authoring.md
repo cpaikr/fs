@@ -97,15 +97,22 @@ inside FS JSON are nonconforming.
 
 ## Schema and Version Discovery
 
-Every V0 document declares `"formatVersion": "0.1"`. Do not add a top-level
-`$schema` property: the current closed document schema does not permit it. Use
-`fs schema document` to read the exact bundled schema, or
-`fs schema --output <new-path> document` to create an exact copy.
+Every V0 document declares `"formatVersion": "0.1"`. It may also declare this
+exact discovery pointer as its first member:
 
-Replacing placeholder schema identifiers and deciding whether to allow an
-optional constant `$schema` pointer remain Roadmap step 11. Such a pointer
-would aid discovery only; full semantic validation would still require the
-reference validator.
+```json
+{
+  "$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json",
+  "formatVersion": "0.1"
+}
+```
+
+The pointer is optional, but no other `$schema` value conforms. It helps tools
+find the public shape contract; it does not require network access or prove
+full semantic conformance. Use `fs schema document` to read the same exact
+schema from the installed package, or
+`fs schema --output <new-path> document` to create an exact local copy. Full
+validation still requires the reference validator.
 
 ## Working With the Examples
 

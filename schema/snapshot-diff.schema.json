@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fs.example/schema/0.1/snapshot-diff.schema.json",
+  "$id": "https://cpaikr.github.io/fs/schema/0.1/snapshot-diff.schema.json",
   "title": "FS V0 validation snapshot diff",
   "oneOf": [
     {

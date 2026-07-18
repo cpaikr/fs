@@ -75,6 +75,24 @@ find . \
   -name '*.json' -print0 \
   | xargs -0 jq empty
 
+schema_base='https://cpaikr.github.io/fs/schema/0.1'
+for schema_name in fs-document validation-result snapshot-diff; do
+  jq -e --arg id "$schema_base/$schema_name.schema.json" \
+    '."$id" == $id' "schema/$schema_name.schema.json" >/dev/null
+done
+jq -e --arg id "$schema_base/fs-document.schema.json" '
+  .properties."$schema".const == $id and
+  (.required | index("$schema") == null)
+' schema/fs-document.schema.json >/dev/null
+jq -e --arg id "$schema_base/fs-document.schema.json" \
+  '."$schema" == $id' examples/manufacturing-group.json >/dev/null
+jq -e 'has("$schema") | not' examples/minimal.json >/dev/null
+jq -e 'has("$id") | not' fixtures/cli/case.schema.json >/dev/null
+if rg -n 'https://fs\.example' .; then
+  echo "Repository contains an unresolved placeholder schema identifier" >&2
+  exit 1
+fi
+
 ajv=(npx --yes ajv-cli@5.0.0 validate --spec=draft2020)
 
 echo "Checking fixture manifest"

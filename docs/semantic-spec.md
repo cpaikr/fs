@@ -20,17 +20,26 @@ meaning.
 
 `formatVersion` MUST be `"0.1"`. Because V0 is unreleased, the statement-item
 contract directly uses the unreleased version rather than introducing a
-compatibility version. Validation results and snapshot
-diffs likewise use `formatVersion: "0.1"`.
+compatibility version. Validation results and snapshot diffs likewise use
+`formatVersion: "0.1"`.
 
-The top-level members, in specification order, are `formatVersion`, optional
-`documentId`, `entity`, `scope`, `units`, `periods`, optional
-`groupingColumns`, `statements`, and optional `validationSnapshot`.
+An FS document MAY contain a top-level `$schema` member. When present, its
+value MUST be exactly
+`https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json`. This pointer
+aids schema discovery only. It does not change `formatVersion`, require network
+access, or replace the complete structural and semantic validation defined by
+this specification.
 
-No other top-level member is allowed. `documentId`, optional `entity.id`, and
-optional `scope.id` are author-controlled stable identities. Their required
-`entity.name` and `scope.label` members are human-readable. Omitting an
-optional identity has no effect on conformance or calculation semantics.
+The top-level members, in specification order, are optional `$schema`,
+`formatVersion`, optional `documentId`, `entity`, `scope`, `units`, `periods`,
+optional `groupingColumns`, `statements`, and optional `validationSnapshot`.
+
+No other top-level member is allowed. `$schema` is not an author-controlled
+identifier: if supplied, it is the exact constant above. `documentId`,
+optional `entity.id`, and optional `scope.id` are author-controlled stable
+identities. Their required `entity.name` and `scope.label` members are
+human-readable. Omitting an optional identity has no effect on conformance or
+calculation semantics.
 
 `entity` contains required nonempty string `name` and optional identifier
 `id`. `scope` contains required nonempty string `label` and optional identifier

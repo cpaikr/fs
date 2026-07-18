@@ -55,9 +55,12 @@ npx -y @cpai/fs@0.1.0 example
 npx -y @cpai/fs@0.1.0 example minimal
 ```
 
-The [FS V0 semantic specification](https://github.com/cpaikr/fs/blob/main/docs/semantic-spec.md)
+The [FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/)
 defines meaning beyond JSON shape. Passing the schema alone is not full
-conformance evidence.
+conformance evidence. A document may include the exact optional discovery
+pointer `"$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"`;
+validation still uses the bundled contract and does not require network
+access.
 
 ## Validate and Create
 

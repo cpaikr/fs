@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fs.example/fixtures/cli/0.1/case.schema.json",
   "title": "FS V0 CLI acceptance case",
   "type": "object",
   "additionalProperties": false,

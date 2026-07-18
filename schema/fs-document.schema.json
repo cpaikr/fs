@@ -1,11 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fs.example/schema/0.1/fs-document.schema.json",
+  "$id": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json",
   "title": "FS V0 document",
   "type": "object",
   "additionalProperties": false,
   "required": ["formatVersion", "entity", "scope", "units", "periods", "statements"],
   "properties": {
+    "$schema": {
+      "const": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+    },
     "formatVersion": { "const": "0.1" },
     "documentId": { "$ref": "#/$defs/id" },
     "entity": { "$ref": "#/$defs/entity" },

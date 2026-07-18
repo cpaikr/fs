@@ -111,6 +111,7 @@ export type ValidationSnapshot =
     }
 
 export interface Document {
+  readonly $schema?: "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
   readonly formatVersion: "0.1"
   readonly documentId?: string
   readonly entity: { readonly id?: string; readonly name: string }

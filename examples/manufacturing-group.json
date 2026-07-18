@@ -1,4 +1,5 @@
 {
+  "$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json",
   "formatVersion": "0.1",
   "documentId": "manufacturing-group-2025",
   "entity": {

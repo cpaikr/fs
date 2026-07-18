@@ -11,8 +11,9 @@ the [authoring guide](../docs/authoring.md) for the encoding workflow.
   optional identifiers, grouping columns, rollups, and validation snapshot, so
   its calculation status is `not-defined`.
 - `manufacturing-group.json` combines income, balance-sheet, cash-flow, equity,
-  and manufacturing statements for one entity. It is structurally conforming
-  and deliberately calculation-inconsistent.
+  and manufacturing statements for one entity. It carries the optional
+  canonical `$schema` discovery pointer, is structurally conforming, and is
+  deliberately calculation-inconsistent.
 
 ## Manufacturing Example Evidence
 
