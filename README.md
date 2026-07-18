@@ -58,3 +58,7 @@ define the public contract.
 
 Report package or specification problems through the
 [public issue tracker](https://github.com/cpaikr/cpaikr.github.io/issues).
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).

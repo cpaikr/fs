@@ -57,6 +57,26 @@ const assertJsonEqual = (actual, expected, label) => {
   }
 }
 
+const expectedReleaseMetadata = {
+  name: "@cpai/fs",
+  version: "0.1.0",
+  keywords: ["financial-statements", "json-schema", "validation", "cli"],
+  homepage: "https://cpaikr.github.io/fs/spec/0.1/",
+  bugs: { url: "https://github.com/cpaikr/cpaikr.github.io/issues" },
+  repository: { type: "git", url: "git+https://github.com/cpaikr/fs.git" },
+  author: "CPAI",
+  license: "Apache-2.0",
+  bin: { fs: "dist/bin.js" },
+  engines: { node: "^22.17.0 || ^24.15.0" },
+  publishConfig: { access: "public", registry: "https://registry.npmjs.org/" }
+}
+
+const assertReleaseMetadata = (manifest, label) => {
+  for (const [field, expected] of Object.entries(expectedReleaseMetadata)) {
+    assertJsonEqual(manifest[field], expected, `${label} ${field}`)
+  }
+}
+
 try {
   const packed = run(
     npm,
@@ -93,6 +113,7 @@ try {
     "writer"
   ]
   const retainedAssets = [
+    "LICENSE",
     "README.md",
     "assets/guide/authoring.md",
     "examples/README.md",
@@ -116,7 +137,7 @@ try {
   }
 
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
-  if (packageJson.bin?.fs !== "dist/bin.js") throw new Error("packed bin mapping drifted")
+  assertReleaseMetadata(packageJson, "source package metadata")
   if (!filename.endsWith(".tgz")) throw new Error("npm pack did not produce a tarball")
 
   const tarball = join(temporaryDirectory, filename)
@@ -131,6 +152,8 @@ try {
   }
 
   const installedRoot = join(installDirectory, "node_modules", "@cpai", "fs")
+  const installedPackageJson = JSON.parse(readFileSync(join(installedRoot, "package.json"), "utf8"))
+  assertReleaseMetadata(installedPackageJson, "installed package metadata")
   for (const path of retainedAssets) {
     const source = readFileSync(path)
     const packedAsset = readFileSync(join(installedRoot, path))

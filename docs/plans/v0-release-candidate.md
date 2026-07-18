@@ -26,8 +26,10 @@ GitHub release, or mark Roadmap step 11 complete.
 
 - The npm identity is `@cpai/fs`; V0 uses package version `0.1.0` and artifact
   `formatVersion: "0.1"`.
-- CPAI owns the npm scope. Authenticated ownership evidence is still required
-  before the final candidate gate; credentials must not be committed.
+- The owner confirms control of the CPAI npm scope. Credentials must not be
+  committed or supplied to release-candidate validation.
+- V0 is licensed under Apache-2.0, selected by the owner for permissive use
+  with an explicit patent grant.
 - The public schema host is the dedicated public
   `cpaikr/cpaikr.github.io` repository served by HTTPS GitHub Pages. The
   private `cpaikr/fs` repository stays private during this milestone.
@@ -62,7 +64,7 @@ GitHub release, or mark Roadmap step 11 complete.
 - [x] Phase 2: merge the reviewed schema slice; publish its exact schema bytes
   and versioned semantic specification; verify every public HTTPS resource
   before starting later work.
-- [ ] Phase 3: complete npm package, licensing, repository, support, and
+- [x] Phase 3: complete npm package, licensing, repository, support, and
   release configuration without publishing.
 - [ ] Phase 4: make packed-package verification release-grade across every
   supported operating system and Node.js line.
@@ -79,6 +81,15 @@ the schemas use `application/json`, allow cross-origin reads, and are
 byte-identical to the repository files. AJV validates all maintained result
 and diff fixtures against the downloaded schemas and their relative
 cross-schema references.
+
+The second slice defines Apache-2.0 licensing and complete public npm
+metadata, replaces private and unpacked README routes with public resources,
+and adds an npm publication dry run. Packed-package verification now executes
+the real `prepack` lifecycle, requires an exact inventory, verifies retained
+asset bytes and installed metadata, and exercises the installed CLI. The
+cross-platform matrix remains the proof boundary for Phase 4; its new
+release-candidate job waits for every OS/Node cell and documentation gate
+before running npm's publication dry run.
 
 ## Known Temporary Drift
 
@@ -115,14 +126,21 @@ downloads confirmed the public schemas' status, content type, CORS header,
 byte identity, and cross-file reference behavior before this second branch
 started from updated `dev`.
 
+The Phase-3 and local Phase-4 slice passes `pnpm release:check`: documentation
+and fixture contracts, TypeScript, strict Effect diagnostics, 163 tests, all
+121 packed-process acceptance cases, writer crash and concurrency integration,
+the exact 44-file installed tarball, and npm's publication dry run. The
+Apache-2.0 file matches the canonical Apache text, workflow YAML parses, and
+`git diff --check` passes. Independent implementation and design review found
+no Bucket-I or Bucket-II issue; the remaining risk is intentionally delegated
+to the PR's exact-head Blacksmith matrix and dependent dry-run job.
+
 ## Blockers
 
-The repository contains no licensing decision or license file. The owner must
-select the public release license before Phase 3 can complete; no license will
-be inferred.
+None.
 
 ## Next Action
 
-Complete the package and release metadata, including the owner-selected
-license, then strengthen installed-tarball verification and release dry-run
-gates without publishing.
+Complete local release-gate validation and review, then open the second PR and
+prove its exact head through every Blacksmith OS/Node matrix cell, the
+documentation gate, and the dependent npm publication dry run.

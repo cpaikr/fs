@@ -41,3 +41,21 @@ jobs:
           node-version: 24.15.0
       - name: Check documentation and fixture contracts
         run: ./scripts/check-docs.sh
+
+  release-candidate:
+    name: npm publish dry run
+    needs: [test, documentation]
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.15.0
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+      - name: Enable pinned pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.0 --activate
+      - name: Install without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify npm publication without publishing
+        run: npm publish --dry-run

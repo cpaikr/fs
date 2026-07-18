@@ -17,11 +17,13 @@
     "url": "git+https://github.com/cpaikr/fs.git"
   },
   "author": "CPAI",
+  "license": "Apache-2.0",
   "type": "module",
   "bin": {
     "fs": "dist/bin.js"
   },
   "files": [
+    "LICENSE",
     "dist",
     "assets",
     "examples/*.json",
