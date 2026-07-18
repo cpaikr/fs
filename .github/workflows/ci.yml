@@ -21,10 +21,10 @@ jobs:
           - blacksmith-2vcpu-windows-2025
         node: [22.17.0, 24.15.0]
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
       - name: Enable pinned pnpm
@@ -37,10 +37,10 @@ jobs:
   documentation:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.15.0
       - name: Enable pinned pnpm
@@ -54,10 +54,10 @@ jobs:
     name: production dependency audit
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.15.0
       - name: Enable pinned pnpm
@@ -68,14 +68,14 @@ jobs:
         run: pnpm audit:prod
 
   release-candidate:
-    name: npm publish dry run
+    name: npm publication check
     needs: [test, documentation, production-audit]
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.15.0
           registry-url: https://registry.npmjs.org/
@@ -84,5 +84,5 @@ jobs:
         run: corepack enable && corepack prepare pnpm@10.28.0 --activate
       - name: Install without lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Verify npm publication without publishing
-        run: npm publish --dry-run
+      - name: Verify npm publication state
+        run: node scripts/check-publication.mjs
