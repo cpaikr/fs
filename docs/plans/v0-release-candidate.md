@@ -1,10 +1,10 @@
 # V0 Release Candidate Plan
 
-Status: In progress. The working tree based on `dev` contains the reviewed npm
-identity, documentation system, Agent Skill, and PR review follow-up. The
-complete local release gate passes on the active supported Node.js line on
-macOS, but this exact revision has no integrated cross-platform proof.
-Publication is outside this documentation run.
+Status: In progress. The reviewed candidate is merged to `main` at `b06de25`.
+Its complete supported OS and Node.js matrix, documentation gate, production
+audit, and dependent npm publication dry run pass. Release Please setup is in
+progress; repository visibility, npm publication, tag, and GitHub release are
+pending.
 
 This plan owns the live V0 release-candidate state, release decisions,
 validation, blockers, and next action. The
@@ -60,6 +60,12 @@ after publication succeeds.
 - Candidate proof covers every declared Node.js line on Linux, macOS, and
   Windows, followed by the dependent npm publication dry run on the exact
   candidate head.
+- Release Please owns version bumps, the release manifest, changelog, tag, and
+  GitHub release. Its push workflow prepares release PRs without tagging; its
+  separately dispatched release stage runs only after npm publication is
+  verified.
+- Before `1.0.0`, backward-compatible features bump the package patch version
+  and breaking changes bump its minor version.
 
 ## Completed Candidate Foundation
 
@@ -85,7 +91,7 @@ integrated commit.
 
 ## Current Revision
 
-The working tree based on `dev`:
+The candidate merged to `main`:
 
 - changes package metadata, runtime discovery, installed-package checks,
   current CLI guidance, and generated Agent Skill commands to
@@ -102,37 +108,38 @@ The working tree based on `dev`:
 - preserves the artifact format, operational CLI contract, public schema and
   specification URLs, and repository identity.
 
-On 2026-07-18, live checks found `cpaikr/fs` private with `main` as its default
-branch, no tag or GitHub release, and no published
+On 2026-07-18, exact-head push run `29647831201` proved `b06de25` on every
+declared OS and Node.js line, then passed documentation, production audit, and
+the dependent npm publication dry run. Live checks found `cpaikr/fs` private
+with `main` as its default branch, no tag or GitHub release, and no published
 `@sjunepark/fs@0.1.0`. This is the expected pre-release state.
 
-The prior cross-platform run does not prove these review-follow-up bytes.
-Codex completed review without findings, and the CodeRabbit findings are
-addressed in this working tree. This revision becomes a verified candidate
-only after commit and fresh exact-head CI.
+Release Please setup is being prepared on top of the merged candidate. Its
+workflow and ownership documentation are not package payload, and the initial
+manifest records `0.0.0`; the setup commit supplies the one-time
+`Release-As: 0.1.0` input.
 
 ## Remaining Work
 
 ### Candidate proof
 
-1. Commit and push the reviewed revision without changing its validated bytes.
-2. Run the complete supported OS and Node.js matrix and its dependent npm
-   publication dry run on the exact candidate head.
-3. Reconcile any material finding in its owning contract, implementation, or
-   this plan, then repeat exact-head proof.
-4. Freeze the verified candidate for release.
+Complete. The verified package payload is frozen at `b06de25`; release setup
+and generated release artifacts must not change that payload.
 
 ### Release handoff
 
 After the candidate proof succeeds and release is explicitly authorized:
 
-1. Promote the verified candidate with commit preservation.
-2. Make `cpaikr/fs` public and verify anonymous access to the source, license,
+1. Merge the Release Please setup with commit preservation.
+2. Review and merge its generated `0.1.0` release PR without changing the
+   packed payload.
+3. Make `cpaikr/fs` public and verify anonymous access to the source, license,
    issue, homepage, and package-repository routes.
-3. Publish the exact verified tarball only after repository visibility
+4. Publish the exact verified tarball only after repository visibility
    succeeds.
-4. Verify the public package, then tag the exact commit, create the GitHub
-   release, and mark the V0 roadmap milestone complete.
+5. Verify the public package, then dispatch Release Please to tag the release
+   PR merge commit and create the GitHub release.
+6. Mark the V0 roadmap milestone complete.
 
 ## Validation
 
@@ -150,17 +157,15 @@ The current working tree passes:
 The release gate covers documentation and contract artifacts, type and strict
 Effect diagnostics, unit and packed-process acceptance suites, writer crash and
 concurrency integration, installed-tarball checks, and npm's publication dry
-run. Fresh integrated Linux, macOS, and Windows proof remains pending for this
-revision.
+run. Exact-head Linux, macOS, and Windows proof is complete for `b06de25`.
 
 ## Blockers
 
-No product decision is blocked. Publication is blocked until the reviewed
-revision has exact-head cross-platform proof and its dependent npm publication
-dry run. Repository visibility and publication remain user-owned release
+No product decision is blocked. Repository visibility, npm publication, and
+the separately dispatched tag and GitHub release remain explicit release
 actions.
 
 ## Next Action
 
-Commit and push the unchanged candidate revision so the complete
-cross-platform matrix and dependent npm dry run can prove its exact head.
+Validate and merge the Release Please setup, then review the generated `0.1.0`
+release PR.

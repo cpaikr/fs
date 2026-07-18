@@ -26,6 +26,15 @@
 - Do not edit examples or expected-result fixtures merely to make a prose
   summary appear current; resolve the underlying contract deliberately.
 
+## Release ownership
+
+- Release Please owns package version bumps, `.release-please-manifest.json`,
+  `CHANGELOG.md`, release tags, and GitHub releases. Change release inputs or
+  configuration instead of editing those generated artifacts manually.
+- A push to `main` may create or update a release PR but does not tag a
+  release. Dispatch the Release Please workflow manually only after the exact
+  package version has been published and verified.
+
 <!-- effect-solutions:start -->
 
 ## Effect

@@ -94,3 +94,27 @@ tarball inventory and retained asset bytes, install the tarball in isolation,
 and exercise its CLI. Use `pnpm release:check` only for an authorized release
 candidate validation; publication, tagging, and release creation are separate
 actions.
+
+## Release management
+
+Release Please owns package version changes, the release manifest,
+`CHANGELOG.md`, release tags, and GitHub releases. Conventional Commits on
+`main` supply its release inputs. Do not edit generated release artifacts
+manually.
+
+The Release Please workflow deliberately separates preparation from release:
+
+- a push to `main` creates or updates the release PR without tagging; and
+- a manual workflow dispatch creates the tag and GitHub release without
+  opening a release PR, but only after it verifies the repository is public
+  and the manifest version is already available from npm.
+
+Merge a release PR only after its version, changelog, package boundary, and CI
+are reviewed. Make the repository public, publish and verify that exact package
+version, then dispatch the workflow against `main` so a failed publication
+cannot leave a successful GitHub release behind.
+
+The initial manifest starts at `0.0.0`. The setup commit carries the one-time
+`Release-As: 0.1.0` input because the already-verified V0 package metadata is
+`0.1.0`. Before `1.0.0`, features bump the patch version and breaking changes
+bump the minor version.
