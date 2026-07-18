@@ -1,11 +1,9 @@
 # Domain Glossary
 
-This glossary defines the canonical language for the accepted statement-item
-row model in [ADR 0001](adr/0001-replace-dimensional-members-with-item-grouping.md).
-The current [semantic specification](semantic-spec.md) remains normative until
-the [statement-item-row refactor](plans/statement-item-row-refactor.md)
-incorporates the decision. The active plan records that temporary terminology
-drift.
+This glossary defines the canonical language for the current statement-item
+row model accepted by
+[ADR 0001](adr/0001-replace-dimensional-members-with-item-grouping.md). The
+[semantic specification](semantic-spec.md) owns normative artifact meaning.
 
 ## Artifact
 
@@ -69,8 +67,8 @@ taxonomy, or value coordinate.
 
 **Grouping value**:
 The nonempty string or `null` assigned to an item for one grouping column. It
-describes the item and never implies arithmetic, ordering, signs, or display
-behavior.
+describes the item and never implies arithmetic, hierarchy, ordering, signs,
+merged cells, or styling.
 _Avoid_: Dimension member, category entity
 
 ## Validation
@@ -101,8 +99,8 @@ Whether every rollup application agrees within the applicable unit tolerance.
 It is independent of structural conformance.
 
 **Calculation status**:
-The derived aggregate outcome: not run, not defined, consistent, or
-inconsistent. It is never stored as current document state.
+The derived aggregate outcome: `not-run`, `not-defined`, `consistent`, or
+`inconsistent`. It is never stored as current document state.
 
 **Validation result**:
 The current outcome produced by evaluating structural conformance and rollup

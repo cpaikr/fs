@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fs.example/schema/0.1/snapshot-diff.schema.json",
+  "$id": "https://cpaikr.github.io/fs/schema/0.1/snapshot-diff.schema.json",
   "title": "FS V0 validation snapshot diff",
   "oneOf": [
     {
@@ -29,7 +29,7 @@
       "properties": {
         "formatVersion": { "const": "0.1" },
         "status": { "enum": ["match", "mismatch"] },
-        "conformance": { "$ref": "#/$defs/statusComparison" },
+        "conformance": { "$ref": "#/$defs/conformanceComparison" },
         "calculations": { "$ref": "#/$defs/calculationComparison" },
         "applications": {
           "type": "array",
@@ -39,7 +39,7 @@
     }
   ],
   "$defs": {
-    "statusComparison": {
+    "conformanceComparison": {
       "type": "object",
       "additionalProperties": false,
       "required": ["recorded", "current"],
@@ -53,8 +53,8 @@
       "additionalProperties": false,
       "required": ["recorded", "current"],
       "properties": {
-        "recorded": { "enum": ["not-run", "not-defined", "not-evaluated", "consistent", "inconsistent"] },
-        "current": { "enum": ["not-run", "not-defined", "not-evaluated", "consistent", "inconsistent"] }
+        "recorded": { "enum": ["not-run", "not-defined", "consistent", "inconsistent"] },
+        "current": { "enum": ["not-run", "not-defined", "consistent", "inconsistent"] }
       }
     },
     "unchangedOrChanged": {

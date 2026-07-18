@@ -6,11 +6,11 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 echo "Linting Markdown"
-npx --yes markdownlint-cli2@0.18.1 '**/*.md' '#node_modules' '#dist'
+pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist'
 
 echo "Checking Markdown links"
 while IFS= read -r -d '' document; do
-  npx --yes markdown-link-check@3.13.7 \
+  pnpm exec markdown-link-check \
     --quiet \
     --config scripts/markdown-link-check.json \
     "$document"
@@ -23,15 +23,18 @@ done < <(
 
 echo "Checking maintained CLI content"
 node scripts/render-guide.mjs --check-installed
+node scripts/render-guide.mjs --check-readme
 node scripts/render-guide.mjs --check-skill
-npx_guide="$(node scripts/render-guide.mjs --npx-version 0.1.0)"
+package_name="$(node -p 'require("./package.json").name')"
+package_version="$(node -p 'require("./package.json").version')"
+npx_guide="$(node scripts/render-guide.mjs --npx-version "$package_version")"
 for expected_command in \
   'schema document' \
   'example' \
   'example minimal' \
   'validate candidate.json' \
   'create --output statement.fs.json candidate.json'; do
-  if [[ "$npx_guide" != *"npx -y @cpai/fs@0.1.0 $expected_command"* ]]; then
+  if [[ "$npx_guide" != *"npx -y $package_name@$package_version $expected_command"* ]]; then
     echo "Pinned npx guide rendering lost an expected command" >&2
     exit 1
   fi
@@ -51,7 +54,7 @@ if [[ "$npx_guide" == *'{{'* ]]; then
 fi
 node scripts/render-guide.mjs --npx-version 1.0.0+build.1 >/dev/null
 skill_guide="$(node scripts/render-guide.mjs --skill-version 1.0.0+build.1)"
-if [[ "$skill_guide" != *'This Skill is based on `@cpai/fs` version `1.0.0+build.1`.'* ]]; then
+if [[ "$skill_guide" != *"This Skill uses \`$package_name@1.0.0+build.1\`."* ]]; then
   echo "Agent Skill rendering lost its package-version basis" >&2
   exit 1
 fi
@@ -75,7 +78,25 @@ find . \
   -name '*.json' -print0 \
   | xargs -0 jq empty
 
-ajv=(npx --yes ajv-cli@5.0.0 validate --spec=draft2020)
+schema_base='https://cpaikr.github.io/fs/schema/0.1'
+for schema_name in fs-document validation-result snapshot-diff; do
+  jq -e --arg id "$schema_base/$schema_name.schema.json" \
+    '."$id" == $id' "schema/$schema_name.schema.json" >/dev/null
+done
+jq -e --arg id "$schema_base/fs-document.schema.json" '
+  .properties."$schema".const == $id and
+  (.required | index("$schema") == null)
+' schema/fs-document.schema.json >/dev/null
+jq -e --arg id "$schema_base/fs-document.schema.json" \
+  '."$schema" == $id' examples/manufacturing-group.json >/dev/null
+jq -e 'has("$schema") | not' examples/minimal.json >/dev/null
+jq -e 'has("$id") | not' fixtures/cli/case.schema.json >/dev/null
+if rg -n 'https://fs\.example' .; then
+  echo "Repository contains an unresolved placeholder schema identifier" >&2
+  exit 1
+fi
+
+ajv=(pnpm exec ajv validate --spec=draft2020)
 
 echo "Checking fixture manifest"
 jq -e '
@@ -86,7 +107,6 @@ jq -e '
     ((.document | type) == "string") and
     ((.document | length) > 0) and
     ((.calculationStatus == "not-defined") or
-      (.calculationStatus == "not-evaluated") or
       (.calculationStatus == "consistent") or
       (.calculationStatus == "inconsistent"))) and
   all(.invalidDocuments[];
@@ -100,7 +120,9 @@ jq -e '
   (([.validDocuments[].document] | length) ==
     ([.validDocuments[].document] | unique | length)) and
   (([.invalidDocuments[].document] | length) ==
-    ([.invalidDocuments[].document] | unique | length))
+    ([.invalidDocuments[].document] | unique | length)) and
+  ([.validDocuments[].document] == ([.validDocuments[].document] | sort)) and
+  ([.invalidDocuments[].document] == ([.invalidDocuments[].document] | sort))
 ' fixtures/manifest.json >/dev/null
 
 temporary_directory="$(mktemp -d "${TMPDIR:-/tmp}/fs-docs.XXXXXX")"
@@ -257,5 +279,36 @@ echo "Validating expected results"
   -s schema/snapshot-diff.schema.json \
   -r schema/fs-document.schema.json \
   -d 'fixtures/snapshot-diffs/*.json'
+
+echo "Checking stable application identities"
+for result in fixtures/calculation-results/*.json; do
+  jq -e '
+    [.calculations.applications[].key |
+      [.statement, .parent, .period] | @json] as $keys |
+    ($keys | length) == ($keys | unique | length)
+  ' "$result" >/dev/null
+done
+
+for document in examples/*.json fixtures/valid/*.json \
+  fixtures/cli/expected/record-validation/*.json; do
+  jq -e '
+    [.validationSnapshot.applications[]?.key |
+      [.statement, .parent, .period] | @json] as $keys |
+    ($keys | length) == ($keys | unique | length)
+  ' "$document" >/dev/null
+done
+
+for diff in fixtures/snapshot-diffs/*.json; do
+  jq -e '
+    all(.applications[]?;
+      if .change == "unchanged" or .change == "changed"
+      then .recorded.key == .current.key
+      else true
+      end) and
+    ([.applications[]? | (.recorded.key? // .current.key) |
+      [.statement, .parent, .period] | @json] as $keys |
+      ($keys | length) == ($keys | unique | length))
+  ' "$diff" >/dev/null
+done
 
 echo "Documentation checks passed"

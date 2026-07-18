@@ -1,19 +1,14 @@
 # CLI Acceptance Fixtures
 
-These cases remain executable evidence for the current `0.1` contract. Their
-artifact-sensitive inputs and outputs change only through the coordinated
-[Roadmap step-10 refactor](../../docs/plans/statement-item-row-refactor.md).
+These fixtures provide executable evidence for the current `0.1` statement-row
+process contract in the
+[CLI acceptance contract](../../docs/cli/acceptance.md). That contract owns
+observable behavior; the descriptors and manifest own its maintained process
+evidence.
 
-These fixtures provide executable evidence for the observable process contract
-in the [CLI acceptance contract](../../docs/cli/acceptance.md). The contract is
-authoritative for target behavior. The
-[completed step-9 plan](../../docs/plans/agent-guidance-snapshots-rendering.md)
-records its delivery state and validation.
-
-The checked-in suite retains the pre-migration domain, content, logging, and
-filesystem evidence while encoding the Effect-native grammar, help, built-in,
-and usage-presentation contract. The completed plan records the implementation
-evidence that satisfies it.
+Artifact inputs and expected results are referenced from their owning trees so
+the CLI suite exercises the same statement rows, rollups, snapshots, schemas,
+examples, and generated guidance as the language-neutral contract evidence.
 
 ## Layout
 
@@ -31,9 +26,12 @@ inside the repository and resolve to regular files.
 ## Target Protocol
 
 The harness invokes `command` with the exact `arguments` array and no shell.
-It creates a fresh workspace and fixed empty home, copies `workspace` entries,
-supplies optional exact standard-input bytes, and fixes locale, timezone,
-non-interactive terminal state, and disabled color.
+It creates a fresh workspace and fixed empty home, copies or deterministically
+generates `workspace` entries, supplies optional exact or generated
+standard-input bytes, and fixes locale, timezone, non-interactive terminal
+state, and disabled color. A case may replace `process.cwd` with a throwing
+boundary before importing the installed executable to prove behavior when the
+current directory is unavailable consistently across supported platforms.
 
 Standard output supports three comparisons:
 
@@ -68,30 +66,36 @@ Black-box descriptors cannot prove injected I/O order, commit races, crash
 atomicity, platform permission faults, or global log redaction. Retained
 integration tests own those guarantees.
 
-## Required Coverage
+## Maintained Coverage
 
-The revised suite keeps these domain and operational cases:
+The suite keeps these domain and operational boundaries:
 
 - validation by path and standard input, every calculation aggregate,
   snapshot match and mismatch, structural failures, invalid snapshots,
   malformed input, trailing content, duplicate members, unsafe scale, and
   missing input;
+- bounded file and standard-input reads, iterative JSON nesting and value
+  limits, bounded diagnostic fanout and bytes, stable redacted limit results,
+  and existing-output precedence over oversized candidate input;
+- current-directory-independent native help, discovery, bundled schema access,
+  and standard-input validation, plus the stable relative-path failure when the
+  current directory is unavailable;
 - deterministic discovery and exact installed guide, schema, example, and
   created-document bytes, including generated validation snapshots that
   revalidate as snapshot matches, plus deterministic standalone HTML from the
-  flat presentation model;
+  statement-row presentation model;
 - silent and enabled logging, thresholds, bounded failure context, and I/O
   invariance; and
 - atomic no-overwrite behavior, missing parents, write failures, existing
   destinations, commit races, and invalid-input/existing-output precedence.
 
-The revised grammar and native presentation coverage requires:
+Grammar and native-presentation coverage includes:
 
 - semantic top-level and per-command help, representative `-h` aliases, exact
   installed version identity, and nonempty completions for every documented
   shell;
-- exact-one operand descriptions containing `Exactly one` to clarify
-  beta.98's native variadic ellipsis without weakening runtime cardinality;
+- exact-one operand descriptions containing `Exactly one` to clarify the pinned
+  CLI's native variadic ellipsis without weakening runtime cardinality;
 - native help on standard output, a native diagnostic on standard error, and
   exit code `2` for missing or extra operands, unknown commands, unknown flags,
   unknown command values, and invalid log levels;
@@ -102,8 +106,5 @@ The revised grammar and native presentation coverage requires:
 - native action short-circuiting without application I/O, without fixing
   precedence among combined action flags or valueless completions behavior.
 
-The migration removes the old unsupported-format and artifact-version cases,
-converts rejected version and completion cases into successes, replaces exact
-help assets with semantic assertions, and removes invalid-syntax-plus-help
-precedence guarantees. It retains the existing artifact, validation, content,
-logging, and filesystem evidence rather than recreating those matrices.
+The manifest is the exact case inventory. This guide describes responsibilities
+and matcher behavior without duplicating that volatile list.

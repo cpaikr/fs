@@ -2,27 +2,25 @@
 
 Status: Accepted.
 
-Rendering needs an explicit finite-output contract regardless of whether FS
-migrates from the current dimensional contract to the statement-row model
-accepted by
-[ADR 0001](0001-replace-dimensional-members-with-item-grouping.md). This ADR
-remains independent so the data-model and operational decisions can be
-accepted or revised separately.
+Rendering needs an explicit finite-output contract. This ADR was accepted
+alongside the migration to the statement-row model in
+[ADR 0001](0001-replace-dimensional-members-with-item-grouping.md) and remains
+independent so the data-model and operational decisions can be revised
+separately.
 
 The [CLI acceptance contract](../cli/acceptance.md) incorporates this decision
-for the current renderer. The same budgets remain invariant across the planned
-statement-row refactor unless a later accepted decision changes them.
+for the current renderer. The budgets change only through a later accepted
+decision.
 
 ## Context
 
-The current renderer eagerly constructs the Cartesian product of statement
-axes. Thirty axes with two members each imply 1,073,741,824 data columns. A
-small conforming input can therefore exhaust memory before the CLI can return a
-controlled error.
+The pre-refactor renderer eagerly constructed the Cartesian product of
+statement axes. Thirty axes with two members each implied 1,073,741,824 data
+columns, so a small conforming input could exhaust memory before the CLI
+returned a controlled error.
 
-HTML also restricts `colspan` to 1,000. In the current renderer, a heading row
-spans one label column plus every data column, so 1,000 data columns produce the
-invalid value `colspan="1001"`. See the
+HTML also restricts `colspan` to 1,000. The pre-refactor renderer used a
+whole-row heading whose span could exceed that limit. See the
 [WHATWG table-cell attribute contract](https://html.spec.whatwg.org/multipage/tables.html#attributes-common-to-td-and-th-elements).
 
 Streaming addresses peak buffering but cannot make inherently enormous output
@@ -38,18 +36,17 @@ limit:
   and other non-data columns; and
 - at most 100,000 logical table-grid slots across the document.
 
-A data column contains a financial value; the row-label column is not a data
-column. In the current model, data columns are the period and selected-axis
-intersections. In the accepted row model, they are the statement's periods.
-Because the current layout has one label column, the total-column limit permits
-at most 999 data columns.
+A data column contains a financial value; item, unit, and grouping metadata
+columns are not data columns. In the current row model, data columns are the
+statement's periods. Because every table has an item-label column, the
+total-column limit permits at most 999 period columns; optional unit and
+grouping columns reduce that maximum.
 
 A logical grid slot is one row-column intersection after spans are expanded.
-For the current renderer, a statement with `C` data columns and `R` body rows
-uses `(C + 1) * (R + 1)` slots: one label column, one header row, and `R` body
-rows. A cell spanning a complete row consumes `C + 1` logical slots even if it
-is one HTML element. A future renderer that adds visible columns or rows must
-count their occupied intersections by the same rule.
+For the current renderer, a statement with `C` total columns and `R` body rows
+uses `C * (R + 1)` slots: one header row and `R` item rows. A future renderer
+that adds visible columns, rows, or spans must count their occupied
+intersections by the same rule.
 
 After structural preflight, rendering may build the result only in a bounded
 sink. It rejects final UTF-8 HTML larger than 16 MiB (16,777,216 bytes),
@@ -65,16 +62,16 @@ Any of these violations returns:
 - no output file; and
 - no automated help suggestion.
 
-The CLI acceptance contract must define this error's precedence relative to
-other render failures when the ADR is accepted. Arithmetic overflow while
-computing a count is itself over-limit; it must not wrap, allocate, or require
-the exact expanded count to be representable.
+The CLI acceptance contract defines this error's precedence relative to other
+render failures. Arithmetic overflow while computing a count is itself
+over-limit; it must not wrap, allocate, or require the exact expanded count to
+be representable.
 
 ## Consequences
 
-- The 1,000-total-column limit keeps a whole-row heading span within HTML's
-  maximum; the current label-column layout leaves 999 period or period/member
-  data columns.
+- The 1,000-total-column limit bounds table width and remains compatible with
+  HTML's maximum `colspan`; the required item-label column leaves at most 999
+  period columns.
 - The grid budget bounds work even when many individually narrow statements or
   many rows would produce excessive output.
 - The byte budget covers long labels and markup that cell counts cannot bound.

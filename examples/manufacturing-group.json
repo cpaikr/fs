@@ -1,41 +1,15 @@
 {
+  "$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json",
   "formatVersion": "0.1",
-  "documentId": "acme-manufacturing-2025",
+  "documentId": "manufacturing-group-2025",
   "entity": {
-    "id": "acme-manufacturing",
-    "name": "ACME Manufacturing Group"
+    "id": "example-group",
+    "name": "Example Manufacturing Group"
   },
   "scope": {
     "id": "consolidated",
-    "label": "Consolidated group"
+    "label": "Consolidated financial statements"
   },
-  "items": [
-    { "id": "revenue", "label": "Revenue" },
-    { "id": "cost-of-sales", "label": "Cost of sales" },
-    { "id": "gross-profit", "label": "Gross profit" },
-    { "id": "operating-expenses", "label": "Operating expenses" },
-    { "id": "net-income", "label": "Net income" },
-    { "id": "cash", "label": "Cash and cash equivalents" },
-    { "id": "inventory", "label": "Inventory" },
-    { "id": "other-assets", "label": "Other assets" },
-    { "id": "total-assets", "label": "Total assets" },
-    { "id": "liabilities", "label": "Liabilities" },
-    { "id": "equity", "label": "Equity" },
-    { "id": "liabilities-and-equity", "label": "Liabilities and equity" },
-    { "id": "operating-cash-flow", "label": "Operating cash flow" },
-    { "id": "investing-cash-flow", "label": "Investing cash flow" },
-    { "id": "financing-cash-flow", "label": "Financing cash flow" },
-    { "id": "net-cash-movement", "label": "Net change in cash" },
-    { "id": "direct-materials", "label": "Direct materials" },
-    { "id": "direct-labor", "label": "Direct labor" },
-    { "id": "factory-overhead", "label": "Factory overhead" },
-    { "id": "manufacturing-cost", "label": "Total manufacturing cost" },
-    { "id": "opening-equity", "label": "Opening balance" },
-    { "id": "owner-contributions", "label": "Owner contributions" },
-    { "id": "equity-profit", "label": "Profit for the period" },
-    { "id": "dividends", "label": "Dividends" },
-    { "id": "closing-equity", "label": "Closing balance" }
-  ],
   "units": [
     {
       "id": "krw-millions",
@@ -45,294 +19,418 @@
       "defaultTolerance": "0"
     },
     {
-      "id": "percentage",
-      "label": "Percent",
-      "measure": "pure",
-      "scale": -2
+      "id": "krw-per-share",
+      "label": "KRW per share",
+      "measure": "KRW/share",
+      "scale": 0
     }
   ],
   "periods": [
-    { "id": "at-2023-12-31", "kind": "instant", "date": "2023-12-31" },
-    { "id": "at-2024-12-31", "kind": "instant", "date": "2024-12-31" },
-    { "id": "at-2025-03-31", "kind": "instant", "date": "2025-03-31" },
-    { "id": "at-2025-06-30", "kind": "instant", "date": "2025-06-30" },
-    { "id": "at-2025-12-31", "kind": "instant", "date": "2025-12-31" },
-    { "id": "at-2026-12-31", "kind": "instant", "date": "2026-12-31" },
-    { "id": "fy2023", "kind": "duration", "start": "2023-01-01", "end": "2023-12-31" },
-    { "id": "fy2024", "kind": "duration", "start": "2024-01-01", "end": "2024-12-31" },
-    { "id": "q4-2024", "kind": "duration", "start": "2024-10-01", "end": "2024-12-31" },
-    { "id": "fy2025", "kind": "duration", "start": "2025-01-01", "end": "2025-12-31" },
-    { "id": "q1-2025", "kind": "duration", "start": "2025-01-01", "end": "2025-03-31" },
-    { "id": "q2-2025", "kind": "duration", "start": "2025-04-01", "end": "2025-06-30" },
-    { "id": "ytd-h1-2025", "kind": "duration", "start": "2025-01-01", "end": "2025-06-30" },
-    { "id": "fy2026", "kind": "duration", "start": "2026-01-01", "end": "2026-12-31" },
-    { "id": "fy2028", "kind": "duration", "start": "2028-01-01", "end": "2028-12-31" }
-  ],
-  "dimensions": [
     {
-      "id": "equity-component",
-      "label": "Equity component",
-      "members": [
-        { "id": "share-capital", "label": "Share capital" },
-        { "id": "retained-earnings", "label": "Retained earnings" },
-        { "id": "treasury-shares", "label": "Treasury shares" }
-      ]
+      "id": "fy2025",
+      "kind": "duration",
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    },
+    {
+      "id": "fy2024",
+      "kind": "duration",
+      "start": "2024-01-01",
+      "end": "2024-12-31"
+    },
+    {
+      "id": "at-2025",
+      "kind": "instant",
+      "date": "2025-12-31"
+    },
+    {
+      "id": "at-2024",
+      "kind": "instant",
+      "date": "2024-12-31"
     }
   ],
-  "facts": [
-    { "item": "revenue", "period": "fy2024", "unit": "krw-millions", "value": "1200" },
-    { "item": "cost-of-sales", "period": "fy2024", "unit": "krw-millions", "value": "-800" },
-    { "item": "gross-profit", "period": "fy2024", "unit": "krw-millions", "value": "400" },
-    { "item": "operating-expenses", "period": "fy2024", "unit": "krw-millions", "value": "-250.25" },
-    { "item": "net-income", "period": "fy2024", "unit": "krw-millions", "value": "149.75" },
-    { "item": "revenue", "period": "fy2025", "unit": "krw-millions", "value": "1250.5" },
-    { "item": "cost-of-sales", "period": "fy2025", "unit": "krw-millions", "value": "-850.5" },
-    { "item": "gross-profit", "period": "fy2025", "unit": "krw-millions", "value": "410" },
-    { "item": "operating-expenses", "period": "fy2025", "unit": "krw-millions", "value": "-260" },
-    { "item": "net-income", "period": "fy2025", "unit": "krw-millions", "value": "150" },
-
-    { "item": "cash", "period": "at-2023-12-31", "unit": "krw-millions", "value": "100" },
-    { "item": "cash", "period": "at-2024-12-31", "unit": "krw-millions", "value": "130" },
-    { "item": "cash", "period": "at-2025-03-31", "unit": "krw-millions", "value": "140" },
-    { "item": "cash", "period": "at-2025-06-30", "unit": "krw-millions", "value": "145" },
-    { "item": "cash", "period": "at-2025-12-31", "unit": "krw-millions", "value": "150" },
-    { "item": "cash", "period": "at-2026-12-31", "unit": "krw-millions", "value": "165" },
-    { "item": "inventory", "period": "at-2024-12-31", "unit": "krw-millions", "value": "300" },
-    { "item": "inventory", "period": "at-2025-12-31", "unit": "krw-millions", "unavailable": true },
-    { "item": "other-assets", "period": "at-2024-12-31", "unit": "krw-millions", "value": "570" },
-    { "item": "other-assets", "period": "at-2025-12-31", "unit": "krw-millions", "value": "600" },
-    { "item": "total-assets", "period": "at-2024-12-31", "unit": "krw-millions", "value": "1000" },
-    { "item": "total-assets", "period": "at-2025-12-31", "unit": "krw-millions", "value": "1050" },
-    { "item": "liabilities", "period": "at-2024-12-31", "unit": "krw-millions", "value": "550" },
-    { "item": "liabilities", "period": "at-2025-12-31", "unit": "krw-millions", "value": "570" },
-    { "item": "equity", "period": "at-2024-12-31", "unit": "krw-millions", "value": "450" },
-    { "item": "equity", "period": "at-2025-12-31", "unit": "krw-millions", "value": "480" },
-    { "item": "liabilities-and-equity", "period": "at-2024-12-31", "unit": "krw-millions", "value": "1000" },
-    { "item": "liabilities-and-equity", "period": "at-2025-12-31", "unit": "krw-millions", "value": "1050" },
-
-    { "item": "operating-cash-flow", "period": "fy2024", "unit": "krw-millions", "value": "160" },
-    { "item": "investing-cash-flow", "period": "fy2024", "unit": "krw-millions", "value": "-100" },
-    { "item": "financing-cash-flow", "period": "fy2024", "unit": "krw-millions", "value": "-30" },
-    { "item": "operating-cash-flow", "period": "fy2025", "unit": "krw-millions", "value": "180" },
-    { "item": "investing-cash-flow", "period": "fy2025", "unit": "krw-millions", "value": "-120" },
-    { "item": "financing-cash-flow", "period": "fy2025", "unit": "krw-millions", "value": "-40" },
-    { "item": "net-cash-movement", "period": "fy2024", "unit": "krw-millions", "value": "30" },
-    { "item": "net-cash-movement", "period": "q2-2025", "unit": "krw-millions", "value": "5" },
-    { "item": "net-cash-movement", "period": "fy2025", "unit": "krw-millions", "value": "20" },
-    { "item": "net-cash-movement", "period": "fy2026", "unit": "krw-millions", "value": "15" },
-
-    { "item": "direct-materials", "period": "fy2024", "unit": "krw-millions", "value": "400" },
-    { "item": "direct-labor", "period": "fy2024", "unit": "krw-millions", "value": "200" },
-    { "item": "factory-overhead", "period": "fy2024", "unit": "krw-millions", "value": "100" },
-    { "item": "manufacturing-cost", "period": "fy2024", "unit": "krw-millions", "value": "700" },
-    { "item": "direct-materials", "period": "fy2025", "unit": "krw-millions", "value": "420" },
-    { "item": "direct-labor", "period": "fy2025", "unit": "krw-millions", "value": "210" },
-    { "item": "factory-overhead", "period": "fy2025", "unit": "krw-millions", "value": "0" },
-    { "item": "manufacturing-cost", "period": "fy2025", "unit": "krw-millions", "value": "630" },
-
-    { "item": "opening-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "180" },
-    { "item": "owner-contributions", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "20" },
-    { "item": "equity-profit", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "0" },
-    { "item": "dividends", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "0" },
-    { "item": "closing-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "200" },
-    { "item": "opening-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "200" },
-    { "item": "owner-contributions", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "0" },
-    { "item": "equity-profit", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "149.75" },
-    { "item": "dividends", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "-99.75" },
-    { "item": "closing-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "250" },
-    { "item": "opening-equity", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "200" },
-    { "item": "owner-contributions", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "30" },
-    { "item": "equity-profit", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "0" },
-    { "item": "dividends", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "0" },
-    { "item": "closing-equity", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "share-capital" }, "value": "230" },
-    { "item": "opening-equity", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "250" },
-    { "item": "owner-contributions", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "0" },
-    { "item": "equity-profit", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "150" },
-    { "item": "dividends", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "-120" },
-    { "item": "closing-equity", "period": "fy2025", "unit": "krw-millions", "dimensions": { "equity-component": "retained-earnings" }, "value": "280" },
-    { "item": "opening-equity", "period": "fy2024", "unit": "krw-millions", "dimensions": { "equity-component": "treasury-shares" }, "unavailable": true }
+  "groupingColumns": [
+    "majorGroup",
+    "valuation"
   ],
   "statements": [
     {
-      "id": "income-statement",
-      "label": "Income statement",
-      "unit": "krw-millions",
-      "periods": ["fy2025", "fy2024"],
-      "entries": [
-        { "type": "heading", "label": "Operations" },
-        { "type": "item", "item": "revenue" },
-        { "type": "item", "item": "cost-of-sales" },
-        { "type": "item", "item": "gross-profit" },
-        { "type": "item", "item": "operating-expenses" },
-        { "type": "item", "item": "net-income" }
+      "id": "balance-sheet",
+      "label": "Balance sheet",
+      "periods": [
+        "at-2025",
+        "at-2024"
+      ],
+      "items": [
+        {
+          "id": "cash",
+          "label": "Cash",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "400",
+            "at-2024": "350"
+          },
+          "rollupTo": "assets",
+          "groupings": {
+            "majorGroup": "Assets",
+            "valuation": "Cash"
+          }
+        },
+        {
+          "id": "inventory",
+          "label": "Inventory",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "600",
+            "at-2024": "550"
+          },
+          "rollupTo": "assets",
+          "groupings": {
+            "majorGroup": "Assets",
+            "valuation": "NWC"
+          }
+        },
+        {
+          "id": "assets",
+          "label": "Total assets",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "1000",
+            "at-2024": "900"
+          },
+          "groupings": {
+            "majorGroup": "Assets",
+            "valuation": null
+          }
+        },
+        {
+          "id": "liabilities",
+          "label": "Liabilities",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "450",
+            "at-2024": "400"
+          },
+          "rollupTo": "liabilities-and-equity",
+          "groupings": {
+            "majorGroup": "Liabilities and equity",
+            "valuation": "Debt"
+          }
+        },
+        {
+          "id": "equity",
+          "label": "Equity",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "550",
+            "at-2024": "500"
+          },
+          "rollupTo": "liabilities-and-equity",
+          "groupings": {
+            "majorGroup": "Liabilities and equity",
+            "valuation": "Equity"
+          }
+        },
+        {
+          "id": "liabilities-and-equity",
+          "label": "Liabilities and equity",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "1000",
+            "at-2024": "900"
+          },
+          "groupings": {
+            "majorGroup": "Liabilities and equity",
+            "valuation": null
+          }
+        }
       ]
     },
     {
-      "id": "balance-sheet",
-      "label": "Balance sheet",
-      "unit": "krw-millions",
-      "periods": ["at-2025-12-31", "at-2024-12-31"],
-      "entries": [
-        { "type": "heading", "label": "Assets" },
-        { "type": "item", "item": "cash" },
-        { "type": "item", "item": "inventory" },
-        { "type": "item", "item": "other-assets" },
-        { "type": "item", "item": "total-assets" },
-        { "type": "heading", "label": "Liabilities and equity" },
-        { "type": "item", "item": "liabilities" },
-        { "type": "item", "item": "equity" },
-        { "type": "item", "item": "liabilities-and-equity" }
+      "id": "income-statement",
+      "label": "Income statement",
+      "periods": [
+        "fy2025",
+        "fy2024"
+      ],
+      "items": [
+        {
+          "id": "product-revenue",
+          "label": "Product revenue",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "60",
+            "fy2024": "50"
+          },
+          "rollupTo": "revenue",
+          "groupings": {
+            "majorGroup": "Revenue",
+            "valuation": "Revenue"
+          }
+        },
+        {
+          "id": "service-revenue",
+          "label": "Service revenue",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "40",
+            "fy2024": "30"
+          },
+          "rollupTo": "revenue",
+          "groupings": {
+            "majorGroup": "Revenue",
+            "valuation": "Revenue"
+          }
+        },
+        {
+          "id": "revenue",
+          "label": "Revenue",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "100",
+            "fy2024": "80"
+          },
+          "rollupTo": "gross-profit",
+          "groupings": {
+            "majorGroup": "Revenue",
+            "valuation": "Revenue"
+          }
+        },
+        {
+          "id": "materials",
+          "label": "Materials",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "-35",
+            "fy2024": "-30"
+          },
+          "rollupTo": "cost-of-sales",
+          "groupings": {
+            "majorGroup": "Cost of sales",
+            "valuation": null
+          }
+        },
+        {
+          "id": "labor",
+          "label": "Labor",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "-25",
+            "fy2024": "-20"
+          },
+          "rollupTo": "cost-of-sales",
+          "groupings": {
+            "majorGroup": "Cost of sales",
+            "valuation": null
+          }
+        },
+        {
+          "id": "cost-of-sales",
+          "label": "Cost of sales",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "-60",
+            "fy2024": "-50"
+          },
+          "rollupTo": "gross-profit",
+          "groupings": {
+            "majorGroup": "Cost of sales",
+            "valuation": null
+          }
+        },
+        {
+          "id": "gross-profit",
+          "label": "Gross profit",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "41",
+            "fy2024": "30"
+          },
+          "groupings": {
+            "majorGroup": "Profit",
+            "valuation": "EBITDA"
+          }
+        },
+        {
+          "id": "basic-eps",
+          "label": "Basic EPS",
+          "unit": "krw-per-share",
+          "values": {
+            "fy2025": "1250",
+            "fy2024": {
+              "unavailable": true
+            }
+          },
+          "groupings": {
+            "majorGroup": "Per share",
+            "valuation": "EPS"
+          }
+        }
       ]
     },
     {
       "id": "cash-flow-statement",
       "label": "Cash flow statement",
-      "unit": "krw-millions",
-      "periods": ["fy2025", "fy2024"],
-      "entries": [
-        { "type": "item", "item": "net-income", "label": "Net income (shared fact)" },
-        { "type": "item", "item": "operating-cash-flow" },
-        { "type": "item", "item": "investing-cash-flow" },
-        { "type": "item", "item": "financing-cash-flow" },
-        { "type": "item", "item": "net-cash-movement" }
+      "periods": [
+        "fy2025",
+        "fy2024"
+      ],
+      "items": [
+        {
+          "id": "operating",
+          "label": "Operating cash flow",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "30",
+            "fy2024": "25"
+          },
+          "rollupTo": "net-cash-flow",
+          "groupings": {
+            "majorGroup": "Cash flow",
+            "valuation": null
+          }
+        },
+        {
+          "id": "investing",
+          "label": "Investing cash flow",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "-10",
+            "fy2024": "-8"
+          },
+          "rollupTo": "net-cash-flow",
+          "groupings": {
+            "majorGroup": "Cash flow",
+            "valuation": null
+          }
+        },
+        {
+          "id": "financing",
+          "label": "Financing cash flow",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "0",
+            "fy2024": "-2"
+          },
+          "rollupTo": "net-cash-flow",
+          "groupings": {
+            "majorGroup": "Cash flow",
+            "valuation": null
+          }
+        },
+        {
+          "id": "net-cash-flow",
+          "label": "Net cash flow",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "20",
+            "fy2024": "15"
+          },
+          "groupings": {
+            "majorGroup": "Cash flow",
+            "valuation": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "equity-statement",
+      "label": "Statement of changes in equity",
+      "periods": [
+        "at-2025",
+        "at-2024"
+      ],
+      "items": [
+        {
+          "id": "share-capital",
+          "label": "Share capital",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "200",
+            "at-2024": "180"
+          },
+          "rollupTo": "total-equity",
+          "groupings": {
+            "majorGroup": "Equity",
+            "valuation": "Equity"
+          }
+        },
+        {
+          "id": "retained-earnings",
+          "label": "Retained earnings",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "350",
+            "at-2024": "320"
+          },
+          "rollupTo": "total-equity",
+          "groupings": {
+            "majorGroup": "Equity",
+            "valuation": "Equity"
+          }
+        },
+        {
+          "id": "total-equity",
+          "label": "Total equity",
+          "unit": "krw-millions",
+          "values": {
+            "at-2025": "550",
+            "at-2024": "500"
+          },
+          "groupings": {
+            "majorGroup": "Equity",
+            "valuation": "Equity"
+          }
+        }
       ]
     },
     {
       "id": "manufacturing-statement",
       "label": "Manufacturing cost statement",
-      "unit": "krw-millions",
-      "periods": ["fy2025", "fy2024"],
-      "entries": [
-        { "type": "item", "item": "direct-materials" },
-        { "type": "item", "item": "direct-labor" },
-        { "type": "item", "item": "factory-overhead" },
-        { "type": "item", "item": "manufacturing-cost" }
-      ]
-    },
-    {
-      "id": "changes-in-equity",
-      "label": "Statement of changes in equity",
-      "unit": "krw-millions",
-      "periods": ["fy2025", "fy2024"],
-      "dimensions": [
+      "periods": [
+        "fy2025",
+        "fy2024"
+      ],
+      "items": [
         {
-          "dimension": "equity-component",
-          "members": ["share-capital", "retained-earnings", "treasury-shares"]
-        }
-      ],
-      "entries": [
-        { "type": "item", "item": "opening-equity" },
-        { "type": "item", "item": "owner-contributions" },
-        { "type": "item", "item": "equity-profit" },
-        { "type": "item", "item": "dividends" },
-        { "type": "item", "item": "closing-equity" }
-      ]
-    }
-  ],
-  "calculationRules": [
-    {
-      "id": "gross-profit-subtotal",
-      "kind": "samePeriod",
-      "unit": "krw-millions",
-      "target": { "item": "gross-profit" },
-      "terms": [
-        { "coefficient": "1", "item": "revenue" },
-        { "coefficient": "1", "item": "cost-of-sales" }
-      ],
-      "scope": { "periods": ["fy2024", "fy2025"] },
-      "tolerance": "0.1"
-    },
-    {
-      "id": "manufacturing-cost-subtotal",
-      "kind": "samePeriod",
-      "unit": "krw-millions",
-      "target": { "item": "manufacturing-cost" },
-      "terms": [
-        { "coefficient": "1", "item": "direct-materials" },
-        { "coefficient": "1", "item": "direct-labor" },
-        { "coefficient": "1", "item": "factory-overhead" }
-      ],
-      "scope": { "periods": ["fy2024", "fy2025"] }
-    },
-    {
-      "id": "liabilities-and-equity-subtotal",
-      "kind": "samePeriod",
-      "unit": "krw-millions",
-      "target": { "item": "liabilities-and-equity" },
-      "terms": [
-        { "coefficient": "1", "item": "liabilities" },
-        { "coefficient": "1", "item": "equity" }
-      ],
-      "scope": { "periods": ["at-2024-12-31", "at-2025-12-31"] }
-    },
-    {
-      "id": "equity-component-rollup",
-      "kind": "samePeriod",
-      "unit": "krw-millions",
-      "target": { "item": "closing-equity" },
-      "terms": [
-        { "coefficient": "1", "item": "opening-equity" },
-        { "coefficient": "1", "item": "owner-contributions" },
-        { "coefficient": "1", "item": "equity-profit" },
-        { "coefficient": "1", "item": "dividends" }
-      ],
-      "scope": {
-        "periods": ["fy2024", "fy2025"],
-        "dimensions": [
-          { "equity-component": "share-capital" },
-          { "equity-component": "retained-earnings" }
-        ]
-      }
-    },
-    {
-      "id": "cash-flow-subtotal",
-      "kind": "samePeriod",
-      "unit": "krw-millions",
-      "target": { "item": "net-cash-movement" },
-      "terms": [
-        { "coefficient": "1", "item": "operating-cash-flow" },
-        { "coefficient": "1", "item": "investing-cash-flow" },
-        { "coefficient": "1", "item": "financing-cash-flow" }
-      ],
-      "scope": { "periods": ["fy2024", "fy2025"] }
-    },
-    {
-      "id": "cash-roll-forward",
-      "kind": "rollForward",
-      "unit": "krw-millions",
-      "balance": { "item": "cash" },
-      "movements": [
-        { "coefficient": "1", "item": "net-cash-movement" }
-      ],
-      "scope": {
-        "periods": ["fy2023", "fy2024", "q4-2024", "fy2025", "q1-2025", "q2-2025", "ytd-h1-2025", "fy2026", "fy2028"]
-      }
-    },
-    {
-      "id": "net-income-reconciliation",
-      "kind": "assertion",
-      "target": {
-        "item": "net-income",
-        "period": "fy2025",
-        "unit": "krw-millions"
-      },
-      "terms": [
-        {
-          "coefficient": "1",
-          "fact": {
-            "item": "equity-profit",
-            "period": "fy2025",
-            "unit": "krw-millions",
-            "dimensions": { "equity-component": "share-capital" }
+          "id": "materials",
+          "label": "Materials",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "35",
+            "fy2024": "30"
+          },
+          "rollupTo": "manufacturing-cost",
+          "groupings": {
+            "majorGroup": "Manufacturing",
+            "valuation": null
           }
         },
         {
-          "coefficient": "1",
-          "fact": {
-            "item": "equity-profit",
-            "period": "fy2025",
-            "unit": "krw-millions",
-            "dimensions": { "equity-component": "retained-earnings" }
+          "id": "labor",
+          "label": "Labor",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "25",
+            "fy2024": "20"
+          },
+          "rollupTo": "manufacturing-cost",
+          "groupings": {
+            "majorGroup": "Manufacturing",
+            "valuation": null
+          }
+        },
+        {
+          "id": "manufacturing-cost",
+          "label": "Manufacturing cost",
+          "unit": "krw-millions",
+          "values": {
+            "fy2025": "60",
+            "fy2024": "50"
+          },
+          "groupings": {
+            "majorGroup": "Manufacturing",
+            "valuation": null
           }
         }
       ]

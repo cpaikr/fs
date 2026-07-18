@@ -3,7 +3,7 @@
   "command": "fs",
   "arguments": ["record-validation", "--output", "recorded.json", "-"],
   "workspace": [],
-  "stdin": { "file": "../valid/no-calculation-rules.json" },
+  "stdin": { "file": "../valid/no-rollups.json" },
   "expect": {
     "stdout": {
       "encoding": "json",
@@ -16,7 +16,7 @@
       ],
       "arrays": [{ "pointer": "/snapshotDiff/applications", "equals": 0 }],
       "equalities": [
-        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rules.json" } },
+        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rollups.json" } },
         { "pointer": "/snapshotDiff/formatVersion", "equals": "0.1" },
         { "pointer": "/snapshotDiff/status", "equals": "match" },
         { "pointer": "/snapshotDiff/conformance/recorded", "equals": "conforming" },
@@ -34,7 +34,7 @@
     "filesystem": {
       "workspace": {
         "created": [
-          { "path": "recorded.json", "equalsFile": "expected/record-validation/no-rules.json" }
+          { "path": "recorded.json", "equalsFile": "expected/record-validation/no-rollups.json" }
         ],
         "unchanged": [],
         "absent": []

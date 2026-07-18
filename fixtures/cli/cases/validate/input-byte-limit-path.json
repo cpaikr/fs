@@ -1,0 +1,36 @@
+{
+  "id": "validate-input-byte-limit-path",
+  "command": "fs",
+  "arguments": ["validate", "input.json"],
+  "workspace": [
+    {
+      "generated": [{ "utf8": " ", "count": 16777217 }],
+      "to": "input.json"
+    }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path", "budget", "limit"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "validate" },
+        { "pointer": "/error/code", "equals": "input-limit-exceeded" },
+        { "pointer": "/error/path", "equals": "input.json" },
+        { "pointer": "/error/budget", "equals": "input-bytes" },
+        { "pointer": "/error/limit", "equals": 16777216 },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["input.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

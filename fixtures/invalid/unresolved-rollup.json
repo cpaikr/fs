@@ -1,0 +1,46 @@
+{
+  "formatVersion": "0.1",
+  "entity": {
+    "name": "Example Entity"
+  },
+  "scope": {
+    "label": "Consolidated financial statements"
+  },
+  "units": [
+    {
+      "id": "usd",
+      "label": "USD",
+      "measure": "USD",
+      "scale": 0
+    }
+  ],
+  "periods": [
+    {
+      "id": "fy2025",
+      "kind": "duration",
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    }
+  ],
+  "statements": [
+    {
+      "id": "statement",
+      "label": "Statement",
+      "periods": [
+        "fy2025"
+      ],
+      "items": [
+        {
+          "id": "child",
+          "label": "Child",
+          "unit": "usd",
+          "values": {
+            "fy2025": "1"
+          },
+          "groupings": {},
+          "rollupTo": "unknown"
+        }
+      ]
+    }
+  ]
+}

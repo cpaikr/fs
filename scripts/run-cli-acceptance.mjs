@@ -6,14 +6,17 @@ import {
   mkdtempSync,
   readFileSync,
   readdirSync,
-  rmSync
+  rmSync,
+  writeFileSync
 } from "node:fs"
 import { isDeepStrictEqual } from "node:util"
 import { tmpdir } from "node:os"
 import { dirname, join, resolve, sep } from "node:path"
+import { pathToFileURL } from "node:url"
 
 const fixtureRoot = resolve("fixtures/cli")
 const manifest = JSON.parse(readFileSync(join(fixtureRoot, "manifest.json"), "utf8"))
+const packageName = JSON.parse(readFileSync("package.json", "utf8")).name
 const pattern = process.env.FS_CASE_PATTERN ? new RegExp(process.env.FS_CASE_PATTERN) : null
 const selectedCases = manifest.cases.filter((path) => {
   if (pattern === null) return true
@@ -54,6 +57,15 @@ const pointerValue = (value, pointer) => {
 }
 
 const readJson = (path) => JSON.parse(readFileSync(path, "utf8"))
+
+const generatedBytes = (segments) =>
+  Buffer.from(segments.map(({ utf8, count }) => utf8.repeat(count)).join(""), "utf8")
+
+const sourceBytes = (source) => {
+  if (source.file) return readFileSync(repositoryFile(source.file))
+  if (source.utf8 !== undefined) return Buffer.from(source.utf8, "utf8")
+  return generatedBytes(source.generated)
+}
 
 const expectedEquality = (equality) => {
   if (Object.hasOwn(equality, "equals")) return equality.equals
@@ -253,7 +265,7 @@ try {
     installRoot,
     join(temporaryRoot, filename)
   ])
-  const entrypoint = join(installRoot, "node_modules", "@cpai", "fs", "dist", "bin.js")
+  const entrypoint = join(installRoot, "node_modules", ...packageName.split("/"), "dist", "bin.js")
 
   const failures = []
   for (const casePath of selectedCases) {
@@ -266,15 +278,15 @@ try {
     for (const staged of descriptor.workspace) {
       const destination = join(workspace, staged.to)
       mkdirSync(dirname(destination), { recursive: true })
-      cpSync(repositoryFile(staged.copy), destination)
+      if (staged.copy !== undefined) {
+        cpSync(repositoryFile(staged.copy), destination)
+      } else {
+        writeFileSync(destination, generatedBytes(staged.generated))
+      }
     }
     const workspaceBefore = walkTree(workspace)
     const homeBefore = walkTree(home)
-    const stdin = descriptor.stdin === null
-      ? Buffer.alloc(0)
-      : descriptor.stdin.file
-        ? readFileSync(repositoryFile(descriptor.stdin.file))
-        : Buffer.from(descriptor.stdin.utf8, "utf8")
+    const stdin = descriptor.stdin === null ? Buffer.alloc(0) : sourceBytes(descriptor.stdin)
     const environment = {
       ...process.env,
       HOME: home,
@@ -288,7 +300,22 @@ try {
     }
     delete environment.NODE_OPTIONS
 
-    const observed = spawn.sync(process.execPath, [entrypoint, ...descriptor.arguments], {
+    let invokedEntrypoint = entrypoint
+    if (descriptor.workingDirectory === "unavailable") {
+      invokedEntrypoint = join(caseRoot, "cwd-unavailable.mjs")
+      const unavailable = [
+        "process.cwd = () => {",
+        "  const error = new Error('sensitive unavailable working directory detail')",
+        "  error.code = 'ENOENT'",
+        "  throw error",
+        "}",
+        `await import(${JSON.stringify(pathToFileURL(entrypoint).href)})`,
+        ""
+      ].join("\n")
+      writeFileSync(invokedEntrypoint, unavailable)
+    }
+
+    const observed = spawn.sync(process.execPath, [invokedEntrypoint, ...descriptor.arguments], {
       cwd: workspace,
       env: environment,
       input: stdin,

@@ -14,7 +14,7 @@
         { "pointer": "/output", "equals": ["status", "path"] }
       ],
       "equalities": [
-        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rules.json" } },
+        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rollups.json" } },
         { "pointer": "/snapshotDiff", "equalsFile": { "file": "../snapshot-diffs/not-recorded.json" } },
         { "pointer": "/output/status", "equals": "created" },
         { "pointer": "/output/path", "equals": "report.html" },

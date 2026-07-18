@@ -1,0 +1,104 @@
+{
+  "id": "validate-snapshot-prefix-property",
+  "command": "fs",
+  "arguments": ["validate", "input.json"],
+  "workspace": [
+    {
+      "copy": "../invalid/validation-snapshot-prefix-property.json",
+      "to": "input.json"
+    }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "help"] },
+        {
+          "pointer": "/validation",
+          "equals": ["formatVersion", "conformance", "calculations"]
+        },
+        {
+          "pointer": "/validation/conformance",
+          "equals": ["status", "errors"]
+        },
+        {
+          "pointer": "/validation/conformance/errors/0",
+          "equals": ["code", "path", "message"]
+        },
+        {
+          "pointer": "/validation/calculations",
+          "equals": ["status", "applications"]
+        },
+        {
+          "pointer": "/snapshotDiff",
+          "equals": ["formatVersion", "status", "conformance", "calculations", "applications"]
+        },
+        {
+          "pointer": "/snapshotDiff/conformance",
+          "equals": ["recorded", "current"]
+        },
+        {
+          "pointer": "/snapshotDiff/calculations",
+          "equals": ["recorded", "current"]
+        },
+        {
+          "pointer": "/snapshotDiff/applications/0",
+          "equals": ["change", "recorded"]
+        }
+      ],
+      "arrays": [
+        { "pointer": "/validation/conformance/errors", "equals": 1 },
+        { "pointer": "/validation/calculations/applications", "equals": 0 },
+        { "pointer": "/snapshotDiff/applications", "equals": 1 }
+      ],
+      "equalities": [
+        { "pointer": "/validation/formatVersion", "equals": "0.1" },
+        { "pointer": "/validation/conformance/status", "equals": "nonconforming" },
+        {
+          "pointer": "/validation/conformance/errors/0/code",
+          "equalsSelected": {
+            "file": "../manifest.json",
+            "arrayPointer": "/invalidDocuments",
+            "wherePointer": "/document",
+            "whereEquals": "invalid/validation-snapshot-prefix-property.json",
+            "valuePointer": "/code"
+          }
+        },
+        {
+          "pointer": "/validation/conformance/errors/0/path",
+          "equalsSelected": {
+            "file": "../manifest.json",
+            "arrayPointer": "/invalidDocuments",
+            "wherePointer": "/document",
+            "whereEquals": "invalid/validation-snapshot-prefix-property.json",
+            "valuePointer": "/path"
+          }
+        },
+        { "pointer": "/validation/calculations/status", "equals": "not-run" },
+        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.1" },
+        { "pointer": "/snapshotDiff/status", "equals": "mismatch" },
+        { "pointer": "/snapshotDiff/conformance/recorded", "equals": "conforming" },
+        { "pointer": "/snapshotDiff/conformance/current", "equals": "nonconforming" },
+        { "pointer": "/snapshotDiff/calculations/recorded", "equals": "consistent" },
+        { "pointer": "/snapshotDiff/calculations/current", "equals": "not-run" },
+        { "pointer": "/snapshotDiff/applications/0/change", "equals": "removed" },
+        {
+          "pointer": "/snapshotDiff/applications/0/recorded",
+          "equalsFile": {
+            "file": "../valid/recorded-snapshot.json",
+            "pointer": "/validationSnapshot/applications/0"
+          }
+        },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/validation/conformance/errors/0/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["input.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

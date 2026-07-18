@@ -1,15 +1,13 @@
 # CLI Design
 
-This design describes the current CLI and `0.1` artifact behavior. The accepted
-statement-item-row model changes artifact-dependent validation, snapshots,
-examples, and rendering only after the
-[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates the
-owning contracts and executable evidence.
+This design describes the CLI for the current `0.1` statement-item-row
+contract. The CLI projects the document contract without adding a second data
+model.
 
 The CLI is the packaged reference consumer and authoring aid for complete FS
-documents. The
-[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
-records Roadmap step 9 implementation and validation.
+documents. This design does not attest to implementation or release
+availability. Verify implementation in source and the built package; use the
+[active release plan](../plans/v0-release-candidate.md) for live release status.
 
 ## Boundary
 
@@ -24,9 +22,11 @@ source material, choose item meanings, prescribe statement contents, infer
 values, convert units, or repair financial ambiguity.
 
 The [semantic specification](../semantic-spec.md) defines artifact behavior,
-the [authoring guide](../authoring.md) defines the document-encoding workflow,
-and the [acceptance contract](acceptance.md) defines exact process behavior.
-Schemas and fixtures provide machine-readable evidence for those contracts.
+the [authoring policy](../authoring.md) defines the financial-decision boundary,
+the [portable workflow](../../content/guide/authoring.md.template) defines the
+exact create-and-repair procedure, and the
+[acceptance contract](acceptance.md) defines exact process behavior. Schemas
+and fixtures provide machine-readable evidence for those contracts.
 
 Canonical FS documents, schemas, and examples remain JSON. Structured V0
 operation results and operational errors also use JSON. Framework help,
@@ -52,7 +52,7 @@ Help includes command descriptions, required operands, accepted flags,
 choices, defaults, subcommands, and examples. That semantic inventory is the
 contract; formatter wording, spacing, and section layout are not independent
 product content. Exact-one operand descriptions begin with `Exactly one` even
-when the pinned beta's consume-all refinement causes native usage to show a
+when the pinned CLI's consume-all refinement causes native usage to show a
 variadic ellipsis; that formatter detail never relaxes runtime cardinality.
 Version, completions, and help are non-interactive action flags and may
 complete without running ordinary command validation or a command handler.
@@ -65,6 +65,48 @@ Logging is silent by default and never changes standard output, exit status,
 ordering, or filesystem effects. When enabled, it emits bounded deterministic
 JSON Lines diagnostics without document contents, raw dependency errors,
 causes, stack traces, timestamps, or runtime identifiers.
+
+## Operational Boundaries
+
+The public CLI treats every document input as untrusted. Finite V0 budgets
+bound raw input, JSON nesting and value counts, nonconforming diagnostic work,
+encoded diagnostics, and exact-decimal work without changing artifact
+conformance. The [acceptance contract](acceptance.md#operational-errors) owns
+the exact thresholds, counting rules, stable results, and precedence.
+
+The byte boundary is enforced while reading, before UTF-8 decoding, and stops
+at the first excess byte. JSON nesting and value budgets are enforced by a
+non-recursive scanner before materialization. A larger document receives a
+fast conformance pass: conforming input continues normally, while
+nonconforming input is refused before complete diagnostic generation. Complete
+structural diagnostics remain deterministic within their value and
+encoded-byte budgets. Decimal budgets run after schema conformance and before
+semantic snapshot or rollup arithmetic. When another structural error prevents
+whole-document conformance, snapshot decimals are still bounded before a
+schema-valid snapshot is compared. A limit failure is an operational refusal,
+not evidence that the same document is nonconforming for another FS
+implementation.
+
+These limits retain substantial headroom over the maintained corpus while
+bounding measured adversarial costs on every supported Node.js line.
+Supported-runtime measurements found recursive descent failing at different
+depths, schema diagnostic fanout amplifying a compact invalid input into tens
+of megabytes of output, and large exact-decimal cancellation changing work
+materially with author order. The selected boundaries avoid those
+runtime-dependent failure regions while preserving large conforming documents
+and making valid child order cost-stable.
+
+Native help, version, and completion actions are parsed and completed without
+loading document-command implementation or acquiring application path context.
+Root discovery and pathless bundled content do the same. Standard input and
+absolute paths also require no current directory. A relative input or output
+path acquires the current directory lazily; if it is unavailable, the operation
+returns the stable working-directory failure instead of exposing a Node error.
+
+V0 is CLI-only. Supported package entry points are the `fs` executable,
+packaged assets exposed through commands, and the explicitly allowed
+`./package.json` metadata entry. Implementation modules are private package
+internals, not a JavaScript or TypeScript library API.
 
 ## Command Surface
 
@@ -80,22 +122,20 @@ document identity from filenames.
 
 ### `fs guide authoring`
 
-Present the prerequisites, artifact workflow, refusal to infer missing
-financial decisions, and validation loop from the
-[authoring guide](../authoring.md). The installed command and Agent Skill must
-be generated or checked from one maintained source so their guidance cannot
+Implement the prerequisites and decision boundaries in the
+[authoring policy](../authoring.md). The installed command and Agent Skill are
+generated from one portable source so their exact operational procedure cannot
 drift.
 
 The [portable template](../../content/guide/authoring.md.template) is that
 source. Its [installed rendering](../../assets/guide/authoring.md) uses `fs`;
 the deterministic renderer accepts an exact package version and fixes the
-`npx -y @cpai/fs@<version>` prefix and visible version-basis note for Agent
+`npx -y @sjunepark/fs@<version>` prefix and visible version-basis note for Agent
 Skill generation.
 
-Generated routes and commands do not assume a repository checkout. Package
-publication remains release work. The guide routes to schemas, examples, and
-the semantic specification without embedding the whole contract in default
-agent context.
+Generated routes and commands do not assume a repository checkout. The guide
+routes to schemas, examples, and the semantic specification without embedding
+the whole contract in default agent context.
 
 ### `fs schema [--output <path>] <name>`
 
@@ -106,6 +146,12 @@ versions become available, add an explicit `--artifact-version` flag rather
 than overloading the CLI's global `--version` action. `fs --version` reports
 the CLI package version; any other placement the pinned parser happens to
 accept retains that global meaning and never selects schema content.
+
+Each bundled schema has its canonical public identifier under
+`https://cpaikr.github.io/fs/schema/0.1/`. Discovery remains offline and reads
+the bundled bytes; it does not fetch the canonical URL. The document schema
+permits an optional top-level `$schema` property only when it equals the
+document schema's identifier.
 
 Without `--output`, write the schema bytes directly. With `--output`, create
 exactly the requested new file and report that creation. Never overwrite or
@@ -121,19 +167,18 @@ form does not select a payload and therefore does not accept `--output`.
 Return the named example's exact bundled JSON or create an exact copy at the
 requested new path. Examples are illustrative documents, not partially
 completed statement templates. `manufacturing-group` is structurally
-conforming but deliberately calculation-inconsistent.
+conforming but deliberately rollup-inconsistent.
 
 ### `fs validate <document|->`
 
-Read a path or standard input (`-`) without modifying it and report structural
-conformance, current calculation status and applications, and comparison with
-an embedded validation snapshot.
+Read a path or standard input (`-`) within the published operational budgets
+without modifying it and report structural conformance, current rollup status
+and applications, and comparison with an embedded validation snapshot.
 
-Structural conformance and calculation consistency remain separate. A
-document with no rules reports `not-defined`; rules with no applicable
-evaluation report `not-evaluated`; calculation inconsistency and snapshot
-mismatch remain usable successful results. Structural nonconformance reports
-calculations as `not-run`.
+Structural conformance and rollup consistency remain separate. A
+document with no rollup parents reports `not-defined`; rollup inconsistency and
+snapshot mismatch remain usable successful results. Structural nonconformance
+reports calculations as `not-run`.
 
 No recorded snapshot is explicit. A present but structurally unusable snapshot
 produces snapshot-diff status `not-comparable` with reason
@@ -146,13 +191,13 @@ accepted encoding and its process contract exist.
 
 ### `fs create --output <document> <candidate|->`
 
-Validate a complete candidate and atomically copy its exact bytes to the
-requested new path. This is the authoring commit boundary, not a document
-generator.
+Validate a complete candidate within the published operational budgets and
+atomically copy its exact bytes to the requested new path. This is the
+authoring commit boundary, not a document generator.
 
 The command writes only a structurally conforming document, but may write one
-with inconsistent calculations. It never modifies the candidate, overwrites a
-destination, reserializes content, infers facts, fills totals, or changes
+with inconsistent rollups. It never modifies the candidate, overwrites a
+destination, reserializes content, infers values, fills totals, or changes
 financial meaning. An existing destination takes precedence over candidate
 validation and remains protected at commit time.
 
@@ -166,24 +211,27 @@ inconsistency may be recorded; structural nonconformance prevents writing.
 ### `fs render --output <html> <document|->`
 
 Produce a simple standalone HTML presentation at the requested new path.
-Rendering uses the flat presentation model and does not infer hierarchy,
-calculations, or missing facts. Checked structural budgets prevent unbounded
-table expansion before allocation, and a bounded sink rejects encoded HTML
-that exceeds the accepted finite-output policy.
+Rendering iterates statement-owned items directly. It presents grouping
+columns as flat metadata and identifies heterogeneous row units without
+inferring hierarchy, subtotal styling, calculations, or missing values.
+Checked structural budgets prevent unbounded tables before allocation, and a
+bounded sink rejects encoded HTML that exceeds the accepted finite-output
+policy.
 
 ## Commands Intentionally Absent
 
 - `fs init` does not create a blank document because the V0 contract requires
   meaningful nonempty content.
 - `add-account`, `add-row`, `set-cell`, `add-item`, and `add-fact` are not V0
-  commands. Field-by-field mutation creates transient invalid state and makes
-  poor use of an agent-facing interface.
+  commands. The row contract has no top-level fact target, and field-by-field
+  mutation creates transient invalid state and makes poor use of an
+  agent-facing interface.
 - Statement-type templates are absent because FS does not prescribe taxonomy
   or statement contents.
 - `import-xbrl`, `import-sec`, `from-csv`, and source mapping remain outside
   the product boundary.
 - `repair`, `fix`, `normalize`, `calculate`, and `fill-totals` are absent
-  because apparent corrections commonly require author judgment and rules
+  because apparent corrections commonly require author judgment and rollups
   never materialize values.
 
 If later evidence supports mutation, prefer one atomic batch change document
@@ -208,6 +256,9 @@ with validated, non-overwriting output over stateful commands.
   command-value validation. Only the documented action forms are contracted;
   a valueless completions flag and combined action flags are framework-owned
   unsupported workflows.
+- Native actions, root discovery, pathless bundled content, standard input,
+  and absolute paths do not require a current working directory. Only resolving
+  a relative input or output path may acquire it.
 - Result ordering is deterministic and empty or absent states are explicit.
 - Errors identify the operation and a concrete correction without exposing
   dependency output or internal failures.
@@ -229,13 +280,13 @@ loop. Static Skill guidance and `fs guide authoring` share one source.
 
 Publish the Skill from the repository's root `skills/` catalog. Installed CLI
 guidance uses `fs`. Generated Skill commands name an exact npm package version
-as `npx -y @cpai/fs@<version>` and state that version as their basis; package
-publication remains separate release work.
+as `npx -y @sjunepark/fs@<version>` and state that version as their basis. This
+is a generated-command reproducibility rule, not evidence of package
+availability.
 
-## Delivery
+## Implementation Evidence
 
-The
-[completed delivery plan](../plans/agent-guidance-snapshots-rendering.md)
-records the implementation phases and validation gates. The
-[completed V0 CLI plan](../plans/cli-v0.md) retains the selected runtime,
-package, dependency constraints, and step-8 validation evidence.
+The [development guide](../development.md) owns repository validation commands,
+and the [active release plan](../plans/v0-release-candidate.md) owns live status.
+Completed milestone plans linked from the [documentation index](../README.md)
+retain historical implementation decisions and gate evidence.

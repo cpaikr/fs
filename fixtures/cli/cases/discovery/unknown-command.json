@@ -3,7 +3,7 @@
   "command": "fs",
   "arguments": ["unknown"],
   "workspace": [
-    { "copy": "../valid/no-calculation-rules.json", "to": "unknown" }
+    { "copy": "../valid/no-rollups.json", "to": "unknown" }
   ],
   "stdin": null,
   "expect": {

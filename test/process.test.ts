@@ -5,20 +5,27 @@ import { join, resolve } from "node:path"
 
 import { describe, expect, it } from "vitest"
 
+import type { ContentWriteRequest, DocumentRequest } from "../src/application.js"
+import { executeContentWithIO } from "../src/content.js"
+import { inputLimits } from "../src/limits.js"
+import { nodeServices } from "../src/node-services.js"
+import { runPathless } from "../src/pathless.js"
 import {
   ApplicationIO,
   ApplicationIOError,
   execute,
-  type ApplicationIOService,
-  type ApplicationRequest
+  executeWithIO,
+  type ApplicationIOService
 } from "../src/process.js"
+import { renderHtml, renderLimits } from "../src/render.js"
+import type { Document, Item, Period } from "../src/validation/model.js"
 import { outputEntryExists, writeNewFile } from "../src/writer.js"
 
 const makeIO = (
   cwd: string,
   overrides: Partial<ApplicationIOService> = {}
 ): ApplicationIOService => ({
-  cwd,
+  cwd: Effect.succeed(cwd),
   readFile: (path) =>
     Effect.try({
       try: () => readFileSync(path),
@@ -36,13 +43,79 @@ const makeIO = (
 })
 
 const run = (
-  request: ApplicationRequest,
+  request: DocumentRequest,
   io: ApplicationIOService = makeIO(process.cwd())
-) => Effect.runSync(execute(request).pipe(Effect.provideService(ApplicationIO, io)))
+) => Effect.runSync(executeWithIO(request).pipe(
+  Effect.provideService(ApplicationIO, io),
+  Effect.provide(nodeServices)
+))
+
+const runContent = (
+  request: ContentWriteRequest,
+  io: ApplicationIOService
+) => Effect.runSync(executeContentWithIO(request).pipe(Effect.provideService(ApplicationIO, io)))
+
+const tableDocument = (periodCount: number, itemCount: number): Document => {
+  const periods: Array<Period> = []
+  const periodIds: Array<string> = []
+  const start = Date.UTC(2020, 0, 1)
+  for (let index = 0; index < periodCount; index += 1) {
+    const id = `p${index}`
+    periods.push({
+      id,
+      kind: "instant",
+      date: new Date(start + index * 86_400_000).toISOString().slice(0, 10)
+    })
+    periodIds.push(id)
+  }
+  const values = Object.fromEntries(periodIds.map((period) => [period, "1"]))
+  const items: Array<Item> = Array.from({ length: itemCount }, (_, index) => ({
+    id: `item${index}`,
+    label: `Item ${index}`,
+    unit: "usd",
+    values,
+    groupings: {}
+  }))
+  return {
+    formatVersion: "0.1",
+    entity: { name: "Process render boundary" },
+    scope: { label: "Rendering" },
+    units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],
+    periods,
+    statements: [{ id: "statement", label: "Statement", periods: periodIds, items }]
+  }
+}
+
+const exactByteDocument = (): Document => {
+  const document = JSON.parse(readFileSync(resolve("examples/minimal.json"), "utf8")) as Document
+  const statement = document.statements[0]
+  const first = statement?.items[0]
+  if (statement === undefined || first === undefined) throw new Error("Minimal fixture lost its first item")
+  const baselineDocument: Document = {
+    ...document,
+    entity: { ...document.entity, name: "x" },
+    statements: [{ ...statement, items: [{ ...first, label: "x" }] }]
+  }
+  const baseline = renderHtml(baselineDocument)
+  if (!baseline.ok) throw new Error("Minimal fixture unexpectedly exceeded a render budget")
+  const remaining = renderLimits.htmlBytes - baseline.bytes.length
+  return {
+    ...baselineDocument,
+    entity: {
+      ...baselineDocument.entity,
+      name: `x${"a".repeat(Math.floor(remaining / 2))}`
+    },
+    statements: [{
+      ...statement,
+      items: [{ ...first, label: `x${"a".repeat(remaining % 2)}` }]
+    }]
+  }
+}
 
 describe("application process boundary", () => {
   it("reports deterministic discovery without entering I/O", () => {
-    const result = run({ command: "fs" })
+    const result = runPathless({ command: "fs" })
+    if (result === undefined) throw new Error("Discovery lost its pathless result")
 
     expect(result.exitCode).toBe(0)
     expect(result.stderr).toEqual(Buffer.alloc(0))
@@ -55,11 +128,11 @@ describe("application process boundary", () => {
     const io = makeIO(process.cwd(), {
       writeFile: () => Effect.succeed("write-failed")
     })
-    const schema = run(
+    const schema = runContent(
       { command: "schema", name: "validation-result", output: "result.json" },
       io
     )
-    const example = run(
+    const example = runContent(
       { command: "example", name: "manufacturing-group", output: "result.json" },
       io
     )
@@ -70,6 +143,82 @@ describe("application process boundary", () => {
     expect(JSON.parse(example.stdout.toString("utf8"))).toMatchObject({
       help: [{ executable: "fs", arguments: ["example", "--output", "<new-path>", "manufacturing-group"] }]
     })
+  })
+
+  it("acquires a working directory only for relative paths", () => {
+    let cwdCalls = 0
+    const unavailable = makeIO(process.cwd(), {
+      cwd: Effect.sync(() => {
+        cwdCalls += 1
+      }).pipe(
+        Effect.flatMap(() => Effect.fail(new ApplicationIOError({ operation: "working-directory" })))
+      ),
+      readFile: () => Effect.succeed(readFileSync(resolve("examples/minimal.json"))),
+      readStdin: Effect.succeed(readFileSync(resolve("examples/minimal.json"))),
+      outputExists: () => Effect.succeed(false),
+      writeFile: () => Effect.succeed(null)
+    })
+
+    expect(run({ command: "validate", input: "-", logLevel: "none" }, unavailable).exitCode).toBe(0)
+    expect(run({
+      command: "validate",
+      input: resolve("examples/minimal.json"),
+      logLevel: "none"
+    }, unavailable).exitCode).toBe(0)
+    expect(run({
+      command: "create",
+      input: "-",
+      output: resolve("result.json")
+    }, unavailable).exitCode).toBe(0)
+    expect(runContent({
+      command: "schema",
+      name: "document",
+      output: resolve("schema.json")
+    }, unavailable).exitCode).toBe(0)
+    expect(cwdCalls).toBe(0)
+
+    const relative = run({ command: "validate", input: "input.json", logLevel: "none" }, unavailable)
+    expect(relative.exitCode).toBe(1)
+    expect(JSON.parse(relative.stdout.toString("utf8"))).toMatchObject({
+      error: { code: "working-directory-unavailable" },
+      help: []
+    })
+    expect(cwdCalls).toBe(1)
+  })
+
+  it("accepts an exact-limit file and rejects its first excess byte", () => {
+    const root = mkdtempSync(join(tmpdir(), "fs-input-limit-"))
+    const path = join(root, "input.json")
+    const runLive = () => Effect.runSync(execute({
+      command: "validate",
+      input: path,
+      logLevel: "none"
+    }).pipe(
+      Effect.provide(nodeServices)
+    ))
+    try {
+      writeFileSync(path, Buffer.concat([
+        Buffer.alloc(inputLimits.bytes - 2, 0x20),
+        Buffer.from("{}")
+      ]))
+      const exact = runLive()
+      expect(exact.exitCode).toBe(1)
+      expect(JSON.parse(exact.stdout.toString("utf8"))).toMatchObject({
+        validation: { conformance: { status: "nonconforming" } }
+      })
+
+      writeFileSync(path, Buffer.alloc(inputLimits.bytes + 1, 0x20))
+      const excess = runLive()
+      expect(JSON.parse(excess.stdout.toString("utf8"))).toMatchObject({
+        error: {
+          code: "input-limit-exceeded",
+          budget: "input-bytes",
+          limit: inputLimits.bytes
+        }
+      })
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 
   it.each(["validate", "create"] as const)("reads stdin exactly once for %s", (command) => {
@@ -107,7 +256,7 @@ describe("application process boundary", () => {
         makeIO(root, {
           readStdin: Effect.sync(() => {
             reads += 1
-            return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+            return readFileSync(resolve("fixtures/valid/no-rollups.json"))
           })
         })
       )
@@ -117,6 +266,44 @@ describe("application process boundary", () => {
     } finally {
       rmSync(root, { recursive: true, force: true })
     }
+  })
+
+  it("refuses to replace an internally contradictory snapshot", () => {
+    const calls: Array<string> = []
+    const result = run(
+      {
+        command: "record-validation",
+        input: "fixtures/invalid/contradictory-snapshot-application.json",
+        output: "recorded.json",
+        logLevel: "none"
+      },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.succeed(false),
+        writeFile: () => Effect.sync(() => {
+          calls.push("write")
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(1)
+    expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
+      validation: {
+        conformance: {
+          status: "nonconforming",
+          errors: [
+            {
+              code: "invalid-value",
+              path: "/validationSnapshot/applications/0"
+            }
+          ]
+        },
+        calculations: { status: "not-run", applications: [] }
+      },
+      snapshotDiff: { status: "not-comparable", reason: "invalid-snapshot" },
+      output: { status: "not-created", reason: "structural-nonconformance" }
+    })
+    expect(calls).toEqual([])
   })
 
   it("reads stdin exactly once when rendering", () => {
@@ -319,7 +506,7 @@ describe("application process boundary", () => {
         }),
         readStdin: Effect.sync(() => {
           calls.push("read")
-          return readFileSync(resolve("fixtures/valid/no-calculation-rules.json"))
+          return readFileSync(resolve("fixtures/valid/no-rollups.json"))
         }),
         writeFile: (_path, contents) => Effect.sync(() => {
           calls.push("write")
@@ -332,7 +519,7 @@ describe("application process boundary", () => {
     expect(result.exitCode).toBe(0)
     expect(calls).toEqual(["exists", "read", "write"])
     expect(written).toEqual(
-      readFileSync(resolve("fixtures/cli/expected/record-validation/no-rules.json"))
+      readFileSync(resolve("fixtures/cli/expected/record-validation/no-rollups.json"))
     )
   })
 
@@ -384,7 +571,7 @@ describe("application process boundary", () => {
         }),
         readStdin: Effect.sync(() => {
           calls.push("read")
-          return readFileSync(resolve("fixtures/invalid/unresolved-item.json"))
+          return readFileSync(resolve("fixtures/invalid/unresolved-rollup.json"))
         }),
         writeFile: () => Effect.sync(() => {
           calls.push("write")
@@ -400,15 +587,26 @@ describe("application process boundary", () => {
     expect(calls).toEqual(["exists", "read"])
   })
 
-  it("reports render limits after validation without writing output", () => {
+  it.each([
+    [
+      "columns",
+      () => readFileSync(resolve("fixtures/valid/render-column-limit-exceeded.json"))
+    ],
+    ["grid-slots", () => Buffer.from(JSON.stringify(tableDocument(99, 1_000)))],
+    [
+      "html-bytes",
+      () => {
+        const document = JSON.parse(readFileSync(resolve("examples/minimal.json"), "utf8")) as Document
+        return Buffer.from(JSON.stringify({
+          ...document,
+          entity: { ...document.entity, name: "&".repeat(Math.floor(renderLimits.htmlBytes / 10) + 1) }
+        }))
+      }
+    ]
+  ] as const)("reports the %s render limit after validation without writing output", (budget, input) => {
     const calls: Array<string> = []
     const result = run(
-      {
-        command: "render",
-        input: "-",
-        output: "result.html",
-        logLevel: "error"
-      },
+      { command: "render", input: "-", output: "result.html", logLevel: "error" },
       makeIO(process.cwd(), {
         outputExists: () => Effect.sync(() => {
           calls.push("exists")
@@ -416,7 +614,7 @@ describe("application process boundary", () => {
         }),
         readStdin: Effect.sync(() => {
           calls.push("read")
-          return readFileSync(resolve("fixtures/valid/render-column-limit-exceeded.json"))
+          return input()
         }),
         writeFile: () => Effect.sync(() => {
           calls.push("write")
@@ -427,17 +625,45 @@ describe("application process boundary", () => {
 
     expect(result.exitCode).toBe(1)
     expect(JSON.parse(result.stdout.toString("utf8"))).toMatchObject({
-      error: {
-        operation: "render",
-        code: "output-limit-exceeded",
-        path: "result.html"
-      },
+      error: { operation: "render", code: "output-limit-exceeded", path: "result.html" },
       help: []
     })
     expect(result.stderr.toString("utf8")).toContain(
-      '"code":"output-limit-exceeded","budget":"columns","limit":1000'
+      `"code":"output-limit-exceeded","budget":"${budget}"`
     )
     expect(calls).toEqual(["exists", "read"])
+  })
+
+  it.each([
+    ["columns", () => tableDocument(renderLimits.columns - 1, 1)],
+    ["grid-slots", () => tableDocument(99, 999)],
+    ["html-bytes", exactByteDocument]
+  ] as const)("writes successfully at the exact %s render boundary", (budget, input) => {
+    const calls: Array<string> = []
+    let written: Buffer<ArrayBufferLike> = Buffer.alloc(0)
+    const result = run(
+      { command: "render", input: "-", output: "result.html", logLevel: "none" },
+      makeIO(process.cwd(), {
+        outputExists: () => Effect.sync(() => {
+          calls.push("exists")
+          return false
+        }),
+        readStdin: Effect.sync(() => {
+          calls.push("read")
+          return Buffer.from(JSON.stringify(input()))
+        }),
+        writeFile: (_path, contents) => Effect.sync(() => {
+          calls.push("write")
+          written = contents
+          return null
+        })
+      })
+    )
+
+    expect(result.exitCode).toBe(0)
+    expect(calls).toEqual(["exists", "read", "write"])
+    expect(written.length).toBeGreaterThan(0)
+    if (budget === "html-bytes") expect(written).toHaveLength(renderLimits.htmlBytes)
   })
 
   it("contains unexpected application defects without leaking causes", () => {

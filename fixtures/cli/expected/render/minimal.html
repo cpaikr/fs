@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Example Entity — Separate financial statements</title>
+  <title>Example Entity — Consolidated financial statements</title>
   <style>
     :root { color-scheme: light; font-family: system-ui, sans-serif; }
     body { color: #1f2937; margin: 2rem; }
@@ -15,33 +15,32 @@
     .table-scroll { overflow-x: auto; }
     table { border-collapse: collapse; min-width: 100%; }
     th, td { border-bottom: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
-    th:first-child, td:first-child { text-align: left; }
+    th:first-child, td:first-child, .metadata { text-align: left; }
     thead th { border-bottom: 2px solid #6b7280; }
-    .heading { background: #f3f4f6; }
     .missing, .unavailable { color: #6b7280; font-style: italic; }
   </style>
 </head>
 <body>
   <header>
     <h1>Example Entity</h1>
-    <p class="scope">Separate financial statements</p>
+    <p class="scope">Consolidated financial statements</p>
   </header>
   <main>
     <section>
-      <h2>Statement of financial position</h2>
-      <p class="unit">Unit: US dollars · Measure: USD · Scale: 10<sup>0</sup></p>
+      <h2>Statement</h2>
+      <p class="unit">Unit: USD (USD, scale 0)</p>
       <div class="table-scroll">
         <table>
           <thead>
             <tr>
               <th scope="col">Item</th>
-              <th scope="col">2025-12-31</th>
+              <th scope="col">2025-01-01 – 2025-12-31</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th scope="row">Cash</th>
-              <td class="value">0</td>
+              <td class="value">1</td>
             </tr>
           </tbody>
         </table>

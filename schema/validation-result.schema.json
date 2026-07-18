@@ -1,44 +1,165 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fs.example/schema/0.1/validation-result.schema.json",
+  "$id": "https://cpaikr.github.io/fs/schema/0.1/validation-result.schema.json",
   "title": "FS V0 validation result",
   "type": "object",
   "additionalProperties": false,
   "required": ["formatVersion", "conformance", "calculations"],
   "properties": {
     "formatVersion": { "const": "0.1" },
-    "conformance": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["status", "errors"],
-      "properties": {
-        "status": { "enum": ["conforming", "nonconforming"] },
-        "errors": {
-          "type": "array",
-          "items": {
+    "conformance": { "$ref": "#/$defs/conformanceResult" },
+    "calculations": { "$ref": "#/$defs/calculationResult" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "conformance": {
             "type": "object",
-            "additionalProperties": false,
-            "required": ["code", "path", "message"],
+            "properties": { "status": { "const": "nonconforming" } },
+            "required": ["status"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "calculations": {
+            "type": "object",
+            "properties": { "status": { "const": "not-run" } },
+            "required": ["status"]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "calculations": {
+            "type": "object",
             "properties": {
-              "code": { "$ref": "fs-document.schema.json#/$defs/id" },
-              "path": { "type": "string" },
-              "message": { "type": "string", "minLength": 1 }
-            }
+              "status": { "enum": ["not-defined", "consistent", "inconsistent"] }
+            },
+            "required": ["status"]
           }
         }
       }
+    }
+  ],
+  "$defs": {
+    "diagnosticCode": {
+      "enum": [
+        "required-property",
+        "unknown-property",
+        "invalid-type",
+        "invalid-value",
+        "decimal-string-required",
+        "invalid-tolerance",
+        "scale-out-of-range",
+        "duplicate-id",
+        "duplicate-reference",
+        "duplicate-period-definition",
+        "invalid-date",
+        "invalid-duration",
+        "unresolved-reference",
+        "map-key-mismatch",
+        "self-rollup",
+        "cyclic-rollup",
+        "unit-mismatch",
+        "duplicate-application-key"
+      ]
     },
-    "calculations": {
+    "structuralError": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "applications"],
+      "required": ["code", "path", "message"],
       "properties": {
-        "status": { "enum": ["not-run", "not-defined", "not-evaluated", "consistent", "inconsistent"] },
-        "applications": {
-          "type": "array",
-          "items": { "$ref": "fs-document.schema.json#/$defs/applicationResult" }
-        }
+        "code": { "$ref": "#/$defs/diagnosticCode" },
+        "path": { "type": "string", "pattern": "^(?:/(?:[^~/]|~[01])*)*$" },
+        "message": { "type": "string", "minLength": 1 }
       }
+    },
+    "conformanceResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "errors"],
+          "properties": {
+            "status": { "const": "conforming" },
+            "errors": { "type": "array", "maxItems": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "errors"],
+          "properties": {
+            "status": { "const": "nonconforming" },
+            "errors": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#/$defs/structuralError" }
+            }
+          }
+        }
+      ]
+    },
+    "calculationResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "applications"],
+          "properties": {
+            "status": { "const": "not-run" },
+            "applications": { "type": "array", "maxItems": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "applications"],
+          "properties": {
+            "status": { "const": "not-defined" },
+            "applications": { "type": "array", "maxItems": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "applications"],
+          "properties": {
+            "status": { "const": "consistent" },
+            "applications": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "fs-document.schema.json#/$defs/satisfiedApplication"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "applications"],
+          "properties": {
+            "status": { "const": "inconsistent" },
+            "applications": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "fs-document.schema.json#/$defs/applicationResult"
+              },
+              "contains": {
+                "oneOf": [
+                  { "$ref": "fs-document.schema.json#/$defs/unsatisfiedApplication" },
+                  { "$ref": "fs-document.schema.json#/$defs/errorApplication" }
+                ]
+              },
+              "minContains": 1
+            }
+          }
+        }
+      ]
     }
   }
 }

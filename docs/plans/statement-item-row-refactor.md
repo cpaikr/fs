@@ -1,129 +1,146 @@
-# Statement Item Row Refactor Plan
+# Statement Item Row Refactor Delivery Record
 
-Status: Ready. Roadmap step 10 is planned; no contract or implementation
-cutover has started.
+Status: Complete. Roadmap step 10 is implemented and verified.
 
-This file is the concise milestone index and the only owner of live progress,
-temporary drift, blockers, and the next action. Stable phase scope and gates
-live in the linked child plans. The
-[semantic specification](../semantic-spec.md) owns current artifact meaning,
-the [CLI acceptance contract](../cli/acceptance.md) owns observable process
-behavior, and [ADR 0001](../adr/0001-replace-dimensional-members-with-item-grouping.md)
-owns the accepted replacement decision.
+This record owns the durable delivery evidence for replacing the dimensional
+artifact model. The [semantic specification](../semantic-spec.md) owns current
+artifact meaning, the [CLI acceptance contract](../cli/acceptance.md) owns
+observable process behavior, and
+[ADR 0001](../adr/0001-replace-dimensional-members-with-item-grouping.md) owns
+the accepted replacement decision.
 
 ## Milestone
 
-Replace the current item/fact/dimension/member contract with statement-owned
-item rows using nested `values` and `groupings` maps and optional additive
-`rollupTo` relationships. Replace the contract and implementation directly;
-do not add dual schemas, legacy-document readers, normalizers, or compatibility
-aliases.
+Roadmap step 10 replaced top-level items, facts, dimensions, members,
+coordinates, shared presentation entries, and general calculation rules with
+statement-owned item rows. Each item carries nested `values` and `groupings`
+maps and may declare one additive `rollupTo` relationship.
 
-The milestone includes normative contracts, schemas, examples, fixtures,
-validation, snapshots, rendering, generated authoring guidance, CLI evidence,
-and package verification. It stops before Roadmap step 11 schema publication,
-cross-platform release verification, version publication, and npm release.
+The cutover changed the normative contracts, schemas, examples, fixtures,
+validation, calculations, snapshots, rendering, generated authoring guidance,
+CLI evidence, and packed package together. It deliberately introduced no dual
+schema, legacy-document reader, normalizer, feature flag, or compatibility
+alias.
 
-## Fixed Decisions
+## Fixed decisions
 
-- Statements own ordered items and their values; there are no top-level items
-  or facts.
-- Every item has fixed level-one fields, with required `values` and `groupings`
-  maps nested within it.
-- `groupingColumns` declares custom grouping keys without defining schemes,
-  categories, hierarchies, or arithmetic.
-- Different items in one statement may use different units. A rollup parent
-  and all direct children must use the same unit.
-- `rollupTo` is the only arithmetic relationship. Parent subtotal values stay
-  explicit and are validated rather than derived.
-- JSON remains canonical. Flat tables and TOON remain possible derived forms,
-  not parallel semantic contracts.
-- General calculations, roll-forwards, dimensions, members, shared facts,
-  presentation-only headings, and label overrides are removed rather than
+- Statements own ordered items and their values; item identifiers and rollup
+  references are statement-local.
+- Every item has fixed level-one fields and required `values` and `groupings`
+  maps whose keys exactly match the containing statement periods and document
+  grouping columns.
+- `groupingColumns` declares flat descriptive purposes without schemes,
+  categories, hierarchy, arithmetic, or value identity.
+- Item cells distinguish exact decimal strings, missing values, explicit
+  unavailability, and zero.
+- Different items in one statement may use different units. Every rollup edge
+  requires one exact shared unit identifier.
+- `rollupTo` is the only arithmetic relationship. Reported parent cells remain
+  explicit and are compared with their direct children using stored signs and
+  the parent unit's tolerance.
+- Application identity is `{statement, parent, period}`. Missing and
+  unavailable rollup cells use statement/item/period cell identities.
+- JSON remains canonical. Positional tables and TOON may be derived views, not
+  parallel semantic contracts.
+- General formulas, roll-forwards, dimensions, members, shared facts,
+  presentation-only headings, and label overrides were removed rather than
   emulated.
-- [ADR 0002](../adr/0002-bound-render-output.md) independently fixes finite
-  rendering budgets and the `output-limit-exceeded` process contract.
+- [ADR 0002](../adr/0002-bound-render-output.md) independently owns finite
+  rendering limits and the `output-limit-exceeded` policy.
 
-## Aggregate State
+The unreleased artifact retained `formatVersion: "0.1"` at the cutover because
+there was no released predecessor requiring compatibility. Subsequent schema
+publication work added the current canonical identifiers without changing the
+row model.
 
-| Phase | State | Detailed plan |
-| --- | --- | --- |
-| 0. Contract and remaining decisions | Not started | [Target contract](statement-item-row-refactor/phase-0-contract.md) |
-| 1. Schemas and contract evidence | Not started | [Schemas and evidence](statement-item-row-refactor/phase-1-schema-evidence.md) |
-| 2. Document model and structural validation | Not started | [Core validation](statement-item-row-refactor/phase-2-core-validation.md) |
-| 3. Rollups, results, and snapshots | Not started | [Rollups and snapshots](statement-item-row-refactor/phase-3-rollups-snapshots.md) |
-| 4. Rendering | Not started | [Rendering](statement-item-row-refactor/phase-4-rendering.md) |
-| 5. CLI, guidance, and package integration | Not started | [CLI and package](statement-item-row-refactor/phase-5-cli-package.md) |
-| 6. Legacy removal and final gate | Not started | [Final gate](statement-item-row-refactor/phase-6-final-gate.md) |
+## Delivery
 
-Phases 2–4 are ordered work packets within one runtime cutover. The shared
-`Document` type is consumed throughout validation, snapshots, rendering, and
-process orchestration, so those intermediate boundaries are not merge or
-release points. Keep the cutover on one branch and restore the full repository
-gate before Phase 5 closes. This is simpler and safer than creating a temporary
-compatibility interface solely to keep each internal packet independently
-green.
+### Contracts and machine-readable evidence
 
-## Current State
+The semantic specification, authoring guide, product scope, glossary, and CLI
+contracts were first rewritten around statement-owned items. They fixed exact
+cell states, map equality, mixed-unit rendering, rollup error applications,
+snapshot forms, deterministic ordering, and render-failure precedence before
+runtime changes began.
 
-The replacement shape and vocabulary are accepted. The decision ADR, product
-scope, glossary, roadmap, and this plan describe the target. All normative
-schemas, fixtures, examples, authoring and CLI contracts, and runtime code
-still implement format `0.1` and the dimensional fact model. No refactor code
-has been written.
+All three schemas and the complete example and fixture matrix were then
+replaced as one evidence set. The new cases cover exact map keys, wrong nested
+cell types, statement-local identifier reuse, unresolved and cyclic rollups,
+unit mismatches, nested direct-child subtotals, calculation cell errors, and
+the new snapshot identity. Raw malformed, trailing-content, duplicate-member,
+and noncanonical exact-copy inputs retained their process-level purposes.
 
-The completed step-9 renderer and snapshot implementation remain the verified
-baseline. Historical delivery evidence stays in the
-[completed step-9 plan](agent-guidance-snapshots-rendering.md) and must not be
-rewritten as refactor progress.
+### Runtime cutover
 
-Shared evidence is owned by the earliest phase that must consume it. Phase 1
-owns schema-valid expected JSON documents and the static integrity of
-artifact-sensitive CLI descriptors. Phase 3 owns runtime production and exact
-byte verification of recorded documents, Phase 4 owns exact HTML fixtures, and
-Phase 5 owns executable process integration and package verification. Later
-phases reuse rather than duplicate earlier evidence.
+The shared TypeScript document model and every direct consumer migrated on one
+branch rather than creating an intermediate compatibility interface:
 
-## Known Temporary Drift
+- structural validation now builds statement-local item registries, validates
+  exact nested maps, and checks rollup references, cycles, and units;
+- calculation discovers ordered direct children and evaluates every reported
+  parent for each selected statement period with exact decimal arithmetic;
+- snapshot comparison and recording use the statement-qualified application
+  key and closed status/application combinations;
+- rendering iterates statement, item, grouping-column, and period order
+  directly, distinguishes homogeneous and heterogeneous units, and keeps
+  grouping columns flat; and
+- process orchestration, generated guidance, discovery, acceptance evidence,
+  and packed-package smoke switched to the same row model without changing the
+  established logging or writer guarantees.
 
-- The product scope and glossary describe the accepted target while the
-  semantic specification, schemas, examples, fixtures, and implementation
-  still define the current fact-and-dimension contract.
-- ADR 0001 uses provisional `formatVersion: "0.2"`; Phase 0 must decide whether
-  the unreleased contract replaces `0.1` or advances the artifact version.
-- The exact serialized rollup-error payload, mixed-unit HTML presentation, and
-  grouping-column HTML visibility remain Phase-0 contract decisions.
+The renderer checks every statement's column budget before accumulating the
+document-wide grid budget, then enforces the encoded-byte limit through a
+bounded sink. Structural nonconformance still precedes render budgets, while
+calculation inconsistency and snapshot mismatch remain renderable.
 
-This drift is deliberate only while Roadmap step 10 is active. Do not update
-examples or fixtures piecemeal to make summaries appear current.
+### Legacy removal
 
-## Validation
+The final audit removed legacy runtime types, schemas, fixtures, diagnostic
+paths, generated guidance, and active-contract prose for dimensions, members,
+facts, coordinates, presentations, general rules, and obsolete calculation
+statuses. Uses of “member” that mean a JSON object member were intentionally
+retained.
 
-The pre-refactor baseline is the complete validation recorded by the
-[step-9 plan](agent-guidance-snapshots-rendering.md). The planning slice passes
-`./scripts/check-docs.sh` across Markdown, links, maintained CLI content, every
-manifest-listed CLI case, current schemas, examples, fixtures, and expected
-results. The accepted ADR example also parses as JSON and passes targeted checks
-for exact `values` and `groupings` keys, resolved units and rollups, mixed-unit
-statement evidence, and reported child sums. `git diff --check` passes. Fresh
-cross-contract review applied safe corrections. Follow-up review assigned each
-shared fixture to the earliest phase that consumes it and left no unresolved
-material finding.
+The migration used a reviewed contract slice followed by the coordinated
+machine/runtime cutover. Completed Roadmap step-9 evidence remained historical
+and was not rewritten as step-10 progress.
 
-## Blockers
+## Review findings closed during delivery
 
-None to beginning Phase 0. Its explicit decisions must be resolved before
-normative schemas or implementation change.
+Fresh reviews found and closed several cross-layer defects before completion:
 
-## Next Action
+- schema-union diagnostics no longer leak irrelevant alternatives, and typed
+  value cells are classified correctly;
+- contradictory recorded numeric applications make snapshots invalid and
+  block recording instead of being silently preserved;
+- snapshot status and application combinations, including mutable aliases,
+  are constrained in the TypeScript model;
+- render preflight reports column overflow before document-wide grid overflow
+  and process tests exercise every limit without entering the writer; and
+- installed-package smoke covers discovery, validation, exact creation,
+  snapshot recording, and rendering against the shared expected artifacts.
 
-Execute Phase 0 as a contract-only slice: settle the remaining serialized and
-rendering decisions, then rewrite the semantic, authoring, and affected CLI
-contracts before changing machine-readable artifacts.
+## Validation evidence
 
-## Completion
+At closure:
 
-Roadmap step 10 is complete only when every phase is complete, no unplanned
-legacy contract path remains, all generated and checked-in artifacts agree,
-the full validation gate passes, and the required code-review pass has no
-unresolved material finding. Release work remains Roadmap step 11.
+- every valid document and expected result passed its schema, every
+  semantic-invalid fixture first passed JSON Schema, and every schema-invalid
+  fixture failed at the intended layer;
+- the reference validator produced the language-neutral calculation and snapshot
+  fixtures with deterministic diagnostics and application ordering;
+- representative documents passed schema discovery, parsing, validation,
+  calculation, snapshot recording and comparison, rendering, exact creation,
+  CLI acceptance, and installed-package smoke;
+- writer crash and concurrency integration retained atomic no-overwrite
+  guarantees; and
+- `pnpm verify`, `./scripts/check-docs.sh`, `git diff --check`, and the required
+  final code-review pass completed without an unresolved material finding.
+
+No temporary drift or compatibility path remained at closure.
+
+## Subsequent work
+
+Release-candidate preparation was intentionally outside this refactor. Its
+current state, validation, and next action live only in the
+[V0 release candidate plan](v0-release-candidate.md).

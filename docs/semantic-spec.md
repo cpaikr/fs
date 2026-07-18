@@ -1,360 +1,447 @@
 # FS V0 Semantic Specification
 
-This specification remains the normative current `0.1` contract. The accepted
-[statement-item-row replacement](adr/0001-replace-dimensional-members-with-item-grouping.md)
-is not valid input until the coordinated
-[Roadmap step-10 refactor](plans/statement-item-row-refactor.md) replaces this
-document, schemas, fixtures, and implementation together.
-
-This specification defines the meaning of an FS document independently of any
-implementation language. The [JSON Schema](../schema/fs-document.schema.json)
-checks its JSON shape. Requirements in this document that concern uniqueness,
-references, dates, arithmetic, or ordering are additional structural or
-calculation semantics and remain normative even where JSON Schema cannot
+This specification defines the current `0.1` FS document contract independently
+of any implementation language. The
+[JSON Schema](../schema/fs-document.schema.json) enforces this JSON shape;
+requirements concerning uniqueness, references, dates, nested-map keys,
+rollups, snapshots, or ordering remain normative where JSON Schema cannot
 express them.
 
 The key words **MUST**, **MUST NOT**, **SHOULD**, and **MAY** are normative.
 
-## 1. Artifact boundary
+## 1. Artifact boundary and closed grammar
 
 An FS document is one JSON object describing exactly one reporting entity and
-one reporting scope. It MAY contain many periods, facts, statements, and
-calculation rules. Definitions are document-local; identifiers have no meaning
-outside the document unless an author separately coordinates them.
-
+one reporting scope. Definitions and identifiers are document-local and have
+no meaning outside the document unless an author separately coordinates them.
 The document does not encode extraction provenance, an accounting taxonomy,
-policy, or multi-entity alignment. Filenames have no semantic meaning.
+policy, source mappings, or multi-entity alignment. Filenames have no semantic
+meaning.
 
-`formatVersion` MUST be `"0.1"`. A future incompatible artifact contract will
-use a different value. `documentId` is an optional author-controlled stable
-identity; omitting it has no effect on conformance or calculation semantics.
-Optional `entity.id` and `scope.id` are likewise author-controlled stable
-identifiers, while their required `name` and `label` fields are human-readable.
+`formatVersion` MUST be `"0.1"`. Validation results and snapshot diffs likewise
+use `formatVersion: "0.1"`.
 
-## 2. Identifiers and references
+An FS document MAY contain a top-level `$schema` member. When present, its
+value MUST be exactly
+`https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json`. This pointer
+aids schema discovery only. It does not change `formatVersion`, require network
+access, or replace the complete structural and semantic validation defined by
+this specification.
 
-Every `id` MUST match `^[A-Za-z][A-Za-z0-9._-]*$`. Within each definition
-collection, identifiers MUST be unique. References MUST resolve within the
-same document and to the indicated definition kind.
+The top-level members, in specification order, are optional `$schema`,
+`formatVersion`, optional `documentId`, `entity`, `scope`, `units`, `periods`,
+optional `groupingColumns`, `statements`, and optional `validationSnapshot`.
 
-Object member order is never semantic. Array order is semantic only where this
-specification says so. Consumers MUST NOT infer meaning from definition or fact
-array order.
+No other top-level member is allowed. `$schema` is not an author-controlled
+identifier: if supplied, it is the exact constant above. `documentId`,
+optional `entity.id`, and optional `scope.id` are author-controlled stable
+identities. Their required `entity.name` and `scope.label` members are
+human-readable. Omitting an optional identity has no effect on conformance or
+calculation semantics.
 
-## 3. Definitions
+`entity` contains required nonempty string `name` and optional identifier
+`id`. `scope` contains required nonempty string `label` and optional identifier
+`id`. These objects have no other members. Every `label`, `name`, `measure`,
+`description`, and grouping string described below MUST be nonempty.
 
-### 3.1 Items
+`units`, `periods`, and `statements` MUST be nonempty arrays. Every statement's
+`periods` and `items` arrays MUST be nonempty. `groupingColumns` MAY be omitted
+when unused. Every item always has required `values` and `groupings` objects;
+when `groupingColumns` is omitted or empty, `groupings` MUST be `{}`.
 
-An item gives a document-local financial meaning to facts. `label` is its
-default display label. `description` MAY clarify the author's meaning.
+Objects are closed: properties not declared by the grammar below are
+nonconforming. This specification is the complete source for required fields,
+JSON types, meaning, and cross-object invariants. The schemas encode the same
+closed grammar without adding another contract.
 
-V0 has no general classification field. Statement membership, calculation
-participation, or an identifier naming convention MUST NOT be interpreted as a
-classification taxonomy.
+## 2. Identifiers, references, and order
 
-### 3.2 Units, measures, and scales
+Every identifier and grouping-column name MUST match
+`^[A-Za-z][A-Za-z0-9._-]*$`. Unit, period, and statement identifiers MUST be
+unique in their respective document-wide arrays. Item identifiers MUST be
+unique within their containing statement. The same item identifier MAY occur
+in different statements and has no shared identity between them.
 
-A unit names both a `measure` and a base-ten `scale`. `measure` is an
-author-defined measurement name such as `KRW`, `shares`, or `pure`; it is not
-resolved through a core registry. `scale` MUST be an integer in the inclusive
-range `-9007199254740991` through `9007199254740991`. It is the exponent `s`
-in:
+References MUST resolve within the document and to the indicated definition
+kind. Item references made by `rollupTo` resolve only within the containing
+statement.
 
-`displayed value × 10^s measure units`
+Object member order is never semantic. The following arrays are semantically
+ordered:
 
-Thus a value of `"1250"` in a KRW unit with scale `6` means KRW
-1,250,000,000. A percent can use measure `pure`, scale `-2`.
+1. `groupingColumns` declares grouping-column order;
+2. `statements` declares statement display and calculation order;
+3. each statement's `periods` declares its display and calculation order; and
+4. each statement's `items` declares row and calculation order.
 
-Arithmetic combines facts only when their unit identifiers are identical.
-V0 does not convert units, scales, currencies, or measures.
+Unit and period definition-array order is not presentation order. Consumers
+MUST NOT infer arithmetic, taxonomy, or hierarchy from any order.
 
-`defaultTolerance`, when present, is a nonnegative absolute tolerance expressed
-in the unit's scaled values. Its implicit value is exact zero. A rule's
-nonnegative `tolerance` overrides the unit default for that rule.
+## 3. Units and periods
 
-### 3.3 Periods
+### 3.1 Units
+
+A unit names an author-defined `measure` and a base-ten `scale`. `scale` MUST
+be an integer in the inclusive range `-9007199254740991` through
+`9007199254740991`. It is the exponent `s` in:
+
+`stored value × 10^s measure units`
+
+Thus `"1250"` with measure `KRW` and scale `6` represents KRW 1,250,000,000.
+FS does not resolve measures through a registry or convert currencies,
+measures, scales, or units.
+
+`defaultTolerance`, when present, is a nonnegative exact decimal expressed in
+the unit's scaled values. Its implicit value is exact zero. A rollup uses the
+parent item's unit default tolerance; there is no relationship-level override.
+Each closed unit object contains required `id`, `label`, `measure`, and `scale`
+and optional `defaultTolerance`.
+
+Every decimal field uses one canonical JSON string grammar:
+
+```text
+^(?:0|-?(?:[1-9][0-9]*)(?:\.[0-9]*[1-9])?|-?0\.[0-9]*[1-9])$
+```
+
+This grammar applies to item values and application `actual`, `expected`,
+`difference`, and `tolerance` in current results, snapshots, and diffs.
+`defaultTolerance` and application `tolerance` additionally MUST be
+nonnegative. No decimal field may use a JSON number.
+
+### 3.2 Periods
 
 An instant period has `kind: "instant"` and one ISO 8601 calendar `date`. A
 duration period has `kind: "duration"`, an inclusive `start`, and an inclusive
 `end`. Dates MUST be real Gregorian dates and a duration's start MUST be no
 later than its end.
 
+The closed instant object contains exactly `id`, `kind`, and `date`. The closed
+duration object contains exactly `id`, `kind`, `start`, and `end`. Dates use
+the lexical form `YYYY-MM-DD`.
+
 Period identifiers are references, not encoded dates. Two period definitions
 MUST NOT describe the same instant or the same `(start, end)` duration.
-Different durations MAY overlap, including annual, quarterly, and year-to-date
-periods.
+Different durations MAY overlap.
 
-### 3.4 Dimensions
+## 4. Statements and item rows
 
-A dimension is a named non-period fact axis. Its member definitions are
-document-local. Dimension and member identifiers MUST be unique within their
-respective collections.
+A statement owns an ordered collection of item rows and selects the periods
+for which every row stores one cell. All item data is statement-owned.
 
-V0 uses explicit dimension coordinates. It defines no default member, member
-hierarchy, aggregation, wildcard, or dimensional arithmetic. A fact with no
-dimensions and a fact with dimensions are distinct.
+Every closed statement object contains exactly required `id`, `label`,
+`periods`, and `items`. Its label is a nonempty display string.
 
-## 4. Facts and coordinates
+Each statement's `periods` array MUST contain unique, resolved period
+identifiers. Every item has:
 
-Facts are encoded individually in `facts`; compact fact series are not part of
-the canonical V0 mapping. This makes absence, explicit unavailability, and the
-complete coordinate visible without expansion rules.
+- required `id`, `label`, `unit`, `values`, and `groupings`;
+- optional `description` and `rollupTo`; and
+- no other member.
 
-A fact coordinate is the tuple of:
+The `unit` reference applies to every value of that item. Different items in
+one statement MAY use different units. `description` clarifies meaning but is
+not displayed or used in validation.
 
-1. `item` identifier;
-2. `period` identifier;
-3. `unit` identifier; and
-4. the complete `dimensions` object, or the empty object if omitted.
+An item is the atomic financial meaning supplied to FS. It may correspond to
+one ledger account, several accounts already aggregated upstream, or another
+reported line. FS MAY group an item but MUST NOT split, allocate, or infer
+finer detail from it.
 
-No two facts may have the same coordinate. Every dimension and member in a
-fact MUST resolve. Dimension keys are compared as an unordered map.
+## 5. Values and groupings
 
-A fact has exactly one of:
+### 5.1 Value maps and cell states
 
-- `value`, containing an exact decimal string; or
-- `unavailable: true`, stating explicitly that a value is unavailable.
+An item's `values` object MUST have exactly the containing statement's period
+identifiers as keys. No key may be missing or extra. Each cell is exactly one
+of:
 
-A missing fact is represented only by the absence of its coordinate from
-`facts`. Zero is `"0"`; JSON number `0`, JSON `null`, an empty string, and an
-unavailable fact are not zero and are not valid value encodings.
+- an exact decimal string;
+- JSON `null`, meaning missing; or
+- `{ "unavailable": true }`, meaning explicitly unavailable.
 
-Exact decimals use ordinary base-ten notation without exponent, leading plus,
-leading integer zeros, trailing fractional zeros, or negative zero. Consumers
-MUST use decimal arithmetic capable of representing the strings exactly and
+Missing is encoded explicitly as `null`, because the exact-key rule makes
+omission nonconforming. Zero is `"0"`. JSON number `0`, an empty string,
+`null`, and an unavailable value are not zero.
+
+The canonical decimal grammar in Section 3.1 forbids exponent, leading plus,
+leading integer zeros, trailing fractional zeros, and negative zero. Consumers
+MUST use decimal arithmetic capable of representing these strings exactly and
 MUST NOT first convert them to binary floating point.
 
-## 5. Statements
+### 5.2 Grouping maps
 
-A statement is a flat presentation over shared facts. It does not own facts,
-materialize missing facts, or imply calculations.
+`groupingColumns` declares document-local, user-named classification purposes.
+It MUST contain unique identifiers. It defines no scheme, category registry,
+taxonomy, hierarchy, arithmetic, or value coordinate.
 
-The `statements` array is the display order when a consumer presents more than
-one statement.
+Every item's `groupings` object MUST have exactly the declared
+`groupingColumns` as keys. Each value is a nonempty string or JSON `null`.
+Grouping values describe an already-atomic item. They never create another
+item, split a value, affect item identity or order, or imply a rollup.
 
-`periods` explicitly lists displayed periods in display order. `dimensions`
-MAY list non-period presentation axes and their displayed members in display
-order. A statement MUST NOT list one dimension axis more than once. A statement
-cell is found by combining an item entry, one listed
-period, all listed dimension members for the applicable axis product, and the
-statement's `unit`. Absence remains missing; an unavailable fact remains
-unavailable.
+## 6. Additive rollups
 
-`entries` is the row order. An `item` entry references one item and MAY
-override its display label. A `heading` entry contains only a label. Headings
-are the sole non-item entry in V0 and carry no nesting, indentation,
-calculation, coordinate, or classification semantics.
+`rollupTo` is the only arithmetic relationship. It is a child-to-parent
+reference within the same statement. A reference MUST resolve to another item,
+MUST NOT refer to the item itself, and all relationships in a statement MUST
+form an acyclic directed graph. The child and parent MUST use the same unit
+identifier.
 
-The same fact MAY be presented by any number of statements. Separate facts
-that an author expects to agree require a calculation rule or explicit
-assertion; presentation never creates that expectation.
+A parent with one or more direct children is a reported subtotal. Parent
+values remain explicit stored cells. Validation never derives, fills,
+replaces, or materializes them. For each selected statement period:
 
-## 6. Calculation rules
+`expected = sum(direct child values)`
 
-Calculation rules validate stored facts. They never create, replace, infer, or
-materialize a fact. Rules are optional.
+`difference = actual parent value - expected`
 
-All coefficients and tolerances are exact decimals. For every evaluated rule:
+Every coefficient is one and stored signs are used unchanged. An application
+is satisfied when `abs(difference) <= parent unit defaultTolerance`, or exact
+zero when the tolerance is omitted. Only direct children are summed. A child
+that is itself a subtotal contributes its explicit stored value to its parent,
+so a nested descendant is not counted twice.
 
-`expected = Σ(coefficient × operand value)`
-
-`difference = actual target value - expected`
-
-The application is satisfied when `abs(difference) <= tolerance`.
-
-Every target and operand selected by one application MUST use the rule's
-`unit`. If an applicable required coordinate is missing or unavailable, the
-application has an evaluation error; it is not skipped and not treated as
-zero. Using different units within a rule is structural nonconformance, not an
-evaluation-time conversion or error.
-
-### 6.1 Same-period rules
-
-A `samePeriod` rule declares a target item, one or more operand terms, a unit,
-and an explicit scope. Its Cartesian application scope is every listed period
-combined with every listed dimension coordinate. When `dimensions` is
-omitted, the sole coordinate is the empty object.
-
-For each application, target and operands use the same scoped period, unit,
-and complete dimension coordinate. Same-period rules are reusable because the
-item relationship is declared once for several coordinates.
-
-### 6.2 Roll-forward rules
-
-A `rollForward` rule is V0's only automatically bound cross-period rule. It
-declares a balance item, movement terms, a unit, and candidate duration
-periods. For each candidate duration `current`, the validator finds duration
-periods from the same rule scope whose `end` is the calendar day immediately
-before `current.start`.
-
-- no candidate and no earlier scoped duration: skip as `no-predecessor`;
-- no candidate but at least one earlier scoped duration: skip as `gap`;
-- more than one candidate: skip as `ambiguous-predecessor`;
-- exactly one candidate: apply the rule.
-
-For an application, the opening coordinate is the balance item at the unique
-instant period whose date equals the predecessor's `end`. The closing
-coordinate is the balance item at the unique instant period whose date equals
-the current duration's `end`. Movement coordinates use their declared items
-and the current duration. All use the rule unit and scoped dimensions.
-The closing fact is the target and its expected value is the opening fact with
-coefficient `1` plus the sum of each declared movement coefficient multiplied
-by its movement fact.
-
-Once a unique predecessor exists, an absent boundary instant period, missing
-fact, or unavailable fact is an evaluation error. A duplicate boundary instant
-is structural nonconformance under Section 3.3, so calculations do not run.
-These are not reasons to skip. Earlier means a duration whose end is before
-`current.start`; overlap alone does not establish precedence.
-
-The rule applies for every listed dimension coordinate, or the empty object
-when `dimensions` is omitted. Authors MUST use explicit assertions for gaps,
-ambiguous overlapping series, nonconsecutive comparisons, or any other
-irregular temporal relationship.
-
-### 6.3 Explicit assertions
-
-An `assertion` binds one exact target coordinate and exact operand coordinates.
-It has exactly one application and no automatic scope or temporal binding.
-Its target unit is the assertion's calculation unit, supplies the applicable
-unit default tolerance, and MUST match every operand unit.
-Assertions are appropriate for cross-statement reconciliations, irregular
-periods, and relationships between differing dimensions. They are distinct
-from reusable rules so an exact exception cannot silently broaden its scope.
+Custom grouping values have no effect on rollup discovery or evaluation.
 
 ## 7. Structural and calculation outcomes
 
-Structural conformance includes JSON Schema conformance and all normative
-referential, uniqueness, date, coordinate, and rule invariants in this
-specification. Calculation inconsistency does not affect structural
-conformance. Calculation rules MUST NOT be evaluated for a structurally
-nonconforming document because its coordinates and rule preconditions are not
-reliable.
+Structural conformance includes JSON Schema conformance and every normative
+identifier, reference, date, map-key, snapshot, unit, and graph invariant in
+this specification. Rollup inconsistency does not affect structural
+conformance. Rollups MUST NOT run for a structurally nonconforming document.
 
-Each rule application has one status:
+Each rollup application has a stable key:
 
-- `satisfied`: evaluated within tolerance;
-- `unsatisfied`: evaluated outside tolerance;
-- `error`: applicable but a required coordinate was missing or unavailable, or
-  a required boundary instant was absent; or
-- `skipped`: automatic temporal binding did not apply, with reason
-  `no-predecessor`, `gap`, or `ambiguous-predecessor`.
+```json
+{ "statement": "income-statement", "parent": "revenue", "period": "fy2025" }
+```
 
-An error identifies the failing complete fact `coordinate`, or the `opening`
-or `closing` boundary and its required date. If more than one precondition
-fails, report the first in this order: opening boundary, closing boundary,
-target coordinate, then operands in their declared order. A boundary is
-`missing-boundary-period` when no matching instant exists.
+The key is statement-local parent identity plus the selected period. Each
+application is exactly one of:
 
+- `satisfied`, with `actual`, `expected`, `difference`, and `tolerance`;
+- `unsatisfied`, with the same numeric fields; or
+- `error`, with reason `missing-value` or `unavailable-value` and a `cell`
+  object `{ "statement": id, "item": id, "period": id }`.
+
+For a cell error, inspect the parent first and then direct children in item
+order; report only the first missing or unavailable cell. No numeric fields
+are present on an error application.
+
+The complete serialized application forms are:
+
+```json
+{
+  "key": {
+    "statement": "income-statement",
+    "parent": "revenue",
+    "period": "fy2025"
+  },
+  "status": "satisfied",
+  "actual": "100",
+  "expected": "100",
+  "difference": "0",
+  "tolerance": "0"
+}
+```
+
+```json
+{
+  "key": {
+    "statement": "income-statement",
+    "parent": "revenue",
+    "period": "fy2025"
+  },
+  "status": "error",
+  "reason": "missing-value",
+  "cell": {
+    "statement": "income-statement",
+    "item": "revenue",
+    "period": "fy2025"
+  }
+}
+```
+
+An unsatisfied application has the first form with `status: "unsatisfied"`.
+An unavailable-cell error has the second form with reason
+`unavailable-value`. No other application field is permitted.
+
+Applications are ordered by statement order, then parent item order among
+items with direct children, then statement period order. Keys MUST be unique.
 The document calculation status is:
 
-- `not-run` when structural nonconformance prevents calculation evaluation;
-- `not-defined` when no calculation rules exist;
-- `not-evaluated` when rules exist but every application is skipped;
-- `consistent` when at least one application is satisfied, any others are
-  skipped, and none is unsatisfied or error; or
+- `not-run` when structural nonconformance prevents rollup evaluation;
+- `not-defined` when no item is a rollup parent;
+- `consistent` when at least one application exists and all are satisfied; or
 - `inconsistent` when any application is unsatisfied or error.
 
-`not-run` requires structural status `nonconforming` and an empty application
-array. Every other calculation status requires `conforming`. `not-defined` has
-an empty application array; `not-evaluated` has one or more applications and
-all are skipped. The `consistent` and `inconsistent` statuses follow the
-evaluated-application rules above. A snapshot MUST be internally consistent by
-the same rules for its recorded statuses and applications.
+`not-run` requires structural status `nonconforming`; every other calculation
+status requires `conforming`. `not-run` and `not-defined` have empty
+application arrays. The other statuses have nonempty arrays following the
+rules above.
 
-Application order is calculation-rule array order, then each rule's period
-array order, then dimension-coordinate array order. Every application key is
-the structured object `{"rule": id, "period": id, "dimensions": {...}}`.
-For an assertion, `period` and `dimensions` come from its target. Empty
-dimensions are always recorded as `{}`. Keys MUST be unique within one result.
-This key is stable across stored/current results and is the identity used by
-snapshot diffs.
+A validation result is exactly:
 
-The language-neutral result shape is specified by
-[`validation-result.schema.json`](../schema/validation-result.schema.json).
+```json
+{
+  "formatVersion": "0.1",
+  "conformance": { "status": "conforming", "errors": [] },
+  "calculations": { "status": "not-defined", "applications": [] }
+}
+```
+
+The empty application array is replaced by the required nonempty ordered
+applications when status is `consistent` or `inconsistent`. For
+`nonconforming`, `errors` is nonempty, calculations are `not-run`, and
+applications are empty. For `conforming`, `errors` is empty. These objects are
+closed, and each error contains exactly `code`, `path`, and `message`.
+
+[`validation-result.schema.json`](../schema/validation-result.schema.json)
+encodes this language-neutral result shape.
 
 ## 8. Validation snapshots and deterministic diffs
 
-`validationSnapshot` MAY record an earlier validation result in an otherwise
-ordinary FS document. It contains only `conformance`, `calculations`, and the
-ordered application results needed for comparison. It is historical evidence,
-never current status; consumers MUST always recompute current validation.
+`validationSnapshot` MAY record an earlier validation result in an ordinary FS
+document. It contains only `conformance`, `calculations`, and ordered
+applications. It is historical evidence, never current status; consumers MUST
+always recompute current validation.
 
-Snapshots intentionally omit timestamps, validator identity, filenames,
-document hashes, and duplicated document identity. These do not contribute to
-semantic comparison and would make recording or diffing less deterministic.
+The snapshot fields are scalar status strings plus the application array:
 
-Snapshot applications use the stable application key. A diff compares
-conformance status, calculation status, and applications by key, classifying
-each application as `unchanged`, `changed`, `added`, or `removed`. Diff entries
-are ordered by current application order followed by removed applications in
-their recorded order. No snapshot produces `status: "not-recorded"`. A present
-but structurally invalid snapshot produces `status: "not-comparable"` with
-reason `invalid-snapshot`. Otherwise the status is `match` only when every
-compared value matches, and `mismatch` otherwise.
+```json
+{
+  "conformance": "conforming",
+  "calculations": "not-defined",
+  "applications": []
+}
+```
 
-Recorded and current application keys MUST each be unique. Each diff entry
-contains the complete recorded and/or current application object, so it does
-not duplicate the application key at the diff-entry level. Status comparisons
-likewise contain their recorded and current values without a redundant derived
-boolean. A `changed` or `unchanged` entry's recorded and current objects MUST
-have the same key; an `added` entry contains only current, and a `removed`
-entry contains only recorded. Each application key appears in exactly one diff
-entry.
+As with a current result, `consistent` and `inconsistent` require nonempty
+applications, while `not-run` and `not-defined` require an empty array.
 
-A recorded key MAY refer to a rule no longer present in the current document;
-that is how a removed application is represented. Snapshot contents are not
-current document references and therefore do not participate in current
-referential conformance.
+Snapshots omit `formatVersion`, timestamps, validator identity, filenames,
+document hashes, and duplicated document identity. A snapshot MUST be
+internally consistent under the result-status rules in Section 7. Snapshot
+application keys MUST be unique. Recorded keys and cells are historical and
+do not resolve against current statements, items, or periods.
 
-For `satisfied` and `unsatisfied`, comparison includes status, actual,
-expected, difference, and tolerance. For `error` and `skipped`, it includes
-status and reason; error comparison also includes its complete coordinate or
-boundary and date. Human messages are not snapshot fields and are not compared.
-The normative diff shape is specified by
-[`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json).
+A diff compares conformance status, calculation status, and applications by
+key. Applications are classified as `unchanged`, `changed`, `added`, or
+`removed`. Entries are ordered by current application order followed by
+removed applications in recorded order. Each key appears exactly once.
+
+When `validationSnapshot` is absent, the diff is exactly:
+
+```json
+{ "formatVersion": "0.1", "status": "not-recorded" }
+```
+
+A present but structurally invalid snapshot produces exactly:
+
+```json
+{
+  "formatVersion": "0.1",
+  "status": "not-comparable",
+  "reason": "invalid-snapshot"
+}
+```
+
+Otherwise the closed diff object contains exactly `formatVersion`, status
+`match` or `mismatch`, `conformance`, `calculations`, and `applications`.
+`conformance` is exactly `{ "recorded": status, "current": status }`, where
+each status is `conforming` or `nonconforming`. `calculations` has the same two
+members, where each value is `not-run`, `not-defined`, `consistent`, or
+`inconsistent`. Status is `match` only when every compared value matches and
+`mismatch` otherwise.
+
+Each closed application-change object has one of four exact member sets:
+
+- `unchanged` and `changed`: `change`, `recorded`, and `current`;
+- `added`: `change` and `current`; or
+- `removed`: `change` and `recorded`.
+
+`change` is the matching literal. Every `recorded` and `current` value is one
+complete closed application object from Section 7, including all numeric fields
+for `satisfied` or `unsatisfied`, or `reason` and `cell` for `error`.
+`unchanged` and `changed` applications MUST have the same key. `added` and
+`removed` intentionally omit the absent side. Human messages are not snapshot
+fields and are not compared.
+[`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json) encodes
+these forms.
 
 ### 8.1 Structural diagnostics
 
-A validation result identifies each structural error with a stable `code`, a
-JSON Pointer `path`, and a human-readable `message`. The V0 fixture vocabulary
-includes `decimal-string-required`, `fact-value-exclusive`,
-`unknown-property`, `invalid-tolerance`, `duplicate-id`, `unresolved-reference`,
-`duplicate-fact-coordinate`, `invalid-date`, `invalid-duration`,
-`scale-out-of-range`, `unit-mismatch`, `duplicate-statement-axis`,
-`duplicate-period-definition`, `invalid-period-kind`, and
-`duplicate-application-key`. Validators MAY report additional precise codes
-for other schema or semantic failures, but MUST use the fixture code when the
-named condition applies. Multiple errors are ordered by instance path, then
-code.
+Every structural error has a stable `code`, a JSON Pointer `path`, and a
+nonempty human-readable `message`. Multiple errors are ordered by path and then
+code. These are the complete current codes and path rules:
 
-Language-neutral result equality compares conformance status plus each error's
-code and path. `message` MUST be nonempty for users but its wording is not
-normative and is ignored when comparing an implementation with a fixture; this
-permits clear wording and localization without changing artifact semantics.
+- `required-property`: a required member is absent; the path is the missing
+  member's would-be path.
+- `unknown-property`: a closed object has an extra member; the path is that
+  member.
+- `invalid-type`: a value has the wrong JSON type; the path is that value.
+- `invalid-value`: a typed value violates its enum, constant, pattern,
+  cardinality, closed union, or a recorded numeric application's arithmetic
+  and status relationship; the path is that value, application, or collection.
+- `decimal-string-required`: an item value uses a JSON number instead of an
+  exact decimal string; the path is that value cell.
+- `invalid-tolerance`: `defaultTolerance` is malformed or negative; the path
+  is that member.
+- `scale-out-of-range`: `scale` is outside the safe-integer range; the path is
+  that member.
+- `duplicate-id`: a unit, period, statement, grouping column, or
+  statement-local item identifier repeats; the path is the later identifier.
+- `duplicate-reference`: a statement repeats a selected period; the path is
+  the later reference.
+- `duplicate-period-definition`: a period repeats an instant or duration
+  definition; the path is the later period object.
+- `invalid-date`: a date string is not a real Gregorian date; the path is the
+  date member.
+- `invalid-duration`: a duration starts after it ends; the path is the period
+  object.
+- `unresolved-reference`: a period, unit, or `rollupTo` reference does not
+  resolve in its required scope; the path is the reference.
+- `map-key-mismatch`: `values` keys differ from statement periods or
+  `groupings` keys differ from `groupingColumns`; the path is the complete map.
+- `self-rollup`: an item rolls up to itself; the path is `rollupTo`.
+- `cyclic-rollup`: a non-self `rollupTo` edge participates in a cycle; the path
+  is that edge, with one error for every participating edge.
+- `unit-mismatch`: a child and its rollup parent use different units; the path
+  is the child's `rollupTo`.
+- `duplicate-application-key`: an embedded snapshot repeats an application
+  key; the path is the later application's `key`.
 
-## 9. Canonical JSON mapping and determinism
+Self-reference validation emits only `self-rollup`; it does not also emit
+`cyclic-rollup`. Schema validators MUST normalize native keywords to the code
+above; implementation-specific schema keywords are not public diagnostics.
+Language-neutral equality compares conformance status and each error's code
+and path. Message wording is not normative.
 
-Canonical V0 means the field names and structures in this specification and
-its schemas, not a byte-level JSON canonicalization scheme. Producers SHOULD
-emit top-level collections in specification order and definition arrays in an
-author-chosen stable order. Consumers MUST preserve semantically ordered
-arrays and MUST treat all object member order as irrelevant.
+## 9. Canonical JSON mapping and rendering
 
-Dates and decimals have one lexical form, dimensions are complete unordered
-maps, facts are individual objects, and snapshot application identities are
-structured keys. These constraints make semantic inspection and diffing
-deterministic without giving whitespace, object-key order, or filenames
-meaning.
+Canonical V0 means the fields and structures in this specification, not a
+byte-level JSON canonicalization scheme. Producers SHOULD emit
+top-level members in specification order and preserve author-chosen array
+order. Consumers MUST preserve semantically ordered arrays and treat all
+object member order as irrelevant.
+
+Rendering is a deterministic projection, not a second semantic contract. It
+shows statements and items in array order and periods in each statement's
+selected order. Declared grouping columns appear as flat, non-arithmetic
+columns in declaration order. A homogeneous statement identifies its one unit
+once; a heterogeneous statement shows a unit cell for each row. Rendering does
+not infer hierarchy, subtotal styling, signs, missing values, or taxonomy from
+rollups or groupings. The [CLI acceptance contract](cli/acceptance.md) fixes
+the exact HTML and finite-output behavior.
 
 ## 10. Conformance fixture contract
 
-Files under `examples/` and `fixtures/valid/` MUST conform to the document JSON
-Schema and every semantic invariant above. Each file under `fixtures/invalid/`
+Files under `examples/` and `fixtures/valid/` MUST conform to the document
+schema and every semantic invariant above. Each file under `fixtures/invalid/`
 is intentionally nonconforming and has a matching entry in
 [`manifest.json`](../fixtures/manifest.json) naming its expected failure.
 
 Calculation-result and snapshot-diff fixtures are language-neutral expected
-outputs. A conforming validator MUST produce semantically equal objects for the
-corresponding input cases, independent of programming language or display
+outputs. A conforming validator MUST produce semantically equal objects for
+the corresponding inputs, independent of programming language or display
 format.

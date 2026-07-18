@@ -3,9 +3,8 @@
 `fs` is a working title. The [roadmap](../ROADMAP.md) records strategic
 delivery milestones.
 
-This document describes the accepted V0 target. The current normative contract
-still uses the earlier fact-and-dimension model while the
-[statement-item-row refactor](plans/statement-item-row-refactor.md) is pending.
+This document summarizes the V0 product boundary. The
+[semantic specification](semantic-spec.md) owns the exact artifact contract.
 
 ## Summary
 
@@ -24,7 +23,7 @@ shape. Those outputs preserve cells but often lose financial meaning:
 - periods, dates, units, and scales are implicit;
 - missing, unavailable, and zero values are conflated;
 - reported additive subtotals cannot be checked consistently;
-- statement layout is mistaken for fact identity; and
+- statement layout is mistaken for item identity; and
 - every downstream consumer needs custom parsing instructions.
 
 The result should instead be one predictable document whose ordered item rows,
@@ -38,13 +37,13 @@ Its central boundaries are:
 - JSON is the canonical serialization.
 - One document covers exactly one reporting entity and reporting scope.
 - One document may contain multiple statements and multiple periods.
-- Statements own ordered, document-local items and their period-keyed values.
-- Each item owns one unit and may carry values for user-declared grouping
-  columns; the project supplies no accounting taxonomy.
+- Statements own ordered, document-local items and their stored period values.
+- Items carry author-declared units and flat groupings; the project supplies no
+  accounting taxonomy.
 - FS may group an item but does not split, allocate, or infer finer detail.
 - All values, including reported subtotal values, are stored explicitly.
-  Optional `rollupTo` relationships validate direct additive children but
-  never create, replace, or materialize values.
+  Optional additive rollups validate direct children but never create, replace,
+  or materialize values.
 - Rollup inconsistency is reportable without making structurally usable data
   nonconforming.
 - Source and provenance metadata are entirely outside the specification.
@@ -81,7 +80,7 @@ for their use.
 
 ## Deliverables
 
-The first usable release should contain:
+The V0 product consists of:
 
 1. A semantic specification and canonical JSON mapping.
 2. A JSON Schema and language-neutral conformance fixtures.
@@ -94,8 +93,9 @@ The first usable release should contain:
 
 ## Design Method
 
-The format is intentionally optimized for ordinary financial statements rather
-than a general fact cube. The examples must prove multi-period item values,
+The format is intentionally optimized for ordinary financial statements
+rather than a general multidimensional data cube. The examples must prove
+multi-period item values,
 mixed item units, user-declared grouping columns, additive reported subtotals,
 overlapping period types, unavailable values, and calculation inconsistencies.
 Genuinely multidimensional cases are outside V0 rather than generated through

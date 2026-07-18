@@ -4,7 +4,7 @@
   "arguments": ["render", "--output", "report.html", "input.json"],
   "workspace": [
     { "copy": "../raw-input/malformed-json.json.txt", "to": "input.json" },
-    { "copy": "../valid/no-calculation-rules.json", "to": "report.html" }
+    { "copy": "../valid/no-rollups.json", "to": "report.html" }
   ],
   "stdin": null,
   "expect": {

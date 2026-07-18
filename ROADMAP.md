@@ -2,16 +2,14 @@
 
 This roadmap owns strategic sequence only. The
 [product scope](docs/product-scope.md) defines the boundary, and the
-[completed step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md)
-records its delivery decisions and validation.
-
-The accepted statement-item-row redesign is planned in the active
-[refactor plan](docs/plans/statement-item-row-refactor.md).
+[active release plan](docs/plans/v0-release-candidate.md) owns live status and
+the next action. Completed milestone plans linked from the
+[documentation index](docs/README.md) retain delivery decisions and validation.
 
 ## Reference CLI
 
-Steps 1–8 define the completed reference CLI sequence. Detailed historical
-scope and validation are maintained in the
+The completed reference CLI sequence and its historical validation are
+maintained in the
 [V0 CLI plan](docs/plans/cli-v0.md).
 
 ## Release Sequence
@@ -30,10 +28,9 @@ scope and validation are maintained in the
    `effect/unstable/cli` runner.
 9. [x] Generate agent guidance from one source, then add snapshot recording
    and rendering through contract-first slices.
-10. [ ] Replace the dimensional fact model with statement-owned item rows,
+10. [x] Replace the dimensional fact model with statement-owned item rows,
     nested value and grouping maps, and additive rollup validation.
-11. [ ] Replace placeholder schema identifiers, run cross-platform package
-    verification, and release V0.
+11. [ ] Complete release preparation and publish V0.
 
 ## Later Directions
 

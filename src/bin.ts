@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-import { NodeServices } from "@effect/platform-node"
-import { runMain } from "@effect/platform-node/NodeRuntime"
+import { runMain } from "@effect/platform-node-shared/NodeRuntime"
 import { Effect, Layer } from "effect"
 
+import { ApplicationExecutor } from "./application.js"
 import { noColorOutput, program } from "./cli.js"
-import { ApplicationIO } from "./process.js"
+import { nodeServices } from "./node-services.js"
 
-const mainLayer = ApplicationIO.live.pipe(
-  Layer.provideMerge(NodeServices.layer),
-  Layer.merge(noColorOutput)
+const mainLayer = nodeServices.pipe(
+  Layer.merge(noColorOutput),
+  Layer.merge(ApplicationExecutor.live)
 )
 
 runMain(

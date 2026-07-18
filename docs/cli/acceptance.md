@@ -1,10 +1,7 @@
 # CLI Acceptance Contract
 
-This contract remains authoritative for the current `0.1` implementation. The
-accepted statement-item-row replacement does not change observable process
-behavior until the
-[Roadmap step-10 refactor](../plans/statement-item-row-refactor.md) updates this
-contract, fixtures, and runtime together.
+This contract defines observable process behavior for the current `0.1`
+statement-item-row contract.
 
 ## Purpose
 
@@ -58,7 +55,7 @@ assert the active command path, required operands, command-local flags, Effect
 built-ins, relevant offending token, and absence of ANSI control sequences.
 They do not copy formatter prose, wrapping, spacing, or section layout into
 independent expected files. Exact-one operand descriptions must contain the
-literal `Exactly one`. A native variadic ellipsis produced by the beta.98
+literal `Exactly one`. A native variadic ellipsis produced by the pinned CLI's
 consume-all refinement is not interpreted as accepting extras. Version cases
 assert the exact installed package version, and completion cases assert a
 nonempty script for the requested shell; completion metadata does not expand
@@ -68,12 +65,12 @@ An illustrative case descriptor is:
 
 ```json
 {
-  "id": "validate-path-no-rules",
+  "id": "validate-path-no-rollups",
   "command": "fs",
   "arguments": ["validate", "input.json"],
   "workspace": [
     {
-      "copy": "../valid/no-calculation-rules.json",
+      "copy": "../valid/no-rollups.json",
       "to": "input.json"
     }
   ],
@@ -85,7 +82,7 @@ An illustrative case descriptor is:
       "subtrees": [
         {
           "pointer": "/validation",
-          "equalsFile": "../calculation-results/no-rules.json"
+          "equalsFile": "../calculation-results/no-rollups.json"
         },
         {
           "pointer": "/snapshotDiff",
@@ -189,7 +186,7 @@ not repeat the command, input path, working directory, validator identity, or
 time. The case where the embedded snapshot itself is structurally unusable is
 represented by `not-comparable` with reason `invalid-snapshot`.
 
-When an invalid-document manifest entry has no complete calculation-result
+When an invalid-document manifest entry has no complete validation-result
 file, its CLI expectation is composed from the existing manifest: conformance
 is `nonconforming`; the named code and path match exactly; the message is
 nonempty; and calculations are `not-run` with no applications. This does not
@@ -203,7 +200,7 @@ Matching snapshots, structural nonconformance, and invalid embedded snapshots
 do not produce that suggestion.
 
 Structural nonconformance is a validation result with exit code `1`, not a
-generic command error. It has calculation status `not-run`. Calculation
+generic command error. It has calculation status `not-run`. Rollup
 inconsistency and snapshot mismatch remain successful results with exit code
 `0`.
 
@@ -232,12 +229,52 @@ instead of a validation envelope:
 Fixtures fix the exact fields appropriate to each error. Stable V0 usage codes
 are not part of the JSON vocabulary; grammar failures use Effect-native text.
 Stable operational codes are `input-not-found`, `input-unreadable`,
-`invalid-json`, `output-exists`, `output-parent-not-found`,
-`output-limit-exceeded`, `write-failed`, and `internal-error`.
+`input-limit-exceeded`, `invalid-json`, `working-directory-unavailable`,
+`output-exists`, `output-parent-not-found`, `output-limit-exceeded`,
+`write-failed`, and `internal-error`.
 
 Malformed syntax, trailing content, and duplicate object members all produce
 `invalid-json` before JSON Schema validation. Duplicate members are never
 resolved with first-value-wins or last-value-wins behavior.
+
+`input-limit-exceeded` reports a raw-byte, JSON-nesting, JSON-value,
+nonconforming-document-value, encoded-diagnostic-byte, per-decimal-digit, or
+total-decimal-digit budget violation. It has exit code `1`, includes the input
+operand in `path` (`-` for standard input), has empty `help`, and creates no
+output. The message names the violated budget and its limit without echoing
+document content. Diagnostic logging may include only `code`, `source`,
+`budget`, and `limit` for this failure.
+
+The fixed V0 input budgets are:
+
+| Budget | Limit | Counting rule |
+| --- | ---: | --- |
+| `input-bytes` | 16,777,216 | Raw bytes before UTF-8 decoding |
+| `json-nesting` | 64 | Active object/array containers; root container is 1 |
+| `json-values` | 200,000 | Root plus every member or element value |
+| `invalid-document-values` | 256 | Values in nonconforming input |
+| `validation-diagnostic-bytes` | 1,048,576 | Encoded diagnostics |
+| `decimal-digits` | 1,000 | Digits in one schema-conforming exact decimal |
+| `total-decimal-digits` | 1,000,000 | Digits across conforming exact decimals |
+
+The byte reader accepts exactly the limit only after reaching EOF and stops at
+the first excess byte. The scanner is iterative. It applies syntax, duplicate,
+nesting, and value checks from left to right, so the first encountered owned
+failure wins. UTF-8 failure precedes scanning after the byte boundary succeeds.
+When a document exceeds the nonconforming-value budget, a fail-fast schema or
+semantic pass still permits it if it is conforming but refuses it before
+complete diagnostics if it is not. The diagnostic-byte budget is checked
+before a validation envelope is encoded. Decimal budgets are checked after
+schema conformance and before semantic validation or arithmetic. A
+schema-valid snapshot is also decimal-bounded before comparison when an
+unrelated structural error makes the containing document nonconforming.
+
+`working-directory-unavailable` applies only when an operation must resolve a
+relative path and the process has no usable current directory. It has exit code
+`1`, no `path`, empty `help`, and a generic bounded message. Native help,
+version, and completions; root discovery; pathless guide, schema, and example
+reads; standard input; and absolute input or output paths never acquire the
+current directory.
 
 An unexpected implementation defect is translated at the outermost process
 boundary to `internal-error`, exit code `1`, and a bounded generic message. The
@@ -264,9 +301,19 @@ validation without entering application I/O. Precedence among combined action
 flags, and behavior when `--completions` has no shell value, are
 framework-defined and are not supported workflows.
 
+After grammar and native-action handling, relative path resolution precedes
+application preflight because no path operation can proceed without it. For
+write commands whose paths resolve, an existing destination precedes all input
+reads and limits. Input read failures precede byte and decoding results. The
+byte boundary precedes UTF-8 and JSON; scanner failures follow their
+left-to-right encounter order; schema conformance precedes decimal budgets;
+decimal budgets precede semantics and calculations. Render budgets and
+missing-parent or commit-time write failures occur only after valid input and
+generated output, preserving the filesystem precedence below.
+
 ## Exit Codes
 
-- `0`: an action flag or operation completed, including calculation
+- `0`: an action flag or operation completed, including rollup
   inconsistency, snapshot mismatch, and definitive empty results.
 - `1`: an operational, parsing, or structural conformance failure prevented
   the requested successful outcome.
@@ -289,7 +336,7 @@ deletion, or content change.
 `fs schema` and `fs example` write the exact bundled bytes. `fs create`
 preserves the complete candidate bytes from either a path or standard input;
 it is not a serializer or normalizer. A structurally conforming but
-calculation-inconsistent candidate may be written. Malformed or structurally
+rollup-inconsistent candidate may be written. Malformed or structurally
 nonconforming input creates no output.
 
 Successful `fs schema --output` and named `fs example --output` operations
@@ -348,8 +395,8 @@ error shape instead.
 its optional `validationSnapshot`. A present invalid snapshot is structural
 nonconformance; the command never strips invalid data to make an input pass.
 For a conforming document, the replacement snapshot contains exactly the
-current conformance status, calculation status, and calculation applications
-in their validation-result order. Calculation inconsistency is recordable.
+current conformance status, calculation status, and rollup applications in
+their validation-result order. Rollup inconsistency is recordable.
 
 The generated document is UTF-8 JSON with two-space indentation and one final
 LF. It preserves the parsed member order of the input, except that an existing
@@ -370,39 +417,46 @@ stable error vocabulary.
 
 `fs render` fully validates the input before rendering. Structural
 nonconformance, including an invalid embedded snapshot, prevents output;
-calculation inconsistency and snapshot mismatch do not. Calculation rules and
-the optional validation snapshot affect the reported validation result but
-never the rendered page.
+rollup inconsistency and snapshot mismatch do not. Rollup relationships and the
+optional validation snapshot affect the reported validation result but never
+the rendered values or row order.
 
 The output is one deterministic UTF-8 HTML document with one final LF. It uses
 the exact `<!doctype html>` document structure and embedded CSS fixed by the
 executable render fixtures. It contains no scripts, external resources, or
-author-controlled HTML. Every author-controlled entity, scope, statement,
-unit, measure, dimension, member, item, and entry-override label is escaped as
-text. Identifiers and descriptions are not displayed.
+author-controlled HTML. Every displayed entity, scope, statement, item, unit,
+measure, grouping-column name, and grouping value is escaped as text.
+`documentId`, optional metadata identifiers, statement, period, item, and unit
+identifiers, descriptions, `rollupTo`, validation results, and snapshots are
+not displayed.
 
 The page title combines the entity name and scope label. Its body shows that
-metadata, then every statement in document display order. Each statement
-shows its label and unit label, measure, and literal base-ten scale. Values are
-the exact stored decimal strings: rendering performs no numeric conversion,
-rescaling, rounding, aggregation, or calculation.
+metadata, then every statement in document order. Each statement is one flat
+table. Rows follow item array order; columns are, in order:
 
-Each statement is one table. Rows follow `entries`; an item override label
-wins over the referenced item's label. A heading spans the whole table and
-is a visual separator rendered as an ordinary table cell; it has no table
-header scope, row-group semantics, or nesting. Columns are period-major: for
-each listed period in display order, enumerate the Cartesian product of listed
-axes in axis and member display order, with the first axis changing slowest. A
-statement without axes has one column per period. Instant headers use the exact
-date; duration headers use `<start> – <end>`. Axis coordinates follow the
-period, formatted as `<dimension label>: <member label>` and separated with
-` · `.
+1. one `Item` column;
+2. one `Unit` column only when the statement is heterogeneous;
+3. every declared grouping column in document declaration order; and
+4. one value column for every statement period in statement period order.
 
-A cell lookup uses exactly the item, period, statement unit, and complete axis
-coordinate. A stored value is displayed verbatim, explicit unavailability is
-displayed as `Unavailable`, and an absent coordinate is displayed as
-`Missing`. Dimensionless facts therefore do not fill dimensional cells, and
-facts with unlisted dimensions are not rendered.
+A statement is homogeneous exactly when every item uses the same unit
+identifier. A homogeneous statement displays that resolved unit once above
+the table and omits the `Unit` column. A heterogeneous statement has no common
+unit display and identifies each row's resolved unit in its `Unit` cell. Unit
+text is `<label> (<measure>, scale <scale>)`; scale is the literal signed base-
+ten exponent and is not applied to stored values.
+
+Grouping headers display the declared identifier. A string grouping value is
+displayed verbatim; JSON `null` is displayed as `—`. Grouping cells remain
+ordinary flat columns. Equal values do not merge cells or create headings,
+nesting, indentation, ordering, rollups, or styling.
+
+Instant period headers use the exact date. Duration headers use
+`<start> – <end>`. A value cell is read directly from
+`item.values[period]`. An exact decimal is displayed verbatim, JSON `null` is
+displayed as `Missing`, and `{ "unavailable": true }` is displayed as
+`Unavailable`. Rendering performs no numeric conversion, rescaling, rounding,
+aggregation, derivation, or subtotal styling.
 
 Successful rendering reports the input validation and snapshot diff, output
 status `created`, the argument path, and empty help. Structural refusal uses
@@ -412,13 +466,13 @@ Operational errors use operation `render` and the shared stable error
 vocabulary.
 
 Rendering computes finite structural budgets with checked arithmetic before
-constructing coordinates, rows, or cells. A rendered statement may contain at
-most 1,000 logical columns including its label column, so the current layout
-permits at most 999 data columns. Across the document, rendered tables may
-occupy at most 100,000 logical grid slots after spans are expanded. A current
-statement with `C` data columns and `R` body rows consumes
-`(C + 1) * (R + 1)` slots. Arithmetic that cannot stay within a budget is
-over-limit without requiring the expanded count to be representable.
+constructing rows or cells. A rendered statement may contain at most 1,000
+logical columns including the item-label column and every conditional unit,
+grouping, and period column. Across the document, rendered tables may occupy
+at most 100,000 logical grid slots after spans are expanded. A statement with
+`C` total columns and `R` item rows consumes `C * (R + 1)` slots, including its
+header row. Arithmetic that cannot stay within a budget is over-limit without
+requiring the exact expanded count to be representable.
 
 After structural preflight, rendering uses a bounded sink and rejects final
 UTF-8 HTML larger than 16 MiB (16,777,216 bytes), measured after escaping and
@@ -426,28 +480,32 @@ encoding. Any budget violation returns operation `render`, code
 `output-limit-exceeded`, exit code `1`, a message naming the budget and limit,
 the requested output path, empty help, and no output file.
 
-An existing destination still wins before input I/O. Malformed or structurally
-nonconforming input wins before render budgets. Structural budgets precede the
-encoded-byte budget; every budget failure precedes parent inspection and
-commit-time writer failures.
+Precedence is exact. An existing destination wins before input I/O. Input read
+and JSON parse failures precede document validation. Schema and semantic
+nonconformance, including invalid embedded snapshots, precede render budgets.
+For conforming input, inspect statements in order: the first over-limit column
+count wins; otherwise checked document-wide grid accumulation is next. The
+encoded-byte budget follows structural preflight. Every budget failure
+precedes output-parent inspection and commit-time writer failures. Rollup
+inconsistency and snapshot mismatch never prevent or reorder rendering.
 
-## Required Cases
+## Maintained Coverage
 
 ### `fs validate`
 
-Start the suite with these integration seams rather than repeating every
+The suite uses these integration seams rather than repeating every
 language-neutral semantic fixture. Paths in the table are relative to
 `fixtures/`; a bare filename resolves by its unique basename under that tree.
 
 | Case | Reused input | Exit |
 | --- | --- | ---: |
-| Valid path with no rules | `valid/no-calculation-rules.json` | 0 |
+| Valid path with no rollups | `valid/no-rollups.json` | 0 |
 | Same document through standard input | same | 0 |
-| Calculation inconsistency | `examples/manufacturing-group.json` | 0 |
+| Rollup inconsistency | `examples/manufacturing-group.json` | 0 |
 | Recorded snapshot match | `valid/recorded-snapshot.json` | 0 |
 | Recorded snapshot mismatch | `valid/snapshot-mismatch-source.json` | 0 |
 | JSON Schema failure | `invalid/decimal-number.json` | 1 |
-| Semantic structural failure | `invalid/unresolved-item.json` | 1 |
+| Semantic structural failure | `invalid/unresolved-rollup.json` | 1 |
 | Invalid embedded snapshot | `duplicate-snapshot-application-key.json` | 1 |
 | Out-of-range unit scale | `invalid/scale-above-maximum.json` | 1 |
 | Malformed JSON | `raw-input/malformed-json.json.txt` | 1 |
@@ -461,18 +519,18 @@ Every validation case asserts an unchanged workspace and no created path.
 
 ### Native actions, grammar, and logging
 
-Add semantic text cases for top-level and per-command `--help` and
-representative `-h` aliases. Generated help identifies the active command,
-required operands, command-local flags, and the accepted help, version,
-completions, and log-level built-ins. It contains no ANSI control sequences and
-does not expose wizard, prompt, or interactive surfaces. Add success cases for
-`--version`, `-v`, and each documented completion shell.
+Semantic text cases cover top-level and per-command `--help`, representative
+`-h` aliases, `--version`, `-v`, and each documented completion shell.
+Generated help identifies the active command, required operands, command-local
+flags, and the accepted help, version, completions, and log-level built-ins. It
+contains no ANSI control sequences and does not expose wizard, prompt, or
+interactive surfaces.
 
 The fixed fixture environment disables color. A separate integration test
 provides a color-capable terminal and still requires generated help to contain
 no ANSI control sequences.
 
-Add grammar cases that prove:
+Grammar cases prove:
 
 - missing operands, extra operands, unknown commands, unknown flags, and
   unknown command values use native help and diagnostics with exit code `2`;
@@ -485,7 +543,7 @@ Add grammar cases that prove:
   I/O. Combined action-flag precedence and valueless completions behavior are
   not fixed.
 
-Add logging cases that prove:
+Logging cases prove:
 
 - omitted and explicit `none` logging produce identical standard output and
   empty standard error;
@@ -495,19 +553,18 @@ Add logging cases that prove:
   context; and
 - an unknown log level fails as usage and leaves the workspace unchanged.
 
-Instrument the I/O boundaries in integration tests to prove that omitted,
-`none`, and enabled logging preserve the same input-read and write-call order,
-and that grammar failures and native actions invoke neither application
-boundary.
+I/O-boundary integration tests prove that omitted, `none`, and enabled logging
+preserve the same input-read and write-call order, and that grammar failures
+and native actions invoke neither application boundary.
 
 ### Discovery and read-only content
 
-After validation, add cases in this order:
+Discovery and bundled-content cases cover:
 
 1. `fs` with no arguments: exact discovery JSON, stable executable and npm
    package identities, no selected input, supported artifact version and
    serialization, read/write classification including `record-validation`, and
-   complete next commands. Also reject an unknown command.
+   complete next commands, plus rejection of an unknown command.
 2. `fs guide authoring`: exact generated standalone Markdown and rejection of
    unknown topics or arguments.
 3. `fs schema`: all three supported names, exact standard-output payload,
@@ -523,66 +580,67 @@ touch the requested path.
 
 ### `fs create`
 
-Cover valid path and standard-input creation, calculation-inconsistent
-creation, malformed input, schema and semantic structural refusal, missing
-`--output`, duplicate `--output`, unknown arguments and flags, missing parent,
-existing output, and the combined invalid-input/existing-output precedence
-case. Successful output must be byte-for-byte equal to the candidate.
+Cases cover valid path and standard-input creation, rollup-inconsistent
+creation, malformed input, schema and semantic structural refusal, missing or
+duplicate `--output`, unknown arguments and flags, missing parents, existing
+output, and combined invalid-input/existing-output precedence. Successful
+output is byte-for-byte equal to the candidate.
 
 ### `fs record-validation`
 
-Cover path and standard-input success without a prior snapshot, replacement of
-a mismatching snapshot, calculation-inconsistent success, and exact generated
-document bytes. Re-validating every expected generated document must produce
-snapshot status `match`.
+Cases cover path and standard-input success without a prior snapshot,
+replacement of a mismatching snapshot, rollup-inconsistent success, and exact
+generated document bytes. Re-validating every expected generated document
+produces snapshot status `match`.
 
-Cover malformed input, schema and semantic structural refusal, an invalid
-embedded snapshot, missing input, missing parent, existing output, and the
-combined invalid-input/existing-output precedence case. Cover missing and
-duplicate `--output`, missing and extra input operands, unknown flags, and
-native command help. Successful output and every refusal leave the input
-unchanged, and every failure creates no output or residue.
+Failure and grammar cases cover malformed input, schema and semantic structural
+refusal, an invalid embedded snapshot, missing input or parent, existing
+output, combined invalid-input/existing-output precedence, missing or duplicate
+`--output`, missing or extra input operands, unknown flags, and native command
+help. Successful output and every refusal leave the input unchanged, and every
+failure creates no output or residue.
 
-Instrument the application boundary to prove preflight-before-read ordering,
-one standard-input read, validation-before-write ordering, and unchanged
-behavior with logging. The shared writer fault and concurrency suite continues
-to own crash atomicity and commit-race behavior.
+Application-boundary tests prove preflight-before-read ordering, one
+standard-input read, validation-before-write ordering, and unchanged behavior
+with logging. The shared writer fault and concurrency suite owns crash
+atomicity and commit-race behavior.
 
 ### `fs render`
 
-Cover exact HTML from a path for the complete presentation fixture and from
-standard input for the minimal example. Cover a calculation-inconsistent,
-snapshot-mismatching input to prove both states remain renderable while their
-content is absent from the HTML. Exact output fixtures prove statement,
-period, axis, member, and row ordering; dimensionless and dimensional lookup;
-exact zero, negative, and fractional decimals; literal scale metadata;
-missing and unavailable cells; entry-label override; heading behavior; and
-escaping of every author-controlled label kind.
+Cases cover exact HTML from a path for the complete presentation fixture and
+from standard input for the minimal example. A rollup-inconsistent,
+snapshot-mismatching input proves both states remain renderable while their
+content is absent from the HTML. Exact output fixtures prove statement, item,
+period, unit, and grouping-column order independent of definition order;
+homogeneous-unit collapsing and heterogeneous row units; exact zero, negative,
+and fractional decimals; literal scale metadata; missing and unavailable
+cells; null and string grouping values; and escaping of every displayed
+author-controlled text kind. They also prove that grouping values and rollups
+create no hierarchy, merged cells, or subtotal styling.
 
-Cover malformed input, schema and semantic structural refusal, an invalid
-embedded snapshot, missing input, missing parent, existing output, and the
-combined invalid-input/existing-output precedence case. Cover missing and
-duplicate `--output`, missing and extra input operands, unknown flags, native
-command help, discovery, and root help. Successful output and every refusal
-leave the input unchanged, and every failure creates no output or residue.
+Failure and grammar cases cover malformed input, schema and semantic structural
+refusal, an invalid embedded snapshot, missing input or parent, existing
+output, combined invalid-input/existing-output precedence, missing or duplicate
+`--output`, missing or extra input operands, unknown flags, native command
+help, discovery, and root help. Successful output and every refusal leave the
+input unchanged, and every failure creates no output or residue.
 
-Cover a non-directory output parent with both malformed and conforming input.
-Cover checked rejection beyond the column, grid-slot, and encoded-byte budgets
-and success at each boundary; prove that over-limit rendering never enters the
+Non-directory-parent cases use both malformed and conforming input. Boundary
+cases cover checked rejection beyond the column, grid-slot, and encoded-byte
+budgets and success at each limit; over-limit rendering never enters the
 writer.
 
-Instrument the application boundary to prove preflight-before-read ordering,
-one standard-input read, validation-before-write ordering, unchanged rendered
+Application-boundary tests prove preflight-before-read ordering, one
+standard-input read, validation-before-write ordering, unchanged rendered
 bytes with logging, and no render write on structural refusal. The shared
-writer fault and concurrency suite continues to own crash atomicity and
-commit-race behavior.
+writer fault and concurrency suite owns crash atomicity and commit-race
+behavior.
 
-## Implementation Gate
+## Repository Gate
 
-The packed CLI must satisfy the complete contract. Intermediate migrations
-either remain internal or fail closed; they must not weaken semantic
-validation, exact content, logging, filesystem safety, or defect redaction.
-The command boundary must own every accepted output and translate unexpected
-application defects to `internal-error` without leaking raw causes. Pending
-cases remain visible, and no temporary output shape becomes part of the
-acceptance contract.
+The packed CLI must continue to satisfy the complete descriptor set. Contract
+changes update acceptance prose and visible descriptors before implementation;
+intermediate states remain internal or fail closed. The command boundary owns
+every accepted output and translates unexpected application defects to
+`internal-error` without leaking raw causes. No temporary output shape becomes
+part of the acceptance contract.

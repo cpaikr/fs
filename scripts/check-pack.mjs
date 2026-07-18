@@ -1,6 +1,6 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs"
+import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync, statSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { dirname, join, resolve, sep } from "node:path"
 import spawn from "cross-spawn"
 import { pathToFileURL } from "node:url"
 
@@ -40,49 +40,150 @@ const assertNativeHelp = (result, label) => {
   }
 }
 
+const successfulJson = (result, label) => {
+  if (result.status !== 0 || result.stderr !== "") {
+    throw new Error(result.stderr || `${label} failed with status ${String(result.status)}`)
+  }
+  try {
+    return JSON.parse(result.stdout)
+  } catch {
+    throw new Error(`${label} did not return JSON`)
+  }
+}
+
+const assertJsonEqual = (actual, expected, label) => {
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    throw new Error(`${label} differs from the accepted value`)
+  }
+}
+
+const resolveInstalledExport = (specifier, cwd) =>
+  run(
+    process.execPath,
+    [
+      "--input-type=module",
+      "--eval",
+      `import { createRequire } from "node:module"; createRequire(import.meta.url).resolve(${JSON.stringify(specifier)})`
+    ],
+    { cwd, encoding: "utf8" }
+  )
+
+const assertExportUnavailable = (specifier, cwd) => {
+  const result = resolveInstalledExport(specifier, cwd)
+  if (result.status === 0 || !result.stderr.includes("ERR_PACKAGE_PATH_NOT_EXPORTED")) {
+    throw new Error(
+      `${specifier} unexpectedly resolved through the installed package exports (status=${String(result.status)}, stderr=${result.stderr})`
+    )
+  }
+}
+
+const assertPackagedMarkdownLinks = (installedRoot, markdownPaths) => {
+  const root = resolve(installedRoot)
+  for (const markdownPath of markdownPaths) {
+    const markdown = readFileSync(join(installedRoot, markdownPath), "utf8")
+    for (const match of markdown.matchAll(/\]\(([^)]+)\)/g)) {
+      const target = match[1].trim().split(/\s+/, 1)[0].replace(/^<|>$/g, "")
+      if (target.startsWith("#") || /^[a-z][a-z0-9+.-]*:/iu.test(target)) continue
+      const linkedPath = resolve(
+        dirname(join(installedRoot, markdownPath)),
+        target.split(/[?#]/u, 1)[0]
+      )
+      if (!linkedPath.startsWith(`${root}${sep}`) || !existsSync(linkedPath)) {
+        throw new Error(`packed Markdown link is unavailable: ${markdownPath} -> ${target}`)
+      }
+    }
+  }
+}
+
+const expectedReleaseMetadata = {
+  name: "@sjunepark/fs",
+  version: "0.1.0",
+  keywords: ["financial-statements", "json-schema", "validation", "cli"],
+  homepage: "https://cpaikr.github.io/fs/spec/0.1/",
+  bugs: { url: "https://github.com/cpaikr/cpaikr.github.io/issues" },
+  repository: { type: "git", url: "git+https://github.com/cpaikr/fs.git" },
+  author: "CPAI",
+  license: "Apache-2.0",
+  type: "module",
+  bin: { fs: "dist/bin.js" },
+  exports: { "./package.json": "./package.json" },
+  engines: { node: "^22.17.0 || ^24.15.0" },
+  publishConfig: { access: "public", registry: "https://registry.npmjs.org/" }
+}
+
+const assertReleaseMetadata = (manifest, label) => {
+  for (const [field, expected] of Object.entries(expectedReleaseMetadata)) {
+    assertJsonEqual(manifest[field], expected, `${label} ${field}`)
+  }
+}
+
 try {
   const packed = run(
     npm,
-    ["pack", "--ignore-scripts", "--json", "--pack-destination", temporaryDirectory],
+    ["pack", "--json", "--pack-destination", temporaryDirectory],
     { encoding: "utf8" }
   )
   if (packed.status !== 0) {
     throw new Error(packed.stderr || packed.stdout || "npm pack failed")
   }
 
-  const [{ filename, files }] = JSON.parse(packed.stdout)
+  // npm forwards prepack output before its JSON payload, so parse the final
+  // JSON document rather than requiring the lifecycle to stay silent.
+  const jsonStart = packed.stdout.lastIndexOf("\n[")
+  const packJson = jsonStart === -1 ? packed.stdout : packed.stdout.slice(jsonStart + 1)
+  const [{ filename, files }] = JSON.parse(packJson)
   const paths = files.map((entry) => entry.path).sort()
-  const required = [
+  const compiledModules = [
+    "application",
+    "assets",
+    "bin",
+    "cli",
+    "content",
+    "io",
+    "json",
+    "limits",
+    "logger",
+    "node-services",
+    "pathless",
+    "process",
+    "record-validation",
+    "render",
+    "validation/calculate",
+    "validation/decimal",
+    "validation/identity",
+    "validation/model",
+    "validation/schema",
+    "validation/semantic",
+    "validation/snapshot",
+    "validation/validate",
+    "writer"
+  ]
+  const retainedAssets = [
+    "LICENSE",
+    "README.md",
     "assets/guide/authoring.md",
-    "dist/bin.js",
-    "dist/cli.js",
-    "dist/process.js",
-    "dist/render.js",
+    "examples/README.md",
     "examples/manufacturing-group.json",
     "examples/minimal.json",
-    "package.json",
     "schema/fs-document.schema.json",
     "schema/snapshot-diff.schema.json",
     "schema/validation-result.schema.json"
   ]
-
-  for (const path of required) {
-    if (!paths.includes(path)) throw new Error(`packed file missing: ${path}`)
-  }
-  for (const path of paths) {
-    if (
-      path.startsWith(".agents/") ||
-      path.startsWith("skills/") ||
-      path.startsWith("src/") ||
-      path.startsWith("test/") ||
-      path.startsWith("fixtures/")
-    ) {
-      throw new Error(`repository-only path was packed: ${path}`)
-    }
+  const expectedPaths = [
+    ...retainedAssets,
+    ...compiledModules.flatMap((module) => [`dist/${module}.js`, `dist/${module}.js.map`]),
+    "package.json"
+  ].sort()
+  if (JSON.stringify(paths) !== JSON.stringify(expectedPaths)) {
+    const missing = expectedPaths.filter((path) => !paths.includes(path))
+    const unexpected = paths.filter((path) => !expectedPaths.includes(path))
+    throw new Error(
+      `packed inventory drifted (missing=${JSON.stringify(missing)}, unexpected=${JSON.stringify(unexpected)})`
+    )
   }
 
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
-  if (packageJson.bin?.fs !== "dist/bin.js") throw new Error("packed bin mapping drifted")
+  assertReleaseMetadata(packageJson, "source package metadata")
   if (!filename.endsWith(".tgz")) throw new Error("npm pack did not produce a tarball")
 
   const tarball = join(temporaryDirectory, filename)
@@ -96,12 +197,34 @@ try {
     throw new Error(installed.stderr || installed.stdout || "packed install failed")
   }
 
-  const installedRoot = join(installDirectory, "node_modules", "@cpai", "fs")
-  for (const path of required.filter((entry) => !entry.startsWith("dist/") && entry !== "package.json")) {
+  const installedRoot = join(
+    installDirectory,
+    "node_modules",
+    ...expectedReleaseMetadata.name.split("/")
+  )
+  const installedPackageJson = JSON.parse(readFileSync(join(installedRoot, "package.json"), "utf8"))
+  assertReleaseMetadata(installedPackageJson, "installed package metadata")
+  const metadataExport = resolveInstalledExport(
+    `${expectedReleaseMetadata.name}/package.json`,
+    installDirectory
+  )
+  if (metadataExport.status !== 0 || metadataExport.stderr !== "") {
+    throw new Error(metadataExport.stderr || "installed package metadata export is unavailable")
+  }
+  assertExportUnavailable(expectedReleaseMetadata.name, installDirectory)
+  assertExportUnavailable(
+    `${expectedReleaseMetadata.name}/dist/validation/validate.js`,
+    installDirectory
+  )
+  for (const path of retainedAssets) {
     const source = readFileSync(path)
     const packedAsset = readFileSync(join(installedRoot, path))
     if (!source.equals(packedAsset)) throw new Error(`packed bytes differ: ${path}`)
   }
+  assertPackagedMarkdownLinks(
+    installedRoot,
+    retainedAssets.filter((path) => path.endsWith(".md"))
+  )
 
   const installedBin = join(installedRoot, "dist", "bin.js")
   if (!readFileSync(installedBin, "utf8").startsWith("#!/usr/bin/env node\n")) {
@@ -113,13 +236,89 @@ try {
 
   const shim = join(installDirectory, "node_modules", ".bin", process.platform === "win32" ? "fs.cmd" : "fs")
   if (!existsSync(shim)) throw new Error("installed fs shim is missing")
-  const discovery = run(shim, [], { cwd: installDirectory, encoding: "utf8" })
-  if (discovery.status !== 0 || discovery.stderr !== "") {
-    throw new Error(discovery.stderr || "installed fs discovery failed")
+  const installedSchema = join(installedRoot, "schema", "fs-document.schema.json")
+  const missingSchema = `${installedSchema}.missing`
+  renameSync(installedSchema, missingSchema)
+  try {
+    const missingAsset = run(shim, ["schema", "document"], {
+      cwd: installDirectory,
+      encoding: "utf8"
+    })
+    if (missingAsset.status !== 1 || missingAsset.stderr !== "") {
+      throw new Error("missing installed asset did not produce a bounded process failure")
+    }
+    assertJsonEqual(
+      JSON.parse(missingAsset.stdout),
+      {
+        error: {
+          operation: "schema",
+          code: "internal-error",
+          message: "The requested operation could not be completed."
+        },
+        help: []
+      },
+      "missing installed asset failure"
+    )
+  } finally {
+    renameSync(missingSchema, installedSchema)
   }
+  const discovery = successfulJson(
+    run(shim, [], { cwd: installDirectory, encoding: "utf8" }),
+    "installed fs discovery"
+  )
   const expectedDiscovery = JSON.parse(readFileSync("fixtures/cli/expected/discovery.json", "utf8"))
-  if (JSON.stringify(JSON.parse(discovery.stdout)) !== JSON.stringify(expectedDiscovery)) {
-    throw new Error("installed fs discovery differs from the accepted value")
+  assertJsonEqual(discovery, expectedDiscovery, "installed fs discovery")
+
+  const noRollupsPath = join(process.cwd(), "fixtures", "valid", "no-rollups.json")
+  const expectedValidation = JSON.parse(
+    readFileSync("fixtures/calculation-results/no-rollups.json", "utf8")
+  )
+  const expectedNotRecorded = JSON.parse(
+    readFileSync("fixtures/snapshot-diffs/not-recorded.json", "utf8")
+  )
+  const validation = successfulJson(
+    run(shim, ["validate", noRollupsPath], { cwd: installDirectory, encoding: "utf8" }),
+    "installed fs validate"
+  )
+  assertJsonEqual(validation.validation, expectedValidation, "installed fs validation result")
+  assertJsonEqual(validation.snapshotDiff, expectedNotRecorded, "installed fs validation snapshot diff")
+
+  const createdPath = join(temporaryDirectory, "installed-created.json")
+  const creation = successfulJson(
+    run(shim, ["create", "--output", createdPath, noRollupsPath], {
+      cwd: installDirectory,
+      encoding: "utf8"
+    }),
+    "installed fs create"
+  )
+  if (creation.output?.status !== "created" || creation.output.path !== createdPath) {
+    throw new Error("installed fs create did not report the accepted output")
+  }
+  if (!readFileSync(createdPath).equals(readFileSync(noRollupsPath))) {
+    throw new Error("installed fs create did not preserve candidate bytes")
+  }
+
+  const recordedPath = join(temporaryDirectory, "installed-recorded.json")
+  const recording = successfulJson(
+    run(shim, ["record-validation", "--output", recordedPath, noRollupsPath], {
+      cwd: installDirectory,
+      encoding: "utf8"
+    }),
+    "installed fs record-validation"
+  )
+  if (
+    recording.snapshotDiff?.status !== "match" ||
+    recording.output?.status !== "created" ||
+    recording.output.path !== recordedPath
+  ) {
+    throw new Error("installed fs record-validation did not report the accepted output")
+  }
+  if (
+    !readFileSync(recordedPath).equals(
+      readFileSync("fixtures/cli/expected/record-validation/no-rollups.json")
+    )
+  ) {
+    throw new Error("installed fs record-validation bytes differ from the accepted value")
   }
 
   const renderedPath = join(temporaryDirectory, "installed-render.html")

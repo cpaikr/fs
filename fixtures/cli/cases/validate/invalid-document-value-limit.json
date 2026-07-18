@@ -1,0 +1,37 @@
+{
+  "id": "validate-invalid-document-value-limit",
+  "command": "fs",
+  "arguments": ["validate", "-"],
+  "workspace": [],
+  "stdin": {
+    "generated": [
+      { "utf8": "{\"formatVersion\":\"0.1\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2024-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[", "count": 1 },
+      { "utf8": "{},", "count": 232 },
+      { "utf8": "{}]}]}", "count": 1 }
+    ]
+  },
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["error", "help"] },
+        { "pointer": "/error", "equals": ["operation", "code", "message", "path", "budget", "limit"] }
+      ],
+      "equalities": [
+        { "pointer": "/error/operation", "equals": "validate" },
+        { "pointer": "/error/code", "equals": "input-limit-exceeded" },
+        { "pointer": "/error/path", "equals": "-" },
+        { "pointer": "/error/budget", "equals": "invalid-document-values" },
+        { "pointer": "/error/limit", "equals": 256 },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/error/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

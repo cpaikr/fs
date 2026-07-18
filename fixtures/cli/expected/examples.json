@@ -2,12 +2,12 @@
   "examples": [
     {
       "name": "minimal",
-      "purpose": "Smallest complete document with no calculation rules.",
+      "purpose": "Smallest complete document with no rollups.",
       "calculationStatus": "not-defined"
     },
     {
       "name": "manufacturing-group",
-      "purpose": "Representative multi-statement document with a deliberate calculation inconsistency.",
+      "purpose": "Representative multi-statement document with a deliberate rollup inconsistency.",
       "calculationStatus": "inconsistent"
     }
   ],

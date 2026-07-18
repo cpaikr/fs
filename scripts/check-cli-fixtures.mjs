@@ -337,7 +337,7 @@ for (const caseReference of manifest.cases) {
   identifiers.push(descriptor.id);
 
   const stagedPaths = descriptor.workspace.map(({ copy, to }) => {
-    normalizeRepositoryFile(copy, `${context} workspace`);
+    if (copy !== undefined) normalizeRepositoryFile(copy, `${context} workspace`);
     assertWorkspacePath(to, `${context} workspace`);
     return to;
   });

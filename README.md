@@ -1,41 +1,73 @@
-# fs
+# `@sjunepark/fs`
 
-Status: The current V0 artifact semantics and packed reference CLI through
-`fs render` exist. A replacement statement-item-row model is accepted and its
-refactor is planned but not implemented. `fs` is a working title.
+`@sjunepark/fs` is the reference CLI for FS, a versioned JSON format for clean,
+structured financial statements. FS gives people and agents one predictable
+artifact to produce after financial data has been extracted or authored.
 
-`fs` is a public format for clean, structured financial statements. It gives
-people and agents one predictable artifact to produce after extracting or
-authoring financial data, regardless of whether the source was a PDF,
-spreadsheet, website, or manual entry.
+FS is not an extraction system, accounting taxonomy, source-mapping service,
+or financial-policy engine. Authors remain responsible for those decisions.
 
-The core product is a standalone JSON document and its validation semantics.
-It is not an extraction system, accounting taxonomy, or financial-policy
-engine.
+## Requirements
 
-## Start Here
+- Node.js `22.17.0` or later in the Node.js 22 line, or Node.js `24.15.0` or
+  later in the Node.js 24 line.
 
-- To encode an author-resolved financial model, use the
-  [authoring guide](docs/authoring.md).
-- To implement or evaluate the format, use the normative
-  [semantic specification](docs/semantic-spec.md).
-- To understand the product and its boundaries, read the
-  [product scope](docs/product-scope.md).
-- For every document and its authority, use the
-  [documentation index](docs/README.md).
-- To review or execute the accepted redesign, use the
-  [statement-item-row refactor plan](docs/plans/statement-item-row-refactor.md).
+## Package command forms
 
-## Repository State
+The pinned V0 package interface uses the following commands. This command
+reference does not attest to current npm publication availability.
 
-The V0 semantic contract, schemas, examples, language-neutral fixtures, full
-validator, bundled discovery/content commands, and exact-byte non-overwriting
-creation and validation-snapshot recording exist. The packed CLI runs the
-revised contract through `effect/unstable/cli` and renders deterministic,
-standalone HTML presentations.
+Run without a global installation:
 
-The [roadmap](ROADMAP.md) shows strategic milestones. The
-[step-9 plan](docs/plans/agent-guidance-snapshots-rendering.md) records its
-delivery decisions and validation. The
-[step-10 plan](docs/plans/statement-item-row-refactor.md) owns the pending
-replacement and its temporary contract drift.
+```sh
+npx -y @sjunepark/fs@0.1.0 --help
+```
+
+Or install the `fs` executable globally:
+
+```sh
+npm install --global @sjunepark/fs@0.1.0
+fs --help
+```
+
+Common workflows:
+
+```sh
+# Read the bundled authoring guide.
+npx -y @sjunepark/fs@0.1.0 guide authoring
+
+# Write the document schema or a bundled example to stdout.
+npx -y @sjunepark/fs@0.1.0 schema document
+npx -y @sjunepark/fs@0.1.0 example minimal
+
+# Validate a document and calculate its results.
+npx -y @sjunepark/fs@0.1.0 validate statement.fs.json
+
+# Render a deterministic standalone HTML table.
+npx -y @sjunepark/fs@0.1.0 render --output statement.html statement.fs.json
+```
+
+The package bundles its schemas, guide, and examples. Validation does not
+depend on network access.
+
+## Develop from source
+
+In a source checkout, `docs/development.md` owns repository setup, local CLI
+execution, validation, generated content, and package checks. That
+repository-only guide is not part of the npm package.
+
+## Format contract
+
+V0 documents use `formatVersion: "0.1"`. The normative
+[FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/) and
+[versioned document schema](https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json)
+define the public contract.
+
+## Support
+
+Report package or specification problems through the
+[public issue tracker](https://github.com/cpaikr/cpaikr.github.io/issues).
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).

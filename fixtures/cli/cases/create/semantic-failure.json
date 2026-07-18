@@ -3,7 +3,7 @@
   "command": "fs",
   "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
-    { "copy": "../invalid/unresolved-item.json", "to": "candidate.json" }
+    { "copy": "../invalid/unresolved-rollup.json", "to": "candidate.json" }
   ],
   "stdin": null,
   "expect": {
@@ -35,7 +35,7 @@
             "file": "../manifest.json",
             "arrayPointer": "/invalidDocuments",
             "wherePointer": "/document",
-            "whereEquals": "invalid/unresolved-item.json",
+            "whereEquals": "invalid/unresolved-rollup.json",
             "valuePointer": "/code"
           }
         },
@@ -45,7 +45,7 @@
             "file": "../manifest.json",
             "arrayPointer": "/invalidDocuments",
             "wherePointer": "/document",
-            "whereEquals": "invalid/unresolved-item.json",
+            "whereEquals": "invalid/unresolved-rollup.json",
             "valuePointer": "/path"
           }
         },

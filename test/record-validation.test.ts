@@ -5,15 +5,15 @@ import { describe, expect, it } from "vitest"
 
 import { decodeJson } from "../src/json.js"
 import { recordValidationSnapshot } from "../src/record-validation.js"
-import type { Document } from "../src/validation/model.js"
+import type { ApplicationResult, Document } from "../src/validation/model.js"
 import { validateDocument } from "../src/validation/validate.js"
 
 describe("validation snapshot recording", () => {
   it.each([
     [
       "without an existing snapshot",
-      "fixtures/valid/no-calculation-rules.json",
-      "fixtures/cli/expected/record-validation/no-rules.json"
+      "fixtures/valid/no-rollups.json",
+      "fixtures/cli/expected/record-validation/no-rollups.json"
     ],
     [
       "while replacing a mismatching snapshot",
@@ -38,16 +38,14 @@ describe("validation snapshot recording", () => {
   })
 
   it("preserves arbitrary parsed top-level member order before the appended snapshot", () => {
-    const decoded = decodeJson(readFileSync(resolve("fixtures/valid/no-calculation-rules.json")))
+    const decoded = decodeJson(readFileSync(resolve("fixtures/valid/no-rollups.json")))
     expect(decoded.ok).toBe(true)
     if (!decoded.ok) return
     const source = decoded.value as Document
     const reordered: Document = {
       statements: source.statements,
-      facts: source.facts,
       periods: source.periods,
       units: source.units,
-      items: source.items,
       scope: source.scope,
       entity: source.entity,
       formatVersion: source.formatVersion
@@ -58,10 +56,8 @@ describe("validation snapshot recording", () => {
     const recorded = recordValidationSnapshot(reordered, validation)
     const expectedOrder = [
       "statements",
-      "facts",
       "periods",
       "units",
-      "items",
       "scope",
       "entity",
       "formatVersion",
@@ -70,5 +66,81 @@ describe("validation snapshot recording", () => {
 
     expect(Object.keys(recorded.document)).toEqual(expectedOrder)
     expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)
+  })
+
+  it("preserves the optional schema pointer in its author-chosen position", () => {
+    const source = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
+    if (
+      source.$schema === undefined ||
+      source.documentId === undefined ||
+      source.groupingColumns === undefined
+    ) {
+      throw new Error("Manufacturing example lost its optional discovery members")
+    }
+    const input: Document = {
+      formatVersion: source.formatVersion,
+      documentId: source.documentId,
+      entity: source.entity,
+      $schema: source.$schema,
+      scope: source.scope,
+      units: source.units,
+      periods: source.periods,
+      groupingColumns: source.groupingColumns,
+      statements: source.statements
+    }
+    const validation = validateDocument(input).validation
+    const recorded = recordValidationSnapshot(input, validation)
+    const expectedOrder = [
+      "formatVersion",
+      "documentId",
+      "entity",
+      "$schema",
+      "scope",
+      "units",
+      "periods",
+      "groupingColumns",
+      "statements",
+      "validationSnapshot"
+    ]
+
+    expect(recorded.document.$schema).toBe(
+      "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+    )
+    expect(Object.keys(recorded.document)).toEqual(expectedOrder)
+    expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)
+    expect(validateDocument(recorded.document).snapshotDiff.status).toBe("match")
+  })
+
+  it("does not retain a mutable alias to refined application arrays", () => {
+    const input = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
+    const validation = validateDocument(input).validation
+    const recorded = recordValidationSnapshot(input, validation)
+    const snapshot = structuredClone(recorded.document.validationSnapshot)
+
+    const sourceApplications = validation.calculations.applications as unknown as Array<ApplicationResult>
+    sourceApplications.splice(0)
+
+    expect(recorded.document.validationSnapshot).toEqual(snapshot)
+  })
+
+  it.each([
+    ["not-run", "fixtures/invalid/extra-value-key.json"],
+    ["not-defined", "examples/minimal.json"]
+  ] as const)("does not retain a mutable alias for %s application arrays", (status, inputPath) => {
+    const input = JSON.parse(readFileSync(inputPath, "utf8")) as Document
+    const validation = validateDocument(input).validation
+    expect(validation.calculations.status).toBe(status)
+    const recorded = recordValidationSnapshot(input, validation)
+    const snapshot = structuredClone(recorded.document.validationSnapshot)
+
+    const sourceApplications = validation.calculations.applications as unknown as Array<ApplicationResult>
+    sourceApplications.push({
+      key: { statement: "mutated", parent: "mutated", period: "mutated" },
+      status: "error",
+      reason: "missing-value",
+      cell: { statement: "mutated", item: "mutated", period: "mutated" }
+    })
+
+    expect(recorded.document.validationSnapshot).toEqual(snapshot)
   })
 })

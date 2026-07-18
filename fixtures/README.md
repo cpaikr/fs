@@ -1,86 +1,59 @@
 # Language-Neutral Fixtures
 
-These fixtures remain executable evidence for the current `0.1` contract. The
-[Roadmap step-10 refactor](../docs/plans/statement-item-row-refactor.md) will
-replace the complete matrix rather than editing individual fixtures to resemble
-the accepted target prematurely.
-
-These fixtures provide machine-readable evidence for the normative
+These fixtures are machine-readable evidence for the current `0.1`
 [semantic specification](../docs/semantic-spec.md). Deterministic CLI process
 fixtures live under [`cli/`](cli/) and follow the
-[CLI acceptance contract](../docs/cli/acceptance.md). They reference the
-artifact inputs and results here instead of duplicating this matrix.
+[CLI acceptance contract](../docs/cli/acceptance.md).
 
-[`manifest.json`](manifest.json) is the fixture index. Its `document` paths are
-relative to this directory. It separates JSON Schema failures from semantic
-failures that require reference resolution, exact coordinate comparison, or
-calendar logic.
+[`manifest.json`](manifest.json) is the document-fixture index. Its paths are
+relative to this directory. Schema-layer cases fail the closed JSON shape;
+semantic-layer cases first pass JSON Schema and then fail reference, graph,
+map-key, calendar, or snapshot invariants.
 
-A conforming validator must:
-
-1. accept every `validDocuments` entry structurally;
-2. derive its named `calculationStatus`;
-3. reject every `invalidDocuments` entry at the named layer with the stable
-   `code` and JSON Pointer `path`; and
-4. match the named calculation and snapshot results.
+A conforming validator must accept every valid entry, derive its declared
+calculation status, and reject every invalid entry with the declared stable
+code and JSON Pointer path.
 
 ## Expected Results
 
-- `valid/no-calculation-rules.json` maps to
-  `calculation-results/no-rules.json` and
-  `snapshot-diffs/not-recorded.json`.
-- `valid/all-rules-skipped.json` maps to
-  `calculation-results/all-skipped.json` and
-  `snapshot-diffs/not-recorded.json`.
-- `valid/calculation-errors.json` maps to
-  `calculation-results/required-fact-errors.json` and
+- `valid/no-rollups.json` maps to
+  `calculation-results/no-rollups.json` and
   `snapshot-diffs/not-recorded.json`.
 - `valid/exact-arithmetic.json` maps to
-  `calculation-results/exact-arithmetic.json` and
-  `snapshot-diffs/not-recorded.json`.
-- `valid/scale-boundaries.json` maps to `snapshot-diffs/not-recorded.json` and
-  proves that both inclusive `unit.scale` endpoints are schema-valid.
-- `valid/recorded-snapshot.json` maps to
-  `calculation-results/recorded-snapshot-current.json` and
-  `snapshot-diffs/match.json`.
-- `valid/snapshot-mismatch-source.json` maps to
-  `calculation-results/snapshot-mismatch-current.json` and
-  `snapshot-diffs/mismatch.json`.
-- `../examples/manufacturing-group.json` maps to
-  `calculation-results/manufacturing-group.json` and
+  `calculation-results/exact-arithmetic.json` and proves exact decimal,
+  nested direct-child, and inclusive-tolerance behavior.
+- `valid/statement-local-rollups.json` maps to
+  `calculation-results/statement-local-rollups.json` and proves that equal item
+  identifiers in different statements produce distinct application keys.
+- `valid/rollup-cell-errors.json` maps to
+  `calculation-results/rollup-cell-errors.json` and proves missing and
+  unavailable cell errors.
+- `valid/scale-boundaries.json` proves both inclusive `unit.scale` endpoints.
+- `valid/recorded-snapshot.json` maps to the recorded-snapshot current result
+  and `snapshot-diffs/match.json`.
+- `valid/snapshot-mismatch-source.json` maps to the snapshot-mismatch current
+  result and `snapshot-diffs/mismatch.json`.
+- `../examples/manufacturing-group.json` maps to the manufacturing result and
   `snapshot-diffs/not-recorded.json`.
 
-`invalid/unresolved-item.json` maps to
-`calculation-results/structural-nonconformance.json`. It proves that a
-nonconforming document receives calculation status `not-run`; validators do
-not attempt arithmetic against unreliable references.
-
+`calculation-results/structural-nonconformance.json` proves that calculations
+are `not-run` when references are unreliable.
 `invalid/duplicate-snapshot-application-key.json` maps to
-`snapshot-diffs/invalid-snapshot.json`. It proves that a present but
-structurally unusable snapshot is `not-comparable`, not `not-recorded`.
+`snapshot-diffs/invalid-snapshot.json`, distinguishing an unusable recorded
+snapshot from an absent one. `snapshot-diffs/application-set-changes.json`
+exercises the closed added and removed application forms.
 
-`raw-input/` contains exact process inputs that fail before document-schema
-validation. They are intentionally outside `manifest.json`: malformed syntax,
-trailing content, and duplicate object members all become the CLI
-`invalid-json` operational error rather than document conformance results.
+## Raw Process Inputs
 
-The same directory contains `noncanonical-valid.json`, a conforming
-document with leading whitespace and compact JSON. Exact-copy CLI cases use it
-to detect reserialization even when parsed JSON values would compare equal.
+`raw-input/` contains exact inputs for failures that precede document-schema
+validation: malformed syntax, trailing content, and duplicate JSON object
+members. `noncanonical-valid.json` is instead a conforming compact row
+document with leading whitespace; exact-copy CLI cases use it to detect
+reserialization.
 
 ## Shape Validation
 
-Run these commands from the repository root with any draft 2020-12
-implementation. For example:
-
-```sh
-npx --yes ajv-cli@5 validate --spec=draft2020 \
-  -s schema/fs-document.schema.json -d 'examples/*.json'
-npx --yes ajv-cli@5 validate --spec=draft2020 \
-  -s schema/fs-document.schema.json -d 'fixtures/valid/*.json'
-```
-
-Manifest entries with layer `schema` must fail that schema. The remaining
-invalid fixtures must pass JSON Schema before failing their named semantic
-invariant. This distinction prevents an implementation from hiding missing
-semantic validation behind a coincidental shape error.
+Run `./scripts/check-docs.sh` from the repository root. It validates the
+manifest inventory, all conforming artifacts and expected results, the schema
+classification of every invalid document, unique application identities, and
+the CLI descriptor references.

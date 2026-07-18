@@ -1,0 +1,34 @@
+{
+  "id": "validate-cwd-unavailable-stdin",
+  "command": "fs",
+  "workingDirectory": "unavailable",
+  "arguments": ["validate", "-"],
+  "workspace": [],
+  "stdin": { "file": "../valid/no-rollups.json" },
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [{ "pointer": "", "equals": ["validation", "snapshotDiff", "help"] }],
+      "equalities": [
+        { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rollups.json" } },
+        { "pointer": "/snapshotDiff", "equalsFile": { "file": "../snapshot-diffs/not-recorded.json" } },
+        {
+          "pointer": "/help",
+          "equals": [
+            {
+              "executable": "fs",
+              "arguments": ["record-validation", "--output", "<new-document>", "-"]
+            }
+          ]
+        }
+      ],
+      "nonemptyStrings": []
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 0,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": [], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}

@@ -4,7 +4,7 @@
   "arguments": ["create", "--output", "result.json", "candidate.json"],
   "workspace": [
     { "copy": "../raw-input/malformed-json.json.txt", "to": "candidate.json" },
-    { "copy": "../valid/no-calculation-rules.json", "to": "result.json" }
+    { "copy": "../valid/no-rollups.json", "to": "result.json" }
   ],
   "stdin": null,
   "expect": {

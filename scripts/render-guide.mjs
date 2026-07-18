@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -10,6 +10,7 @@ const templatePath = resolve(
   "content/guide/authoring.md.template",
 );
 const installedPath = resolve(repositoryRoot, "assets/guide/authoring.md");
+const readmePath = resolve(repositoryRoot, "README.md");
 const packagePath = resolve(repositoryRoot, "package.json");
 const skillPath = resolve(
   repositoryRoot,
@@ -21,21 +22,48 @@ const skillMetadataPath = resolve(
 );
 const commandPlaceholder = "{{FS_COMMAND}}";
 const versionNotePlaceholder = "{{FS_VERSION_NOTE}}";
+const skillName = "author-fs";
+const skillDescription =
+  "Author FS documents from resolved financial models. Use when creating a " +
+  "conforming FS JSON document or repairing structural diagnostics after " +
+  "financial meanings, values, units, periods, groupings, and rollups are " +
+  "author-confirmed.";
+const skillDisplayName = "Author FS Documents";
+const skillShortDescription = "Encode or repair resolved FS financial documents";
+const skillDefaultPrompt =
+  "Use $author-fs to encode or repair this author-resolved financial model " +
+  "as a conforming FS document.";
 const skillFrontmatter = `---
-name: author-fs
-description: >-
-  Encode and validate complete FS financial-statement documents from
-  author-resolved models. Use when an agent must create or repair an FS JSON
-  document without inferring missing financial meanings, values, taxonomy,
-  calculations, or source mappings.
+name: ${skillName}
+description: ${JSON.stringify(skillDescription)}
 ---
 
 `;
 const skillMetadata = `interface:
-  display_name: "Author FS Documents"
-  short_description: "Encode and validate resolved financial statements"
-  default_prompt: "Use $author-fs to encode this resolved financial model as a conforming FS document."
+  display_name: ${JSON.stringify(skillDisplayName)}
+  short_description: ${JSON.stringify(skillShortDescription)}
+  default_prompt: ${JSON.stringify(skillDefaultPrompt)}
 `;
+
+const validateSkillDefinition = () => {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(skillName) || skillName.length > 64) {
+    throw new Error("Agent Skill name must be a kebab-case name of at most 64 characters");
+  }
+  if (basename(dirname(skillPath)) !== skillName) {
+    throw new Error("Agent Skill directory must match its name");
+  }
+  if (skillDescription.length === 0 || skillDescription.length > 1024) {
+    throw new Error("Agent Skill description must contain at most 1024 characters");
+  }
+  if (skillShortDescription.length < 25 || skillShortDescription.length > 64) {
+    throw new Error("Agent Skill short description must contain 25-64 characters");
+  }
+  if (!skillDefaultPrompt.includes(`$${skillName}`)) {
+    throw new Error("Agent Skill default prompt must name the Skill");
+  }
+};
+
+validateSkillDefinition();
 
 const isNumericIdentifier = (value) =>
   /^(?:0|[1-9][0-9]*)$/.test(value);
@@ -102,23 +130,53 @@ const render = (command, versionNote = "") => {
   return rendered;
 };
 
-const renderSkill = (version) => {
+const packageMetadata = () => {
+  const manifest = JSON.parse(readFileSync(packagePath, "utf8"));
+  if (
+    typeof manifest.name !== "string" ||
+    !/^@[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9._-]*$/.test(manifest.name)
+  ) {
+    throw new Error("package.json name must be an exact scoped npm package name");
+  }
+  if (typeof manifest.version !== "string" || !isExactSemVer(manifest.version)) {
+    throw new Error("package.json version must be an exact npm version");
+  }
+  return { name: manifest.name, version: manifest.version };
+};
+
+const checkReadmePackageIdentity = ({ name, version }) => {
+  const readme = readFileSync(readmePath, "utf8");
+  const exactPackage = `${name}@${version}`;
+  const packageCommands = [
+    ...readme.matchAll(
+      /(?:npx -y|npm install --global)\s+(@[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9._-]*@[0-9A-Za-z.+-]+)/gu,
+    ),
+  ].map((match) => match[1]);
+  if (
+    !readme.startsWith(`# \`${name}\`\n`) ||
+    !readme.includes(`\`${name}\` is`) ||
+    packageCommands.length === 0 ||
+    packageCommands.some((specifier) => specifier !== exactPackage)
+  ) {
+    throw new Error("README.md package identity or version is stale");
+  }
+};
+
+const renderSkill = (name, version) => {
   if (!isExactSemVer(version)) {
     throw new Error("The package version must be an exact npm version");
   }
-  const versionNote = `This Skill is based on \`@cpai/fs\` version \`${version}\`.\n\n`;
-  return skillFrontmatter + render(`npx -y @cpai/fs@${version}`, versionNote);
-};
-
-const packageVersion = () => {
-  const value = JSON.parse(readFileSync(packagePath, "utf8")).version;
-  if (typeof value !== "string" || !isExactSemVer(value)) {
-    throw new Error("package.json version must be an exact npm version");
-  }
-  return value;
+  const exactPackage = `${name}@${version}`;
+  const versionNote =
+    `This Skill uses \`${exactPackage}\`.\n` +
+    "Its pinned commands are the package-availability check: continue only when\n" +
+    "they resolve from npm. Report a block instead of substituting an unpinned\n" +
+    "tag or another version.\n\n";
+  return skillFrontmatter + render(`npx -y ${exactPackage}`, versionNote);
 };
 
 const arguments_ = process.argv.slice(2);
+const package_ = packageMetadata();
 
 if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
   const expected = render("fs");
@@ -129,10 +187,12 @@ if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
     );
     process.exitCode = 1;
   }
+} else if (arguments_.length === 1 && arguments_[0] === "--check-readme") {
+  checkReadmePackageIdentity(package_);
 } else if (arguments_.length === 1 && arguments_[0] === "--installed") {
   process.stdout.write(render("fs"));
 } else if (arguments_.length === 1 && arguments_[0] === "--check-skill") {
-  const expected = renderSkill(packageVersion());
+  const expected = renderSkill(package_.name, package_.version);
   const actual = readFileSync(skillPath, "utf8");
   if (actual !== expected) {
     process.stderr.write(
@@ -148,25 +208,26 @@ if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
     process.exitCode = 1;
   }
 } else if (arguments_.length === 1 && arguments_[0] === "--npx-template") {
-  process.stdout.write(render("npx -y @cpai/fs@<version>"));
+  process.stdout.write(render(`npx -y ${package_.name}@<version>`));
 } else if (arguments_.length === 2 && arguments_[0] === "--npx-version") {
   const version = arguments_[1];
   if (!isExactSemVer(version)) {
     process.stderr.write("The package version must be an exact npm version\n");
     process.exitCode = 2;
   } else {
-    process.stdout.write(render(`npx -y @cpai/fs@${version}`));
+    process.stdout.write(render(`npx -y ${package_.name}@${version}`));
   }
 } else if (arguments_.length === 2 && arguments_[0] === "--skill-version") {
   try {
-    process.stdout.write(renderSkill(arguments_[1]));
+    process.stdout.write(renderSkill(package_.name, arguments_[1]));
   } catch (error) {
     process.stderr.write(`${error.message}\n`);
     process.exitCode = 2;
   }
 } else {
   process.stderr.write(
-    "Usage: render-guide.mjs --check-installed | --check-skill | " +
+    "Usage: render-guide.mjs --check-installed | --check-readme | " +
+      "--check-skill | " +
       "--installed | --npx-template | --npx-version <version> | " +
       "--skill-version <version>\n",
   );

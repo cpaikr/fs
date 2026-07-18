@@ -1,0 +1,50 @@
+{
+  "id": "validate-invalid-document-value-limit-exact",
+  "command": "fs",
+  "arguments": ["validate", "input.json"],
+  "workspace": [
+    {
+      "generated": [
+        { "utf8": "{\"formatVersion\":\"0.1\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2024-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[", "count": 1 },
+        { "utf8": "{},", "count": 231 },
+        { "utf8": "{}]}]}", "count": 1 }
+      ],
+      "to": "input.json"
+    }
+  ],
+  "stdin": null,
+  "expect": {
+    "stdout": {
+      "encoding": "json",
+      "members": [
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "help"] },
+        { "pointer": "/validation", "equals": ["formatVersion", "conformance", "calculations"] },
+        { "pointer": "/validation/conformance", "equals": ["status", "errors"] },
+        { "pointer": "/validation/conformance/errors/0", "equals": ["code", "path", "message"] },
+        { "pointer": "/validation/calculations", "equals": ["status", "applications"] },
+        { "pointer": "/snapshotDiff", "equals": ["formatVersion", "status"] }
+      ],
+      "arrays": [
+        { "pointer": "/validation/conformance/errors", "equals": 1160 }
+      ],
+      "equalities": [
+        { "pointer": "/validation/formatVersion", "equals": "0.1" },
+        { "pointer": "/validation/conformance/status", "equals": "nonconforming" },
+        { "pointer": "/validation/conformance/errors/0/code", "equals": "required-property" },
+        { "pointer": "/validation/conformance/errors/0/path", "equals": "/statements/0/items/0/groupings" },
+        { "pointer": "/validation/calculations/status", "equals": "not-run" },
+        { "pointer": "/validation/calculations/applications", "equals": [] },
+        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.1" },
+        { "pointer": "/snapshotDiff/status", "equals": "not-recorded" },
+        { "pointer": "/help", "equals": [] }
+      ],
+      "nonemptyStrings": ["/validation/conformance/errors/0/message"]
+    },
+    "stderr": { "encoding": "bytes", "equalsUtf8": "" },
+    "exitCode": 1,
+    "filesystem": {
+      "workspace": { "created": [], "unchanged": ["input.json"], "absent": [] },
+      "home": { "created": [], "unchanged": [], "absent": [] }
+    }
+  }
+}
