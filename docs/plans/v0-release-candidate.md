@@ -109,13 +109,26 @@ the complete CLI descriptor matrix. `git diff --check` passes. Fresh contract
 review applied two wording and example clarity fixes and then found no
 remaining material correctness, design, validation, or plan-coverage gap.
 
+PR #9 receives completed Codex and CodeRabbit review. Codex reports no
+finding. CodeRabbit's three findings are fixed in `6aa8991`, validated with the
+focused and full gates, replied to, and resolved. The documentation job and
+both Windows/Node matrix cells pass on the reviewed head. The four GitHub-hosted
+Linux and macOS cells do not start because the organization reports failed
+payments or an insufficient Actions spending limit; they provide no code-test
+evidence and must be rerun successfully before merge.
+
 ## Blockers
 
 The repository contains no licensing decision or license file. The owner must
 select the public release license before Phase 3 can complete; no license will
 be inferred.
 
+GitHub-hosted Actions jobs cannot start until the `cpaikr` organization billing
+or Actions spending limit is corrected. This blocks the required all-green PR
+and final-candidate evidence.
+
 ## Next Action
 
-Complete the Phase-1 PR's required reviews and merge it into `dev`, then
-publish and verify the exact schema bytes before starting Phase 2.
+Correct the organization Actions billing or spending-limit failure, rerun the
+failed Linux and macOS jobs for PR #9 to a green result, and merge it into `dev`.
+Then publish and verify the exact schema bytes before starting Phase 2.
