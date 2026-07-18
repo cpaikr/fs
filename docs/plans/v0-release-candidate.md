@@ -59,7 +59,7 @@ GitHub release, or mark Roadmap step 11 complete.
 - [x] Phase 1: align canonical schema identifiers and optional `$schema`
   across semantic prose, schemas, models, fixtures, examples, generated
   guidance, tests, and checks.
-- [ ] Phase 2: merge the reviewed schema slice; publish its exact schema bytes
+- [x] Phase 2: merge the reviewed schema slice; publish its exact schema bytes
   and versioned semantic specification; verify every public HTTPS resource
   before starting later work.
 - [ ] Phase 3: complete npm package, licensing, repository, support, and
@@ -71,27 +71,18 @@ GitHub release, or mark Roadmap step 11 complete.
 
 ## Current State
 
-The completed step-10 state on `dev` is the baseline. This active plan and its
-documentation-index route are established. The dedicated public
-`cpaikr/cpaikr.github.io` repository now exists and GitHub Pages is enabled at
-`https://cpaikr.github.io/` with enforced HTTPS. It does not yet publish FS
-schemas. The Phase-1 source cutover assigns all three shipped schema IDs,
-removes the unnecessary internal CLI descriptor ID, permits only the optional
-exact document pointer, preserves it through recording, and aligns the owning
-prose, generated guidance, example, invalid fixture, tests, and checks.
-The public semantic specification is deployed from Pages commit `ac0d330` and
-returns HTTPS 200 at its versioned URL.
-
-The first PR owns Phases 0 and 1. After it is reviewed and merged, the
-reviewed schema bytes will be copied to the public host and verified before a
-fresh second branch starts from updated `dev`.
+PR #9 merged Phases 0 and 1 into `dev` as merge commit `11bd7d2`, preserving
+the slice's individual commits. Pages commit `63b13ad` publishes the exact
+merged document, validation-result, and snapshot-diff schemas and the
+versioned semantic specification. Every public resource returns HTTPS 200;
+the schemas use `application/json`, allow cross-origin reads, and are
+byte-identical to the repository files. AJV validates all maintained result
+and diff fixtures against the downloaded schemas and their relative
+cross-schema references.
 
 ## Known Temporary Drift
 
-- Public schema URLs do not serve the repository schemas yet.
-
-This drift is confined to the reviewed publication boundary. It must be closed
-immediately after the first PR merges and before the second branch starts.
+None.
 
 ## Validation
 
@@ -112,13 +103,17 @@ the complete CLI descriptor matrix. `git diff --check` passes. Fresh contract
 review applied two wording and example clarity fixes and then found no
 remaining material correctness, design, validation, or plan-coverage gap.
 
-PR #9 receives completed Codex and CodeRabbit review. Codex reports no
+PR #9 received completed Codex and CodeRabbit review. Codex reported no
 finding. CodeRabbit's three findings are fixed in `6aa8991`, validated with the
-focused and full gates, replied to, and resolved. The documentation job and
-both Windows/Node matrix cells pass on the reviewed head. The initial
-GitHub-hosted Linux and macOS cells could not start because of an organization
-billing limit. The owner directed the full matrix to Blacksmith; the replacement
-run must pass before merge.
+focused and full gates, replied to, and resolved. Its final CI run
+`29623796785` passed documentation and all six Blacksmith OS/Node matrix cells
+on head `c4ed1fc`. A final local code-review pass found no material issue in
+the runner migration.
+
+Pages deployment `29624021568` succeeded for commit `63b13ad`. Direct
+downloads confirmed the public schemas' status, content type, CORS header,
+byte identity, and cross-file reference behavior before this second branch
+started from updated `dev`.
 
 ## Blockers
 
@@ -128,6 +123,6 @@ be inferred.
 
 ## Next Action
 
-Validate and push the Blacksmith runner migration, confirm every PR #9 matrix
-cell is green, and merge it into `dev`. Then publish and verify the exact
-schema bytes before starting Phase 2.
+Complete the package and release metadata, including the owner-selected
+license, then strengthen installed-tarball verification and release dry-run
+gates without publishing.
