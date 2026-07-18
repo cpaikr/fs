@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://fs.example/schema/0.1/validation-result.schema.json",
+  "$id": "https://cpaikr.github.io/fs/schema/0.1/validation-result.schema.json",
   "title": "FS V0 validation result",
   "type": "object",
   "additionalProperties": false,

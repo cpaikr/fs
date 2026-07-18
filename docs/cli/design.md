@@ -105,6 +105,12 @@ than overloading the CLI's global `--version` action. `fs --version` reports
 the CLI package version; any other placement the pinned parser happens to
 accept retains that global meaning and never selects schema content.
 
+Each bundled schema has its canonical public identifier under
+`https://cpaikr.github.io/fs/schema/0.1/`. Discovery remains offline and reads
+the bundled bytes; it does not fetch the canonical URL. The document schema
+permits an optional top-level `$schema` property only when it equals the
+document schema's identifier.
+
 Without `--output`, write the schema bytes directly. With `--output`, create
 exactly the requested new file and report that creation. Never overwrite or
 create missing parent directories.

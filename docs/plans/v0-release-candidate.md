@@ -42,6 +42,9 @@ GitHub release, or mark Roadmap step 11 complete.
 - Published V0 schema bytes must exactly match the reviewed repository
   schemas. After V0 publication, the `0.1` URLs are immutable; an incompatible
   schema requires a new versioned path.
+- The same public Pages site serves the normative semantic specification at
+  `https://cpaikr.github.io/fs/spec/0.1/`; packaged guidance must not route
+  public users into the private source repository.
 - Delivery uses two substantial sequential PRs into `dev`: first the schema
   publication contract, then release metadata and cross-platform candidate
   verification. Each branch starts from updated `dev`; the PRs are not
@@ -50,11 +53,12 @@ GitHub release, or mark Roadmap step 11 complete.
 ## Phase State
 
 - [x] Phase 0: establish the active plan, public host, decisions, and baseline.
-- [ ] Phase 1: align canonical schema identifiers and optional `$schema`
+- [x] Phase 1: align canonical schema identifiers and optional `$schema`
   across semantic prose, schemas, models, fixtures, examples, generated
   guidance, tests, and checks.
-- [ ] Phase 2: merge the reviewed schema slice, publish its exact schema bytes,
-  and verify the public HTTPS resources before starting later work.
+- [ ] Phase 2: merge the reviewed schema slice; publish its exact schema bytes
+  and versioned semantic specification; verify every public HTTPS resource
+  before starting later work.
 - [ ] Phase 3: complete npm package, licensing, repository, support, and
   release configuration without publishing.
 - [ ] Phase 4: make packed-package verification release-grade across every
@@ -68,9 +72,12 @@ The completed step-10 state on `dev` is the baseline. This active plan and its
 documentation-index route are established. The dedicated public
 `cpaikr/cpaikr.github.io` repository now exists and GitHub Pages is enabled at
 `https://cpaikr.github.io/` with enforced HTTPS. It does not yet publish FS
-schemas. The source repository still uses the placeholder document schema
-identifier, does not assign canonical identifiers to the result schemas, and
-rejects a document-level `$schema` property.
+schemas. The Phase-1 source cutover assigns all three shipped schema IDs,
+removes the unnecessary internal CLI descriptor ID, permits only the optional
+exact document pointer, preserves it through recording, and aligns the owning
+prose, generated guidance, example, invalid fixture, tests, and checks.
+The public semantic specification is deployed from Pages commit `ac0d330` and
+returns HTTPS 200 at its versioned URL.
 
 The first PR owns Phases 0 and 1. After it is reviewed and merged, the
 reviewed schema bytes will be copied to the public host and verified before a
@@ -78,13 +85,10 @@ fresh second branch starts from updated `dev`.
 
 ## Known Temporary Drift
 
-- `schema/fs-document.schema.json` still uses `https://fs.example/`.
-- The result schemas have no canonical `$id`.
-- The semantic and authoring contracts still reject document-level `$schema`.
 - Public schema URLs do not serve the repository schemas yet.
 
-This drift is confined to the active Phase-1 cutover and must be closed before
-the first PR merges.
+This drift is confined to the reviewed publication boundary. It must be closed
+immediately after the first PR merges and before the second branch starts.
 
 ## Validation
 
@@ -96,6 +100,15 @@ guidance, schemas, examples, fixtures, and the CLI descriptor matrix.
 must repeat those gates; implementation and package slices must additionally
 pass the full repository gate.
 
+The Phase-1 schema cutover passes focused schema and recording tests, then the
+full `pnpm verify` gate: TypeScript, strict Effect diagnostics, unit and
+boundary tests, packed-process acceptance, writer integration, and installed
+tarball smoke. `./scripts/check-docs.sh` passes with exact generated guidance,
+canonical-ID and optional-pointer assertions, every schema and fixture, and
+the complete CLI descriptor matrix. `git diff --check` passes. Fresh contract
+review applied two wording and example clarity fixes and then found no
+remaining material correctness, design, validation, or plan-coverage gap.
+
 ## Blockers
 
 The repository contains no licensing decision or license file. The owner must
@@ -104,4 +117,5 @@ be inferred.
 
 ## Next Action
 
-Implement the aligned Phase-1 schema publication contract on this branch.
+Commit and open the Phase-1 PR into `dev`, then complete its required reviews
+and merge before publishing the exact schema bytes.

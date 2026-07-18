@@ -68,6 +68,18 @@ describe("validation snapshot recording", () => {
     expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)
   })
 
+  it("preserves the optional schema pointer in its author-chosen position", () => {
+    const input = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
+    const validation = validateDocument(input).validation
+    const recorded = recordValidationSnapshot(input, validation)
+
+    expect(recorded.document.$schema).toBe(
+      "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+    )
+    expect(Object.keys(recorded.document)[0]).toBe("$schema")
+    expect(Object.keys(recorded.document).at(-1)).toBe("validationSnapshot")
+  })
+
   it("does not retain a mutable alias to refined application arrays", () => {
     const input = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
     const validation = validateDocument(input).validation

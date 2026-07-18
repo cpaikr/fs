@@ -186,6 +186,12 @@
       "path": "/statements/0/items/0/groupings/valuation"
     },
     {
+      "document": "invalid/wrong-schema.json",
+      "layer": "schema",
+      "code": "invalid-value",
+      "path": "/$schema"
+    },
+    {
       "document": "invalid/wrong-value-cell-type.json",
       "layer": "schema",
       "code": "invalid-type",
