@@ -1,13 +1,10 @@
 # V0 Release Candidate Plan
 
-Status: In progress. The reviewed candidate is merged to `main` at `b06de25`.
-Its complete supported OS and Node.js matrix, documentation gate, production
-audit, and dependent npm publication dry run pass. Release Please setup is in
-progress; repository visibility, npm publication, tag, and GitHub release are
-pending.
+Status: Complete. `@sjunepark/fs@0.1.0` is public on npm, `cpaikr/fs` is public,
+and GitHub release `v0.1.0` tags release commit `1f1d736`.
 
-This plan owns the live V0 release-candidate state, release decisions,
-validation, blockers, and next action. The
+This completed plan records the final V0 release state, release decisions,
+validation, and follow-up boundary. The
 [semantic specification](../semantic-spec.md) owns artifact meaning, the
 [CLI design](../cli/design.md) owns command intent, the
 [CLI acceptance contract](../cli/acceptance.md) owns observable process
@@ -110,62 +107,55 @@ The candidate merged to `main`:
 
 On 2026-07-18, exact-head push run `29647831201` proved `b06de25` on every
 declared OS and Node.js line, then passed documentation, production audit, and
-the dependent npm publication dry run. Live checks found `cpaikr/fs` private
-with `main` as its default branch, no tag or GitHub release, and no published
-`@sjunepark/fs@0.1.0`. This is the expected pre-release state.
+the dependent npm publication dry run. Release setup and generated release
+artifacts did not change the verified package payload.
 
-Release Please setup is being prepared on top of the merged candidate. Its
-workflow and ownership documentation are not package payload, and the initial
-manifest records `0.0.0`; the setup commit supplies the one-time
-`Release-As: 0.1.0` input.
-
-## Remaining Work
+## Release Result
 
 ### Candidate proof
 
 Complete. The verified package payload is frozen at `b06de25`; release setup
-and generated release artifacts must not change that payload.
+and generated release artifacts did not change that payload.
 
 ### Release handoff
 
-After the candidate proof succeeds and release is explicitly authorized:
+Complete. Release Please setup merged through PR `#17`, its runner correction
+through PR `#18`, and generated release PR `#19` at commit `1f1d736`. The
+generated changelog gate correction merged separately through PR `#20`.
 
-1. Merge the Release Please setup with commit preservation.
-2. Review and merge its generated `0.1.0` release PR without changing the
-   packed payload.
-3. Make `cpaikr/fs` public and verify anonymous access to the source, license,
-   issue, homepage, and package-repository routes.
-4. Publish the exact verified tarball only after repository visibility
-   succeeds.
-5. Verify the public package, then dispatch Release Please to tag the release
-   PR merge commit and create the GitHub release.
-6. Mark the V0 roadmap milestone complete.
+The repository was made public and anonymous access to the source, license,
+issues, specification, and schemas succeeded before npm publication. The exact
+verified tarball was published as
+[`@sjunepark/fs@0.1.0`](https://www.npmjs.com/package/@sjunepark/fs/v/0.1.0).
+Release Please workflow run `29649239716` then created tag and
+[GitHub release `v0.1.0`](https://github.com/cpaikr/fs/releases/tag/v0.1.0) at
+`1f1d736`.
 
 ## Validation
 
-The current working tree passes:
+The released revision passes:
 
 - `pnpm release:check` on the active supported Node.js line on macOS;
 - `pnpm audit:prod`;
 - generated guide, Agent Skill, and metadata parity checks within
   `pnpm check:docs`;
 - the official Agent Skill structure validator;
-- a fresh-context Skill execution that followed the exact pinned commands and
-  stopped at the expected unpublished-package boundary; and
+- a clean registry install and execution reporting `fs v0.1.0`; and
 - `git diff --check`.
 
 The release gate covers documentation and contract artifacts, type and strict
 Effect diagnostics, unit and packed-process acceptance suites, writer crash and
 concurrency integration, installed-tarball checks, and npm's publication dry
-run. Exact-head Linux, macOS, and Windows proof is complete for `b06de25`.
+run. Exact-head Linux, macOS, and Windows proof is complete for `b06de25`. The
+published tarball matches the locally verified artifact at SHA-1
+`941b024b7c7c03523202143594cd5ccd547270d9` and SHA-256
+`4a0adf25abb822c2af94236eafdea6f8774d447953f234a753ab8a13d53706c5`.
 
 ## Blockers
 
-No product decision is blocked. Repository visibility, npm publication, and
-the separately dispatched tag and GitHub release remain explicit release
-actions.
+None. V0 release work is complete.
 
 ## Next Action
 
-Validate and merge the Release Please setup, then review the generated `0.1.0`
-release PR.
+No V0 release action remains. Start a focused plan before pursuing a later
+roadmap direction.

@@ -1,10 +1,11 @@
 # Roadmap
 
 This roadmap owns strategic sequence only. The
-[product scope](docs/product-scope.md) defines the boundary, and the
-[active release plan](docs/plans/v0-release-candidate.md) owns live status and
-the next action. Completed milestone plans linked from the
-[documentation index](docs/README.md) retain delivery decisions and validation.
+[product scope](docs/product-scope.md) defines the boundary. The completed
+[V0 release plan](docs/plans/v0-release-candidate.md) records release evidence;
+future active plans own their live status and next action. Completed milestone
+plans linked from the [documentation index](docs/README.md) retain delivery
+decisions and validation.
 
 ## Reference CLI
 
@@ -30,7 +31,7 @@ maintained in the
    and rendering through contract-first slices.
 10. [x] Replace the dimensional fact model with statement-owned item rows,
     nested value and grouping maps, and additive rollup validation.
-11. [ ] Complete release preparation and publish V0.
+11. [x] Complete release preparation and publish V0.
 
 ## Later Directions
 
