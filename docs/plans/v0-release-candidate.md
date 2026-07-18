@@ -217,13 +217,13 @@ integration into `dev`.
 
 ## Known Temporary Drift
 
-The artifact contract has no known drift. `dev` implements the operational
-policies: bounded reads and iterative scanning, decimal budgets and
+The artifact-format and operational-policy contracts have no known drift.
+`dev` implements bounded reads and iterative scanning, decimal budgets and
 order-stable aggregation, lazy working-directory access, owned redacted
 failures, typed validation outcomes, pathless loading, and lazy AJV
-compilation. Package deep imports remain unsealed and documentation tools
-still run outside the lockfile on `dev`; the active Phase 3 checkpoint closes
-that temporary packaging and CI drift.
+compilation. Packaging and CI drift does remain on `dev`: deep imports are
+unsealed and documentation tools run outside the lockfile until the active
+Phase 3 checkpoint closes both issues.
 
 The preserved review follow-up was merged to `dev` by PR #11 as merge commit
 `6741e34`. The ordered Phase 0 contract and Phase 1–2 implementation commits
