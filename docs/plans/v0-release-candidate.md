@@ -307,7 +307,7 @@ action is authorized.
 
 ## Next Action
 
-Open the Phase 4 final-proof PR against updated `dev`, complete its required CI
-and automated reviews, address every material finding, and merge with commit
-preservation. Audit the exact integrated `dev` candidate, then stop before
-Phase 5 while release authorization remains absent.
+Complete PR #14's required CI and automated reviews, address every material
+finding, and merge with commit preservation. Audit the exact integrated `dev`
+candidate, then stop before Phase 5 while release authorization remains
+absent.

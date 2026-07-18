@@ -103,7 +103,10 @@ describe("document schema validation", () => {
       readFileSync("fixtures/valid/render-column-limit-exceeded.json")
     )
     expect(largeConforming.decoded.values).toBeGreaterThan(inputLimits.invalidDocumentValues)
-    expect(largeConforming.validation).toMatchObject({ ok: true })
+    expect(largeConforming.validation).toMatchObject({
+      ok: true,
+      result: { validation: { conformance: { status: "conforming" } } }
+    })
   })
 
   it("bounds semantic fanout and encoded diagnostic bytes", () => {
