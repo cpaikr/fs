@@ -1,6 +1,7 @@
 # Author FS Source-Resolution Plan
 
-Status: In Progress.
+Status: Complete. PR `#23` contains the reviewed implementation, and full CI
+run `29679555660` passed at implementation head `000e37d`.
 
 This focused plan owns delivery status for delegated source resolution in the
 repository-distributed `author-fs` Skill. The [authoring policy](../authoring.md)
@@ -35,9 +36,23 @@ artifact contract rather than an extraction or conversion engine.
 
 ## Validation
 
-Pending generated-artifact parity, documentation checks, Skill structure
-validation, vague-invocation forward testing, complete repository checks, and
-independent review.
+- `pnpm check` passed generated-artifact parity, documentation and contract
+  checks, type and strict Effect diagnostics, unit and process acceptance,
+  writer integration, and packed-package validation.
+- `pnpm audit:prod` reported no known production vulnerabilities.
+- The official Skill structure validator passed in an isolated PyYAML
+  environment.
+- A blind vague-invocation test selected the source-material route, resolved
+  the supplied statement model, and preserved the pinned package boundary. It
+  exposed an over-inferred rollup; after the guide was tightened, a fresh blind
+  test left that unsupported relationship unencoded.
+- The CI classifier parsed successfully and selected lightweight CI for the
+  original guidance-only change, full CI for an unavailable comparison, full
+  CI for a source change, and full CI for the workflow-changing implementation
+  head. Remote run `29679555660` passed the complete gate.
+- Independent implementation, design, and complexity review found no narrow
+  safe fixes. Mixed source material plus existing FS JSON remains a separate
+  authority decision between reconciliation and structural repair.
 
 ## Blockers
 
@@ -45,5 +60,6 @@ None.
 
 ## Next Action
 
-Complete validation and independent review, address safe findings, then push
-the reviewed follow-up to PR `#23`.
+No source-resolution delivery action remains. A future mixed-input workflow
+should define whether source evidence or an existing FS document is
+authoritative before combining reconciliation with structural repair.
