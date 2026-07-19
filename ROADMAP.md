@@ -18,8 +18,8 @@ maintained in the
 1. [x] Define the V0 product boundary and semantic artifact contract.
 2. [x] Add baseline schemas, representative examples, and language-neutral
    conformance and result fixtures.
-3. [x] Publish document-encoding guidance that refuses missing financial
-   decisions.
+3. [x] Publish document-encoding guidance that requires resolved financial
+   decisions before encoding.
 4. [x] Define the reference CLI surface and observable acceptance contract.
 5. [x] Close known contract-artifact gaps and verify the selected public CLI
    integration boundary.
@@ -36,8 +36,11 @@ maintained in the
 ## Later Directions
 
 Agent evaluations remain optional and non-normative. If added, they may test
-encoding and structural repair from author-resolved inputs, but must not score
-extraction, source mapping, taxonomy alignment, or accounting judgment.
+source-material routing, evidence traceability, appropriate escalation,
+encoding, and structural repair. They must not establish one extraction,
+taxonomy, cross-entity alignment, or accounting interpretation as part of the
+FS contract; source resolution remains delegated professional judgment upstream
+of the artifact and CLI.
 
 A later dataset layer may coordinate multiple single-entity documents under
 author-supplied shared definitions. FS may represent that alignment, but will

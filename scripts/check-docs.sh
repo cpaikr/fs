@@ -59,6 +59,19 @@ if [[ "$skill_guide" != *"This Skill uses \`$package_name@1.0.0+build.1\`."* ]];
   echo "Agent Skill rendering lost its package-version basis" >&2
   exit 1
 fi
+if [[ "$skill_guide" != *'[source-input guide](guides/resolving-inputs.md)'* ]]; then
+  echo "Agent Skill rendering lost its source-input guide" >&2
+  exit 1
+fi
+if [[ "$skill_guide" != *'asks to organize, structure, or convert statements'* ]] ||
+  [[ "$skill_guide" != *'source-fidelity gate'* ]]; then
+  echo "Agent Skill rendering lost its source-material route" >&2
+  exit 1
+fi
+if [[ "$npx_guide" == *'guides/resolving-inputs.md'* ]]; then
+  echo "Package guide unexpectedly references the Skill-only source-input guide" >&2
+  exit 1
+fi
 for invalid_version in latest 1.0.0-.. 1.0.0-01; do
   if node scripts/render-guide.mjs \
     --npx-version "$invalid_version" >/dev/null 2>&1; then

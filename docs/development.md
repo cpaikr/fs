@@ -63,6 +63,20 @@ Its executables are exact lockfile dependencies and require the repository's
 frozen, lifecycle-disabled install. Run it after changing documentation,
 schemas, examples, or fixtures.
 
+## CI change scope
+
+CI always runs its documentation and contract-artifact gate. A fail-closed
+changed-path classifier in [the CI workflow](../.github/workflows/ci.yml)
+allows guidance-only changes to skip the supported-runtime matrix, production
+dependency audit, and npm publication check. Any path outside the workflow's
+explicit safe set, an unavailable comparison commit, or an empty comparison
+runs the complete CI gate.
+
+The expensive jobs use job-level conditions so skipped jobs conclude
+successfully for required-check purposes. Keep this classification inside the
+workflow rather than adding workflow trigger path filters, which can leave a
+required workflow check pending when no run is created.
+
 ## Documentation and generated guidance
 
 The [documentation index](README.md) identifies the owner for each contract.
@@ -72,9 +86,9 @@ Change the owning document first and update summaries by reference.
 `content/guide/authoring.md.template` owns the exact portable operational
 procedure shared by the bundled authoring guide and repository-distributed
 Agent Skill.
-`scripts/render-guide.mjs` owns Skill-only frontmatter, OpenAI metadata, and
-the exact npm command and availability note. The renderer exposes the installed
-and version-pinned forms:
+`scripts/render-guide.mjs` owns Skill-only routing, frontmatter, OpenAI
+metadata, and the exact npm command and availability note. The renderer exposes
+the installed and version-pinned forms:
 
 ```sh
 node scripts/render-guide.mjs --installed > assets/guide/authoring.md

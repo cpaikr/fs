@@ -22,17 +22,19 @@ const skillMetadataPath = resolve(
 );
 const commandPlaceholder = "{{FS_COMMAND}}";
 const versionNotePlaceholder = "{{FS_VERSION_NOTE}}";
+const sourceIntakePlaceholder = "{{FS_SOURCE_INTAKE}}";
 const skillName = "author-fs";
 const skillDescription =
-  "Author FS documents from resolved financial models. Use when creating a " +
-  "conforming FS JSON document or repairing structural diagnostics after " +
-  "financial meanings, values, units, periods, groupings, and rollups are " +
-  "author-confirmed.";
+  "Organize financial statements into conforming FS documents. Use when " +
+  "source statements in spreadsheets, PDFs, images, webpages, or other " +
+  "imperfect inputs must be explored and resolved before encoding, when an " +
+  "already-resolved financial model must be encoded, or when an existing FS " +
+  "JSON document needs structural repair.";
 const skillDisplayName = "Author FS Documents";
-const skillShortDescription = "Encode or repair resolved FS financial documents";
+const skillShortDescription = "Organize statements into conforming FS documents";
 const skillDefaultPrompt =
-  "Use $author-fs to encode or repair this author-resolved financial model " +
-  "as a conforming FS document.";
+  "Use $author-fs to organize these financial statements into conforming FS " +
+  "documents.";
 const skillFrontmatter = `---
 name: ${skillName}
 description: ${JSON.stringify(skillDescription)}
@@ -114,16 +116,21 @@ const isExactSemVer = (value) => {
   return true;
 };
 
-const render = (command, versionNote = "") => {
+const render = (command, versionNote = "", sourceIntake = "") => {
   const template = readFileSync(templatePath, "utf8");
-  for (const placeholder of [commandPlaceholder, versionNotePlaceholder]) {
+  for (const placeholder of [
+    commandPlaceholder,
+    versionNotePlaceholder,
+    sourceIntakePlaceholder,
+  ]) {
     if (!template.includes(placeholder)) {
       throw new Error(`Guide template does not contain ${placeholder}`);
     }
   }
   const rendered = template
     .replaceAll(commandPlaceholder, command)
-    .replaceAll(versionNotePlaceholder, versionNote);
+    .replaceAll(versionNotePlaceholder, versionNote)
+    .replaceAll(sourceIntakePlaceholder, sourceIntake);
   if (rendered.includes("{{")) {
     throw new Error("Guide template contains an unresolved placeholder");
   }
@@ -172,7 +179,24 @@ const renderSkill = (name, version) => {
     "Its pinned commands are the package-availability check: continue only when\n" +
     "they resolve from npm. Report a block instead of substituting an unpinned\n" +
     "tag or another version.\n\n";
-  return skillFrontmatter + render(`npx -y ${exactPackage}`, versionNote);
+  const sourceIntake =
+    "## Choose the Authoring Branch\n\n" +
+    "Choose one branch before resolving the encoding inputs:\n\n" +
+    "- **Source material:** Use this branch when the user supplies financial\n" +
+    "  statements or asks to organize, structure, or convert statements without\n" +
+    "  an already-resolved model. Inventory the source artifacts available in the\n" +
+    "  task, then read the [source-input guide](guides/resolving-inputs.md). If no\n" +
+    "  source material is accessible, request it. Use the guide to resolve the\n" +
+    "  prerequisite model, continue through create preparation, and complete its\n" +
+    "  source-fidelity gate before reference validation.\n" +
+    "- **Resolved model:** When all prerequisite financial choices are already\n" +
+    "  supplied, continue with the create branch.\n" +
+    "- **Existing FS JSON:** Continue with the repair branch. Preserve its\n" +
+    "  financial choices and validate the unchanged candidate first.\n\n";
+  return (
+    skillFrontmatter +
+    render(`npx -y ${exactPackage}`, versionNote, sourceIntake)
+  );
 };
 
 const arguments_ = process.argv.slice(2);
