@@ -9,8 +9,66 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: classify change scope
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      full_ci: ${{ steps.scope.outputs.full_ci }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Classify changed paths
+        id: scope
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
+          EVENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          base_sha="${PR_BASE_SHA:-$PUSH_BASE_SHA}"
+          head_sha="${PR_HEAD_SHA:-$EVENT_SHA}"
+          full_ci=true
+
+          if [[ -n "$base_sha" && -n "$head_sha" ]] &&
+            [[ ! "$base_sha" =~ ^0+$ ]] &&
+            git cat-file -e "${base_sha}^{commit}" &&
+            git cat-file -e "${head_sha}^{commit}"; then
+            full_ci=false
+            saw_path=false
+            while IFS= read -r -d '' changed_path; do
+              saw_path=true
+              case "$changed_path" in
+                docs/*.md | ROADMAP.md | content/guide/*.md.template | \
+                  skills/author-fs/SKILL.md | \
+                  skills/author-fs/agents/openai.yaml | \
+                  skills/author-fs/guides/*.md | scripts/check-docs.sh | \
+                  scripts/render-guide.mjs)
+                  ;;
+                *)
+                  full_ci=true
+                  break
+                  ;;
+              esac
+            done < <(
+              git diff --no-renames --name-only \
+                --diff-filter=ACDMRTUXB -z "$base_sha" "$head_sha"
+            )
+            if [[ "$saw_path" == false ]]; then
+              full_ci=true
+            fi
+          fi
+
+          printf 'full_ci=%s\n' "$full_ci" >>"$GITHUB_OUTPUT"
+
   test:
     name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    needs: changes
+    if: ${{ needs.changes.outputs.full_ci == 'true' }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -52,6 +110,8 @@ jobs:
 
   production-audit:
     name: production dependency audit
+    needs: changes
+    if: ${{ needs.changes.outputs.full_ci == 'true' }}
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v6
@@ -69,7 +129,16 @@ jobs:
 
   release-candidate:
     name: npm publication check
-    needs: [test, documentation, production-audit]
+    needs: [changes, test, documentation, production-audit]
+    if: >-
+      ${{
+        always() &&
+        needs.changes.result == 'success' &&
+        needs.changes.outputs.full_ci == 'true' &&
+        needs.test.result == 'success' &&
+        needs.documentation.result == 'success' &&
+        needs.production-audit.result == 'success'
+      }}
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v6
