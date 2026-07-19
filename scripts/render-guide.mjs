@@ -25,16 +25,16 @@ const versionNotePlaceholder = "{{FS_VERSION_NOTE}}";
 const sourceIntakePlaceholder = "{{FS_SOURCE_INTAKE}}";
 const skillName = "author-fs";
 const skillDescription =
-  "Author FS documents from resolved financial models or source materials " +
-  "that must first be explored and resolved. Use when converting financial " +
-  "statements from spreadsheets, PDFs, images, webpages, or other imperfect " +
-  "inputs into a conforming FS JSON document, or repairing structural " +
-  "diagnostics after the financial model is resolved.";
+  "Organize financial statements into conforming FS documents. Use when " +
+  "source statements in spreadsheets, PDFs, images, webpages, or other " +
+  "imperfect inputs must be explored and resolved before encoding, when an " +
+  "already-resolved financial model must be encoded, or when an existing FS " +
+  "JSON document needs structural repair.";
 const skillDisplayName = "Author FS Documents";
-const skillShortDescription = "Resolve source statements, then encode or repair FS";
+const skillShortDescription = "Organize statements into conforming FS documents";
 const skillDefaultPrompt =
-  "Use $author-fs to resolve these financial source materials when needed, " +
-  "then encode or repair them as a conforming FS document.";
+  "Use $author-fs to organize these financial statements into conforming FS " +
+  "documents.";
 const skillFrontmatter = `---
 name: ${skillName}
 description: ${JSON.stringify(skillDescription)}
@@ -180,11 +180,19 @@ const renderSkill = (name, version) => {
     "they resolve from npm. Report a block instead of substituting an unpinned\n" +
     "tag or another version.\n\n";
   const sourceIntake =
-    "## Resolve Source Material When Needed\n\n" +
-    "When the supplied material is not already an author-resolved financial\n" +
-    "model, read the [source-input guide](guides/resolving-inputs.md) before\n" +
-    "encoding. Use it to recover the prerequisite model; it does not extend\n" +
-    "the FS artifact boundary.\n\n";
+    "## Choose the Authoring Branch\n\n" +
+    "Choose one branch before resolving the encoding inputs:\n\n" +
+    "- **Source material:** Use this branch when the user supplies financial\n" +
+    "  statements or asks to organize, structure, or convert statements without\n" +
+    "  an already-resolved model. Inventory the source artifacts available in the\n" +
+    "  task, then read the [source-input guide](guides/resolving-inputs.md). If no\n" +
+    "  source material is accessible, request it. Use the guide to resolve the\n" +
+    "  prerequisite model, continue through create preparation, and complete its\n" +
+    "  source-fidelity gate before reference validation.\n" +
+    "- **Resolved model:** When all prerequisite financial choices are already\n" +
+    "  supplied, continue with the create branch.\n" +
+    "- **Existing FS JSON:** Continue with the repair branch. Preserve its\n" +
+    "  financial choices and validate the unchanged candidate first.\n\n";
   return (
     skillFrontmatter +
     render(`npx -y ${exactPackage}`, versionNote, sourceIntake)

@@ -228,8 +228,8 @@ policy.
   agent-facing interface.
 - Statement-type templates are absent because FS does not prescribe taxonomy
   or statement contents.
-- `import-xbrl`, `import-sec`, `from-csv`, and source mapping remain outside
-  the product boundary.
+- `import-xbrl`, `import-sec`, `from-csv`, and source-mapping commands remain
+  outside the CLI boundary.
 - `repair`, `fix`, `normalize`, `calculate`, and `fill-totals` are absent
   because apparent corrections commonly require author judgment and rollups
   never materialize values.
@@ -273,10 +273,19 @@ postconditions.
 
 ## Agent Integration
 
-Ship an on-demand Agent Skill for encoding an already-resolved financial model.
-It identifies missing prerequisite inputs without supplying them, invokes the
-reference validator, and routes structural diagnostics into an encoding repair
-loop. Static Skill guidance and `fs guide authoring` share one source.
+Ship an on-demand Agent Skill with explicit routes for source material, an
+already-resolved financial model, and existing FS JSON. In the source-material
+route, the Skill may resolve evidence-supported choices using professional
+judgment, discloses material assumptions, and escalates ambiguity only when the
+evidence cannot support a defensible choice with materially different financial
+meaning. It then invokes the reference validator. In the repair route, it
+preserves the candidate's supplied financial choices while routing structural
+diagnostics into an encoding repair loop.
+
+Source resolution remains upstream of the CLI boundary: the CLI still receives
+a complete candidate and exposes no extraction, import, or conversion command.
+The static CLI guide and Skill share the portable encoding workflow. Skill-only
+routing and the source-input guide extend that workflow for delegated agents.
 
 Publish the Skill from the repository's root `skills/` catalog. Installed CLI
 guidance uses `fs`. Generated Skill commands name an exact npm package version

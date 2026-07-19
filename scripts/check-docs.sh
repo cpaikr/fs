@@ -63,6 +63,11 @@ if [[ "$skill_guide" != *'[source-input guide](guides/resolving-inputs.md)'* ]];
   echo "Agent Skill rendering lost its source-input guide" >&2
   exit 1
 fi
+if [[ "$skill_guide" != *'asks to organize, structure, or convert statements'* ]] ||
+  [[ "$skill_guide" != *'source-fidelity gate'* ]]; then
+  echo "Agent Skill rendering lost its source-material route" >&2
+  exit 1
+fi
 if [[ "$npx_guide" == *'guides/resolving-inputs.md'* ]]; then
   echo "Package guide unexpectedly references the Skill-only source-input guide" >&2
   exit 1

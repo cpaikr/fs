@@ -1,6 +1,6 @@
 ---
 name: author-fs
-description: "Author FS documents from resolved financial models or source materials that must first be explored and resolved. Use when converting financial statements from spreadsheets, PDFs, images, webpages, or other imperfect inputs into a conforming FS JSON document, or repairing structural diagnostics after the financial model is resolved."
+description: "Organize financial statements into conforming FS documents. Use when source statements in spreadsheets, PDFs, images, webpages, or other imperfect inputs must be explored and resolved before encoding, when an already-resolved financial model must be encoded, or when an existing FS JSON document needs structural repair."
 ---
 
 # Authoring FS Documents
@@ -13,12 +13,21 @@ tag or another version.
 Encode only an author-resolved financial model. One FS document covers one
 entity and reporting scope.
 
-## Resolve Source Material When Needed
+## Choose the Authoring Branch
 
-When the supplied material is not already an author-resolved financial
-model, read the [source-input guide](guides/resolving-inputs.md) before
-encoding. Use it to recover the prerequisite model; it does not extend
-the FS artifact boundary.
+Choose one branch before resolving the encoding inputs:
+
+- **Source material:** Use this branch when the user supplies financial
+  statements or asks to organize, structure, or convert statements without
+  an already-resolved model. Inventory the source artifacts available in the
+  task, then read the [source-input guide](guides/resolving-inputs.md). If no
+  source material is accessible, request it. Use the guide to resolve the
+  prerequisite model, continue through create preparation, and complete its
+  source-fidelity gate before reference validation.
+- **Resolved model:** When all prerequisite financial choices are already
+  supplied, continue with the create branch.
+- **Existing FS JSON:** Continue with the repair branch. Preserve its
+  financial choices and validate the unchanged candidate first.
 
 ## Resolve Inputs
 

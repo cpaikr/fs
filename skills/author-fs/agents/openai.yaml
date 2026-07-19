@@ -1,4 +1,4 @@
 interface:
   display_name: "Author FS Documents"
-  short_description: "Resolve source statements, then encode or repair FS"
-  default_prompt: "Use $author-fs to resolve these financial source materials when needed, then encode or repair them as a conforming FS document."
+  short_description: "Organize statements into conforming FS documents"
+  default_prompt: "Use $author-fs to organize these financial statements into conforming FS documents."
