@@ -10,6 +10,11 @@ FS is a file-first interchange format, not an extraction system, accounting
 taxonomy, conversion method, or mutable financial database. Authoring starts
 only after the financial model is resolved.
 
+Agent guidance may help resolve imperfect source material into that prerequisite
+model. This assistance remains pre-authoring: report material assumptions to the
+author, keep provenance outside FS JSON, and begin encoding only after the
+required financial choices are internally consistent.
+
 ## Authoring Contract
 
 Before encoding begins, the author must supply:

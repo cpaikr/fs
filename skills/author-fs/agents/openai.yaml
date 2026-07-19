@@ -1,4 +1,4 @@
 interface:
   display_name: "Author FS Documents"
-  short_description: "Encode or repair resolved FS financial documents"
-  default_prompt: "Use $author-fs to encode or repair this author-resolved financial model as a conforming FS document."
+  short_description: "Resolve source statements, then encode or repair FS"
+  default_prompt: "Use $author-fs to resolve these financial source materials when needed, then encode or repair them as a conforming FS document."

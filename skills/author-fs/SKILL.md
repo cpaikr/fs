@@ -1,6 +1,6 @@
 ---
 name: author-fs
-description: "Author FS documents from resolved financial models. Use when creating a conforming FS JSON document or repairing structural diagnostics after financial meanings, values, units, periods, groupings, and rollups are author-confirmed."
+description: "Author FS documents from resolved financial models or source materials that must first be explored and resolved. Use when converting financial statements from spreadsheets, PDFs, images, webpages, or other imperfect inputs into a conforming FS JSON document, or repairing structural diagnostics after the financial model is resolved."
 ---
 
 # Authoring FS Documents
@@ -12,6 +12,13 @@ tag or another version.
 
 Encode only an author-resolved financial model. One FS document covers one
 entity and reporting scope.
+
+## Resolve Source Material When Needed
+
+When the supplied material is not already an author-resolved financial
+model, read the [source-input guide](guides/resolving-inputs.md) before
+encoding. Use it to recover the prerequisite model; it does not extend
+the FS artifact boundary.
 
 ## Resolve Inputs
 
