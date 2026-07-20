@@ -5,92 +5,387 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>A &amp; B &lt;Group&gt; — Scope &quot;quoted&quot;</title>
   <style>
-    :root { color-scheme: light; font-family: system-ui, sans-serif; }
-    body { color: #1f2937; margin: 2rem; }
-    header, main { max-width: 100%; }
-    h1 { margin: 0; }
-    .scope { color: #4b5563; margin: 0.5rem 0 2rem; }
-    section + section { margin-top: 2.5rem; }
-    .unit { color: #4b5563; }
-    .table-scroll { overflow-x: auto; }
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      --paper: #f6f2e9;
+      --sheet: #fffdf8;
+      --ink: #171a1c;
+      --secondary: #606a6e;
+      --rule: #c8c2b7;
+      --teal: #1f6f78;
+      --teal-wash: #ddecef;
+      --error: #9f3f3a;
+    }
+    * { box-sizing: border-box; }
+    body { background: var(--paper); color: var(--ink); margin: 0; }
+    [hidden] { display: none !important; }
+    a { color: var(--teal); text-underline-offset: 0.2em; }
+    a:hover { text-decoration-thickness: 0.12em; }
+    :focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+    .skip-link {
+      background: var(--ink);
+      color: var(--sheet);
+      left: 1rem;
+      padding: 0.75rem 1rem;
+      position: fixed;
+      top: 1rem;
+      transform: translateY(-200%);
+      z-index: 10;
+    }
+    .skip-link:focus { transform: none; }
+    .document {
+      background: var(--sheet);
+      border-inline: 1px solid var(--rule);
+      margin: 0 auto;
+      max-width: 112rem;
+      min-height: 100vh;
+    }
+    .masthead {
+      align-items: baseline;
+      border-bottom: 2px solid var(--ink);
+      display: flex;
+      gap: 1rem 2.5rem;
+      justify-content: space-between;
+      margin-inline: 2rem;
+      padding: 1.25rem 0 1rem;
+    }
+    h1, h2, p { margin-top: 0; }
+    h1, h2, .scope { overflow-wrap: anywhere; }
+    h1 { font-size: clamp(1.6rem, 3vw, 2.35rem); letter-spacing: -0.03em; margin-bottom: 0; }
+    h2 { font-size: clamp(1.4rem, 2.2vw, 1.9rem); letter-spacing: -0.02em; margin-bottom: 1.25rem; }
+    .scope { color: var(--secondary); margin-bottom: 0; text-align: right; }
+    .statement-index {
+      background: var(--sheet);
+      border-bottom: 1px solid var(--rule);
+      overflow-x: auto;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .statement-index ol {
+      display: flex;
+      gap: 0;
+      list-style: none;
+      margin: 0;
+      min-width: max-content;
+      padding: 0;
+    }
+    .statement-index li { display: flex; }
+    .statement-index a {
+      align-items: center;
+      border-bottom: 3px solid transparent;
+      color: var(--ink);
+      display: flex;
+      gap: 0.65rem;
+      min-height: 3.75rem;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+    }
+    .statement-index a:hover, .statement-index a:focus-visible {
+      border-bottom-color: var(--teal);
+      color: var(--teal);
+    }
+    .index-number { color: var(--teal); font-variant-numeric: tabular-nums; font-weight: 700; }
+    .statement {
+      display: grid;
+      grid-template-columns: 10.5rem minmax(0, 1fr);
+      scroll-margin-top: 4.75rem;
+    }
+    .statement + .statement { border-top: 1px solid var(--rule); }
+    .statement-ordinal {
+      background: var(--paper);
+      border-right: 1px solid var(--rule);
+      color: var(--secondary);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 0;
+      padding: 2.75rem 1.5rem;
+      text-transform: uppercase;
+    }
+    .statement-ordinal strong {
+      color: var(--teal);
+      display: block;
+      font-size: 1.35rem;
+      letter-spacing: 0;
+      margin-top: 0.4rem;
+      text-transform: none;
+    }
+    .statement-content { min-width: 0; padding: 2.5rem 3rem 3rem; }
+    .table-caption {
+      color: var(--secondary);
+      font-size: 0.88rem;
+      padding: 0 0 0.8rem;
+      text-align: left;
+    }
+    .overflow-cue { color: var(--secondary); display: none; font-size: 0.85rem; margin-bottom: 0.6rem; }
+    .table-scroll { max-width: 100%; overflow-x: auto; }
+    .table-scroll:focus-visible { outline-offset: 2px; }
     table { border-collapse: collapse; min-width: 100%; }
-    th, td { border-bottom: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
+    th, td {
+      border-bottom: 1px solid var(--rule);
+      padding: 0.62rem 0.75rem;
+      text-align: right;
+      vertical-align: top;
+      white-space: nowrap;
+    }
     th:first-child, td:first-child, .metadata { text-align: left; }
-    thead th { border-bottom: 2px solid #6b7280; }
-    .missing, .unavailable { color: #6b7280; font-style: italic; }
+    thead th {
+      border-bottom: 2px solid var(--teal);
+      color: var(--teal);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    tbody th {
+      font-weight: 500;
+      min-width: 14rem;
+      white-space: normal;
+    }
+    tbody tr:last-child th, tbody tr:last-child td { border-bottom-color: var(--ink); }
+    .value { font-variant-numeric: tabular-nums; }
+    .metadata, .missing, .unavailable { color: var(--secondary); }
+    .missing, .unavailable { font-style: italic; }
+    .handoff {
+      align-items: center;
+      border-bottom: 1px solid var(--rule);
+      border-top: 1px solid var(--rule);
+      display: grid;
+      gap: 0.75rem 1.5rem;
+      grid-template-columns: auto minmax(7rem, 0.25fr) minmax(16rem, 1fr) auto;
+      margin-top: 1.75rem;
+      padding: 1rem 0;
+    }
+    .copy-button {
+      background: var(--sheet);
+      border: 1px solid var(--teal);
+      border-radius: 0;
+      color: var(--teal);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      min-height: 44px;
+      padding: 0.65rem 1rem;
+    }
+    .copy-button:hover { background: var(--teal-wash); }
+    .copy-status { color: var(--teal); font-weight: 700; min-height: 1.5em; }
+    .copy-status[data-state="failure"] { color: var(--error); }
+    .copy-help { color: var(--secondary); margin-bottom: 0; }
+    .native-table-link { align-items: center; display: inline-flex; min-height: 44px; white-space: nowrap; }
+    .copy-source { display: none; }
+    @media (max-width: 64rem) {
+      .document { border-inline: 0; }
+      .statement { grid-template-columns: minmax(0, 1fr); }
+      .statement-ordinal {
+        align-items: baseline;
+        background: var(--sheet);
+        border-bottom: 1px solid var(--rule);
+        border-right: 0;
+        display: flex;
+        gap: 0.6rem;
+        padding: 1rem 2rem;
+      }
+      .statement-ordinal strong { display: inline; font-size: inherit; margin-top: 0; }
+    }
+    @media (max-width: 44rem) {
+      .masthead { align-items: flex-start; flex-direction: column; margin-inline: 1rem; }
+      .scope { text-align: left; }
+      .statement-index { padding-inline: 0.25rem; }
+      .statement-index a { padding-inline: 0.8rem; }
+      .statement-ordinal { padding-inline: 1rem; }
+      .statement-content { padding: 1.75rem 1rem 2.25rem; }
+      .overflow-cue { display: block; }
+      .handoff { align-items: start; grid-template-columns: minmax(0, 1fr); }
+      .copy-button { justify-self: start; }
+      .native-table-link { white-space: normal; }
+    }
+    @media print {
+      :root { --paper: #fff; --sheet: #fff; --ink: #000; --secondary: #333; --rule: #777; --teal: #000; }
+      body, .document { background: #fff; border: 0; }
+      .skip-link, .statement-index, .statement-ordinal, .overflow-cue, .handoff, .copy-source { display: none !important; }
+      .masthead { margin-inline: 0; }
+      .statement { display: block; break-before: page; }
+      .statement:first-child { break-before: auto; }
+      .statement-content { padding: 1.5rem 0; }
+      .table-scroll { overflow: visible; }
+      thead { display: table-header-group; }
+      tr { break-inside: avoid; }
+      a { color: #000; text-decoration: none; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>A &amp; B &lt;Group&gt;</h1>
-    <p class="scope">Scope &quot;quoted&quot;</p>
-  </header>
-  <main>
-    <section>
-      <h2>Ordered &amp; escaped</h2>
-      <p class="unit">Unit: USD &lt;millions&gt; (USD, scale 6)</p>
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Item</th>
-              <th scope="col">valuation</th>
-              <th scope="col">ppt</th>
-              <th scope="col">2025-12-31</th>
-              <th scope="col">2024-12-31</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Cash &lt;available&gt;</th>
-              <td class="metadata">NWC &amp; cash</td>
-              <td class="metadata">—</td>
+  <a class="skip-link" href="#statements">Skip to statements</a>
+  <div class="document">
+    <header class="masthead">
+      <h1>A &amp; B &lt;Group&gt;</h1>
+      <p class="scope">Scope &quot;quoted&quot;</p>
+    </header>
+    <nav class="statement-index" aria-label="Statements">
+      <ol>
+        <li><a href="#statement-1"><span class="index-number">01</span><span>Ordered &amp; escaped</span></a></li>
+        <li><a href="#statement-2"><span class="index-number">02</span><span>Mixed units</span></a></li>
+      </ol>
+    </nav>
+    <main id="statements">
+    <section class="statement" id="statement-1">
+      <p class="statement-ordinal">Statement <strong>1 of 2</strong></p>
+      <div class="statement-content">
+        <h2>Ordered &amp; escaped</h2>
+        <p class="overflow-cue">Scroll horizontally to review all columns.</p>
+        <div class="table-scroll" role="region" aria-label="Ordered &amp; escaped table. Scroll horizontally to review all columns." tabindex="0">
+          <table id="statement-table-1">
+            <caption class="table-caption">Ordered &amp; escaped — Unit: USD &lt;millions&gt; (USD, scale 6)</caption>
+            <thead>
+              <tr>
+                <th scope="col">Item</th>
+                <th scope="col">valuation</th>
+                <th scope="col">ppt</th>
+                <th scope="col">2025-12-31</th>
+                <th scope="col">2024-12-31</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Cash &lt;available&gt;</th>
+                <td class="metadata">NWC &amp; cash</td>
+                <td class="metadata">—</td>
               <td class="value">0</td>
               <td class="missing">Missing</td>
-            </tr>
-            <tr>
-              <th scope="row">Inventory</th>
-              <td class="metadata">NWC</td>
-              <td class="metadata">Working &lt;Capital&gt;</td>
+              </tr>
+              <tr>
+                <th scope="row">Inventory</th>
+                <td class="metadata">NWC</td>
+                <td class="metadata">Working &lt;Capital&gt;</td>
               <td class="value">-1.25</td>
               <td class="unavailable">Unavailable</td>
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">Item	Unit	valuation	ppt	2025-12-31	2024-12-31
+Cash &lt;available&gt;	USD &lt;millions&gt; (USD, scale 6)	NWC &amp; cash		0	Missing
+Inventory	USD &lt;millions&gt; (USD, scale 6)	NWC	Working &lt;Capital&gt;	-1.25	Unavailable</textarea>
+        <div class="handoff" data-copy-handoff hidden>
+          <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-1" data-copy-status="copy-status-1" aria-describedby="copy-help-1" aria-label="Copy Ordered &amp; escaped for Excel">Copy for Excel</button>
+          <span class="copy-status" id="copy-status-1" role="status" aria-live="polite" aria-atomic="true"></span>
+          <p class="copy-help" id="copy-help-1">Copies this statement as tab-separated values for spreadsheet review.</p>
+          <a class="native-table-link" href="#statement-table-1">View native table</a>
+        </div>
       </div>
     </section>
-    <section>
-      <h2>Mixed units</h2>
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Item</th>
-              <th scope="col">Unit</th>
-              <th scope="col">valuation</th>
-              <th scope="col">ppt</th>
-              <th scope="col">2025-12-31</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Amount</th>
-              <td class="metadata">USD &lt;millions&gt; (USD, scale 6)</td>
-              <td class="metadata">—</td>
-              <td class="metadata">Summary</td>
+    <section class="statement" id="statement-2">
+      <p class="statement-ordinal">Statement <strong>2 of 2</strong></p>
+      <div class="statement-content">
+        <h2>Mixed units</h2>
+        <p class="overflow-cue">Scroll horizontally to review all columns.</p>
+        <div class="table-scroll" role="region" aria-label="Mixed units table. Scroll horizontally to review all columns." tabindex="0">
+          <table id="statement-table-2">
+            <caption class="table-caption">Mixed units — Units shown by item</caption>
+            <thead>
+              <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Unit</th>
+                <th scope="col">valuation</th>
+                <th scope="col">ppt</th>
+                <th scope="col">2025-12-31</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Amount</th>
+                <td class="metadata">USD &lt;millions&gt; (USD, scale 6)</td>
+                <td class="metadata">—</td>
+                <td class="metadata">Summary</td>
               <td class="value">2.5</td>
-            </tr>
-            <tr>
-              <th scope="row">Count</th>
-              <td class="metadata">Shares &amp; units (shares, scale 0)</td>
-              <td class="metadata">—</td>
-              <td class="metadata">Summary</td>
+              </tr>
+              <tr>
+                <th scope="row">Count</th>
+                <td class="metadata">Shares &amp; units (shares, scale 0)</td>
+                <td class="metadata">—</td>
+                <td class="metadata">Summary</td>
               <td class="value">3</td>
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      <textarea class="copy-source" id="copy-source-2" readonly hidden aria-hidden="true" tabindex="-1">Item	Unit	valuation	ppt	2025-12-31
+Amount	USD &lt;millions&gt; (USD, scale 6)		Summary	2.5
+Count	Shares &amp; units (shares, scale 0)		Summary	3</textarea>
+        <div class="handoff" data-copy-handoff hidden>
+          <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-2" data-copy-status="copy-status-2" aria-describedby="copy-help-2" aria-label="Copy Mixed units for Excel">Copy for Excel</button>
+          <span class="copy-status" id="copy-status-2" role="status" aria-live="polite" aria-atomic="true"></span>
+          <p class="copy-help" id="copy-help-2">Copies this statement as tab-separated values for spreadsheet review.</p>
+          <a class="native-table-link" href="#statement-table-2">View native table</a>
+        </div>
       </div>
     </section>
-  </main>
+    </main>
+  <script>
+    (() => {
+      "use strict";
+
+      const fallbackCopy = (text, control) => {
+        const temporary = document.createElement("textarea");
+        temporary.value = text;
+        temporary.readOnly = true;
+        temporary.tabIndex = -1;
+        temporary.setAttribute("aria-hidden", "true");
+        temporary.style.position = "fixed";
+        temporary.style.left = "-9999px";
+        temporary.style.top = "0";
+        let copied = false;
+        try {
+          document.body.append(temporary);
+          temporary.focus();
+          temporary.select();
+          temporary.setSelectionRange(0, temporary.value.length);
+          copied = document.execCommand("copy");
+        } catch {
+          copied = false;
+        } finally {
+          temporary.remove();
+          control.focus();
+        }
+        return copied;
+      };
+
+      const copyText = async (text, control) => {
+        try {
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch {
+          return fallbackCopy(text, control);
+        }
+        return fallbackCopy(text, control);
+      };
+
+      for (const control of document.querySelectorAll("[data-copy-control]")) {
+        const source = document.getElementById(control.dataset.copySource || "");
+        const status = document.getElementById(control.dataset.copyStatus || "");
+        const handoff = control.closest("[data-copy-handoff]");
+        if (!(source instanceof HTMLTextAreaElement) || !(status instanceof HTMLElement) || !(handoff instanceof HTMLElement)) continue;
+
+        let attempt = 0;
+        handoff.hidden = false;
+        control.addEventListener("click", async () => {
+          const currentAttempt = ++attempt;
+          status.dataset.state = "pending";
+          status.textContent = "Copying…";
+          const copied = await copyText(source.value, control);
+          window.setTimeout(() => {
+            if (currentAttempt !== attempt) return;
+            status.dataset.state = copied ? "success" : "failure";
+            status.textContent = copied ? "Copied" : "Copy failed. Use the native table instead.";
+          }, 0);
+        });
+      }
+    })();
+  </script>
+  </div>
 </body>
 </html>

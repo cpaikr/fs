@@ -16,6 +16,69 @@ const renderBytes = (document: Document): Buffer => {
   return rendered.bytes
 }
 
+const renderLength = (document: Document): number => renderBytes(document).length
+
+const exactByteDocument = (): Document => {
+  const document = fixture("examples/minimal.json")
+  const statement = document.statements[0]
+  const item = statement?.items[0]
+  if (statement === undefined || item === undefined) {
+    throw new Error("Minimal fixture lost its first statement item")
+  }
+  const baseline: Document = {
+    ...document,
+    entity: { ...document.entity, name: "x" },
+    statements: [{ ...statement, label: "x", items: [{ ...item, label: "x" }] }]
+  }
+  const baselineLength = renderLength(baseline)
+  const entityDelta = renderLength({
+    ...baseline,
+    entity: { ...baseline.entity, name: "xa" }
+  }) - baselineLength
+  const statementDelta = renderLength({
+    ...baseline,
+    statements: [{ ...baseline.statements[0] as Document["statements"][number], label: "xa" }]
+  }) - baselineLength
+  const remaining = renderLimits.htmlBytes - baselineLength
+  let statementPadding = 0
+  while (
+    statementPadding < entityDelta &&
+    (remaining - statementPadding * statementDelta) % entityDelta !== 0
+  ) {
+    statementPadding += 1
+  }
+  const entityPadding = (remaining - statementPadding * statementDelta) / entityDelta
+  if (!Number.isInteger(entityPadding) || entityPadding < 0) {
+    throw new Error("Could not construct the exact HTML byte boundary")
+  }
+  return {
+    ...baseline,
+    entity: { ...baseline.entity, name: `x${"a".repeat(entityPadding)}` },
+    statements: [{
+      ...baseline.statements[0] as Document["statements"][number],
+      label: `x${"a".repeat(statementPadding)}`
+    }]
+  }
+}
+
+const decodeHtmlText = (text: string): string =>
+  text.replace(/&(?:amp|lt|gt|quot|#39);/gu, (entity) => {
+    switch (entity) {
+      case "&amp;": return "&"
+      case "&lt;": return "<"
+      case "&gt;": return ">"
+      case "&quot;": return '"'
+      case "&#39;": return "'"
+      default: throw new Error(`Unexpected HTML entity ${entity}`)
+    }
+  })
+
+const copySource = (html: string, ordinal: number): string => {
+  const match = html.match(new RegExp(`<textarea[^>]+id="copy-source-${ordinal}"[^>]*>([\\s\\S]*?)</textarea>`, "u"))
+  if (match?.[1] === undefined) throw new Error(`Missing copy source ${ordinal}`)
+  return decodeHtmlText(match[1])
+}
+
 const tableDocument = (periodCount: number, itemCount: number): Document => {
   const periods: Array<Period> = []
   const periodIds: Array<string> = []
@@ -72,6 +135,91 @@ describe("HTML rendering", () => {
     expect(JSON.stringify(document)).toBe(original)
   })
 
+  it("renders ordinal navigation, native table fallbacks, and progressive controls", () => {
+    const html = renderBytes(fixture("fixtures/valid/render-presentation.json")).toString("utf8")
+
+    expect(html).toContain('<nav class="statement-index" aria-label="Statements">')
+    expect(html).toContain('<a href="#statement-1"><span class="index-number">01</span>')
+    expect(html).toContain('Statement <strong>2 of 2</strong>')
+    expect(html).toContain('<caption class="table-caption">Ordered &amp; escaped — Unit: USD &lt;millions&gt; (USD, scale 6)</caption>')
+    expect(html).toContain('<caption class="table-caption">Mixed units — Units shown by item</caption>')
+    expect(html).toContain('role="region" aria-label="Ordered &amp; escaped table. Scroll horizontally to review all columns." tabindex="0"')
+    expect(html).toContain('data-copy-handoff hidden')
+    expect(html).toContain('aria-label="Copy Ordered &amp; escaped for Excel"')
+    expect(html).toContain('role="status" aria-live="polite" aria-atomic="true"')
+    expect(html.match(/<table id=/gu)).toHaveLength(2)
+    expect(html.match(/data-copy-control data-copy-source=/gu)).toHaveLength(2)
+  })
+
+  it("streams exact per-statement TSV with an unconditional Unit column", () => {
+    const html = renderBytes(fixture("fixtures/valid/render-presentation.json")).toString("utf8")
+
+    expect(copySource(html, 1)).toBe([
+      "Item\tUnit\tvaluation\tppt\t2025-12-31\t2024-12-31",
+      "Cash <available>\tUSD <millions> (USD, scale 6)\tNWC & cash\t\t0\tMissing",
+      "Inventory\tUSD <millions> (USD, scale 6)\tNWC\tWorking <Capital>\t-1.25\tUnavailable"
+    ].join("\n"))
+    expect(copySource(html, 2)).toBe([
+      "Item\tUnit\tvaluation\tppt\t2025-12-31",
+      "Amount\tUSD <millions> (USD, scale 6)\t\tSummary\t2.5",
+      "Count\tShares & units (shares, scale 0)\t\tSummary\t3"
+    ].join("\n"))
+    expect(copySource(html, 1)).not.toMatch(/\n$/u)
+  })
+
+  it("normalizes delimiters, protects formula prefixes, and keeps copy data inert", () => {
+    const document = fixture("examples/minimal.json")
+    const statement = document.statements[0]
+    const item = statement?.items[0]
+    const unit = document.units[0]
+    if (statement === undefined || item === undefined || unit === undefined) {
+      throw new Error("Minimal fixture lost its presentation data")
+    }
+    const firstGrouping = "\ufeff=Header\tOne"
+    const secondGrouping = "\u00a0+Header\rTwo"
+    const markupGrouping = "markup"
+    const rendered = renderBytes({
+      ...document,
+      units: [{ ...unit, label: "USD\tLabel", measure: "Amount\r\nMeasure" }],
+      groupingColumns: [firstGrouping, secondGrouping, markupGrouping],
+      statements: [{
+        ...statement,
+        items: [{
+          ...item,
+          label: "\u2003-Item\nName",
+          values: { fy2025: "-1.25" },
+          groupings: {
+            [firstGrouping]: "\u3000@Value\r\nLine",
+            [secondGrouping]: null,
+            [markupGrouping]: "</textarea><script>alert(\"x\")</script>&'"
+          }
+        }]
+      }]
+    }).toString("utf8")
+
+    expect(copySource(rendered, 1)).toBe([
+      "Item\tUnit\t'\ufeff=Header One\t'\u00a0+Header Two\tmarkup\t2025-01-01 – 2025-12-31",
+      "'\u2003-Item Name\tUSD Label (Amount  Measure, scale 0)\t'\u3000@Value  Line\t\t</textarea><script>alert(\"x\")</script>&'\t-1.25"
+    ].join("\n"))
+    expect(rendered).toContain("&lt;/textarea&gt;&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&amp;&#39;")
+    expect(rendered.match(/<script>/gu)).toHaveLength(1)
+  })
+
+  it("keeps the executable script fixed and free of author text", () => {
+    const baseline = renderBytes(fixture("examples/minimal.json")).toString("utf8")
+    const document = fixture("examples/minimal.json")
+    const authored = renderBytes({
+      ...document,
+      entity: { ...document.entity, name: "SCRIPT_SENTINEL" }
+    }).toString("utf8")
+    const extractScript = (value: string): string => value.match(/<script>([\s\S]*?)<\/script>/u)?.[1] ?? ""
+
+    expect(extractScript(authored)).toBe(extractScript(baseline))
+    expect(extractScript(authored)).not.toContain("SCRIPT_SENTINEL")
+    expect(authored).not.toMatch(/\son[a-z]+=/u)
+    expect(authored).not.toMatch(/<script[^>]+src=/u)
+  })
+
   it("excludes rollup and validation metadata", () => {
     const html = renderBytes(fixture("fixtures/valid/snapshot-mismatch-source.json")).toString("utf8")
 
@@ -119,6 +267,22 @@ describe("HTML rendering", () => {
     })
   })
 
+  it("refuses structural limits before deriving visible or copied cell text", () => {
+    const document = tableDocument(renderLimits.columns, 1)
+    const statement = document.statements[0]
+    const item = statement?.items[0]
+    if (statement === undefined || item === undefined) throw new Error("Boundary fixture lost its item")
+    Object.defineProperty(item, "label", {
+      get: () => { throw new Error("cell text was derived before structural refusal") }
+    })
+
+    expect(renderHtml(document)).toEqual({
+      ok: false,
+      budget: "columns",
+      limit: renderLimits.columns
+    })
+  })
+
   it("allows the total-column boundary", () => {
     const rendered = renderHtml(tableDocument(renderLimits.columns - 1, 1))
     expect(rendered.ok).toBe(true)
@@ -155,18 +319,7 @@ describe("HTML rendering", () => {
   })
 
   it("allows the exact encoded HTML byte boundary", () => {
-    const document = fixture("examples/minimal.json")
-    const baseline = renderBytes(document).length
-    const valueLength = renderLimits.htmlBytes - baseline + 1
-    const first = document.statements[0]?.items[0]
-    if (first === undefined) throw new Error("Minimal fixture lost its first item")
-    const rendered = renderHtml({
-      ...document,
-      statements: [{
-        ...document.statements[0] as Document["statements"][number],
-        items: [{ ...first, values: { fy2025: `1${"0".repeat(valueLength - 1)}` } }]
-      }]
-    })
+    const rendered = renderHtml(exactByteDocument())
 
     expect(rendered.ok).toBe(true)
     if (rendered.ok) expect(rendered.bytes).toHaveLength(renderLimits.htmlBytes)

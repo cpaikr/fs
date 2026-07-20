@@ -684,8 +684,7 @@ styling. Focused renderer tests must prove the post-preflight TSV projection,
 unconditional Unit column, delimiter normalization, formula protection, null
 grouping behavior, and distinct missing and unavailable states. Browser
 verification must cover Clipboard API success, forced fallback success, failure
-feedback, keyboard operation, and the native-table no-script path. This
-interaction and presentation validation remains pending until implementation.
+feedback, keyboard operation, and the native-table no-script path.
 
 Failure and grammar cases cover malformed input, schema and semantic structural
 refusal, an invalid embedded snapshot, missing input or parent, existing

@@ -43,7 +43,8 @@ Red must not color negative values, inconsistencies, or authored content.
 ## Document Topology
 
 - A compact masthead identifies the entity and scope.
-- A horizontal index links to every statement in document order.
+- A horizontal index links to every statement in document order and remains
+  sticky while analysts review long statements.
 - At wide widths, a slim rail repeats statement location as an ordinal such as
   `Statement 3 of 4`; it does not claim completion or review status.
 - Each statement remains one native table and one statement-local handoff area.
