@@ -92,6 +92,25 @@ describe("HTML rendering", () => {
     expect(html).not.toContain("&<>\"'")
   })
 
+  it("treats every dynamic string as text at the renderer seam", () => {
+    const document = fixture("examples/minimal.json")
+    const statement = document.statements[0]
+    const item = statement?.items[0]
+    if (statement === undefined || item === undefined) {
+      throw new Error("Minimal fixture lost its first item")
+    }
+    const html = renderBytes({
+      ...document,
+      statements: [{
+        ...statement,
+        items: [{ ...item, values: { fy2025: "<script>alert('unsafe')</script>" } }]
+      }]
+    }).toString("utf8")
+
+    expect(html).toContain("&lt;script&gt;alert(&#39;unsafe&#39;)&lt;/script&gt;")
+    expect(html).not.toContain("<td class=\"value\"><script>alert('unsafe')</script></td>")
+  })
+
   it("rejects the Phase-1 over-wide fixture before rendering cells", () => {
     expect(renderHtml(fixture("fixtures/valid/render-column-limit-exceeded.json"))).toEqual({
       ok: false,

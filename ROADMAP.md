@@ -7,6 +7,18 @@ future active plans own their live status and next action. Completed milestone
 plans linked from the [documentation index](docs/README.md) retain delivery
 decisions and validation.
 
+## Current
+
+[Analyst-friendly HTML rendering](docs/plans/analyst-friendly-html-rendering.md)
+
+## Plans
+
+_None._
+
+## Tasks
+
+_None._
+
 ## Reference CLI
 
 The completed reference CLI sequence and its historical validation are
