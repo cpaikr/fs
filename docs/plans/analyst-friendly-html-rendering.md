@@ -16,16 +16,17 @@ The first implementation slice is complete. `renderHtml(document)` now
 orchestrates three focused internals: an opaque auto-escaping template seam, a
 bounded line sink, and a shallow presentation analysis used by structural
 preflight and rendering. Dynamic values are escaped by default, missing
-validated references fail explicitly, and the emitted HTML remains byte-for-
-byte identical to the current fixtures. The output contract still prohibits
-scripts and fixes the emitted HTML and CSS; that contract changes with the copy
-and usability slice, not with this foundation refactor.
+validated references fail explicitly, and that foundation slice preserved the
+former output byte-for-byte. The revised contract now permits only renderer-
+owned fixed inline behavior and treats current presentation bytes as a release-
+level regression surface rather than a cross-version guarantee.
 
 `pnpm render:example` now rebuilds the tracked, multi-statement manufacturing
 preview through the compiled CLI for quick local review while this work
 continues.
 
-The product direction is confirmed:
+The product and visual directions are confirmed. The approved review-index
+system is recorded in [`DESIGN.md`](../../DESIGN.md):
 
 - analysts open the generated file locally and move statement data into Excel;
 - a small inline script is acceptable, but the document remains offline and
@@ -33,14 +34,20 @@ The product direction is confirmed:
 - copying operates per statement and includes an explicit unit column for every
   row, even when the visible table shows one common unit above the table;
 - spreadsheet-native numeric transfer is preferred over exact lexical
-  preservation; and
-- the view is compact, trustworthy, utilitarian, and targets WCAG 2.2 AA.
+  preservation;
+- the view is compact, trustworthy, utilitarian, and targets WCAG 2.2 AA;
+- the visual system uses a warm working-paper canvas, neutral ink, hairline
+  rules, and restrained teal interaction cues;
+- statement navigation conveys ordinal location without inventing completion
+  state; and
+- the approved mock's inferred section index and total styling are omitted
+  because FS does not encode those presentation semantics.
 
-The foundation is committed locally as a reviewable first slice. The visual
-system, rendering-contract revision, clipboard projection, interaction, and
-presentation work remain pending. No implementation beyond the foundation
-refactor should start until the design direction is approved and recorded in
-`DESIGN.md`.
+The foundation is merged into `dev`. The visual system is approved and recorded
+in `DESIGN.md`; the rendering contract now defines fixed inline behavior,
+post-preflight clipboard projection, formula protection, accessible feedback,
+and native-table fallback. Clipboard, interaction, and presentation
+implementation remain pending.
 
 ## Scope
 
@@ -109,8 +116,7 @@ last reviewed merge.
 
 ## Blockers
 
-None. Design approval is the next required craft gate, not an implementation
-blocker.
+None.
 
 ## Validation
 
@@ -122,6 +128,10 @@ strings cannot become markup. Existing exact render fixtures remain unchanged.
 Running `pnpm render:example` also reproduced the tracked manufacturing preview
 without a byte change or leftover temporary output.
 
+The Impeccable direction, palette, and mock gates are complete. The approved
+review-index system was reconciled against the FS semantic boundary in
+`DESIGN.md`, and `pnpm check:docs` passes for the design and contract slice.
+
 Local Chromium rendered the tracked multi-statement example at desktop and
 mobile widths; the local `file:` document was a secure context with Clipboard
 API text writing available. The implementation will still include a fallback
@@ -129,6 +139,6 @@ for browsers where local clipboard access is unavailable.
 
 ## Next action
 
-Complete and record the design approval gates, then revise the rendering
-contract for fixed inline behavior and the post-preflight per-statement TSV
-projection before implementing either behavior.
+Validate and merge the approved design and rendering-contract slice into
+`dev`, then implement the post-preflight projection, progressive clipboard
+behavior, and approved presentation from the updated integration branch.

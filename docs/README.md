@@ -7,6 +7,8 @@ one primary responsibility.
 
 - Continue the active rendering work:
   [Analyst-friendly HTML rendering](plans/analyst-friendly-html-rendering.md)
+- Implement or review its approved visual system:
+  [Analyst HTML design system](../DESIGN.md)
 - Inspect the completed V0 release:
   [V0 release candidate](plans/v0-release-candidate.md)
 - Set up, run, test, or package the repository:
@@ -59,7 +61,9 @@ evidence. Contract prose defines required behavior but does not prove that a
 particular checkout or package implements it.
 
 The product scope and glossary explain intent and terminology but do not
-override the semantic specification.
+override the semantic specification. `DESIGN.md` owns the approved visual and
+interaction direction for rendered HTML; it does not override semantic or CLI
+behavior.
 
 Accepted ADRs record durable decisions and rationale incorporated into their
 owning contracts. Completed plans record delivery evidence. Proposed ADRs have

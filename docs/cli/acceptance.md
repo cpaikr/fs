@@ -422,17 +422,27 @@ optional validation snapshot affect the reported validation result but never
 the rendered values or row order.
 
 The output is one deterministic UTF-8 HTML document with one final LF. It uses
-the exact `<!doctype html>` document structure and embedded CSS fixed by the
-executable render fixtures. It contains no scripts, external resources, or
-author-controlled HTML. Every displayed entity, scope, statement, item, unit,
-measure, grouping-column name, and grouping value is escaped as text.
+the exact `<!doctype html>` document structure, embedded CSS, and fixed inline
+behavior produced by the current executable and covered by executable render
+fixtures. Exact presentation bytes are a release-level regression surface,
+not a cross-version compatibility guarantee. The document has no external
+resources, event-handler attributes, author-controlled HTML, or author-
+controlled executable content. The only script is renderer-owned fixed source;
+author content is never interpolated into it. Every author-controlled string
+emitted into markup or an inert copy source is HTML-escaped. Displayed entity,
+scope, statement, item, unit, measure, grouping-column name, and grouping value
+content therefore remains text.
 `documentId`, optional metadata identifiers, statement, period, item, and unit
 identifiers, descriptions, `rollupTo`, validation results, and snapshots are
 not displayed.
 
 The page title combines the entity name and scope label. Its body shows that
-metadata, then every statement in document order. Each statement is one flat
-table. Rows follow item array order; columns are, in order:
+metadata, then every statement in document order. The body has a renderer-
+owned ordinal anchor and navigation link for every statement. These links
+expose location, not review status or completion. Each statement is one flat,
+explicitly captioned native table. The table remains the complete no-script
+and clipboard-failure fallback. Rows follow item array order; visible columns
+are, in order:
 
 1. one `Item` column;
 2. one `Unit` column only when the statement is heterogeneous;
@@ -458,6 +468,48 @@ displayed as `Missing`, and `{ "unavailable": true }` is displayed as
 `Unavailable`. Rendering performs no numeric conversion, rescaling, rounding,
 aggregation, derivation, or subtotal styling.
 
+The fixed script progressively reveals one `Copy for Excel` button per
+statement. A button's accessible name includes its statement label. Each
+statement has a visible polite status region whose reserved space prevents
+feedback from moving the surrounding content. The script runs only after the
+native tables and inert copy sources exist. With scripts disabled, copy
+controls remain absent and all statements remain readable native tables.
+
+Each copy action transfers exactly one statement as `text/plain` tab-separated
+values. The projection is derived from the validated post-preflight render
+model rather than parsed from displayed DOM text. It has one header row and
+one row per statement item, preserving item order. Columns are, in order:
+
+1. `Item`;
+2. `Unit`, always present;
+3. every declared grouping column in document declaration order; and
+4. one value column for every statement period in statement period order.
+
+The Unit cell for every item uses the same `<label> (<measure>, scale <scale>)`
+text as the visible presentation. Period headers use the same instant or
+duration labels as the visible table. A string grouping value is copied as
+author text and JSON `null` as an empty cell. Exact decimals are copied
+verbatim without a text prefix so spreadsheet software may recognize them as
+numeric values. Missing and unavailable values are copied as the fixed text
+`Missing` and `Unavailable`.
+
+Before author-controlled text enters TSV, every tab, carriage return, or line
+feed is replaced by one space. If the first non-whitespace character is `=`,
+`+`, `-`, or `@`, the renderer prefixes one apostrophe so spreadsheet software
+treats the cell as text. This protection applies to item labels, unit text,
+grouping-column headers and values, and all other author text, but not to exact
+decimal value cells or renderer-owned fixed labels. TSV uses one U+0009 tab
+between cells and one U+000A line feed between rows, with no final line feed.
+It contains no quoting or embedded row delimiters.
+
+Copy begins only from an explicit button activation. The script first attempts
+the asynchronous Clipboard API and falls back to a temporary selected textarea
+and the browser's synchronous copy command when the API is missing or rejects.
+Success reports `Copied`; failure reports that copying failed and directs the
+analyst to the native table. Raw browser errors are not displayed. Feedback is
+available without color through the polite status region, and repeated button
+activation repeats the complete operation.
+
 Successful rendering reports the input validation and snapshot diff, output
 status `created`, the argument path, and empty help. Structural refusal uses
 the same validation information, output status `not-created` with reason
@@ -474,9 +526,13 @@ at most 100,000 logical grid slots after spans are expanded. A statement with
 header row. Arithmetic that cannot stay within a budget is over-limit without
 requiring the exact expanded count to be representable.
 
-After structural preflight, rendering uses a bounded sink and rejects final
+After structural preflight, rendering derives visible rows and copy cells
+lazily while writing them through the bounded sink; it does not materialize a
+complete row set or TSV projection outside that sink. The sink rejects final
 UTF-8 HTML larger than 16 MiB (16,777,216 bytes), measured after escaping and
-encoding. Any budget violation returns operation `render`, code
+encoding. Copy sources do not add logical table-grid slots, but their encoded
+bytes remain inside the same document budget. Any budget violation returns
+operation `render`, code
 `output-limit-exceeded`, exit code `1`, a message naming the budget and limit,
 the requested output path, empty help, and no output file.
 
@@ -610,13 +666,18 @@ atomicity and commit-race behavior.
 Cases cover exact HTML from a path for the complete presentation fixture and
 from standard input for the minimal example. A rollup-inconsistent,
 snapshot-mismatching input proves both states remain renderable while their
-content is absent from the HTML. Exact output fixtures prove statement, item,
-period, unit, and grouping-column order independent of definition order;
-homogeneous-unit collapsing and heterogeneous row units; exact zero, negative,
-and fractional decimals; literal scale metadata; missing and unavailable
-cells; null and string grouping values; and escaping of every displayed
-author-controlled text kind. They also prove that grouping values and rollups
-create no hierarchy, merged cells, or subtotal styling.
+content is absent from the HTML. Exact output fixtures prove statement
+navigation; statement, item, period, unit, and grouping-column order
+independent of definition order; homogeneous-unit collapsing and heterogeneous
+row units; exact zero, negative, and fractional decimals; literal scale
+metadata; missing and unavailable cells; null and string grouping values; and
+escaping of every displayed author-controlled text kind. They also prove that
+grouping values and rollups create no hierarchy, merged cells, or subtotal
+styling. Focused renderer tests prove the post-preflight TSV projection,
+unconditional Unit column, delimiter normalization, formula protection, null
+grouping behavior, and distinct missing and unavailable states. Browser
+verification owns Clipboard API success, forced fallback success, failure
+feedback, keyboard operation, and the native-table no-script path.
 
 Failure and grammar cases cover malformed input, schema and semantic structural
 refusal, an invalid embedded snapshot, missing input or parent, existing
