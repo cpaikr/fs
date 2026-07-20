@@ -673,11 +673,12 @@ row units; exact zero, negative, and fractional decimals; literal scale
 metadata; missing and unavailable cells; null and string grouping values; and
 escaping of every displayed author-controlled text kind. They also prove that
 grouping values and rollups create no hierarchy, merged cells, or subtotal
-styling. Focused renderer tests prove the post-preflight TSV projection,
+styling. Focused renderer tests must prove the post-preflight TSV projection,
 unconditional Unit column, delimiter normalization, formula protection, null
 grouping behavior, and distinct missing and unavailable states. Browser
-verification owns Clipboard API success, forced fallback success, failure
-feedback, keyboard operation, and the native-table no-script path.
+verification must cover Clipboard API success, forced fallback success, failure
+feedback, keyboard operation, and the native-table no-script path. This
+interaction and presentation validation remains pending until implementation.
 
 Failure and grammar cases cover malformed input, schema and semantic structural
 refusal, an invalid embedded snapshot, missing input or parent, existing
