@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Example Manufacturing Group — Consolidated financial statements</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { color: #1f2937; margin: 2rem; }
+    header, main { max-width: 100%; }
+    h1 { margin: 0; }
+    .scope { color: #4b5563; margin: 0.5rem 0 2rem; }
+    section + section { margin-top: 2.5rem; }
+    .unit { color: #4b5563; }
+    .table-scroll { overflow-x: auto; }
+    table { border-collapse: collapse; min-width: 100%; }
+    th, td { border-bottom: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child, .metadata { text-align: left; }
+    thead th { border-bottom: 2px solid #6b7280; }
+    .missing, .unavailable { color: #6b7280; font-style: italic; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Example Manufacturing Group</h1>
+    <p class="scope">Consolidated financial statements</p>
+  </header>
+  <main>
+    <section>
+      <h2>Balance sheet</h2>
+      <p class="unit">Unit: KRW millions (KRW, scale 6)</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">majorGroup</th>
+              <th scope="col">valuation</th>
+              <th scope="col">2025-12-31</th>
+              <th scope="col">2024-12-31</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Cash</th>
+              <td class="metadata">Assets</td>
+              <td class="metadata">Cash</td>
+              <td class="value">400</td>
+              <td class="value">350</td>
+            </tr>
+            <tr>
+              <th scope="row">Inventory</th>
+              <td class="metadata">Assets</td>
+              <td class="metadata">NWC</td>
+              <td class="value">600</td>
+              <td class="value">550</td>
+            </tr>
+            <tr>
+              <th scope="row">Total assets</th>
+              <td class="metadata">Assets</td>
+              <td class="metadata">—</td>
+              <td class="value">1000</td>
+              <td class="value">900</td>
+            </tr>
+            <tr>
+              <th scope="row">Liabilities</th>
+              <td class="metadata">Liabilities and equity</td>
+              <td class="metadata">Debt</td>
+              <td class="value">450</td>
+              <td class="value">400</td>
+            </tr>
+            <tr>
+              <th scope="row">Equity</th>
+              <td class="metadata">Liabilities and equity</td>
+              <td class="metadata">Equity</td>
+              <td class="value">550</td>
+              <td class="value">500</td>
+            </tr>
+            <tr>
+              <th scope="row">Liabilities and equity</th>
+              <td class="metadata">Liabilities and equity</td>
+              <td class="metadata">—</td>
+              <td class="value">1000</td>
+              <td class="value">900</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <h2>Income statement</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Unit</th>
+              <th scope="col">majorGroup</th>
+              <th scope="col">valuation</th>
+              <th scope="col">2025-01-01 – 2025-12-31</th>
+              <th scope="col">2024-01-01 – 2024-12-31</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Product revenue</th>
+              <td class="metadata">KRW millions (KRW, scale 6)</td>
+              <td class="metadata">Revenue</td>
+              <td class="metadata">Revenue</td>
+              <td class="value">60</td>
+              <td class="value">50</td>
+            </tr>
+            <tr>
+              <th scope="row">Service revenue</th>
+              <td class="metadata">KRW millions (KRW, scale 6)</td>
+              <td class="metadata">Revenue</td>
+              <td class="metadata">Revenue</td>
+              <td class="value">40</td>
+              <td class="value">30</td>
+            </tr>
+            <tr>
+              <th scope="row">Revenue</th>
+              <td class="metadata">KRW millions (KRW, scale 6)</td>
+              <td class="metadata">Revenue</td>
+              <td class="metadata">Revenue</td>
+              <td class="value">100</td>
+              <td class="value">80</td>
+            </tr>
+            <tr>
+              <th scope="row">Materials</th>
+              <td class="metadata">KRW millions (KRW, scale 6)</td>
+              <td class="metadata">Cost of sales</td>
+              <td class="metadata">—</td>
+              <td class="value">-35</td>
+              <td class="value">-30</td>
+            </tr>
+            <tr>
+              <th scope="row">Labor</th>
+              <td class="metadata">KRW millions (KRW, scale 6)</td>
+              <td class="metadata">Cost of sales</td>
+              <td class="metadata">—</td>
+              <td class="value">-25</td>
+              <td class="value">-20</td>
+            </tr>
+            <tr>
+              <th scope="row">Cost of sales</th>
+              <td class="metadata">KRW millions (KRW, scale 6)</td>
+              <td class="metadata">Cost of sales</td>
+              <td class="metadata">—</td>
+              <td class="value">-60</td>
+              <td class="value">-50</td>
+            </tr>
+            <tr>
+              <th scope="row">Gross profit</th>
+              <td class="metadata">KRW millions (KRW, scale 6)</td>
+              <td class="metadata">Profit</td>
+              <td class="metadata">EBITDA</td>
+              <td class="value">41</td>
+              <td class="value">30</td>
+            </tr>
+            <tr>
+              <th scope="row">Basic EPS</th>
+              <td class="metadata">KRW per share (KRW/share, scale 0)</td>
+              <td class="metadata">Per share</td>
+              <td class="metadata">EPS</td>
+              <td class="value">1250</td>
+              <td class="unavailable">Unavailable</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <h2>Cash flow statement</h2>
+      <p class="unit">Unit: KRW millions (KRW, scale 6)</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">majorGroup</th>
+              <th scope="col">valuation</th>
+              <th scope="col">2025-01-01 – 2025-12-31</th>
+              <th scope="col">2024-01-01 – 2024-12-31</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Operating cash flow</th>
+              <td class="metadata">Cash flow</td>
+              <td class="metadata">—</td>
+              <td class="value">30</td>
+              <td class="value">25</td>
+            </tr>
+            <tr>
+              <th scope="row">Investing cash flow</th>
+              <td class="metadata">Cash flow</td>
+              <td class="metadata">—</td>
+              <td class="value">-10</td>
+              <td class="value">-8</td>
+            </tr>
+            <tr>
+              <th scope="row">Financing cash flow</th>
+              <td class="metadata">Cash flow</td>
+              <td class="metadata">—</td>
+              <td class="value">0</td>
+              <td class="value">-2</td>
+            </tr>
+            <tr>
+              <th scope="row">Net cash flow</th>
+              <td class="metadata">Cash flow</td>
+              <td class="metadata">—</td>
+              <td class="value">20</td>
+              <td class="value">15</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <h2>Statement of changes in equity</h2>
+      <p class="unit">Unit: KRW millions (KRW, scale 6)</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">majorGroup</th>
+              <th scope="col">valuation</th>
+              <th scope="col">2025-12-31</th>
+              <th scope="col">2024-12-31</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Share capital</th>
+              <td class="metadata">Equity</td>
+              <td class="metadata">Equity</td>
+              <td class="value">200</td>
+              <td class="value">180</td>
+            </tr>
+            <tr>
+              <th scope="row">Retained earnings</th>
+              <td class="metadata">Equity</td>
+              <td class="metadata">Equity</td>
+              <td class="value">350</td>
+              <td class="value">320</td>
+            </tr>
+            <tr>
+              <th scope="row">Total equity</th>
+              <td class="metadata">Equity</td>
+              <td class="metadata">Equity</td>
+              <td class="value">550</td>
+              <td class="value">500</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <h2>Manufacturing cost statement</h2>
+      <p class="unit">Unit: KRW millions (KRW, scale 6)</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">majorGroup</th>
+              <th scope="col">valuation</th>
+              <th scope="col">2025-01-01 – 2025-12-31</th>
+              <th scope="col">2024-01-01 – 2024-12-31</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Materials</th>
+              <td class="metadata">Manufacturing</td>
+              <td class="metadata">—</td>
+              <td class="value">35</td>
+              <td class="value">30</td>
+            </tr>
+            <tr>
+              <th scope="row">Labor</th>
+              <td class="metadata">Manufacturing</td>
+              <td class="metadata">—</td>
+              <td class="value">25</td>
+              <td class="value">20</td>
+            </tr>
+            <tr>
+              <th scope="row">Manufacturing cost</th>
+              <td class="metadata">Manufacturing</td>
+              <td class="metadata">—</td>
+              <td class="value">60</td>
+              <td class="value">50</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
