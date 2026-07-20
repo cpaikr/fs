@@ -158,8 +158,3 @@ context, stale-status, native-table target, feedback-layout, and U+0000 copy
 integrity gaps. The inert source now stores TSV as JSON string text, which the
 fixed script decodes before copying, so schema-valid control characters survive
 HTML parsing without weakening the document schema.
-
-## Next action
-
-No analyst-friendly rendering action remains. Start a focused plan before
-pursuing a later roadmap direction.
