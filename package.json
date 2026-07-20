@@ -50,6 +50,7 @@
     "check:effect": "effect-language-service diagnostics --project tsconfig.json --format text --strict",
     "pack:check": "node scripts/check-pack.mjs",
     "release:check": "pnpm check && npm publish --dry-run",
+    "render:example": "pnpm build && node scripts/render-example.mjs",
     "test": "vitest run",
     "test:acceptance": "pnpm build && node scripts/run-cli-acceptance.mjs",
     "test:writer-integration": "pnpm build && node scripts/run-writer-integration.mjs",

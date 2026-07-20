@@ -5,6 +5,8 @@ one primary responsibility.
 
 ## Start by task
 
+- Continue the active rendering work:
+  [Analyst-friendly HTML rendering](plans/analyst-friendly-html-rendering.md)
 - Inspect the completed V0 release:
   [V0 release candidate](plans/v0-release-candidate.md)
 - Set up, run, test, or package the repository:
