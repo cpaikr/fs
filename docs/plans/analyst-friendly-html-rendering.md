@@ -36,6 +36,12 @@ The product direction is confirmed:
   preservation; and
 - the view is compact, trustworthy, utilitarian, and targets WCAG 2.2 AA.
 
+The foundation is committed locally as a reviewable first slice. The visual
+system, rendering-contract revision, clipboard projection, interaction, and
+presentation work remain pending. No implementation beyond the foundation
+refactor should start until the design direction is approved and recorded in
+`DESIGN.md`.
+
 ## Scope
 
 - Deepen the renderer behind its existing `renderHtml(document)` interface:
@@ -71,6 +77,41 @@ requirements.
 - Preserve `Missing` and `Unavailable` as explicit copied cell states while
   copying null grouping metadata as an empty cell.
 
+## Delivery strategy
+
+1. **Design:** inspect the manufacturing statement at desktop, narrow-screen,
+   and print widths; complete the Impeccable direction, palette, and mock
+   approval gates; then record the approved visual system and interaction
+   vocabulary in `DESIGN.md`.
+2. **Contract:** revise the CLI acceptance contract before observable behavior
+   changes. Permit only renderer-owned fixed inline behavior, keep external
+   resources and author-controlled executable content prohibited, and define
+   the deterministic statement copy projection and fallback behavior.
+3. **Implementation:** build the TSV projection only after structural
+   preflight, wire one safely named copy action and status region per statement,
+   retain native tables as the no-script fallback, and refine screen,
+   responsive, overflow, sticky-context, and print presentation without adding
+   financial interpretation.
+4. **Verification:** add focused unit and packed-process acceptance coverage,
+   regenerate exact fixtures through supported repository commands, run the
+   complete repository gates, inspect the local standalone file in a real
+   browser across desktop and mobile, audit WCAG 2.2 AA and print behavior, and
+   paste representative statement data into Excel to verify cell types and
+   formula protection.
+5. **Completion:** run local code review on every reviewable slice, deliver the
+   fewest manageable sequential PRs to `dev`, address all Codex and CodeRabbit
+   feedback and required checks before merging each PR, and finish with a
+   requirement-by-requirement audit of this plan and its owning contracts.
+
+Keep each slice self-contained and passing. Start every later slice from the
+updated `dev` branch; do not stack branches or leave implementation after the
+last reviewed merge.
+
+## Blockers
+
+None. Design approval is the next required craft gate, not an implementation
+blocker.
+
 ## Validation
 
 The foundation refactor passes type checking, strict Effect diagnostics, all
@@ -88,8 +129,6 @@ for browsers where local clipboard access is unavailable.
 
 ## Next action
 
-Revise the rendering contract for fixed inline behavior, then implement and
-test a post-preflight per-statement clipboard projection. It will always include
-Unit, preserve explicit missing states, normalize delimiters, and protect
-author-controlled cells from spreadsheet formula interpretation before UI
-wiring begins.
+Complete and record the design approval gates, then revise the rendering
+contract for fixed inline behavior and the post-preflight per-statement TSV
+projection before implementing either behavior.
