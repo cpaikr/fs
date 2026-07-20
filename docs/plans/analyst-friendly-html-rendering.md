@@ -1,6 +1,6 @@
 # Analyst-Friendly HTML Rendering Plan
 
-Status: Active.
+Status: Complete.
 
 ## Outcome
 
@@ -12,7 +12,7 @@ meaning.
 
 ## Current state
 
-The first implementation slice is complete. `renderHtml(document)` now
+`renderHtml(document)` now
 orchestrates three focused internals: an opaque auto-escaping template seam, a
 bounded line sink, and a shallow presentation analysis used by structural
 preflight and rendering. Dynamic values are escaped by default, missing
@@ -21,9 +21,8 @@ former output byte-for-byte. The revised contract now permits only renderer-
 owned fixed inline behavior and treats current presentation bytes as a release-
 level regression surface rather than a cross-version guarantee.
 
-`pnpm render:example` now rebuilds the tracked, multi-statement manufacturing
-preview through the compiled CLI for quick local review while this work
-continues.
+`pnpm render:example` rebuilds the tracked, multi-statement manufacturing
+preview through the compiled CLI for quick local review.
 
 The product and visual directions are confirmed. The approved review-index
 system is recorded in [`DESIGN.md`](../../DESIGN.md):
@@ -43,14 +42,13 @@ system is recorded in [`DESIGN.md`](../../DESIGN.md):
 - the approved mock's inferred section index and total styling are omitted
   because FS does not encode those presentation semantics.
 
-The foundation and rendering-contract slices are merged into `dev`. The
-presentation implementation is complete on its delivery branch: native tables
-now use the approved review-index system, responsive overflow guidance, print
-rules, a sticky statement index, and progressive per-statement Excel handoff.
-Clipboard TSV is streamed through the bounded sink after structural preflight,
-includes unit context, normalizes delimiters, and protects formula-prefixed
-author text. Exact fixtures and the tracked examples have been regenerated from
-the implementation.
+The foundation, rendering-contract, and presentation slices are merged into
+`dev`. Native tables use the approved review-index system, responsive overflow
+guidance, print rules, a sticky statement index, and progressive per-statement
+Excel handoff. Clipboard TSV is streamed through the bounded sink after
+structural preflight, includes unit context, normalizes delimiters, and protects
+formula-prefixed author text. Exact fixtures and the tracked examples were
+regenerated from the implementation.
 
 ## Scope
 
@@ -163,5 +161,5 @@ HTML parsing without weakening the document schema.
 
 ## Next action
 
-Deliver and merge the presentation slice into `dev` through its reviewed
-sequential pull request, then complete the release-candidate plan's next action.
+No analyst-friendly rendering action remains. Start a focused plan before
+pursuing a later roadmap direction.
