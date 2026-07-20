@@ -10,9 +10,16 @@ FS is a file-first interchange format, not an extraction system, accounting
 taxonomy, conversion method, or mutable financial database. Authoring starts
 only after the financial model is resolved.
 
+The **authoring actor** is the person or delegated agent responsible for
+resolving that model. The repository-distributed Agent Skill may help an actor
+resolve imperfect source material into the prerequisite model. This assistance
+remains upstream of encoding: report material assumptions and unresolved
+limitations to the user, keep provenance outside FS JSON, and begin encoding
+only after the required financial choices are internally consistent.
+
 ## Authoring Contract
 
-Before encoding begins, the author must supply:
+Before encoding begins, the authoring actor must resolve:
 
 - the reporting entity and exact reporting scope;
 - every statement's item meanings, order, and stable local identifiers;
@@ -22,10 +29,14 @@ Before encoding begins, the author must supply:
 - every confirmed additive parent-child relationship and applicable unit
   tolerance.
 
-These are prerequisites, not questions the format answers. A person or agent
-must stop and request missing or contradictory inputs rather than infer a
-meaning, choose a sign, aggregate or split items, map a taxonomy, invent a
-grouping, or create a value.
+These are prerequisites, not questions the format answers. When a user
+delegates source resolution, an agent may recover evidence-supported choices
+from the supplied material and use professional judgment among reasonable
+interpretations. It asks the user only when the evidence cannot support a
+defensible choice and the alternatives would materially change the financial
+meaning. It must disclose material assumptions and must not invent a value or
+source detail, impose an external taxonomy or cross-entity alignment, or change
+a reported value to manufacture consistency.
 
 ## Create and Repair Policy
 
@@ -70,7 +81,13 @@ meanings and contents remain author-controlled.
 
 ## Agent Use
 
-Agents should use the generated CLI guide or repository-distributed Agent Skill
-for the self-contained operational workflow. Both are generated from the
-portable source. They must stop when the prerequisite financial model is
-incomplete and must not add extraction or mapping behavior outside this policy.
+The generated CLI guide begins with an already-resolved financial model. The
+repository-distributed Agent Skill adds an upstream source-material branch for
+delegated resolution, followed by the same create-and-repair workflow. The
+portable source owns that shared encoding workflow; the Skill-only source-input
+guide owns source exploration and its source-fidelity gate.
+
+An agent resolving source material follows the evidence and escalation boundary
+in the authoring contract above. An agent repairing existing FS JSON treats the
+candidate's financial choices as authoritative and never reinterprets them as
+part of structural repair.

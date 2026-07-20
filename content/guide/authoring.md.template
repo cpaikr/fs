@@ -3,7 +3,7 @@
 {{FS_VERSION_NOTE}}Encode only an author-resolved financial model. One FS document covers one
 entity and reporting scope.
 
-## Resolve Inputs
+{{FS_SOURCE_INTAKE}}## Resolve Inputs
 
 For a new document, confirm all of these inputs before encoding:
 

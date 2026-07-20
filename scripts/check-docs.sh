@@ -6,7 +6,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 echo "Linting Markdown"
-pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist'
+pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist' '#CHANGELOG.md'
 
 echo "Checking Markdown links"
 while IFS= read -r -d '' document; do
@@ -18,6 +18,7 @@ done < <(
   find . \
     -path './.git' -prune -o \
     -path './node_modules' -prune -o \
+    -path './CHANGELOG.md' -prune -o \
     -name '*.md' -print0
 )
 
@@ -56,6 +57,19 @@ node scripts/render-guide.mjs --npx-version 1.0.0+build.1 >/dev/null
 skill_guide="$(node scripts/render-guide.mjs --skill-version 1.0.0+build.1)"
 if [[ "$skill_guide" != *"This Skill uses \`$package_name@1.0.0+build.1\`."* ]]; then
   echo "Agent Skill rendering lost its package-version basis" >&2
+  exit 1
+fi
+if [[ "$skill_guide" != *'[source-input guide](guides/resolving-inputs.md)'* ]]; then
+  echo "Agent Skill rendering lost its source-input guide" >&2
+  exit 1
+fi
+if [[ "$skill_guide" != *'asks to organize, structure, or convert statements'* ]] ||
+  [[ "$skill_guide" != *'source-fidelity gate'* ]]; then
+  echo "Agent Skill rendering lost its source-material route" >&2
+  exit 1
+fi
+if [[ "$npx_guide" == *'guides/resolving-inputs.md'* ]]; then
+  echo "Package guide unexpectedly references the Skill-only source-input guide" >&2
   exit 1
 fi
 for invalid_version in latest 1.0.0-.. 1.0.0-01; do

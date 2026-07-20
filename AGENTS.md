@@ -4,9 +4,9 @@
 
 - Start with [the documentation index](docs/README.md) and use its authority
   map instead of inferring behavior from summaries.
-- Use the [active release plan](docs/plans/v0-release-candidate.md) for live
-  status and the next action. Completed milestone plans are historical delivery
-  evidence, not current-state summaries.
+- Use the [documentation index](docs/README.md) to find the active plan for
+  live status and the next action. Completed milestone plans are historical
+  delivery evidence, not current-state summaries.
 - Verify implementation availability in source, configuration, tests, or the
   built package. Treat CLI contract prose as intended behavior, not evidence
   that the behavior is implemented.
@@ -25,6 +25,15 @@
   append session logs.
 - Do not edit examples or expected-result fixtures merely to make a prose
   summary appear current; resolve the underlying contract deliberately.
+
+## Release ownership
+
+- Release Please owns package version bumps, `.release-please-manifest.json`,
+  `CHANGELOG.md`, release tags, and GitHub releases. Change release inputs or
+  configuration instead of editing those generated artifacts manually.
+- A push to `main` may create or update a release PR but does not tag a
+  release. Dispatch the Release Please workflow manually only after the exact
+  package version has been published and verified.
 
 <!-- effect-solutions:start -->
 

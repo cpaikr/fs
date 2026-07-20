@@ -1,6 +1,6 @@
 ---
 name: author-fs
-description: "Author FS documents from resolved financial models. Use when creating a conforming FS JSON document or repairing structural diagnostics after financial meanings, values, units, periods, groupings, and rollups are author-confirmed."
+description: "Organize financial statements into conforming FS documents. Use when source statements in spreadsheets, PDFs, images, webpages, or other imperfect inputs must be explored and resolved before encoding, when an already-resolved financial model must be encoded, or when an existing FS JSON document needs structural repair."
 ---
 
 # Authoring FS Documents
@@ -12,6 +12,22 @@ tag or another version.
 
 Encode only an author-resolved financial model. One FS document covers one
 entity and reporting scope.
+
+## Choose the Authoring Branch
+
+Choose one branch before resolving the encoding inputs:
+
+- **Source material:** Use this branch when the user supplies financial
+  statements or asks to organize, structure, or convert statements without
+  an already-resolved model. Inventory the source artifacts available in the
+  task, then read the [source-input guide](guides/resolving-inputs.md). If no
+  source material is accessible, request it. Use the guide to resolve the
+  prerequisite model, continue through create preparation, and complete its
+  source-fidelity gate before reference validation.
+- **Resolved model:** When all prerequisite financial choices are already
+  supplied, continue with the create branch.
+- **Existing FS JSON:** Continue with the repair branch. Preserve its
+  financial choices and validate the unchanged candidate first.
 
 ## Resolve Inputs
 

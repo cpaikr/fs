@@ -5,7 +5,7 @@ one primary responsibility.
 
 ## Start by task
 
-- Check live release status or the next action:
+- Inspect the completed V0 release:
   [V0 release candidate](plans/v0-release-candidate.md)
 - Set up, run, test, or package the repository:
   [Development guide](development.md)
@@ -28,6 +28,8 @@ one primary responsibility.
   [Statement item row refactor](plans/statement-item-row-refactor.md)
 - Inspect the completed agent-guidance, snapshot, and rendering milestone:
   [Agent guidance, snapshots, and rendering plan](plans/agent-guidance-snapshots-rendering.md)
+- Inspect the completed delegated source-resolution work for the author-fs Skill:
+  [Author FS source-resolution plan](plans/author-fs-source-resolution.md)
 - Inspect the completed Effect-native CLI milestone:
   [V0 CLI plan](plans/cli-v0.md)
 

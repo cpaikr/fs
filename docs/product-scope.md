@@ -51,9 +51,11 @@ Its central boundaries are:
   a special document type or filename convention.
 
 Authoring guidance and reference tools teach, discover, validate, and safely
-write this same contract. They begin from author-resolved financial meanings
-and values; they do not define a conversion method or introduce semantics
-absent from the artifact specification.
+write this same contract. The CLI begins from author-resolved financial
+meanings and values. The repository-distributed Agent Skill may help a delegated
+authoring actor resolve those prerequisites from source material before
+encoding. That assistance defines no conversion method, adds no artifact
+semantics, and keeps source and provenance records outside FS JSON.
 
 The [domain glossary](glossary.md) defines these terms precisely.
 
@@ -61,7 +63,8 @@ The [domain glossary](glossary.md) defines these terms precisely.
 
 V0 will not:
 
-- extract, OCR, or align source material;
+- define or implement a source extraction, OCR, alignment, or conversion
+  engine;
 - define financial-statement types or prescribe their contents;
 - define a universal item taxonomy or align different companies;
 - decide when an author should retain detail or aggregate items;
@@ -74,9 +77,9 @@ V0 will not:
 - act as a mutable financial database or field-by-field statement editor; or
 - execute arbitrary code embedded in a document.
 
-Authors remain responsible for choosing item meanings, statement composition,
-grouping columns, rollup relationships, and the level of detail appropriate
-for their use.
+The authoring actor, whether a person or delegated agent, remains responsible
+for choosing item meanings, statement composition, grouping columns, rollup
+relationships, and the level of detail appropriate for the user's purpose.
 
 ## Deliverables
 
@@ -121,8 +124,9 @@ V0 succeeds when:
 - documents with no rollup relationships remain valid and straightforward to
   use;
 - documents and validation results are deterministic to inspect and diff;
-- given author-resolved statements and values, a person or agent can discover
-  the contract, encode a complete candidate, and act on validation diagnostics
+- given accessible source statements or an author-resolved model, a person or
+  delegated agent can resolve the prerequisite model when needed, discover the
+  contract, encode a complete candidate, and act on validation diagnostics
   without reading the whole repository; and
 - new user-defined items or statement layouts do not require a core release.
 

@@ -1,0 +1,59 @@
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: release-please-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-pr:
+    if: github.event_name == 'push'
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
+        with:
+          target-branch: main
+          skip-github-release: true
+
+  github-release:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24.15.0
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+      - name: Verify public release preconditions
+        env:
+          REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+        run: |
+          test "$REPOSITORY_VISIBILITY" = "public"
+          package_name="$(node -p 'require("./package.json").name')"
+          package_version="$(node -p 'require("./package.json").version')"
+          manifest_version="$(node -p 'require("./.release-please-manifest.json")["."]')"
+          published_version="$(npm view "$package_name@$package_version" version)"
+          test "$manifest_version" = "$package_version"
+          test "$published_version" = "$package_version"
+      - name: Enable pinned pnpm
+        run: corepack enable && corepack prepare pnpm@10.28.0 --activate
+      - name: Install without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Verify published package bytes
+        run: node scripts/check-publication.mjs --require-published-match
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5
+        with:
+          target-branch: main
+          skip-github-pull-request: true
