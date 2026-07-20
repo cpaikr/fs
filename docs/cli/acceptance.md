@@ -494,21 +494,28 @@ numeric values. Missing and unavailable values are copied as the fixed text
 `Missing` and `Unavailable`.
 
 Before author-controlled text enters TSV, every tab, carriage return, or line
-feed is replaced by one space. If the first non-whitespace character is `=`,
-`+`, `-`, or `@`, the renderer prefixes one apostrophe so spreadsheet software
-treats the cell as text. This protection applies to item labels, unit text,
-grouping-column headers and values, and all other author text, but not to exact
-decimal value cells or renderer-owned fixed labels. TSV uses one U+0009 tab
-between cells and one U+000A line feed between rows, with no final line feed.
-It contains no quoting or embedded row delimiters.
+feed is replaced by one space. For formula protection, whitespace is exactly
+U+0009 through U+000D, U+0020, U+00A0, U+1680, U+2000 through U+200A, U+2028,
+U+2029, U+202F, U+205F, U+3000, and U+FEFF. If the first code point outside
+that set is `=`, `+`, `-`, or `@`, the renderer prefixes one apostrophe so
+spreadsheet software treats the cell as text. This protection applies to item
+labels, unit text, grouping-column headers and values, and all other author
+text, but not to exact decimal value cells or renderer-owned fixed labels. TSV
+uses one U+0009 tab between cells and one U+000A line feed between rows, with
+no final line feed. It contains no quoting or embedded row delimiters.
 
 Copy begins only from an explicit button activation. The script first attempts
 the asynchronous Clipboard API and falls back to a temporary selected textarea
 and the browser's synchronous copy command when the API is missing or rejects.
-Success reports `Copied`; failure reports that copying failed and directs the
-analyst to the native table. Raw browser errors are not displayed. Feedback is
-available without color through the polite status region, and repeated button
-activation repeats the complete operation.
+If that fallback runs, it removes the temporary textarea and restores focus to
+the activated button after either success or failure. Every activation first
+replaces the prior result with `Copying…`; after the operation settles, the
+script applies the final message in a later task so repeated outcomes always
+produce a live-region text change. Success reports `Copied`; failure reports
+that copying failed and directs the analyst to the native table. Raw browser
+errors are not displayed. Feedback is available without color through the
+polite status region, and repeated button activation repeats the complete
+operation.
 
 Successful rendering reports the input validation and snapshot diff, output
 status `created`, the argument path, and empty help. Structural refusal uses
