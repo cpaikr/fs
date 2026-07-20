@@ -17,9 +17,10 @@ import {
   executeWithIO,
   type ApplicationIOService
 } from "../src/process.js"
-import { renderHtml, renderLimits } from "../src/render.js"
+import { renderLimits } from "../src/render.js"
 import type { Document, Item, Period } from "../src/validation/model.js"
 import { outputEntryExists, writeNewFile } from "../src/writer.js"
+import { exactByteDocument } from "./support/exact-byte-document.js"
 
 const makeIO = (
   cwd: string,
@@ -83,59 +84,6 @@ const tableDocument = (periodCount: number, itemCount: number): Document => {
     units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],
     periods,
     statements: [{ id: "statement", label: "Statement", periods: periodIds, items }]
-  }
-}
-
-const exactByteDocument = (): Document => {
-  const document = JSON.parse(readFileSync(resolve("examples/minimal.json"), "utf8")) as Document
-  const statement = document.statements[0]
-  const first = statement?.items[0]
-  if (statement === undefined || first === undefined) throw new Error("Minimal fixture lost its first item")
-  const baselineDocument: Document = {
-    ...document,
-    entity: { ...document.entity, name: "x" },
-    statements: [{ ...statement, label: "x", items: [{ ...first, label: "x" }] }]
-  }
-  const baseline = renderHtml(baselineDocument)
-  if (!baseline.ok) throw new Error("Minimal fixture unexpectedly exceeded a render budget")
-  const entityProbe = renderHtml({
-    ...baselineDocument,
-    entity: { ...baselineDocument.entity, name: "xa" }
-  })
-  const statementProbe = renderHtml({
-    ...baselineDocument,
-    statements: [{
-      ...baselineDocument.statements[0] as Document["statements"][number],
-      label: "xa"
-    }]
-  })
-  if (!entityProbe.ok || !statementProbe.ok) {
-    throw new Error("Render byte-boundary probes unexpectedly exceeded a budget")
-  }
-  const entityDelta = entityProbe.bytes.length - baseline.bytes.length
-  const statementDelta = statementProbe.bytes.length - baseline.bytes.length
-  const remaining = renderLimits.htmlBytes - baseline.bytes.length
-  let statementPadding = 0
-  while (
-    statementPadding < entityDelta &&
-    (remaining - statementPadding * statementDelta) % entityDelta !== 0
-  ) {
-    statementPadding += 1
-  }
-  const entityPadding = (remaining - statementPadding * statementDelta) / entityDelta
-  if (!Number.isInteger(entityPadding) || entityPadding < 0) {
-    throw new Error("Could not construct the exact HTML byte boundary")
-  }
-  return {
-    ...baselineDocument,
-    entity: {
-      ...baselineDocument.entity,
-      name: `x${"a".repeat(entityPadding)}`
-    },
-    statements: [{
-      ...baselineDocument.statements[0] as Document["statements"][number],
-      label: `x${"a".repeat(statementPadding)}`
-    }]
   }
 }
 

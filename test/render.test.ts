@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest"
 
 import { renderHtml, renderLimits } from "../src/render.js"
 import type { Document, Item, Period } from "../src/validation/model.js"
+import { exactByteDocument } from "./support/exact-byte-document.js"
 
 const fixture = (path: string): Document =>
   JSON.parse(readFileSync(resolve(path), "utf8")) as Document
@@ -14,51 +15,6 @@ const renderBytes = (document: Document): Buffer => {
   expect(rendered.ok).toBe(true)
   if (!rendered.ok) throw new Error(`Unexpected ${rendered.budget} limit`)
   return rendered.bytes
-}
-
-const renderLength = (document: Document): number => renderBytes(document).length
-
-const exactByteDocument = (): Document => {
-  const document = fixture("examples/minimal.json")
-  const statement = document.statements[0]
-  const item = statement?.items[0]
-  if (statement === undefined || item === undefined) {
-    throw new Error("Minimal fixture lost its first statement item")
-  }
-  const baseline: Document = {
-    ...document,
-    entity: { ...document.entity, name: "x" },
-    statements: [{ ...statement, label: "x", items: [{ ...item, label: "x" }] }]
-  }
-  const baselineLength = renderLength(baseline)
-  const entityDelta = renderLength({
-    ...baseline,
-    entity: { ...baseline.entity, name: "xa" }
-  }) - baselineLength
-  const statementDelta = renderLength({
-    ...baseline,
-    statements: [{ ...baseline.statements[0] as Document["statements"][number], label: "xa" }]
-  }) - baselineLength
-  const remaining = renderLimits.htmlBytes - baselineLength
-  let statementPadding = 0
-  while (
-    statementPadding < entityDelta &&
-    (remaining - statementPadding * statementDelta) % entityDelta !== 0
-  ) {
-    statementPadding += 1
-  }
-  const entityPadding = (remaining - statementPadding * statementDelta) / entityDelta
-  if (!Number.isInteger(entityPadding) || entityPadding < 0) {
-    throw new Error("Could not construct the exact HTML byte boundary")
-  }
-  return {
-    ...baseline,
-    entity: { ...baseline.entity, name: `x${"a".repeat(entityPadding)}` },
-    statements: [{
-      ...baseline.statements[0] as Document["statements"][number],
-      label: `x${"a".repeat(statementPadding)}`
-    }]
-  }
 }
 
 const decodeHtmlText = (text: string): string =>
@@ -76,7 +32,9 @@ const decodeHtmlText = (text: string): string =>
 const copySource = (html: string, ordinal: number): string => {
   const match = html.match(new RegExp(`<textarea[^>]+id="copy-source-${ordinal}"[^>]*>([\\s\\S]*?)</textarea>`, "u"))
   if (match?.[1] === undefined) throw new Error(`Missing copy source ${ordinal}`)
-  return decodeHtmlText(match[1])
+  const parsed: unknown = JSON.parse(decodeHtmlText(match[1]))
+  if (typeof parsed !== "string") throw new Error(`Copy source ${ordinal} is not a string`)
+  return parsed
 }
 
 const tableDocument = (periodCount: number, itemCount: number): Document => {
@@ -203,6 +161,22 @@ describe("HTML rendering", () => {
     ].join("\n"))
     expect(rendered).toContain("&lt;/textarea&gt;&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&amp;&#39;")
     expect(rendered.match(/<script>/gu)).toHaveLength(1)
+  })
+
+  it("preserves U+0000 through the inert copy payload", () => {
+    const document = fixture("examples/minimal.json")
+    const statement = document.statements[0]
+    const item = statement?.items[0]
+    if (statement === undefined || item === undefined) {
+      throw new Error("Minimal fixture lost its first statement item")
+    }
+    const rendered = renderBytes({
+      ...document,
+      statements: [{ ...statement, items: [{ ...item, label: "Before\u0000After" }] }]
+    }).toString("utf8")
+
+    expect(copySource(rendered, 1)).toContain("Before\u0000After")
+    expect(rendered).toContain("Before\\u0000After")
   })
 
   it("keeps the executable script fixed and free of author text", () => {

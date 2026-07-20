@@ -82,8 +82,10 @@ red. Focus is a square, high-contrast teal outline. No interaction depends on
 hover or color alone.
 
 The button is progressive enhancement: it is absent when the fixed renderer
-script does not run. The semantic table is always present and usable, so the
-no-script path has no dead control or alternate data representation.
+script does not run. Its inert source stores the TSV as JSON string text so
+schema-valid control characters survive HTML parsing before the fixed script
+decodes them. The semantic table is always present and usable, so the no-script
+path has no dead control or alternate data representation.
 
 ## Responsive and Print Behavior
 

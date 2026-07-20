@@ -123,7 +123,7 @@
     .overflow-cue { color: var(--secondary); display: none; font-size: 0.85rem; margin-bottom: 0.6rem; }
     .table-scroll { max-width: 100%; overflow-x: auto; }
     .table-scroll:focus-visible { outline-offset: 2px; }
-    table { border-collapse: collapse; min-width: 100%; }
+    table { border-collapse: collapse; min-width: 100%; scroll-margin-top: 4.75rem; }
     th, td {
       border-bottom: 1px solid var(--rule);
       padding: 0.62rem 0.75rem;
@@ -149,12 +149,12 @@
     .metadata, .missing, .unavailable { color: var(--secondary); }
     .missing, .unavailable { font-style: italic; }
     .handoff {
-      align-items: center;
+      align-items: start;
       border-bottom: 1px solid var(--rule);
       border-top: 1px solid var(--rule);
       display: grid;
       gap: 0.75rem 1.5rem;
-      grid-template-columns: auto minmax(7rem, 0.25fr) minmax(16rem, 1fr) auto;
+      grid-template-columns: auto minmax(11rem, 0.3fr) minmax(10rem, 1fr) auto;
       margin-top: 1.75rem;
       padding: 1rem 0;
     }
@@ -170,7 +170,7 @@
       padding: 0.65rem 1rem;
     }
     .copy-button:hover { background: var(--teal-wash); }
-    .copy-status { color: var(--teal); font-weight: 700; min-height: 1.5em; }
+    .copy-status { color: var(--teal); font-weight: 700; min-height: 4.5em; }
     .copy-status[data-state="failure"] { color: var(--error); }
     .copy-help { color: var(--secondary); margin-bottom: 0; }
     .native-table-link { align-items: center; display: inline-flex; min-height: 44px; white-space: nowrap; }
@@ -199,6 +199,7 @@
       .overflow-cue { display: block; }
       .handoff { align-items: start; grid-template-columns: minmax(0, 1fr); }
       .copy-button { justify-self: start; }
+      .copy-status { min-height: 3em; }
       .native-table-link { white-space: normal; }
     }
     @media print {
@@ -296,13 +297,7 @@
             </tbody>
           </table>
         </div>
-      <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">Item	Unit	majorGroup	valuation	2025-12-31	2024-12-31
-Cash	KRW millions (KRW, scale 6)	Assets	Cash	400	350
-Inventory	KRW millions (KRW, scale 6)	Assets	NWC	600	550
-Total assets	KRW millions (KRW, scale 6)	Assets		1000	900
-Liabilities	KRW millions (KRW, scale 6)	Liabilities and equity	Debt	450	400
-Equity	KRW millions (KRW, scale 6)	Liabilities and equity	Equity	550	500
-Liabilities and equity	KRW millions (KRW, scale 6)	Liabilities and equity		1000	900</textarea>
+      <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-12-31\t2024-12-31\nCash\tKRW millions (KRW, scale 6)\tAssets\tCash\t400\t350\nInventory\tKRW millions (KRW, scale 6)\tAssets\tNWC\t600\t550\nTotal assets\tKRW millions (KRW, scale 6)\tAssets\t\t1000\t900\nLiabilities\tKRW millions (KRW, scale 6)\tLiabilities and equity\tDebt\t450\t400\nEquity\tKRW millions (KRW, scale 6)\tLiabilities and equity\tEquity\t550\t500\nLiabilities and equity\tKRW millions (KRW, scale 6)\tLiabilities and equity\t\t1000\t900"</textarea>
         <div class="handoff" data-copy-handoff hidden>
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-1" data-copy-status="copy-status-1" aria-describedby="copy-help-1" aria-label="Copy Balance sheet for Excel">Copy for Excel</button>
           <span class="copy-status" id="copy-status-1" role="status" aria-live="polite" aria-atomic="true"></span>
@@ -397,15 +392,7 @@ Liabilities and equity	KRW millions (KRW, scale 6)	Liabilities and equity		1000	
             </tbody>
           </table>
         </div>
-      <textarea class="copy-source" id="copy-source-2" readonly hidden aria-hidden="true" tabindex="-1">Item	Unit	majorGroup	valuation	2025-01-01 – 2025-12-31	2024-01-01 – 2024-12-31
-Product revenue	KRW millions (KRW, scale 6)	Revenue	Revenue	60	50
-Service revenue	KRW millions (KRW, scale 6)	Revenue	Revenue	40	30
-Revenue	KRW millions (KRW, scale 6)	Revenue	Revenue	100	80
-Materials	KRW millions (KRW, scale 6)	Cost of sales		-35	-30
-Labor	KRW millions (KRW, scale 6)	Cost of sales		-25	-20
-Cost of sales	KRW millions (KRW, scale 6)	Cost of sales		-60	-50
-Gross profit	KRW millions (KRW, scale 6)	Profit	EBITDA	41	30
-Basic EPS	KRW per share (KRW/share, scale 0)	Per share	EPS	1250	Unavailable</textarea>
+      <textarea class="copy-source" id="copy-source-2" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nProduct revenue\tKRW millions (KRW, scale 6)\tRevenue\tRevenue\t60\t50\nService revenue\tKRW millions (KRW, scale 6)\tRevenue\tRevenue\t40\t30\nRevenue\tKRW millions (KRW, scale 6)\tRevenue\tRevenue\t100\t80\nMaterials\tKRW millions (KRW, scale 6)\tCost of sales\t\t-35\t-30\nLabor\tKRW millions (KRW, scale 6)\tCost of sales\t\t-25\t-20\nCost of sales\tKRW millions (KRW, scale 6)\tCost of sales\t\t-60\t-50\nGross profit\tKRW millions (KRW, scale 6)\tProfit\tEBITDA\t41\t30\nBasic EPS\tKRW per share (KRW/share, scale 0)\tPer share\tEPS\t1250\tUnavailable"</textarea>
         <div class="handoff" data-copy-handoff hidden>
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-2" data-copy-status="copy-status-2" aria-describedby="copy-help-2" aria-label="Copy Income statement for Excel">Copy for Excel</button>
           <span class="copy-status" id="copy-status-2" role="status" aria-live="polite" aria-atomic="true"></span>
@@ -463,11 +450,7 @@ Basic EPS	KRW per share (KRW/share, scale 0)	Per share	EPS	1250	Unavailable</tex
             </tbody>
           </table>
         </div>
-      <textarea class="copy-source" id="copy-source-3" readonly hidden aria-hidden="true" tabindex="-1">Item	Unit	majorGroup	valuation	2025-01-01 – 2025-12-31	2024-01-01 – 2024-12-31
-Operating cash flow	KRW millions (KRW, scale 6)	Cash flow		30	25
-Investing cash flow	KRW millions (KRW, scale 6)	Cash flow		-10	-8
-Financing cash flow	KRW millions (KRW, scale 6)	Cash flow		0	-2
-Net cash flow	KRW millions (KRW, scale 6)	Cash flow		20	15</textarea>
+      <textarea class="copy-source" id="copy-source-3" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nOperating cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t30\t25\nInvesting cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t-10\t-8\nFinancing cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t0\t-2\nNet cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t20\t15"</textarea>
         <div class="handoff" data-copy-handoff hidden>
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-3" data-copy-status="copy-status-3" aria-describedby="copy-help-3" aria-label="Copy Cash flow statement for Excel">Copy for Excel</button>
           <span class="copy-status" id="copy-status-3" role="status" aria-live="polite" aria-atomic="true"></span>
@@ -518,10 +501,7 @@ Net cash flow	KRW millions (KRW, scale 6)	Cash flow		20	15</textarea>
             </tbody>
           </table>
         </div>
-      <textarea class="copy-source" id="copy-source-4" readonly hidden aria-hidden="true" tabindex="-1">Item	Unit	majorGroup	valuation	2025-12-31	2024-12-31
-Share capital	KRW millions (KRW, scale 6)	Equity	Equity	200	180
-Retained earnings	KRW millions (KRW, scale 6)	Equity	Equity	350	320
-Total equity	KRW millions (KRW, scale 6)	Equity	Equity	550	500</textarea>
+      <textarea class="copy-source" id="copy-source-4" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-12-31\t2024-12-31\nShare capital\tKRW millions (KRW, scale 6)\tEquity\tEquity\t200\t180\nRetained earnings\tKRW millions (KRW, scale 6)\tEquity\tEquity\t350\t320\nTotal equity\tKRW millions (KRW, scale 6)\tEquity\tEquity\t550\t500"</textarea>
         <div class="handoff" data-copy-handoff hidden>
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-4" data-copy-status="copy-status-4" aria-describedby="copy-help-4" aria-label="Copy Statement of changes in equity for Excel">Copy for Excel</button>
           <span class="copy-status" id="copy-status-4" role="status" aria-live="polite" aria-atomic="true"></span>
@@ -572,10 +552,7 @@ Total equity	KRW millions (KRW, scale 6)	Equity	Equity	550	500</textarea>
             </tbody>
           </table>
         </div>
-      <textarea class="copy-source" id="copy-source-5" readonly hidden aria-hidden="true" tabindex="-1">Item	Unit	majorGroup	valuation	2025-01-01 – 2025-12-31	2024-01-01 – 2024-12-31
-Materials	KRW millions (KRW, scale 6)	Manufacturing		35	30
-Labor	KRW millions (KRW, scale 6)	Manufacturing		25	20
-Manufacturing cost	KRW millions (KRW, scale 6)	Manufacturing		60	50</textarea>
+      <textarea class="copy-source" id="copy-source-5" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nMaterials\tKRW millions (KRW, scale 6)\tManufacturing\t\t35\t30\nLabor\tKRW millions (KRW, scale 6)\tManufacturing\t\t25\t20\nManufacturing cost\tKRW millions (KRW, scale 6)\tManufacturing\t\t60\t50"</textarea>
         <div class="handoff" data-copy-handoff hidden>
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-5" data-copy-status="copy-status-5" aria-describedby="copy-help-5" aria-label="Copy Manufacturing cost statement for Excel">Copy for Excel</button>
           <span class="copy-status" id="copy-status-5" role="status" aria-live="polite" aria-atomic="true"></span>
@@ -632,13 +609,22 @@ Manufacturing cost	KRW millions (KRW, scale 6)	Manufacturing		60	50</textarea>
         const handoff = control.closest("[data-copy-handoff]");
         if (!(source instanceof HTMLTextAreaElement) || !(status instanceof HTMLElement) || !(handoff instanceof HTMLElement)) continue;
 
+        let text;
+        try {
+          const parsed = JSON.parse(source.value);
+          if (typeof parsed !== "string") continue;
+          text = parsed;
+        } catch {
+          continue;
+        }
+
         let attempt = 0;
         handoff.hidden = false;
         control.addEventListener("click", async () => {
           const currentAttempt = ++attempt;
           status.dataset.state = "pending";
           status.textContent = "Copying…";
-          const copied = await copyText(source.value, control);
+          const copied = await copyText(text, control);
           window.setTimeout(() => {
             if (currentAttempt !== attempt) return;
             status.dataset.state = copied ? "success" : "failure";

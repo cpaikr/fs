@@ -120,7 +120,7 @@ const stylesheet = html`    :root {
     .overflow-cue { color: var(--secondary); display: none; font-size: 0.85rem; margin-bottom: 0.6rem; }
     .table-scroll { max-width: 100%; overflow-x: auto; }
     .table-scroll:focus-visible { outline-offset: 2px; }
-    table { border-collapse: collapse; min-width: 100%; }
+    table { border-collapse: collapse; min-width: 100%; scroll-margin-top: 4.75rem; }
     th, td {
       border-bottom: 1px solid var(--rule);
       padding: 0.62rem 0.75rem;
@@ -146,12 +146,12 @@ const stylesheet = html`    :root {
     .metadata, .missing, .unavailable { color: var(--secondary); }
     .missing, .unavailable { font-style: italic; }
     .handoff {
-      align-items: center;
+      align-items: start;
       border-bottom: 1px solid var(--rule);
       border-top: 1px solid var(--rule);
       display: grid;
       gap: 0.75rem 1.5rem;
-      grid-template-columns: auto minmax(7rem, 0.25fr) minmax(16rem, 1fr) auto;
+      grid-template-columns: auto minmax(11rem, 0.3fr) minmax(10rem, 1fr) auto;
       margin-top: 1.75rem;
       padding: 1rem 0;
     }
@@ -167,7 +167,7 @@ const stylesheet = html`    :root {
       padding: 0.65rem 1rem;
     }
     .copy-button:hover { background: var(--teal-wash); }
-    .copy-status { color: var(--teal); font-weight: 700; min-height: 1.5em; }
+    .copy-status { color: var(--teal); font-weight: 700; min-height: 4.5em; }
     .copy-status[data-state="failure"] { color: var(--error); }
     .copy-help { color: var(--secondary); margin-bottom: 0; }
     .native-table-link { align-items: center; display: inline-flex; min-height: 44px; white-space: nowrap; }
@@ -196,6 +196,7 @@ const stylesheet = html`    :root {
       .overflow-cue { display: block; }
       .handoff { align-items: start; grid-template-columns: minmax(0, 1fr); }
       .copy-button { justify-self: start; }
+      .copy-status { min-height: 3em; }
       .native-table-link { white-space: normal; }
     }
     @media print {
@@ -259,13 +260,22 @@ const behavior = html`  <script>
         const handoff = control.closest("[data-copy-handoff]");
         if (!(source instanceof HTMLTextAreaElement) || !(status instanceof HTMLElement) || !(handoff instanceof HTMLElement)) continue;
 
+        let text;
+        try {
+          const parsed = JSON.parse(source.value);
+          if (typeof parsed !== "string") continue;
+          text = parsed;
+        } catch {
+          continue;
+        }
+
         let attempt = 0;
         handoff.hidden = false;
         control.addEventListener("click", async () => {
           const currentAttempt = ++attempt;
           status.dataset.state = "pending";
           status.textContent = "Copying…";
-          const copied = await copyText(source.value, control);
+          const copied = await copyText(text, control);
           window.setTimeout(() => {
             if (currentAttempt !== attempt) return;
             status.dataset.state = copied ? "success" : "failure";
@@ -288,6 +298,8 @@ const authorTsvText = (text: string): string => {
   return formulaPrefix.test(normalized) ? `'${normalized}` : normalized
 }
 
+const jsonStringFragment = (text: string): string => JSON.stringify(text).slice(1, -1)
+
 const groupingTemplate = (value: string | null | undefined): HtmlTemplate => {
   if (value === null) return html`—`
   if (value === undefined) throw new Error("Validated item lost its grouping value")
@@ -305,17 +317,21 @@ const appendValue = (sink: HtmlSink, value: ValueCell): void => {
 }
 
 const appendAuthorTsvCell = (sink: HtmlSink, value: string): void => {
-  sink.write(html`${authorTsvText(value)}`)
+  sink.write(html`${jsonStringFragment(authorTsvText(value))}`)
 }
 
 const appendTsvValue = (sink: HtmlSink, value: ValueCell): void => {
   if (value === null) {
-    sink.write(html`Missing`)
+    sink.write(html`${jsonStringFragment("Missing")}`)
   } else if (typeof value === "object") {
-    sink.write(html`Unavailable`)
+    sink.write(html`${jsonStringFragment("Unavailable")}`)
   } else {
-    sink.write(html`${value}`)
+    sink.write(html`${jsonStringFragment(value)}`)
   }
+}
+
+const appendTsvDelimiter = (sink: HtmlSink, value: "\t" | "\n"): void => {
+  sink.write(html`${jsonStringFragment(value)}`)
 }
 
 const appendCopySource = (
@@ -324,40 +340,43 @@ const appendCopySource = (
   sink: HtmlSink
 ): void => {
   const { statement, copySourceId } = statementPresentation
-  sink.write(html`      <textarea class="copy-source" id="${copySourceId}" readonly hidden aria-hidden="true" tabindex="-1">Item\tUnit`)
+  sink.write(html`      <textarea class="copy-source" id="${copySourceId}" readonly hidden aria-hidden="true" tabindex="-1">"`)
+  appendAuthorTsvCell(sink, "Item")
+  appendTsvDelimiter(sink, "\t")
+  appendAuthorTsvCell(sink, "Unit")
   for (const grouping of presentation.groupingColumns) {
-    sink.write(html`\t`)
+    appendTsvDelimiter(sink, "\t")
     appendAuthorTsvCell(sink, grouping)
   }
   for (const periodId of statement.periods) {
     const period = presentation.periods.get(periodId)
     if (period === undefined) throw new Error("Validated statement lost its period")
-    sink.write(html`\t`)
+    appendTsvDelimiter(sink, "\t")
     appendAuthorTsvCell(sink, periodLabel(period))
   }
 
   for (const item of statement.items) {
-    sink.write(html`\n`)
+    appendTsvDelimiter(sink, "\n")
     appendAuthorTsvCell(sink, item.label)
     const unit = presentation.units.get(item.unit)
     if (unit === undefined) throw new Error("Validated item lost its unit")
-    sink.write(html`\t`)
+    appendTsvDelimiter(sink, "\t")
     appendAuthorTsvCell(sink, unitText(unit))
     for (const grouping of presentation.groupingColumns) {
       const value = item.groupings[grouping]
       if (value === undefined) throw new Error("Validated item lost its grouping value")
-      sink.write(html`\t`)
+      appendTsvDelimiter(sink, "\t")
       if (value !== null) appendAuthorTsvCell(sink, value)
     }
     for (const periodId of statement.periods) {
       const value = item.values[periodId]
       if (value === undefined) throw new Error("Validated item lost its period value")
-      sink.write(html`\t`)
+      appendTsvDelimiter(sink, "\t")
       appendTsvValue(sink, value)
     }
     if (sink.exceeded) return
   }
-  sink.writeLine(html`</textarea>`)
+  sink.writeLine(html`"</textarea>`)
 }
 
 const captionTemplate = ({ statement, commonUnit }: StatementPresentation): HtmlTemplate =>

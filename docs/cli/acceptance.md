@@ -472,8 +472,11 @@ The fixed script progressively reveals one `Copy for Excel` button per
 statement. A button's accessible name includes its statement label. Each
 statement has a visible polite status region whose reserved space prevents
 feedback from moving the surrounding content. The script runs only after the
-native tables and inert copy sources exist. With scripts disabled, copy
-controls remain absent and all statements remain readable native tables.
+native tables and inert copy sources exist. Each source stores the complete TSV
+as JSON string text so every schema-valid code point, including U+0000, survives
+HTML parsing; the fixed script decodes that string before copying. With scripts
+disabled, copy controls remain absent and all statements remain readable native
+tables.
 
 Each copy action transfers exactly one statement as `text/plain` tab-separated
 values. The projection is derived from the validated post-preflight render

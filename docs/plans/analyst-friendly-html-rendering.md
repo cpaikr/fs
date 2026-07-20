@@ -156,14 +156,10 @@ Focused renderer and process tests, documentation checks, and
 Effect diagnostics, all unit and packed CLI acceptance cases, writer crash and
 concurrency coverage, and installed-package execution. Independent code review
 found and closed reduced-motion, target-size, long-label overflow, sticky-
-context, and stale-status gaps.
-
-The schema permits U+0000 in author text, while browser HTML parsing replaces a
-literal U+0000 in an inert textarea with U+FFFD. Exact preservation of that
-control character in copied TSV remains a contract-level follow-up; rejecting
-it at validation and reversibly encoding it in the inert source have different
-format and maintenance consequences. Ordinary Unicode author text and the
-specified TSV delimiter and formula-protection cases are covered.
+context, stale-status, native-table target, feedback-layout, and U+0000 copy
+integrity gaps. The inert source now stores TSV as JSON string text, which the
+fixed script decodes before copying, so schema-valid control characters survive
+HTML parsing without weakening the document schema.
 
 ## Next action
 
