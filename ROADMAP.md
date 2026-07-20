@@ -9,7 +9,7 @@ decisions and validation.
 
 ## Current
 
-[Analyst-friendly HTML rendering](docs/plans/analyst-friendly-html-rendering.md)
+_None._
 
 ## Plans
 

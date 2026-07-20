@@ -5,7 +5,7 @@ one primary responsibility.
 
 ## Start by task
 
-- Continue the active rendering work:
+- Inspect the completed analyst-friendly rendering work:
   [Analyst-friendly HTML rendering](plans/analyst-friendly-html-rendering.md)
 - Implement or review its approved visual system:
   [Analyst HTML design system](../DESIGN.md)
