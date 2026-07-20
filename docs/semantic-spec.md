@@ -431,8 +431,11 @@ selected order. Declared grouping columns appear as flat, non-arithmetic
 columns in declaration order. A homogeneous statement identifies its one unit
 once; a heterogeneous statement shows a unit cell for each row. Rendering does
 not infer hierarchy, subtotal styling, signs, missing values, or taxonomy from
-rollups or groupings. The [CLI acceptance contract](cli/acceptance.md) fixes
-the exact HTML and finite-output behavior.
+rollups or groupings. A progressive copy convenience may project one statement
+to tab-separated text with an explicit Unit column on every row; this is still
+a non-normative presentation of the same ordered item values. The
+[CLI acceptance contract](cli/acceptance.md) fixes the exact HTML, copy, and
+finite-output behavior.
 
 ## 10. Conformance fixture contract
 
