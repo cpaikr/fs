@@ -472,8 +472,11 @@ The fixed script progressively reveals one `Copy for Excel` button per
 statement. A button's accessible name includes its statement label. Each
 statement has a visible polite status region whose reserved space prevents
 feedback from moving the surrounding content. The script runs only after the
-native tables and inert copy sources exist. With scripts disabled, copy
-controls remain absent and all statements remain readable native tables.
+native tables and inert copy sources exist. Each source stores the complete TSV
+as JSON string text so every schema-valid code point, including U+0000, survives
+HTML parsing; the fixed script decodes that string before copying. With scripts
+disabled, copy controls remain absent and all statements remain readable native
+tables.
 
 Each copy action transfers exactly one statement as `text/plain` tab-separated
 values. The projection is derived from the validated post-preflight render
@@ -684,8 +687,7 @@ styling. Focused renderer tests must prove the post-preflight TSV projection,
 unconditional Unit column, delimiter normalization, formula protection, null
 grouping behavior, and distinct missing and unavailable states. Browser
 verification must cover Clipboard API success, forced fallback success, failure
-feedback, keyboard operation, and the native-table no-script path. This
-interaction and presentation validation remains pending until implementation.
+feedback, keyboard operation, and the native-table no-script path.
 
 Failure and grammar cases cover malformed input, schema and semantic structural
 refusal, an invalid embedded snapshot, missing input or parent, existing

@@ -43,7 +43,8 @@ Red must not color negative values, inconsistencies, or authored content.
 ## Document Topology
 
 - A compact masthead identifies the entity and scope.
-- A horizontal index links to every statement in document order.
+- A horizontal index links to every statement in document order and remains
+  sticky while analysts review long statements.
 - At wide widths, a slim rail repeats statement location as an ordinal such as
   `Statement 3 of 4`; it does not claim completion or review status.
 - Each statement remains one native table and one statement-local handoff area.
@@ -81,8 +82,10 @@ red. Focus is a square, high-contrast teal outline. No interaction depends on
 hover or color alone.
 
 The button is progressive enhancement: it is absent when the fixed renderer
-script does not run. The semantic table is always present and usable, so the
-no-script path has no dead control or alternate data representation.
+script does not run. Its inert source stores the TSV as JSON string text so
+schema-valid control characters survive HTML parsing before the fixed script
+decodes them. The semantic table is always present and usable, so the no-script
+path has no dead control or alternate data representation.
 
 ## Responsive and Print Behavior
 

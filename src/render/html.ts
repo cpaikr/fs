@@ -84,9 +84,21 @@ export class HtmlSink {
     this.chunks = collect ? [] : null
   }
 
+  write(template: HtmlTemplate): void {
+    this.writeTemplate(template, false)
+  }
+
   writeLine(template: HtmlTemplate): void {
+    this.writeTemplate(template, true)
+  }
+
+  private writeTemplate(template: HtmlTemplate, lineBreak: boolean): void {
     if (this.exceeded) return
-    let remaining = this.byteLimit - this.byteCount - 1
+    let remaining = this.byteLimit - this.byteCount - (lineBreak ? 1 : 0)
+    if (remaining < 0) {
+      this.exceeded = true
+      return
+    }
     const renderedParts: Array<string> | null = this.chunks === null ? null : []
     for (const part of template[templateParts]) {
       const length = part.escaped ? escapedByteLength(part.text) : Buffer.byteLength(part.text, "utf8")
@@ -98,7 +110,9 @@ export class HtmlSink {
       renderedParts?.push(part.escaped ? escapeHtml(part.text) : part.text)
     }
     this.byteCount = this.byteLimit - remaining
-    if (renderedParts !== null) this.chunks?.push(`${renderedParts.join("")}\n`)
+    if (renderedParts !== null) {
+      this.chunks?.push(`${renderedParts.join("")}${lineBreak ? "\n" : ""}`)
+    }
   }
 
   bytes(): Buffer {

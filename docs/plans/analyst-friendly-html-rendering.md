@@ -43,11 +43,14 @@ system is recorded in [`DESIGN.md`](../../DESIGN.md):
 - the approved mock's inferred section index and total styling are omitted
   because FS does not encode those presentation semantics.
 
-The foundation is merged into `dev`. The visual system is approved and recorded
-in `DESIGN.md`; the rendering contract now defines fixed inline behavior,
-post-preflight clipboard projection, formula protection, accessible feedback,
-and native-table fallback. Clipboard, interaction, and presentation
-implementation remain pending.
+The foundation and rendering-contract slices are merged into `dev`. The
+presentation implementation is complete on its delivery branch: native tables
+now use the approved review-index system, responsive overflow guidance, print
+rules, a sticky statement index, and progressive per-statement Excel handoff.
+Clipboard TSV is streamed through the bounded sink after structural preflight,
+includes unit context, normalizes delimiters, and protects formula-prefixed
+author text. Exact fixtures and the tracked examples have been regenerated from
+the implementation.
 
 ## Scope
 
@@ -132,13 +135,33 @@ The Impeccable direction, palette, and mock gates are complete. The approved
 review-index system was reconciled against the FS semantic boundary in
 `DESIGN.md`, and `pnpm check:docs` passes for the design and contract slice.
 
-Local Chromium rendered the tracked multi-statement example at desktop and
-mobile widths; the local `file:` document was a secure context with Clipboard
-API text writing available. The implementation will still include a fallback
-for browsers where local clipboard access is unavailable.
+Local Chromium verified the tracked multi-statement example at desktop, tablet,
+and phone widths without page-level overflow. The accessibility tree exposes
+named native tables, captions, keyboard-focusable horizontal scroll regions,
+and per-statement copy controls. The no-script launch keeps every table and
+omits the progressive controls. Clipboard API success, legacy fallback success,
+total failure, repeated activation, Enter and Space activation, live-region
+transitions, and fallback focus restoration all behave as specified.
+
+The printed manufacturing example was rendered to a tagged, five-page PDF and
+visually inspected page by page. Each statement remains legible and complete on
+its own black-on-white page, with navigation, overflow guidance, and clipboard
+controls omitted. The browser-produced balance-sheet TSV pasted into Microsoft
+Excel as the exact `A1:F7` grid. A separate protected-prefix paste confirmed
+that `=`, `+`, `-`, and `@` author text remains literal rather than executing as
+spreadsheet formulas.
+
+Focused renderer and process tests, documentation checks, and
+`git diff --check` pass. The full repository gate also passes, including strict
+Effect diagnostics, all unit and packed CLI acceptance cases, writer crash and
+concurrency coverage, and installed-package execution. Independent code review
+found and closed reduced-motion, target-size, long-label overflow, sticky-
+context, stale-status, native-table target, feedback-layout, and U+0000 copy
+integrity gaps. The inert source now stores TSV as JSON string text, which the
+fixed script decodes before copying, so schema-valid control characters survive
+HTML parsing without weakening the document schema.
 
 ## Next action
 
-Validate and merge the approved design and rendering-contract slice into
-`dev`, then implement the post-preflight projection, progressive clipboard
-behavior, and approved presentation from the updated integration branch.
+Deliver and merge the presentation slice into `dev` through its reviewed
+sequential pull request, then complete the release-candidate plan's next action.
