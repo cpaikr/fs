@@ -6,6 +6,12 @@ const packageJson = JSON.parse(
 );
 const packageSpec = `${packageJson.name}@${packageJson.version}`;
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+const arguments_ = process.argv.slice(2);
+const requirePublishedMatch = arguments_.includes("--require-published-match");
+
+if (arguments_.some((argument) => argument !== "--require-published-match")) {
+  throw new Error("Usage: node scripts/check-publication.mjs [--require-published-match]");
+}
 
 const run = (args, options = {}) =>
   spawnSync(npm, args, {
@@ -31,6 +37,10 @@ if (registryResult.status !== 0) {
   if (!/\bE404\b|404 Not Found/.test(output)) {
     writeFailure(registryResult);
     process.exit(registryResult.status ?? 1);
+  }
+
+  if (requirePublishedMatch) {
+    throw new Error(`${packageSpec} is unpublished; refusing to create a GitHub release.`);
   }
 
   console.log(`${packageSpec} is unpublished; running npm's publication dry run.`);
@@ -81,6 +91,10 @@ if (shasumMatches !== integrityMatches) {
 
 if (shasumMatches) {
   console.log(`Verified ${packageSpec} against npm SHA-1 and SHA-512 integrity.`);
+} else if (requirePublishedMatch) {
+  throw new Error(
+    `Packed ${packageSpec} does not match npm SHA-1 and SHA-512 integrity; refusing to create a GitHub release.`,
+  );
 } else {
   console.log(
     `Packed ${packageSpec} successfully; its bytes have moved beyond the published version, so Release Please must assign the next version before publication.`,
