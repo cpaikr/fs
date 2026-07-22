@@ -1,6 +1,7 @@
 # Analyst HTML Design System
 
-Status: Approved for the active analyst-friendly HTML rendering milestone.
+Status: Approved. Documents the "Charter" rendering direction shipped by the
+current renderer.
 
 This document owns the visual and interaction direction of the standalone HTML
 convenience view. The [semantic specification](docs/semantic-spec.md) remains
@@ -10,100 +11,135 @@ behavior.
 
 ## Approved Direction
 
-The selected direction is the review-index concept: a compact archival working
-paper with a slim statement rail, a horizontal statement index, a disciplined
-numeric grid, and one handoff action local to each statement. It should feel
-closer to an annual-report review copy than a dashboard or spreadsheet clone.
+"Charter" — a modernized institutional annual report. A cool paper-gray canvas
+frames a white sheet; hierarchy comes from typography, alignment, and the
+accountant's own rule vocabulary (hairlines between rows, a strong rule above
+subtotals, a double rule above rollup roots) rather than fills, cards, or
+dashboard chrome. A system serif carries identity (entity name, statement
+titles); everything else is the platform sans with tabular figures.
 
-The HTML is a generated reading and transfer surface. It must never imply that
-review progress, hierarchy, totals, exceptions, or accounting meaning were
-added beyond the FS document.
+The HTML is a generated reading and transfer surface. Row hierarchy, subtotal
+emphasis, and rollup-check results are derived strictly from the FS document's
+own `rollupTo` relationships and a fresh calculation over the validated
+document — the view displays what the document encodes and nothing more.
 
 ## Visual System
 
-Use the system font stack so the document remains self-contained. Headings and
-labels use the platform's neutral sans serif; financial values use tabular
-figures. Hierarchy comes from type size, weight, whitespace, alignment, and
-hairline rules before background fills or containers.
+System font stacks only, so the document remains self-contained: `ui-serif,
+Georgia` for identity, `system-ui` sans for everything else, tabular figures
+for all numerals.
 
 | Token | Value | Use |
 | --- | --- | --- |
-| Paper | `#f6f2e9` | Screen canvas |
-| Sheet | `#fffdf8` | Statement reading surface |
-| Ink | `#171a1c` | Primary text and strong rules |
-| Secondary ink | `#606a6e` | Metadata and supporting copy |
-| Rule | `#c8c2b7` | Hairlines and table rhythm |
-| Analyst teal | `#1f6f78` | Links, active location, and focus |
-| Teal wash | `#ddecef` | Restrained interaction feedback |
-| Exception red | `#9f3f3a` | Copy failure only |
+| Canvas | `#eef0f1` | Cool paper-gray page background |
+| Sheet | `#ffffff` | Document reading surface |
+| Ink | `#191b1e` | Primary text and strong rules |
+| Secondary ink | `#565b61` | Metadata, captions, supporting copy |
+| Hairline | `#d8dadc` | Row separators and light structure |
+| Claret | `#802636` | Single accent: links, focus, location, controls |
+| Claret wash | `#f5e9ec` | Pressed toggle background |
+| Status ok | `#216e3a` | Satisfied checks, copy success |
+| Status fail | `#a4232b` | Unsatisfied checks, copy failure |
+| Status warn | `#7a5200` | Checks that could not run |
 
-Teal is an interaction and location signal, not a financial classification.
-Red must not color negative values, inconsistencies, or authored content.
+All text pairs clear WCAG 2.2 AA (ink on sheet 17.2:1, secondary ink 6.9:1,
+claret 9.3:1). Claret signals interaction and location, never financial
+classification. Negative values stay ordinary ink; status colors are always
+paired with a glyph (`=`, `≠`, `!`) and a literal word.
 
 ## Document Topology
 
-- A compact masthead identifies the entity and scope.
-- A horizontal index links to every statement in document order and remains
-  sticky while analysts review long statements.
-- At wide widths, a slim rail repeats statement location as an ordinal such as
-  `Statement 3 of 4`; it does not claim completion or review status.
-- Each statement remains one native table and one statement-local handoff area.
-- Statement and navigation anchors use renderer-owned ordinal identifiers.
-  Author identifiers never become executable code or raw HTML attributes.
-
-The approved mock's secondary cash-flow section index is not generalized.
-FS does not encode statement sections, and deriving them from labels,
-groupings, or rollups would add financial interpretation. Grouping columns
-remain ordinary columns, and rollups do not create indentation or total styles.
+- A masthead identifies the entity and scope (serif h1) and carries a
+  document-level rollup-check summary (count and outcome).
+- A sticky horizontal index links every statement in document order; the fixed
+  script marks the statement currently in view with a claret underline.
+- Each statement section holds, in order: an ordinal-prefixed serif title, a
+  progressive table-tools row, one native table, a rollup-checks disclosure
+  (when the statement has rollups), and one handoff area.
+- Statement anchors and row relationships use renderer-owned ordinal and index
+  identifiers. Author identifiers never become executable code or raw HTML
+  attributes.
 
 ## Statement Presentation
 
-- Keep the item label column visually dominant and numeric columns aligned to
-  a shared right edge with tabular figures.
-- Preserve statement, item, grouping, and period order exactly.
-- Use a visible table caption that names the statement and its unit context.
-- Keep heterogeneous units in row cells. Show a homogeneous unit once above
-  the visible table while retaining an explicit Unit column in copied data.
-- Use whitespace and rules consistently; do not add cards, shadows, gradients,
-  pill tabs, charts, dashboard metrics, or spreadsheet chrome.
-- Missing and unavailable cells remain explicit text states. Negative numbers
-  remain ordinary ink and receive no inferred exception styling.
+- Text columns (Item, Unit, groupings) and their headers align left; period
+  value columns and their headers align right with tabular figures on a shared
+  right edge that indentation never disturbs.
+- The item-label column is sticky during horizontal scroll, closed by a
+  hairline, so numbers never lose their row identity.
+- Displayed decimals get comma digit grouping (`1,000`); the copied TSV keeps
+  the exact undecorated decimal. Grouping-column headers and toggle chips show
+  a humanized form of the declared identifier (`majorGroup` → `Major group`);
+  TSV headers keep the identifier verbatim.
+- Tables pack to content width like a printed statement rather than
+  stretching to fill the sheet.
+- Statement, item, grouping, and period order are preserved exactly.
+- Rollup hierarchy from the document: parent (subtotal) rows are bold with a
+  strong rule above (the accountant's summing rule); rollup roots close with a
+  double rule below, per accounting convention; child rows indent by depth in
+  the label cell only, with the disclosure triangle absolutely positioned so
+  labels share the row baseline with every other cell.
+- Heterogeneous statements show the compact unit label per row; the full
+  `label (measure, scale n)` text lives in the caption (homogeneous), the
+  tooltip, and copied TSV, so complete context still leaves the view.
+- Missing and unavailable cells remain explicit italic text states.
+- No cards, shadows, gradients, pill tabs, charts, dashboard metrics, zebra
+  stripes, or spreadsheet chrome.
+
+## Progressive Interactions
+
+All interactivity is renderer-owned fixed script, absent without JavaScript,
+and purely presentational — copied TSV and the underlying table never change.
+
+- Row collapse: each subtotal row gets a rotating-triangle disclosure button;
+  collapsing hides all transitive descendants and reveals a `· n rows` count.
+  Statement-level "Collapse rollups" / "Expand all" buttons act on every
+  parent at once. Printing forces collapsed rows visible.
+- Column toggles: `aria-pressed` buttons hide or show the Unit column and each
+  grouping column; on shows `✓` plus wash fill, off shows `○`, so the pair
+  reads as toggles rather than action buttons. Narrow viewports start with
+  these columns off so values fit the first screen.
+- Tooltip: a singleton dark tooltip appears after a ~400 ms hover delay over
+  value cells, anchored near the right-aligned number, restating the row and
+  column context (item, period, full unit, groupings, value, item description
+  when present). It duplicates visible content, so no information is
+  hover-only.
+- Motion is limited to a 120 ms triangle rotation, disabled under
+  `prefers-reduced-motion`.
+
+## Validation Display
+
+Each statement with rollups gets a native `<details>` disclosure summarizing
+its checks (`n rollup checks · all satisfied` or `· m not satisfied`) and a
+check table: formula from item labels (`Total assets = Cash + Inventory`),
+period, verbatim actual / expected / difference / tolerance decimals, and a
+glyph-plus-word result (`= Satisfied`, `≠ Not satisfied`, `! Not checked`).
+Results always come from a fresh calculation over the validated document;
+embedded snapshots are never displayed.
 
 ## Excel Handoff
 
-Each statement has one visible `Copy for Excel` button after its native table.
-Its accessible name includes the statement label. The handoff area explains
-that the action copies tab-separated values and that the native table remains
-available when clipboard access is unavailable.
-
-The status region reserves space so `Copied` or failure feedback does not move
-the table or control. Success uses ink or teal; failure alone may use Exception
-red. Focus is a square, high-contrast teal outline. No interaction depends on
-hover or color alone.
-
-The button is progressive enhancement: it is absent when the fixed renderer
-script does not run. Its inert source stores the TSV as JSON string text so
-schema-valid control characters survive HTML parsing before the fixed script
-decodes them. The semantic table is always present and usable, so the no-script
-path has no dead control or alternate data representation.
+Each statement has one visible `Copy for Excel` button after its checks. Its
+accessible name includes the statement label. The status region reserves space
+so `Copied` or failure feedback does not move content; success is green ink,
+failure alone may be status-fail red. The button is progressive enhancement:
+the inert copy source stores TSV as JSON string text, and the semantic table
+is always the complete no-script fallback.
 
 ## Responsive and Print Behavior
 
-- Wide screens use the slim rail and broad statement canvas.
-- Medium screens drop the rail and retain the horizontal statement index.
-- Narrow screens recompose metadata and handoff content into one column. The
-  native table scrolls horizontally inside a keyboard-focusable region with a
-  textual overflow cue; the document never scales the table into illegibility.
-- Interactive targets remain at least 44 CSS pixels in their constrained
-  dimension, and focus never becomes clipped by an overflow region.
-- Print removes navigation, clipboard controls, status regions, overflow cues,
-  and the warm outer canvas. It repeats table headers, avoids splitting rows
-  where practical, uses black ink, and does not rely on sticky positioning.
+- The sheet is centered with a hairline frame at wide widths and becomes
+  full-bleed below 64rem; below 44rem metadata and handoff recompose into one
+  column and the horizontal-scroll cue appears.
+- The native table scrolls horizontally inside a keyboard-focusable region.
+- Focus is a 2px claret outline everywhere; no interaction depends on hover or
+  color alone.
+- Print removes navigation, tools, clipboard controls, and the canvas; forces
+  collapsed rows visible; repeats table headers; uses black ink.
 
 ## Implementation Fidelity
 
-Build the interface as semantic HTML and CSS with a small fixed progressive-
-enhancement script. The approved mock is a north star, not a bitmap to trace.
-Do not literalize its sample amounts, completion checks, decorative icons, or
-fixed desktop proportions. Do preserve its statement index, ordinal location,
-full-width ledger rhythm, per-statement handoff, and restrained material tone.
+Semantic HTML and CSS with one fixed progressive-enhancement script. Exact
+presentation bytes are a release-level regression surface via the executable
+render fixtures; update `fixtures/cli/expected/render/*.html` and the rendered
+examples together with any presentation change.

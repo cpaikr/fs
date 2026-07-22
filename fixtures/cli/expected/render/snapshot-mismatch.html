@@ -7,209 +7,336 @@
   <style>
     :root {
       color-scheme: light;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-synthesis: none;
-      --paper: #f6f2e9;
-      --sheet: #fffdf8;
-      --ink: #171a1c;
-      --secondary: #606a6e;
-      --rule: #c8c2b7;
-      --teal: #1f6f78;
-      --teal-wash: #ddecef;
-      --error: #9f3f3a;
+      --bg: #eef0f1;
+      --surface: #ffffff;
+      --ink: #191b1e;
+      --ink-2: #565b61;
+      --hairline: #d8dadc;
+      --rule-strong: #191b1e;
+      --accent: #802636;
+      --accent-wash: #f5e9ec;
+      --ok: #216e3a;
+      --fail: #a4232b;
+      --warn: #7a5200;
+      --control-border: #82888e;
+      --hover-row: #f2f3f4;
+      --tooltip-bg: #191b1e;
+      --tooltip-ink: #ffffff;
+      --serif: ui-serif, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --z-sticky: 3;
+      --z-skip: 6;
+      --z-tooltip: 9;
     }
     * { box-sizing: border-box; }
-    body { background: var(--paper); color: var(--ink); margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.45;
+      margin: 0;
+    }
     [hidden] { display: none !important; }
-    a { color: var(--teal); text-underline-offset: 0.2em; }
-    a:hover { text-decoration-thickness: 0.12em; }
-    :focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+    a { color: var(--accent); text-underline-offset: 0.2em; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .skip-link {
       background: var(--ink);
-      color: var(--sheet);
+      color: var(--surface);
       left: 1rem;
       padding: 0.75rem 1rem;
       position: fixed;
       top: 1rem;
       transform: translateY(-200%);
-      z-index: 10;
+      z-index: var(--z-skip);
     }
     .skip-link:focus { transform: none; }
     .document {
-      background: var(--sheet);
-      border-inline: 1px solid var(--rule);
-      margin: 0 auto;
-      max-width: 112rem;
-      min-height: 100vh;
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      margin: 2.5rem auto;
+      max-width: 90rem;
     }
     .masthead {
       align-items: baseline;
-      border-bottom: 2px solid var(--ink);
+      border-bottom: 2px solid var(--rule-strong);
       display: flex;
-      gap: 1rem 2.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem 2.5rem;
       justify-content: space-between;
-      margin-inline: 2rem;
-      padding: 1.25rem 0 1rem;
+      margin-inline: 3rem;
+      padding: 2rem 0 1.25rem;
     }
     h1, h2, p { margin-top: 0; }
     h1, h2, .scope { overflow-wrap: anywhere; }
-    h1 { font-size: clamp(1.6rem, 3vw, 2.35rem); letter-spacing: -0.03em; margin-bottom: 0; }
-    h2 { font-size: clamp(1.4rem, 2.2vw, 1.9rem); letter-spacing: -0.02em; margin-bottom: 1.25rem; }
-    .scope { color: var(--secondary); margin-bottom: 0; text-align: right; }
+    h1 {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.25rem;
+    }
+    .scope { color: var(--ink-2); font-size: 0.875rem; margin-bottom: 0; }
+    .doc-checks { color: var(--ink-2); font-size: 0.8125rem; margin-bottom: 0; text-align: right; }
+    .check-glyph { font-weight: 700; }
+    .check-glyph[data-status="satisfied"] { color: var(--ok); }
+    .check-glyph[data-status="unsatisfied"] { color: var(--fail); }
+    .check-glyph[data-status="error"] { color: var(--warn); }
     .statement-index {
-      background: var(--sheet);
-      border-bottom: 1px solid var(--rule);
+      background: var(--surface);
+      border-bottom: 1px solid var(--hairline);
       overflow-x: auto;
-      padding: 0 2rem;
+      padding: 0 3rem;
       position: sticky;
       top: 0;
-      z-index: 5;
+      z-index: var(--z-sticky);
     }
     .statement-index ol {
       display: flex;
-      gap: 0;
+      gap: 1.75rem;
       list-style: none;
       margin: 0;
       min-width: max-content;
       padding: 0;
     }
-    .statement-index li { display: flex; }
     .statement-index a {
-      align-items: center;
-      border-bottom: 3px solid transparent;
-      color: var(--ink);
+      align-items: baseline;
+      border-bottom: 2px solid transparent;
+      color: var(--ink-2);
       display: flex;
-      gap: 0.65rem;
-      min-height: 3.75rem;
-      padding: 0.75rem 1.5rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      gap: 0.5rem;
+      padding: 0.9rem 0;
       text-decoration: none;
     }
-    .statement-index a:hover, .statement-index a:focus-visible {
-      border-bottom-color: var(--teal);
-      color: var(--teal);
+    .statement-index a:hover { color: var(--ink); }
+    .statement-index a:focus-visible { outline-offset: -3px; }
+    .statement-index a[aria-current="location"] {
+      border-bottom-color: var(--accent);
+      color: var(--ink);
     }
-    .index-number { color: var(--teal); font-variant-numeric: tabular-nums; font-weight: 700; }
-    .statement {
-      display: grid;
-      grid-template-columns: 10.5rem minmax(0, 1fr);
-      scroll-margin-top: 4.75rem;
+    .index-number { font-variant-numeric: tabular-nums; }
+    .statement { padding: 2.25rem 3rem 2.75rem; scroll-margin-top: 3.5rem; }
+    .statement + .statement { border-top: 1px solid var(--hairline); }
+    h2 {
+      align-items: baseline;
+      display: flex;
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
     }
-    .statement + .statement { border-top: 1px solid var(--rule); }
-    .statement-ordinal {
-      background: var(--paper);
-      border-right: 1px solid var(--rule);
-      color: var(--secondary);
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
-      margin-bottom: 0;
-      padding: 2.75rem 1.5rem;
-      text-transform: uppercase;
+    .ordinal {
+      color: var(--ink-2);
+      font-family: var(--sans);
+      font-size: 0.875rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
     }
-    .statement-ordinal strong {
-      color: var(--teal);
-      display: block;
-      font-size: 1.35rem;
-      letter-spacing: 0;
-      margin-top: 0.4rem;
-      text-transform: none;
+    .table-tools {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
     }
-    .statement-content { min-width: 0; padding: 2.5rem 3rem 3rem; }
+    .tools-label { color: var(--ink-2); font-size: 0.75rem; margin-right: 0.25rem; }
+    .tools-spacer { flex: 1; }
+    .tool-toggle, .tool-button {
+      background: var(--surface);
+      border: 1px solid var(--control-border);
+      border-radius: 4px;
+      color: var(--ink);
+      cursor: pointer;
+      font: 500 0.8125rem var(--sans);
+      min-height: 2.25rem;
+      padding: 0.3rem 0.7rem;
+    }
+    .tool-toggle:hover, .tool-button:hover { border-color: var(--ink); }
+    .tool-toggle[aria-pressed="true"] {
+      background: var(--accent-wash);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tool-toggle[aria-pressed="true"]::before { content: "✓ "; }
+    .tool-toggle[aria-pressed="false"] { color: var(--ink-2); }
+    .tool-toggle[aria-pressed="false"]::before { content: "○ "; }
     .table-caption {
-      color: var(--secondary);
-      font-size: 0.88rem;
-      padding: 0 0 0.8rem;
+      caption-side: top;
+      color: var(--ink-2);
+      font-size: 0.75rem;
+      padding: 0 0 0.6rem;
       text-align: left;
     }
-    .overflow-cue { color: var(--secondary); display: none; font-size: 0.85rem; margin-bottom: 0.6rem; }
+    .caption-inner { display: inline-block; left: 0; position: sticky; }
+    .overflow-cue { color: var(--ink-2); display: none; font-size: 0.75rem; margin-bottom: 0.5rem; }
     .table-scroll { max-width: 100%; overflow-x: auto; }
     .table-scroll:focus-visible { outline-offset: 2px; }
-    table { border-collapse: collapse; min-width: 100%; scroll-margin-top: 4.75rem; }
+    table { border-collapse: separate; border-spacing: 0; scroll-margin-top: 3.5rem; }
     th, td {
-      border-bottom: 1px solid var(--rule);
-      padding: 0.62rem 0.75rem;
-      text-align: right;
-      vertical-align: top;
+      border-bottom: 1px solid var(--hairline);
+      font-size: 0.8125rem;
+      font-weight: 400;
+      padding: 0.375rem 0.625rem;
+      vertical-align: baseline;
       white-space: nowrap;
     }
-    th:first-child, td:first-child, .metadata { text-align: left; }
+    .col-text { text-align: left; }
     thead th {
-      border-bottom: 2px solid var(--teal);
-      color: var(--teal);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
+      border-bottom: 2px solid var(--rule-strong);
+      color: var(--ink);
+      font-size: 0.75rem;
+      font-weight: 600;
     }
+    tbody tr:hover > th, tbody tr:hover > td { background: var(--hover-row); }
+    tbody tr:last-child > th, tbody tr:last-child > td { border-bottom-color: var(--rule-strong); }
     tbody th {
-      font-weight: 500;
+      font-weight: 400;
       min-width: 14rem;
+      text-align: left;
       white-space: normal;
     }
-    tbody tr:last-child th, tbody tr:last-child td { border-bottom-color: var(--ink); }
-    .value { font-variant-numeric: tabular-nums; }
-    .metadata, .missing, .unavailable { color: var(--secondary); }
-    .missing, .unavailable { font-style: italic; }
-    .handoff {
-      align-items: start;
-      border-bottom: 1px solid var(--rule);
-      border-top: 1px solid var(--rule);
-      display: grid;
-      gap: 0.75rem 1.5rem;
-      grid-template-columns: auto minmax(11rem, 0.3fr) minmax(10rem, 1fr) auto;
-      margin-top: 1.75rem;
-      padding: 1rem 0;
+    thead th:first-child, tbody th {
+      background: var(--surface);
+      box-shadow: inset -1px 0 var(--hairline);
+      left: 0;
+      position: sticky;
+      z-index: 1;
     }
-    .copy-button {
-      background: var(--sheet);
-      border: 1px solid var(--teal);
-      border-radius: 0;
-      color: var(--teal);
+    tbody tr:hover > th { background: var(--hover-row); }
+    .item-cell {
+      display: block;
+      padding-left: calc(1.15rem + var(--depth, 0) * 1.25rem);
+      position: relative;
+    }
+    .toggle-slot {
+      left: calc(var(--depth, 0) * 1.25rem - 0.2rem);
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .row-toggle {
+      background: none;
+      border: 0;
+      border-radius: 2px;
+      color: var(--ink-2);
       cursor: pointer;
       font: inherit;
-      font-weight: 700;
-      min-height: 44px;
-      padding: 0.65rem 1rem;
+      line-height: 1;
+      padding: 0.35rem;
     }
-    .copy-button:hover { background: var(--teal-wash); }
-    .copy-status { color: var(--teal); font-weight: 700; min-height: 4.5em; }
-    .copy-status[data-state="failure"] { color: var(--error); }
-    .copy-help { color: var(--secondary); margin-bottom: 0; }
-    .native-table-link { align-items: center; display: inline-flex; min-height: 44px; white-space: nowrap; }
+    .row-toggle::before {
+      content: "▾";
+      display: inline-block;
+      transition: transform 120ms ease-out;
+    }
+    .row-toggle:hover { color: var(--accent); }
+    .row-toggle[aria-expanded="false"]::before { transform: rotate(-90deg); }
+    .collapsed-count { color: var(--ink-2); font-size: 0.75rem; }
+    .row-parent > th, .row-parent > td { border-top: 1px solid var(--rule-strong); font-weight: 650; }
+    .row-total > th, .row-total > td { border-bottom: 3px double var(--rule-strong); }
+    tbody tr:first-child > th, tbody tr:first-child > td { border-top: 0; }
+    tbody tr:has(+ .row-parent) > th, tbody tr:has(+ .row-parent) > td { border-bottom: 0; }
+    th.col-num, td.col-num, .value { text-align: right; }
+    th.col-num { min-width: 6.5rem; }
+    td.col-num, .value { padding-left: 1.5rem; }
+    .value { font-variant-numeric: tabular-nums; }
+    .metadata, .missing, .unavailable { color: var(--ink-2); }
+    .missing, .unavailable { font-style: italic; text-align: right; }
+    .checks { border-bottom: 1px solid var(--hairline); margin-top: 1.25rem; }
+    .checks summary {
+      color: var(--ink-2);
+      cursor: pointer;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.6rem 0;
+    }
+    .checks summary:hover { color: var(--ink); }
+    .checks[open] summary { color: var(--ink); }
+    .check-table { margin: 0.25rem 0 1rem; min-width: 0; }
+    .check-table thead th { border-bottom-width: 1px; }
+    .check-table tbody th { font-weight: 400; min-width: 0; }
+    .check-status { white-space: nowrap; }
+    .check-status[data-status="satisfied"] { color: var(--ok); }
+    .check-status[data-status="unsatisfied"] { color: var(--fail); font-weight: 650; }
+    .check-status[data-status="error"] { color: var(--warn); }
+    .handoff {
+      align-items: baseline;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      margin-top: 1.25rem;
+    }
+    .copy-button {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      color: var(--accent);
+      cursor: pointer;
+      font: 600 0.875rem var(--sans);
+      min-height: 44px;
+      padding: 0.6rem 1rem;
+    }
+    .copy-button:hover { background: var(--accent-wash); }
+    .copy-status { font-size: 0.8125rem; font-weight: 600; min-height: 1.25rem; min-width: 9rem; }
+    .copy-status[data-state="failure"] { color: var(--fail); }
+    .copy-status[data-state="success"] { color: var(--ok); }
+    .copy-help { color: var(--ink-2); font-size: 0.75rem; margin-bottom: 0; }
+    .native-table-link { align-items: center; display: inline-flex; font-size: 0.8125rem; margin-left: auto; min-height: 44px; white-space: nowrap; }
     .copy-source { display: none; }
+    .tooltip {
+      background: var(--tooltip-bg);
+      border-radius: 4px;
+      color: var(--tooltip-ink);
+      font-size: 0.75rem;
+      line-height: 1.5;
+      max-width: 24rem;
+      padding: 0.5rem 0.75rem;
+      pointer-events: none;
+      position: fixed;
+      z-index: var(--z-tooltip);
+    }
+    .tooltip strong { font-weight: 600; }
     @media (max-width: 64rem) {
-      .document { border-inline: 0; }
-      .statement { grid-template-columns: minmax(0, 1fr); }
-      .statement-ordinal {
-        align-items: baseline;
-        background: var(--sheet);
-        border-bottom: 1px solid var(--rule);
-        border-right: 0;
-        display: flex;
-        gap: 0.6rem;
-        padding: 1rem 2rem;
-      }
-      .statement-ordinal strong { display: inline; font-size: inherit; margin-top: 0; }
+      .document { border: 0; margin: 0; }
+      .masthead { margin-inline: 1.5rem; }
+      .statement-index { padding-inline: 1.5rem; }
+      .statement { padding-inline: 1.5rem; }
     }
     @media (max-width: 44rem) {
-      .masthead { align-items: flex-start; flex-direction: column; margin-inline: 1rem; }
-      .scope { text-align: left; }
-      .statement-index { padding-inline: 0.25rem; }
-      .statement-index a { padding-inline: 0.8rem; }
-      .statement-ordinal { padding-inline: 1rem; }
-      .statement-content { padding: 1.75rem 1rem 2.25rem; }
+      .masthead { flex-direction: column; margin-inline: 1rem; padding-top: 1.25rem; }
+      .doc-checks { text-align: left; }
+      .statement-index { padding-inline: 1rem; }
+      .statement { padding: 1.5rem 1rem 2rem; }
       .overflow-cue { display: block; }
-      .handoff { align-items: start; grid-template-columns: minmax(0, 1fr); }
-      .copy-button { justify-self: start; }
-      .copy-status { min-height: 3em; }
+      .handoff { align-items: flex-start; flex-direction: column; }
       .native-table-link { white-space: normal; }
     }
+    @media (prefers-reduced-motion: reduce) {
+      .row-toggle::before { transition: none; }
+    }
     @media print {
-      :root { --paper: #fff; --sheet: #fff; --ink: #000; --secondary: #333; --rule: #777; --teal: #000; }
-      body, .document { background: #fff; border: 0; }
-      .skip-link, .statement-index, .statement-ordinal, .overflow-cue, .handoff, .copy-source { display: none !important; }
+      :root {
+        --bg: #fff;
+        --surface: #fff;
+        --ink: #000;
+        --ink-2: #333;
+        --hairline: #999;
+        --rule-strong: #000;
+        --accent: #000;
+        --hover-row: #fff;
+      }
+      body, .document { background: #fff; border: 0; margin: 0; }
+      .skip-link, .statement-index, .table-tools, .overflow-cue, .handoff, .copy-source, .tooltip, .row-toggle, .collapsed-count { display: none !important; }
+      tbody tr[hidden] { display: table-row !important; }
+      th[data-col][hidden], td[data-col][hidden] { display: table-cell !important; }
+      thead th:first-child, tbody th { box-shadow: none; position: static; }
       .masthead { margin-inline: 0; }
-      .statement { display: block; break-before: page; }
+      .statement { break-before: page; padding-inline: 0; }
       .statement:first-child { break-before: auto; }
-      .statement-content { padding: 1.5rem 0; }
       .table-scroll { overflow: visible; }
       thead { display: table-header-group; }
       tr { break-inside: avoid; }
@@ -221,8 +348,11 @@
   <a class="skip-link" href="#statements">Skip to statements</a>
   <div class="document">
     <header class="masthead">
-      <h1>Example Entity</h1>
-      <p class="scope">Consolidated financial statements</p>
+      <div>
+        <h1>Example Entity</h1>
+        <p class="scope">Consolidated financial statements</p>
+      </div>
+      <p class="doc-checks"><span class="check-glyph" data-status="unsatisfied">≠</span> 1 rollup check · 1 not satisfied</p>
     </header>
     <nav class="statement-index" aria-label="Statements">
       <ol>
@@ -231,38 +361,69 @@
     </nav>
     <main id="statements">
     <section class="statement" id="statement-1">
-      <p class="statement-ordinal">Statement <strong>1 of 1</strong></p>
-      <div class="statement-content">
-        <h2>Statement</h2>
-        <p class="overflow-cue">Scroll horizontally to review all columns.</p>
-        <div class="table-scroll" role="region" aria-label="Statement table. Scroll horizontally to review all columns." tabindex="0">
-          <table id="statement-table-1">
-            <caption class="table-caption">Statement — Unit: USD (USD, scale 0)</caption>
-            <thead>
-              <tr>
-                <th scope="col">Item</th>
-                <th scope="col">2025-01-01 – 2025-12-31</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Child</th>
+      <h2><span class="ordinal">01</span>Statement</h2>
+        <div class="table-tools" data-table-tools hidden>
+          <span class="tools-spacer"></span>
+          <button class="tool-button" type="button" data-rows-collapse>Collapse all</button>
+          <button class="tool-button" type="button" data-rows-expand>Expand all</button>
+        </div>
+      <p class="overflow-cue">Scroll horizontally to review all columns.</p>
+      <div class="table-scroll" role="region" aria-label="Statement table. Scroll horizontally to review all columns." tabindex="0">
+        <table id="statement-table-1" data-statement-table data-common-unit="USD (USD, scale 0)">
+          <caption class="table-caption"><span class="caption-inner">Statement — Unit: USD (USD, scale 0)</span></caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-text">Item</th>
+              <th scope="col" class="col-num">2025-01-01 – 2025-12-31</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr data-row="0" data-parent-row="1" style="--depth: 1">
+                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Child</span></span></th>
               <td class="value">10</td>
               </tr>
-              <tr>
-                <th scope="row">Total</th>
+              <tr data-row="1" class="row-parent row-total">
+                <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Total detail rows"></button></span><span class="item-label">Total</span> <span class="collapsed-count" hidden>· 1 row</span></span></th>
               <td class="value">11</td>
               </tr>
-            </tbody>
-          </table>
-        </div>
+          </tbody>
+        </table>
+      </div>
+        <details class="checks">
+          <summary>Rollup checks — 1 · 1 not satisfied</summary>
+          <div class="table-scroll" role="region" aria-label="Statement rollup checks. Scroll horizontally to review all columns." tabindex="0">
+            <table class="check-table">
+              <thead>
+                <tr>
+                  <th scope="col" class="col-text">Check</th>
+                  <th scope="col" class="col-text">Period</th>
+                  <th scope="col" class="col-num">Actual</th>
+                  <th scope="col" class="col-num">Expected</th>
+                  <th scope="col" class="col-num">Difference</th>
+                  <th scope="col" class="col-num">Tolerance</th>
+                  <th scope="col" class="col-text">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Total = Child</th>
+                  <td class="metadata">2025-01-01 – 2025-12-31</td>
+                  <td class="value">11</td>
+                  <td class="value">10</td>
+                  <td class="value">1</td>
+                  <td class="value">0</td>
+<td class="check-status" data-status="unsatisfied">≠ Not satisfied</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
       <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\t2025-01-01 – 2025-12-31\nChild\tUSD (USD, scale 0)\t10\nTotal\tUSD (USD, scale 0)\t11"</textarea>
-        <div class="handoff" data-copy-handoff hidden>
-          <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-1" data-copy-status="copy-status-1" aria-describedby="copy-help-1" aria-label="Copy Statement for Excel">Copy for Excel</button>
-          <span class="copy-status" id="copy-status-1" role="status" aria-live="polite" aria-atomic="true"></span>
-          <p class="copy-help" id="copy-help-1">Copies this statement as tab-separated values for spreadsheet review.</p>
-          <a class="native-table-link" href="#statement-table-1">View native table</a>
-        </div>
+      <div class="handoff" data-copy-handoff hidden>
+        <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-1" data-copy-status="copy-status-1" aria-describedby="copy-help-1" aria-label="Copy Statement for Excel">Copy for Excel</button>
+        <span class="copy-status" id="copy-status-1" role="status" aria-live="polite" aria-atomic="true"></span>
+        <p class="copy-help" id="copy-help-1">Copies this statement as tab-separated values for spreadsheet review.</p>
+        <a class="native-table-link" href="#statement-table-1">View native table</a>
       </div>
     </section>
     </main>
@@ -335,6 +496,175 @@
             status.textContent = copied ? "Copied" : "Copy failed. Use the native table instead.";
           }, 0);
         });
+      }
+
+      for (const table of document.querySelectorAll("[data-statement-table]")) {
+        const statement = table.closest(".statement");
+        if (!(statement instanceof HTMLElement)) continue;
+        const tools = statement.querySelector("[data-table-tools]");
+        const body = table.tBodies[0];
+        if (!(tools instanceof HTMLElement) || body === undefined) continue;
+        tools.hidden = false;
+
+        const setColumn = (toggle, shown) => {
+          toggle.setAttribute("aria-pressed", shown ? "true" : "false");
+          const key = toggle.dataset.colToggle || "";
+          for (const cell of table.querySelectorAll("[data-col]")) {
+            if (cell.dataset.col === key) cell.hidden = !shown;
+          }
+        };
+        const narrowViewport = window.matchMedia("(max-width: 44em)").matches;
+        for (const toggle of tools.querySelectorAll("[data-col-toggle]")) {
+          toggle.addEventListener("click", () => {
+            setColumn(toggle, toggle.getAttribute("aria-pressed") !== "true");
+          });
+          if (narrowViewport) setColumn(toggle, false);
+        }
+
+        const rows = Array.from(body.querySelectorAll("tr[data-row]"));
+        const rowByIndex = new Map(rows.map((row) => [row.dataset.row, row]));
+        const collapsed = new Set();
+
+        const applyRowState = () => {
+          for (const row of rows) {
+            let ancestor = row.dataset.parentRow;
+            let hidden = false;
+            while (ancestor !== undefined && !hidden) {
+              hidden = collapsed.has(ancestor);
+              ancestor = rowByIndex.get(ancestor)?.dataset.parentRow;
+            }
+            row.hidden = hidden;
+          }
+          for (const button of body.querySelectorAll("[data-row-toggle]")) {
+            const row = button.closest("tr");
+            if (!(row instanceof HTMLTableRowElement)) continue;
+            const expanded = !collapsed.has(row.dataset.row);
+            button.setAttribute("aria-expanded", expanded ? "true" : "false");
+            const count = row.querySelector(".collapsed-count");
+            if (count instanceof HTMLElement) count.hidden = expanded;
+          }
+        };
+
+        for (const button of body.querySelectorAll("[data-row-toggle]")) {
+          button.hidden = false;
+          button.addEventListener("click", () => {
+            const row = button.closest("tr");
+            if (!(row instanceof HTMLTableRowElement) || row.dataset.row === undefined) return;
+            if (collapsed.has(row.dataset.row)) collapsed.delete(row.dataset.row);
+            else collapsed.add(row.dataset.row);
+            applyRowState();
+          });
+        }
+
+        tools.querySelector("[data-rows-collapse]")?.addEventListener("click", () => {
+          for (const button of body.querySelectorAll("[data-row-toggle]")) {
+            const row = button.closest("tr");
+            if (row instanceof HTMLTableRowElement && row.dataset.row !== undefined) collapsed.add(row.dataset.row);
+          }
+          applyRowState();
+        });
+        tools.querySelector("[data-rows-expand]")?.addEventListener("click", () => {
+          collapsed.clear();
+          applyRowState();
+        });
+      }
+
+      const tooltip = document.createElement("div");
+      tooltip.className = "tooltip";
+      tooltip.setAttribute("aria-hidden", "true");
+      tooltip.hidden = true;
+      document.body.append(tooltip);
+      let tooltipTimer = 0;
+
+      const tooltipLine = (label, value) => {
+        const line = document.createElement("div");
+        const name = document.createElement("strong");
+        name.textContent = label + ": ";
+        line.append(name, value);
+        return line;
+      };
+
+      const hideTooltip = () => {
+        window.clearTimeout(tooltipTimer);
+        tooltip.hidden = true;
+      };
+
+      const showTooltip = (cell) => {
+        const row = cell.closest("tr");
+        const table = cell.closest("table");
+        if (!(row instanceof HTMLTableRowElement) || !(table instanceof HTMLTableElement)) return;
+        const headerRow = table.tHead?.rows[0];
+        const header = headerRow?.cells[cell.cellIndex];
+        if (header === undefined) return;
+
+        tooltip.replaceChildren();
+        const label = row.querySelector(".item-label");
+        if (label !== null) tooltip.append(tooltipLine("Item", label.textContent || ""));
+        tooltip.append(tooltipLine("Period", header.textContent || ""));
+        const unitCell = row.querySelector('[data-col="unit"]');
+        const unit = unitCell instanceof HTMLElement
+          ? unitCell.dataset.unitFull || unitCell.textContent || ""
+          : table.dataset.commonUnit || "";
+        if (unit !== "") tooltip.append(tooltipLine("Unit", unit));
+        if (headerRow !== undefined) {
+          for (const groupingHeader of headerRow.cells) {
+            const key = groupingHeader.dataset.col;
+            if (key === undefined || !key.startsWith("g")) continue;
+            const groupingCell = row.cells[groupingHeader.cellIndex];
+            if (groupingCell !== undefined) {
+              tooltip.append(tooltipLine(groupingHeader.textContent || "", groupingCell.textContent || ""));
+            }
+          }
+        }
+        tooltip.append(tooltipLine("Value", cell.textContent || ""));
+        const description = row.dataset.description;
+        if (description !== undefined) tooltip.append(tooltipLine("Description", description));
+
+        tooltip.hidden = false;
+        const anchor = cell.getBoundingClientRect();
+        const size = tooltip.getBoundingClientRect();
+        const left = Math.max(8, Math.min(anchor.right - size.width, window.innerWidth - size.width - 8));
+        const top = anchor.bottom + 6 + size.height > window.innerHeight
+          ? anchor.top - size.height - 6
+          : anchor.bottom + 6;
+        tooltip.style.left = left + "px";
+        tooltip.style.top = Math.max(8, top) + "px";
+      };
+
+      document.addEventListener("mouseover", (event) => {
+        if (!(event.target instanceof Element)) return;
+        const cell = event.target.closest("[data-statement-table] td.value, [data-statement-table] td.missing, [data-statement-table] td.unavailable");
+        window.clearTimeout(tooltipTimer);
+        if (!(cell instanceof HTMLTableCellElement)) {
+          tooltip.hidden = true;
+          return;
+        }
+        tooltipTimer = window.setTimeout(() => showTooltip(cell), 400);
+      });
+      document.addEventListener("scroll", hideTooltip, true);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") hideTooltip();
+      });
+
+      const indexLinks = new Map();
+      for (const link of document.querySelectorAll(".statement-index a[href^='#']")) {
+        indexLinks.set(link.getAttribute("href")?.slice(1), link);
+      }
+      if (indexLinks.size > 0 && typeof IntersectionObserver === "function") {
+        const observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            const link = indexLinks.get(entry.target.id);
+            if (link === undefined) continue;
+            if (entry.isIntersecting) {
+              for (const other of indexLinks.values()) other.removeAttribute("aria-current");
+              link.setAttribute("aria-current", "location");
+            }
+          }
+        }, { rootMargin: "-10% 0px -70% 0px" });
+        for (const id of indexLinks.keys()) {
+          const section = document.getElementById(id || "");
+          if (section !== null) observer.observe(section);
+        }
       }
     })();
   </script>

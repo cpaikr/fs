@@ -417,9 +417,10 @@ stable error vocabulary.
 
 `fs render` fully validates the input before rendering. Structural
 nonconformance, including an invalid embedded snapshot, prevents output;
-rollup inconsistency and snapshot mismatch do not. Rollup relationships and the
-optional validation snapshot affect the reported validation result but never
-the rendered values or row order.
+rollup inconsistency and snapshot mismatch do not. Rollup relationships shape
+presentation — row hierarchy, subtotal emphasis, and displayed rollup checks —
+but never rendered values or row order. The optional embedded snapshot affects
+only the reported validation result, never the rendered output.
 
 The output is one deterministic UTF-8 HTML document with one final LF. It uses
 the exact `<!doctype html>` document structure, embedded CSS, and fixed inline
@@ -433,14 +434,18 @@ emitted into markup or an inert copy source is HTML-escaped. Displayed entity,
 scope, statement, item, unit, measure, grouping-column name, and grouping value
 content therefore remains text.
 `documentId`, optional metadata identifiers, statement, period, item, and unit
-identifiers, descriptions, `rollupTo`, validation results, and snapshots are
-not displayed.
+identifiers, and embedded validation snapshots are not displayed. `rollupTo`
+relationships and item descriptions are presentation inputs, not displayed
+text: rollups drive row hierarchy and the displayed rollup-check results
+derived from a fresh calculation over the validated document, and descriptions
+surface only as escaped tooltip context.
 
 The page title combines the entity name and scope label. Its body shows that
-metadata, then every statement in document order. The body has a renderer-
-owned ordinal anchor and navigation link for every statement. These links
-expose location, not review status or completion. Each statement is one flat,
-explicitly captioned native table. The table remains the complete no-script
+metadata, a document-level rollup-check summary, then every statement in
+document order. The body has a renderer-owned ordinal anchor and navigation
+link for every statement. These links expose location, not review status or
+completion. Each statement is one explicitly captioned native table with
+statement-local progressive controls. The table remains the complete no-script
 and clipboard-failure fallback. Rows follow item array order; visible columns
 are, in order:
 
@@ -452,21 +457,50 @@ are, in order:
 A statement is homogeneous exactly when every item uses the same unit
 identifier. A homogeneous statement displays that resolved unit once above
 the table and omits the `Unit` column. A heterogeneous statement has no common
-unit display and identifies each row's resolved unit in its `Unit` cell. Unit
-text is `<label> (<measure>, scale <scale>)`; scale is the literal signed base-
-ten exponent and is not applied to stored values.
+unit display and identifies each row's resolved unit label in its `Unit` cell,
+with the full unit text held in a renderer-owned attribute for tooltip
+display. Full unit text is `<label> (<measure>, scale <scale>)`; scale is the
+literal signed base-ten exponent and is not applied to stored values.
 
-Grouping headers display the declared identifier. A string grouping value is
-displayed verbatim; JSON `null` is displayed as `—`. Grouping cells remain
-ordinary flat columns. Equal values do not merge cells or create headings,
-nesting, indentation, ordering, rollups, or styling.
+Grouping headers and column toggles display a deterministic humanized form of
+the declared identifier: for a purely alphanumeric identifier starting with a
+letter, camelCase boundaries become spaces, single leading capitals lowercase,
+and the first character capitalizes (`majorGroup` becomes `Major group`); any
+other identifier displays verbatim. Copied TSV headers always keep the
+declared identifier verbatim. A string grouping value is displayed verbatim;
+JSON `null` is displayed as `—`. Grouping cells remain ordinary flat columns.
+Equal grouping values do not merge cells or create headings, nesting,
+indentation, ordering, or styling. Text columns (item, unit, groupings) and
+their headers align left; period value columns and their headers align right
+with tabular figures. The item-label column stays pinned while the table
+scrolls horizontally.
+
+Row hierarchy derives solely from `rollupTo` within the statement. Rows that
+other items roll up into are emphasized as subtotals with a strong top rule
+and bold text; rollup roots that receive rollups carry a double rule. Child
+rows indent by rollup depth in the item-label cell only. Row relationships are
+encoded with renderer-owned index attributes; author identifiers never become
+attribute values or executable code.
 
 Instant period headers use the exact date. Duration headers use
 `<start> – <end>`. A value cell is read directly from
-`item.values[period]`. An exact decimal is displayed verbatim, JSON `null` is
+`item.values[period]`. An exact decimal is displayed with comma digit grouping
+in its integer part and its sign, decimal point, and every digit otherwise
+verbatim; copied TSV keeps the exact decimal without grouping. JSON `null` is
 displayed as `Missing`, and `{ "unavailable": true }` is displayed as
 `Unavailable`. Rendering performs no numeric conversion, rescaling, rounding,
-aggregation, derivation, or subtotal styling.
+aggregation, or derivation, and never restyles a value by its sign or
+magnitude.
+
+Each statement with rollup relationships is followed by a native details
+disclosure listing its rollup checks, derived from a fresh calculation over
+the validated document — never from the embedded snapshot. Each check names
+the parent and child item labels as a formula and its period; an evaluable
+check shows verbatim actual, expected, difference, and tolerance decimals with
+a `= Satisfied` or `≠ Not satisfied` result, while a check that cannot run
+names the missing or unavailable cell with a `! Not checked` result. The
+masthead summarizes the document-level check count and outcome. Status is
+conveyed by glyph and text, never color alone.
 
 The fixed script progressively reveals one `Copy for Excel` button per
 statement. A button's accessible name includes its statement label. Each
@@ -474,9 +508,22 @@ statement has a visible polite status region whose reserved space prevents
 feedback from moving the surrounding content. The script runs only after the
 native tables and inert copy sources exist. Each source stores the complete TSV
 as JSON string text so every schema-valid code point, including U+0000, survives
-HTML parsing; the fixed script decodes that string before copying. With scripts
-disabled, copy controls remain absent and all statements remain readable native
-tables.
+HTML parsing; the fixed script decodes that string before copying.
+
+The fixed script also progressively reveals statement-local table tools:
+column-visibility toggles for the conditional `Unit` column and each grouping
+column, collapse and expand controls for rollup parents, per-parent disclosure
+buttons whose collapsed state hides all transitive rollup descendants, a
+singleton hover tooltip restating a value cell's visible row and column
+context (item, period, full unit text, groupings, value, and any item
+description), and a current-statement indicator on the navigation index. All
+of it is renderer-owned fixed source reading renderer-owned index attributes.
+On narrow viewports the script starts unit and grouping columns toggled off
+so item labels and values fit first; the toggles restore them. Collapsing and
+column toggles are presentation-only: they never change copied TSV, and
+printing forces collapsed rows and toggled-off columns visible. With scripts
+disabled, these controls and copy controls remain absent, every row and column
+stays visible, and all statements remain readable native tables.
 
 Each copy action transfers exactly one statement as `text/plain` tab-separated
 values. The projection is derived from the validated post-preflight render
@@ -540,9 +587,9 @@ After structural preflight, rendering derives visible rows and copy cells
 lazily while writing them through the bounded sink; it does not materialize a
 complete row set or TSV projection outside that sink. The sink rejects final
 UTF-8 HTML larger than 16 MiB (16,777,216 bytes), measured after escaping and
-encoding. Copy sources do not add logical table-grid slots, but their encoded
-bytes remain inside the same document budget. Any budget violation returns
-operation `render`, code
+encoding. Copy sources and rollup-check tables do not add logical table-grid
+slots, but their encoded bytes remain inside the same document budget. Any
+budget violation returns operation `render`, code
 `output-limit-exceeded`, exit code `1`, a message naming the budget and limit,
 the requested output path, empty help, and no output file.
 

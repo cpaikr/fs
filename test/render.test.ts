@@ -80,16 +80,17 @@ describe("HTML rendering", () => {
     expect(renderBytes(fixture(input))).toEqual(readFileSync(resolve(expected)))
   })
 
-  it("renders grouping columns as flat metadata without rollup styling", () => {
+  it("renders grouping columns as flat aligned metadata without merging", () => {
     const document = fixture("fixtures/valid/render-presentation.json")
     const original = JSON.stringify(document)
     const html = renderBytes(document).toString("utf8")
 
-    expect(html).toContain('<th scope="col">valuation</th>')
-    expect(html).toContain('<td class="metadata">Working &lt;Capital&gt;</td>')
+    expect(html).toContain('<th scope="col" class="col-text" data-col="g0">Valuation</th>')
+    expect(html).toContain('<td class="metadata col-text" data-col="g1">Working &lt;Capital&gt;</td>')
     expect(html).not.toContain("colspan")
-    expect(html).not.toContain("heading")
     expect(html).not.toContain("rowgroup")
+    expect(html).not.toContain('class="row-parent')
+    expect(html).toContain("No rollup checks defined")
     expect(JSON.stringify(document)).toBe(original)
   })
 
@@ -98,15 +99,28 @@ describe("HTML rendering", () => {
 
     expect(html).toContain('<nav class="statement-index" aria-label="Statements">')
     expect(html).toContain('<a href="#statement-1"><span class="index-number">01</span>')
-    expect(html).toContain('Statement <strong>2 of 2</strong>')
-    expect(html).toContain('<caption class="table-caption">Ordered &amp; escaped — Unit: USD &lt;millions&gt; (USD, scale 6)</caption>')
-    expect(html).toContain('<caption class="table-caption">Mixed units — Units shown by item</caption>')
+    expect(html).toContain('<h2><span class="ordinal">02</span>Mixed units</h2>')
+    expect(html).toContain('<caption class="table-caption"><span class="caption-inner">Ordered &amp; escaped — Unit: USD &lt;millions&gt; (USD, scale 6)</span></caption>')
+    expect(html).toContain('<caption class="table-caption"><span class="caption-inner">Mixed units — Units shown by item</span></caption>')
     expect(html).toContain('role="region" aria-label="Ordered &amp; escaped table. Scroll horizontally to review all columns." tabindex="0"')
     expect(html).toContain('data-copy-handoff hidden')
     expect(html).toContain('aria-label="Copy Ordered &amp; escaped for Excel"')
     expect(html).toContain('role="status" aria-live="polite" aria-atomic="true"')
+    expect(html).toContain("data-table-tools hidden")
+    expect(html).toContain('data-col-toggle="unit" aria-pressed="true"')
+    expect(html).not.toContain("data-rows-collapse>")
     expect(html.match(/<table id=/gu)).toHaveLength(2)
     expect(html.match(/data-copy-control data-copy-source=/gu)).toHaveLength(2)
+  })
+
+  it("aligns text and numeric columns and embeds tooltip unit context", () => {
+    const html = renderBytes(fixture("fixtures/valid/render-presentation.json")).toString("utf8")
+
+    expect(html).toContain('<th scope="col" class="col-text">Item</th>')
+    expect(html).toContain('<th scope="col" class="col-text" data-col="unit">Unit</th>')
+    expect(html).toContain('<th scope="col" class="col-num">2025-12-31</th>')
+    expect(html).toContain('data-common-unit="USD &lt;millions&gt; (USD, scale 6)"')
+    expect(html).toContain('data-unit-full="USD &lt;millions&gt; (USD, scale 6)">USD &lt;millions&gt;</td>')
   })
 
   it("streams exact per-statement TSV with an unconditional Unit column", () => {
@@ -194,13 +208,20 @@ describe("HTML rendering", () => {
     expect(authored).not.toMatch(/<script[^>]+src=/u)
   })
 
-  it("excludes rollup and validation metadata", () => {
+  it("derives rollup hierarchy and fresh validation results without exposing identifiers", () => {
     const html = renderBytes(fixture("fixtures/valid/snapshot-mismatch-source.json")).toString("utf8")
 
+    expect(html).toContain('data-parent-row="1"')
+    expect(html).toContain('class="row-parent row-total"')
+    expect(html).toContain('aria-label="Collapse Total detail rows"')
+    expect(html).toContain('<span class="collapsed-count" hidden>· 1 row</span>')
+    expect(html).toContain("Rollup checks — 1 · 1 not satisfied")
+    expect(html).toContain('<th scope="row">Total = Child</th>')
+    // The embedded snapshot claims this check is satisfied; the rendered result
+    // must come from a fresh calculation over the document instead.
+    expect(html).toContain("≠ Not satisfied")
     expect(html).not.toContain("rollupTo")
     expect(html).not.toContain("validationSnapshot")
-    expect(html).not.toContain("unsatisfied")
-    expect(html).not.toContain("difference")
   })
 
   it("escapes every HTML-sensitive author-text character", () => {
