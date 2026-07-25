@@ -10,45 +10,18 @@ statement into Excel. The FS JSON Schema and semantic specification remain the
 authoritative contract; presentation markup carries no additional financial
 meaning.
 
-## Current state
+## Delivery record
 
-`renderHtml(document)` now
-orchestrates three focused internals: an opaque auto-escaping template seam, a
-bounded line sink, and a shallow presentation analysis used by structural
-preflight and rendering. Dynamic values are escaped by default, missing
-validated references fail explicitly, and that foundation slice preserved the
-former output byte-for-byte. The revised contract now permits only renderer-
-owned fixed inline behavior and treats current presentation bytes as a release-
-level regression surface rather than a cross-version guarantee.
+This completed milestone delivered the renderer seams, bounded output,
+standalone review surface, native-table fallback, and per-statement spreadsheet
+handoff described below. Later rendering changes may supersede its visual and
+interaction details. [`DESIGN.md`](../../DESIGN.md) owns the current visual
+system, the [CLI acceptance contract](../cli/acceptance.md) owns observable
+rendering behavior, and the [semantic specification](../semantic-spec.md) owns
+the presentation boundary.
 
 `pnpm render:example` rebuilds the tracked, multi-statement manufacturing
 preview through the compiled CLI for quick local review.
-
-The product and visual directions are confirmed. The approved review-index
-system is recorded in [`DESIGN.md`](../../DESIGN.md):
-
-- analysts open the generated file locally and move statement data into Excel;
-- a small inline script is acceptable, but the document remains offline and
-  has no external runtime resources;
-- copying operates per statement and includes an explicit unit column for every
-  row, even when the visible table shows one common unit above the table;
-- spreadsheet-native numeric transfer is preferred over exact lexical
-  preservation;
-- the view is compact, trustworthy, utilitarian, and targets WCAG 2.2 AA;
-- the visual system uses a warm working-paper canvas, neutral ink, hairline
-  rules, and restrained teal interaction cues;
-- statement navigation conveys ordinal location without inventing completion
-  state; and
-- the approved mock's inferred section index and total styling are omitted
-  because FS does not encode those presentation semantics.
-
-The foundation, rendering-contract, and presentation slices are merged into
-`dev`. Native tables use the approved review-index system, responsive overflow
-guidance, print rules, a sticky statement index, and progressive per-statement
-Excel handoff. Clipboard TSV is streamed through the bounded sink after
-structural preflight, includes unit context, normalizes delimiters, and protects
-formula-prefixed author text. Exact fixtures and the tracked examples were
-regenerated from the implementation.
 
 ## Scope
 

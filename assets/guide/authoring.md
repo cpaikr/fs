@@ -130,12 +130,16 @@ fs render --output statement.html statement.fs.json
 
 Use another new output path whose parent directory already exists. `render`
 validates the input again and atomically creates a deterministic standalone
-HTML document with embedded CSS, no scripts, and no external resources. Treat
-the HTML as a derived flat presentation, not a replacement for the FS JSON: it
-does not display validation results, snapshots, or rollup relationships, and
-it does not calculate, rescale, round, aggregate, or derive values. Finish
-rendering only when its `output.status` is `"created"`.
+HTML document with embedded CSS, renderer-owned fixed inline behavior, and no
+external resources. Treat the HTML as a derived presentation, not a
+replacement for the FS JSON: it provides statement review, presentation-only
+rollup hierarchy and fresh rollup-check summaries, and per-statement
+copy-for-Excel controls. Rendering calculates rollup checks but does not derive,
+rescale, round, aggregate, or change the displayed statement values. Embedded
+validation snapshots are not displayed. Finish rendering only when its
+`output.status` is `"created"`.
 
 Deliver the created FS JSON and the complete structured validation output,
-including `validation` and `snapshotDiff`. When requested and successfully
-created, deliver the HTML alongside them.
+including `validation` and `snapshotDiff`, which remain in the JSON command
+output. When requested and successfully created, deliver the HTML alongside
+them.
