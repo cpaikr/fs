@@ -139,8 +139,9 @@ identifiers. Every item has:
 - no other member.
 
 The `unit` reference applies to every value of that item. Different items in
-one statement MAY use different units. `description` clarifies meaning but is
-not displayed or used in validation.
+one statement MAY use different units. `description` clarifies meaning and MAY
+be displayed as presentation text, but it does not affect validation or
+artifact semantics.
 
 An item is the atomic financial meaning supplied to FS. It may correspond to
 one ledger account, several accounts already aggregated upstream, or another
@@ -430,10 +431,13 @@ shows statements and items in array order and periods in each statement's
 selected order. Declared grouping columns appear as flat, non-arithmetic
 columns in declaration order. A homogeneous statement identifies its one unit
 once; a heterogeneous statement shows a unit cell for each row. Rendering does
-not infer hierarchy, subtotal styling, signs, missing values, or taxonomy from
-rollups or groupings. A progressive copy convenience may project one statement
-to tab-separated text with an explicit Unit column on every row; this is still
-a non-normative presentation of the same ordered item values. The
+not infer signs, missing values, taxonomy, or financial meaning from rollups or
+groupings. A renderer may derive hierarchy and subtotal styling solely from
+explicit `rollupTo` relationships for presentation; those derivations add no
+financial meaning and do not change values or row order. A progressive copy
+convenience may project one statement to tab-separated text with an explicit
+Unit column on every row; this is still a non-normative presentation of the
+same ordered item values. The
 [CLI acceptance contract](cli/acceptance.md) fixes the exact HTML, copy, and
 finite-output behavior.
 

@@ -435,10 +435,10 @@ scope, statement, item, unit, measure, grouping-column name, and grouping value
 content therefore remains text.
 `documentId`, optional metadata identifiers, statement, period, item, and unit
 identifiers, and embedded validation snapshots are not displayed. `rollupTo`
-relationships and item descriptions are presentation inputs, not displayed
-text: rollups drive row hierarchy and the displayed rollup-check results
-derived from a fresh calculation over the validated document, and descriptions
-surface only as escaped tooltip context.
+relationships and item descriptions are presentation inputs: rollups drive row
+hierarchy and the displayed rollup-check results derived from a fresh
+calculation over the validated document, while descriptions appear as escaped
+secondary item text and are repeated in tooltip context.
 
 The page title combines the entity name and scope label. Its body shows that
 metadata, a document-level rollup-check summary, then every statement in
@@ -499,8 +499,9 @@ the parent and child item labels as a formula and its period; an evaluable
 check shows verbatim actual, expected, difference, and tolerance decimals with
 a `= Satisfied` or `≠ Not satisfied` result, while a check that cannot run
 names the missing or unavailable cell with a `! Not checked` result. The
-masthead summarizes the document-level check count and outcome. Status is
-conveyed by glyph and text, never color alone.
+masthead summarizes the document-level check count and outcome, distinguishing
+checks that are not satisfied from checks that could not be evaluated. Status
+is conveyed by glyph and text, never color alone.
 
 The fixed script progressively reveals one `Copy for Excel` button per
 statement. A button's accessible name includes its statement label. Each
@@ -515,9 +516,10 @@ column-visibility toggles for the conditional `Unit` column and each grouping
 column, collapse and expand controls for rollup parents, per-parent disclosure
 buttons whose collapsed state hides all transitive rollup descendants, a
 singleton hover tooltip restating a value cell's visible row and column
-context (item, period, full unit text, groupings, value, and any item
-description), and a current-statement indicator on the navigation index. All
-of it is renderer-owned fixed source reading renderer-owned index attributes.
+context (item, period, full unit text, groupings, value, and the visible item
+description when present), and a current-statement indicator on the navigation
+index. All of it is renderer-owned fixed source reading renderer-owned index
+attributes.
 On narrow viewports the script starts unit and grouping columns toggled off
 so item labels and values fit first; the toggles restore them. Collapsing and
 column toggles are presentation-only: they never change copied TSV, and
@@ -547,12 +549,13 @@ Before author-controlled text enters TSV, every tab, carriage return, or line
 feed is replaced by one space. For formula protection, whitespace is exactly
 U+0009 through U+000D, U+0020, U+00A0, U+1680, U+2000 through U+200A, U+2028,
 U+2029, U+202F, U+205F, U+3000, and U+FEFF. If the first code point outside
-that set is `=`, `+`, `-`, or `@`, the renderer prefixes one apostrophe so
-spreadsheet software treats the cell as text. This protection applies to item
-labels, unit text, grouping-column headers and values, and all other author
-text, but not to exact decimal value cells or renderer-owned fixed labels. TSV
-uses one U+0009 tab between cells and one U+000A line feed between rows, with
-no final line feed. It contains no quoting or embedded row delimiters.
+that set is `"`, `=`, `+`, `-`, or `@`, the renderer prefixes one apostrophe so
+spreadsheet software treats the cell as literal text instead of a text
+qualifier or formula. This protection applies to item labels, unit text,
+grouping-column headers and values, and all other author text, but not to exact
+decimal value cells or renderer-owned fixed labels. TSV uses one U+0009 tab
+between cells and one U+000A line feed between rows, with no final line feed.
+It contains no quoting or embedded row delimiters.
 
 Copy begins only from an explicit button activation. The script first attempts
 the asynchronous Clipboard API and falls back to a temporary selected textarea
@@ -729,12 +732,15 @@ independent of definition order; homogeneous-unit collapsing and heterogeneous
 row units; exact zero, negative, and fractional decimals; literal scale
 metadata; missing and unavailable cells; null and string grouping values; and
 escaping of every displayed author-controlled text kind. They also prove that
-grouping values and rollups create no hierarchy, merged cells, or subtotal
-styling. Focused renderer tests must prove the post-preflight TSV projection,
-unconditional Unit column, delimiter normalization, formula protection, null
-grouping behavior, and distinct missing and unavailable states. Browser
-verification must cover Clipboard API success, forced fallback success, failure
-feedback, keyboard operation, and the native-table no-script path.
+grouping values create no hierarchy, merged cells, or subtotal styling, while
+rollups drive the documented row hierarchy and subtotal emphasis without
+introducing merged cells. Focused renderer tests must prove the post-preflight
+TSV projection,
+unconditional Unit column, delimiter normalization, spreadsheet-control
+protection, null grouping behavior, and distinct missing and unavailable
+states. Browser verification must cover Clipboard API success, forced fallback
+success, failure feedback, keyboard operation, and the native-table no-script
+path.
 
 Failure and grammar cases cover malformed input, schema and semantic structural
 refusal, an invalid embedded snapshot, missing input or parent, existing

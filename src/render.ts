@@ -1,6 +1,7 @@
 import { HtmlSink } from "./render/html.js"
 import {
   createRenderPresentation,
+  statementFixedColumnCount,
   type RenderPresentation
 } from "./render/presentation.js"
 import { renderTemplate } from "./render/template.js"
@@ -28,6 +29,32 @@ const limitExceeded = (budget: RenderLimitBudget, limit: number): RenderResult =
   limit
 })
 
+const documentStructuralPreflight = (document: Document): RenderResult | undefined => {
+  const groupingColumnCount = document.groupingColumns?.length ?? 0
+  for (const statement of document.statements) {
+    const fixedColumns = statementFixedColumnCount(statement, groupingColumnCount)
+    if (
+      fixedColumns > renderLimits.columns ||
+      statement.periods.length > renderLimits.columns - fixedColumns
+    ) {
+      return limitExceeded("columns", renderLimits.columns)
+    }
+  }
+
+  let gridSlots = 0
+  for (const statement of document.statements) {
+    const columns =
+      statementFixedColumnCount(statement, groupingColumnCount) + statement.periods.length
+    const rows = statement.items.length + 1
+    const remainingSlots = renderLimits.gridSlots - gridSlots
+    if (rows > Math.floor(remainingSlots / columns)) {
+      return limitExceeded("grid-slots", renderLimits.gridSlots)
+    }
+    gridSlots += rows * columns
+  }
+  return undefined
+}
+
 const structuralPreflight = (presentation: RenderPresentation): RenderResult | undefined => {
   for (const { statement, fixedColumnCount } of presentation.statements) {
     const fixedColumns = fixedColumnCount
@@ -50,6 +77,9 @@ const structuralPreflight = (presentation: RenderPresentation): RenderResult | u
 }
 
 export const renderHtml = (document: Document): RenderResult => {
+  const documentStructuralFailure = documentStructuralPreflight(document)
+  if (documentStructuralFailure !== undefined) return documentStructuralFailure
+
   const presentation = createRenderPresentation(document)
   const structuralFailure = structuralPreflight(presentation)
   if (structuralFailure !== undefined) return structuralFailure

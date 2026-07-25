@@ -236,6 +236,13 @@
     .row-toggle:hover { color: var(--accent); }
     .row-toggle[aria-expanded="false"]::before { transform: rotate(-90deg); }
     .collapsed-count { color: var(--ink-2); font-size: 0.75rem; }
+    .item-description {
+      color: var(--ink-2);
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin-top: 0.1rem;
+    }
     .row-parent > th, .row-parent > td { border-top: 1px solid var(--rule-strong); font-weight: 650; }
     .row-total > th, .row-total > td { border-bottom: 3px double var(--rule-strong); }
     tbody tr:first-child > th, tbody tr:first-child > td { border-top: 0; }
@@ -363,7 +370,7 @@
         <li><a href="#statement-5"><span class="index-number">05</span><span>Manufacturing cost statement</span></a></li>
       </ol>
     </nav>
-    <main id="statements">
+    <main id="statements" tabindex="-1">
     <section class="statement" id="statement-1">
       <h2><span class="ordinal">01</span>Balance sheet</h2>
         <div class="table-tools" data-table-tools hidden>
@@ -452,8 +459,8 @@
                 <tr>
                   <th scope="row">Total assets = Cash + Inventory</th>
                   <td class="metadata">2025-12-31</td>
-                  <td class="value">1,000</td>
-                  <td class="value">1,000</td>
+                  <td class="value">1000</td>
+                  <td class="value">1000</td>
                   <td class="value">0</td>
                   <td class="value">0</td>
 <td class="check-status" data-status="satisfied">= Satisfied</td>
@@ -470,8 +477,8 @@
                 <tr>
                   <th scope="row">Liabilities and equity = Liabilities + Equity</th>
                   <td class="metadata">2025-12-31</td>
-                  <td class="value">1,000</td>
-                  <td class="value">1,000</td>
+                  <td class="value">1000</td>
+                  <td class="value">1000</td>
                   <td class="value">0</td>
                   <td class="value">0</td>
 <td class="check-status" data-status="satisfied">= Satisfied</td>
@@ -1075,6 +1082,11 @@
             if (!(row instanceof HTMLTableRowElement)) continue;
             const expanded = !collapsed.has(row.dataset.row);
             button.setAttribute("aria-expanded", expanded ? "true" : "false");
+            const label = row.querySelector(".item-label")?.textContent || "row";
+            button.setAttribute(
+              "aria-label",
+              (expanded ? "Collapse " : "Expand ") + label + " detail rows"
+            );
             const count = row.querySelector(".collapsed-count");
             if (count instanceof HTMLElement) count.hidden = expanded;
           }

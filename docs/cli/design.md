@@ -212,11 +212,13 @@ inconsistency may be recorded; structural nonconformance prevents writing.
 
 Produce an analyst-friendly standalone HTML presentation at the requested new
 path. Rendering iterates statement-owned items directly. It presents grouping
-columns as flat metadata and identifies heterogeneous row units without
-inferring hierarchy, subtotal styling, calculations, or missing values. Native
+columns as flat metadata, identifies heterogeneous row units, and may derive
+presentation-only hierarchy, subtotal styling, and fresh check results from
+explicit rollup relationships without deriving or changing values. Native
 tables remain the no-script review surface. Renderer-owned inline behavior may
-progressively add statement navigation and a per-statement Excel-copy action;
-it never executes or interprets author-controlled content.
+progressively add statement navigation, table controls, contextual tooltips,
+and a per-statement Excel-copy action; it never executes or interprets
+author-controlled content.
 
 The copied projection is tab-separated and always includes an explicit Unit
 column, even when the visible table has one common unit. Author text is

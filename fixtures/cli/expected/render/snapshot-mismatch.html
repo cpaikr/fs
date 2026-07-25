@@ -236,6 +236,13 @@
     .row-toggle:hover { color: var(--accent); }
     .row-toggle[aria-expanded="false"]::before { transform: rotate(-90deg); }
     .collapsed-count { color: var(--ink-2); font-size: 0.75rem; }
+    .item-description {
+      color: var(--ink-2);
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin-top: 0.1rem;
+    }
     .row-parent > th, .row-parent > td { border-top: 1px solid var(--rule-strong); font-weight: 650; }
     .row-total > th, .row-total > td { border-bottom: 3px double var(--rule-strong); }
     tbody tr:first-child > th, tbody tr:first-child > td { border-top: 0; }
@@ -359,7 +366,7 @@
         <li><a href="#statement-1"><span class="index-number">01</span><span>Statement</span></a></li>
       </ol>
     </nav>
-    <main id="statements">
+    <main id="statements" tabindex="-1">
     <section class="statement" id="statement-1">
       <h2><span class="ordinal">01</span>Statement</h2>
         <div class="table-tools" data-table-tools hidden>
@@ -540,6 +547,11 @@
             if (!(row instanceof HTMLTableRowElement)) continue;
             const expanded = !collapsed.has(row.dataset.row);
             button.setAttribute("aria-expanded", expanded ? "true" : "false");
+            const label = row.querySelector(".item-label")?.textContent || "row";
+            button.setAttribute(
+              "aria-label",
+              (expanded ? "Collapse " : "Expand ") + label + " detail rows"
+            );
             const count = row.querySelector(".collapsed-count");
             if (count instanceof HTMLElement) count.hidden = expanded;
           }

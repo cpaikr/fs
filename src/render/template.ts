@@ -244,6 +244,13 @@ const stylesheet = html`    :root {
     .row-toggle:hover { color: var(--accent); }
     .row-toggle[aria-expanded="false"]::before { transform: rotate(-90deg); }
     .collapsed-count { color: var(--ink-2); font-size: 0.75rem; }
+    .item-description {
+      color: var(--ink-2);
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin-top: 0.1rem;
+    }
     .row-parent > th, .row-parent > td { border-top: 1px solid var(--rule-strong); font-weight: 650; }
     .row-total > th, .row-total > td { border-bottom: 3px double var(--rule-strong); }
     tbody tr:first-child > th, tbody tr:first-child > td { border-top: 0; }
@@ -464,6 +471,11 @@ const behavior = html`  <script>
             if (!(row instanceof HTMLTableRowElement)) continue;
             const expanded = !collapsed.has(row.dataset.row);
             button.setAttribute("aria-expanded", expanded ? "true" : "false");
+            const label = row.querySelector(".item-label")?.textContent || "row";
+            button.setAttribute(
+              "aria-label",
+              (expanded ? "Collapse " : "Expand ") + label + " detail rows"
+            );
             const count = row.querySelector(".collapsed-count");
             if (count instanceof HTMLElement) count.hidden = expanded;
           }
@@ -593,7 +605,7 @@ const behavior = html`  <script>
     })();
   </script>`
 
-const formulaPrefix = /^[\u0009-\u000d\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]*[=+\-@]/u
+const spreadsheetControlPrefix = /^[\u0009-\u000d\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]*["=+\-@]/u
 
 const periodLabel = (period: RenderPresentation["document"]["periods"][number]): string =>
   period.kind === "instant" ? period.date : `${period.start} – ${period.end}`
@@ -636,7 +648,7 @@ const displayDecimal = (value: string): string => {
 
 const authorTsvText = (text: string): string => {
   const normalized = text.replace(/[\t\r\n]/gu, " ")
-  return formulaPrefix.test(normalized) ? `'${normalized}` : normalized
+  return spreadsheetControlPrefix.test(normalized) ? `'${normalized}` : normalized
 }
 
 const jsonStringFragment = (text: string): string => JSON.stringify(text).slice(1, -1)
@@ -739,16 +751,28 @@ const checkStatus = (application: ApplicationResult): HtmlTemplate => {
 const checkFormula = (check: StatementCheck): string =>
   `${check.parent.label} = ${check.children.map(({ label }) => label).join(" + ")}`
 
+const checkIssueSummary = (
+  applications: ReadonlyArray<ApplicationResult>
+): string | undefined => {
+  const unsatisfied = applications.filter(({ status }) => status === "unsatisfied").length
+  const notChecked = applications.filter(({ status }) => status === "error").length
+  const issues = [
+    ...(unsatisfied === 0 ? [] : [`${unsatisfied} not satisfied`]),
+    ...(notChecked === 0 ? [] : [`${notChecked} not checked`])
+  ]
+  return issues.length === 0 ? undefined : issues.join(" · ")
+}
+
 const appendChecks = (
   statementPresentation: StatementPresentation,
   sink: HtmlSink
 ): void => {
   const { checks, statement } = statementPresentation
   if (checks.length === 0) return
-  const unsatisfied = checks.filter(({ application }) => application.status !== "satisfied").length
-  const summary = unsatisfied === 0
-    ? html`${checks.length} · all satisfied`
-    : html`${checks.length} · ${unsatisfied} not satisfied`
+  const issueSummary = checkIssueSummary(checks.map(({ application }) => application))
+  const summary = issueSummary === undefined
+    ? `${checks.length} · all satisfied`
+    : `${checks.length} · ${issueSummary}`
   const itemsById = new Map(statement.items.map((item) => [item.id, item]))
   sink.writeLine(html`        <details class="checks">
           <summary>Rollup checks — ${summary}</summary>
@@ -776,10 +800,10 @@ const appendChecks = (
       const reason = application.reason === "missing-value" ? "missing" : "unavailable"
       sink.writeLine(html`                  <td class="metadata col-text" colspan="4">Value for ${cell?.label ?? application.cell.item} is ${reason}</td>`)
     } else {
-      sink.writeLine(html`                  <td class="value">${displayDecimal(application.actual)}</td>
-                  <td class="value">${displayDecimal(application.expected)}</td>
-                  <td class="value">${displayDecimal(application.difference)}</td>
-                  <td class="value">${displayDecimal(application.tolerance)}</td>`)
+      sink.writeLine(html`                  <td class="value">${application.actual}</td>
+                  <td class="value">${application.expected}</td>
+                  <td class="value">${application.difference}</td>
+                  <td class="value">${application.tolerance}</td>`)
     }
     sink.writeLine(checkStatus(application))
     sink.writeLine(html`                </tr>`)
@@ -839,18 +863,10 @@ const rowOpening = (
   return html`              <tr data-row="${index}"${parentAttribute}${classAttribute}${depthAttribute}${descriptionAttribute}>`
 }
 
-const descendantCount = (statementPresentation: StatementPresentation, index: number): number => {
-  const { items } = statementPresentation
-  const descends = (candidate: number): boolean => {
-    let ancestor = items[candidate]?.parentIndex
-    while (ancestor !== undefined) {
-      if (ancestor === index) return true
-      ancestor = items[ancestor]?.parentIndex
-    }
-    return false
-  }
-  return items.filter((_, candidate) => descends(candidate)).length
-}
+const itemDescription = (description: string | undefined): HtmlTemplate =>
+  description === undefined
+    ? html``
+    : html`<span class="item-description">${description}</span>`
 
 const itemCell = (
   statementPresentation: StatementPresentation,
@@ -858,12 +874,11 @@ const itemCell = (
 ): HtmlTemplate => {
   const presentation = statementPresentation.items[index]
   if (presentation === undefined) throw new Error("Validated statement lost its item presentation")
-  const { item, isParent } = presentation
+  const { item, isParent, descendantCount } = presentation
   if (!isParent) {
-    return html`                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">${item.label}</span></span></th>`
+    return html`                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">${item.label}</span>${itemDescription(item.description)}</span></th>`
   }
-  const rows = descendantCount(statementPresentation, index)
-  return html`                <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse ${item.label} detail rows"></button></span><span class="item-label">${item.label}</span> <span class="collapsed-count" hidden>· ${rows} ${rows === 1 ? "row" : "rows"}</span></span></th>`
+  return html`                <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse ${item.label} detail rows"></button></span><span class="item-label">${item.label}</span> <span class="collapsed-count" hidden>· ${descendantCount} ${descendantCount === 1 ? "row" : "rows"}</span>${itemDescription(item.description)}</span></th>`
 }
 
 const appendStatement = (
@@ -962,8 +977,13 @@ const documentChecks = (presentation: RenderPresentation): HtmlTemplate => {
   if (calculations.status === "consistent") {
     return html`<p class="doc-checks"><span class="check-glyph" data-status="satisfied">=</span> ${total} rollup ${checksWord} · all consistent</p>`
   }
-  const unsatisfied = calculations.applications.filter(({ status }) => status !== "satisfied").length
-  return html`<p class="doc-checks"><span class="check-glyph" data-status="unsatisfied">≠</span> ${total} rollup ${checksWord} · ${unsatisfied} not satisfied</p>`
+  const issueSummary = checkIssueSummary(calculations.applications)
+  if (issueSummary === undefined) throw new Error("Inconsistent calculations lost their issue")
+  const status = calculations.applications.some(({ status }) => status === "unsatisfied")
+    ? "unsatisfied"
+    : "error"
+  const glyph = status === "unsatisfied" ? "≠" : "!"
+  return html`<p class="doc-checks"><span class="check-glyph" data-status="${status}">${glyph}</span> ${total} rollup ${checksWord} · ${issueSummary}</p>`
 }
 
 export const renderTemplate = (presentation: RenderPresentation, sink: HtmlSink): void => {
@@ -989,7 +1009,7 @@ ${stylesheet}
       ${documentChecks(presentation)}
     </header>`)
   appendNavigation(presentation, sink)
-  sink.writeLine(html`    <main id="statements">`)
+  sink.writeLine(html`    <main id="statements" tabindex="-1">`)
   for (const statement of presentation.statements) {
     appendStatement(presentation, statement, sink)
     if (sink.exceeded) return

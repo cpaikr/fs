@@ -101,16 +101,17 @@ and purely presentational — copied TSV and the underlying table never change.
   these columns off so values fit the first screen.
 - Tooltip: a singleton dark tooltip appears after a ~400 ms hover delay over
   value cells, anchored near the right-aligned number, restating the row and
-  column context (item, period, full unit, groupings, value, item description
-  when present). It duplicates visible content, so no information is
-  hover-only.
+  column context (item, period, full unit, groupings, value, and item
+  description when present). Descriptions also appear as secondary item text,
+  so the tooltip duplicates visible content and no information is hover-only.
 - Motion is limited to a 120 ms triangle rotation, disabled under
   `prefers-reduced-motion`.
 
 ## Validation Display
 
 Each statement with rollups gets a native `<details>` disclosure summarizing
-its checks (`n rollup checks · all satisfied` or `· m not satisfied`) and a
+its checks (`n rollup checks · all satisfied`, `· m not satisfied`, and/or
+`· k not checked`) and a
 check table: formula from item labels (`Total assets = Cash + Inventory`),
 period, verbatim actual / expected / difference / tolerance decimals, and a
 glyph-plus-word result (`= Satisfied`, `≠ Not satisfied`, `! Not checked`).

@@ -4,6 +4,7 @@ import { resolve } from "node:path"
 import { describe, expect, it } from "vitest"
 
 import { renderHtml, renderLimits } from "../src/render.js"
+import { createRenderPresentation } from "../src/render/presentation.js"
 import type { Document, Item, Period } from "../src/validation/model.js"
 import { exactByteDocument } from "./support/exact-byte-document.js"
 
@@ -63,6 +64,22 @@ const tableDocument = (periodCount: number, itemCount: number): Document => {
   }
 }
 
+const rollupChainDocument = (itemCount: number): Document => {
+  const document = tableDocument(1, itemCount)
+  const statement = document.statements[0]
+  if (statement === undefined) throw new Error("Chain fixture lost its statement")
+  return {
+    ...document,
+    statements: [{
+      ...statement,
+      items: statement.items.map((item, index) => ({
+        ...item,
+        ...(index === 0 ? {} : { rollupTo: `item${index - 1}` })
+      }))
+    }]
+  }
+}
+
 describe("HTML rendering", () => {
   it.each([
     [
@@ -106,6 +123,8 @@ describe("HTML rendering", () => {
     expect(html).toContain('data-copy-handoff hidden')
     expect(html).toContain('aria-label="Copy Ordered &amp; escaped for Excel"')
     expect(html).toContain('role="status" aria-live="polite" aria-atomic="true"')
+    expect(html).toContain('<main id="statements" tabindex="-1">')
+    expect(html).toContain('(expanded ? "Collapse " : "Expand ") + label + " detail rows"')
     expect(html).toContain("data-table-tools hidden")
     expect(html).toContain('data-col-toggle="unit" aria-pressed="true"')
     expect(html).not.toContain("data-rows-collapse>")
@@ -114,13 +133,26 @@ describe("HTML rendering", () => {
   })
 
   it("aligns text and numeric columns and embeds tooltip unit context", () => {
-    const html = renderBytes(fixture("fixtures/valid/render-presentation.json")).toString("utf8")
+    const document = fixture("fixtures/valid/render-presentation.json")
+    const statement = document.statements[0]
+    const item = statement?.items[0]
+    if (statement === undefined || item === undefined) {
+      throw new Error("Presentation fixture lost its first item")
+    }
+    const html = renderBytes({
+      ...document,
+      statements: [{
+        ...statement,
+        items: [{ ...item, description: "Primary <liquidity>" }, ...statement.items.slice(1)]
+      }, ...document.statements.slice(1)]
+    }).toString("utf8")
 
     expect(html).toContain('<th scope="col" class="col-text">Item</th>')
     expect(html).toContain('<th scope="col" class="col-text" data-col="unit">Unit</th>')
     expect(html).toContain('<th scope="col" class="col-num">2025-12-31</th>')
     expect(html).toContain('data-common-unit="USD &lt;millions&gt; (USD, scale 6)"')
     expect(html).toContain('data-unit-full="USD &lt;millions&gt; (USD, scale 6)">USD &lt;millions&gt;</td>')
+    expect(html).toContain('<span class="item-description">Primary &lt;liquidity&gt;</span>')
   })
 
   it("streams exact per-statement TSV with an unconditional Unit column", () => {
@@ -150,10 +182,11 @@ describe("HTML rendering", () => {
     const firstGrouping = "\ufeff=Header\tOne"
     const secondGrouping = "\u00a0+Header\rTwo"
     const markupGrouping = "markup"
+    const quotedGrouping = "quoted"
     const rendered = renderBytes({
       ...document,
       units: [{ ...unit, label: "USD\tLabel", measure: "Amount\r\nMeasure" }],
-      groupingColumns: [firstGrouping, secondGrouping, markupGrouping],
+      groupingColumns: [firstGrouping, secondGrouping, markupGrouping, quotedGrouping],
       statements: [{
         ...statement,
         items: [{
@@ -163,15 +196,16 @@ describe("HTML rendering", () => {
           groupings: {
             [firstGrouping]: "\u3000@Value\r\nLine",
             [secondGrouping]: null,
-            [markupGrouping]: "</textarea><script>alert(\"x\")</script>&'"
+            [markupGrouping]: "</textarea><script>alert(\"x\")</script>&'",
+            [quotedGrouping]: "\"Qualified"
           }
         }]
       }]
     }).toString("utf8")
 
     expect(copySource(rendered, 1)).toBe([
-      "Item\tUnit\t'\ufeff=Header One\t'\u00a0+Header Two\tmarkup\t2025-01-01 – 2025-12-31",
-      "'\u2003-Item Name\tUSD Label (Amount  Measure, scale 0)\t'\u3000@Value  Line\t\t</textarea><script>alert(\"x\")</script>&'\t-1.25"
+      "Item\tUnit\t'\ufeff=Header One\t'\u00a0+Header Two\tmarkup\tquoted\t2025-01-01 – 2025-12-31",
+      "'\u2003-Item Name\tUSD Label (Amount  Measure, scale 0)\t'\u3000@Value  Line\t\t</textarea><script>alert(\"x\")</script>&'\t'\"Qualified\t-1.25"
     ].join("\n"))
     expect(rendered).toContain("&lt;/textarea&gt;&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&amp;&#39;")
     expect(rendered.match(/<script>/gu)).toHaveLength(1)
@@ -224,6 +258,82 @@ describe("HTML rendering", () => {
     expect(html).not.toContain("validationSnapshot")
   })
 
+  it("keeps check decimals verbatim and distinguishes unevaluated checks", () => {
+    const document = fixture("examples/minimal.json")
+    const statement = document.statements[0]
+    const first = statement?.items[0]
+    if (statement === undefined || first === undefined) {
+      throw new Error("Minimal fixture lost its rollup inputs")
+    }
+    const evaluable = renderBytes({
+      ...document,
+      statements: [{
+        ...statement,
+        items: [
+          { ...first, id: "child", label: "Child", values: { fy2025: "1" }, rollupTo: "total" },
+          { ...first, id: "total", label: "Total", values: { fy2025: "1000.25" } }
+        ]
+      }]
+    }).toString("utf8")
+
+    expect(evaluable).toContain('<td class="value">1,000.25</td>')
+    expect(evaluable).toContain(`                  <td class="value">1000.25</td>
+                  <td class="value">1</td>
+                  <td class="value">999.25</td>
+                  <td class="value">0</td>`)
+
+    const notChecked = renderBytes({
+      ...document,
+      statements: [{
+        ...statement,
+        items: [
+          { ...first, id: "child", label: "Child", values: { fy2025: "1" }, rollupTo: "total" },
+          { ...first, id: "total", label: "Total", values: { fy2025: null } }
+        ]
+      }]
+    }).toString("utf8")
+
+    expect(notChecked).toContain(
+      '<span class="check-glyph" data-status="error">!</span> 1 rollup check · 1 not checked'
+    )
+    expect(notChecked).toContain("Rollup checks — 1 · 1 not checked")
+    expect(notChecked).toContain("! Not checked")
+  })
+
+  it("resolves long rollup chains iteratively and caches transitive descendant counts", () => {
+    const itemCount = 10_000
+    const presentation = createRenderPresentation(rollupChainDocument(itemCount))
+    const items = presentation.statements[0]?.items
+
+    expect(items).toHaveLength(itemCount)
+    expect(items?.[0]?.descendantCount).toBe(itemCount - 1)
+    expect(items?.[itemCount - 1]?.depth).toBe(itemCount - 1)
+    expect(items?.[itemCount - 1]?.descendantCount).toBe(0)
+  })
+
+  it("indexes calculation applications by statement", () => {
+    const statementCount = 2_000
+    const document = tableDocument(1, 2)
+    const source = document.statements[0]
+    const child = source?.items[0]
+    const parent = source?.items[1]
+    if (source === undefined || child === undefined || parent === undefined) {
+      throw new Error("Application fixture lost its items")
+    }
+    const statements = Array.from({ length: statementCount }, (_, index) => ({
+      ...source,
+      id: `statement${index}`,
+      items: [
+        { ...child, id: "child", rollupTo: "parent" },
+        { ...parent, id: "parent" }
+      ]
+    }))
+    const presentation = createRenderPresentation({ ...document, statements })
+
+    expect(presentation.statements).toHaveLength(statementCount)
+    expect(presentation.statements.every(({ checks }) => checks.length === 1)).toBe(true)
+  })
+
   it("escapes every HTML-sensitive author-text character", () => {
     const document = fixture("examples/minimal.json")
     const html = renderBytes({
@@ -263,18 +373,35 @@ describe("HTML rendering", () => {
   })
 
   it("refuses structural limits before deriving visible or copied cell text", () => {
-    const document = tableDocument(renderLimits.columns, 1)
-    const statement = document.statements[0]
-    const item = statement?.items[0]
-    if (statement === undefined || item === undefined) throw new Error("Boundary fixture lost its item")
-    Object.defineProperty(item, "label", {
-      get: () => { throw new Error("cell text was derived before structural refusal") }
-    })
+    const failOnCalculation = (document: Document): Document => {
+      const statement = document.statements[0]
+      const parent = statement?.items[0]
+      const child = statement?.items[1]
+      if (statement === undefined || parent === undefined || child === undefined) {
+        throw new Error("Boundary fixture lost its items")
+      }
+      const rollupChild = { ...child, rollupTo: parent.id }
+      Object.defineProperty(rollupChild, "values", {
+        get: () => { throw new Error("calculations ran before structural refusal") }
+      })
+      return {
+        ...document,
+        statements: [{
+          ...statement,
+          items: [parent, rollupChild, ...statement.items.slice(2)]
+        }]
+      }
+    }
 
-    expect(renderHtml(document)).toEqual({
+    expect(renderHtml(failOnCalculation(tableDocument(renderLimits.columns, 2)))).toEqual({
       ok: false,
       budget: "columns",
       limit: renderLimits.columns
+    })
+    expect(renderHtml(failOnCalculation(tableDocument(99, 1_000)))).toEqual({
+      ok: false,
+      budget: "grid-slots",
+      limit: renderLimits.gridSlots
     })
   })
 

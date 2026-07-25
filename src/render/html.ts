@@ -34,40 +34,28 @@ export const html = (
   return { [templateParts]: parts }
 }
 
+const escapeReplacements = {
+  "&": { escaped: "&amp;", byteDelta: 4 },
+  "<": { escaped: "&lt;", byteDelta: 3 },
+  ">": { escaped: "&gt;", byteDelta: 3 },
+  '"': { escaped: "&quot;", byteDelta: 5 },
+  "'": { escaped: "&#39;", byteDelta: 4 }
+} as const
+
+type EscapableCharacter = keyof typeof escapeReplacements
+
+const escapePattern = /[&<>"']/gu
+
 const escapeHtml = (text: string): string =>
-  text.replace(/[&<>"']/gu, (character) => {
-    switch (character) {
-      case "&":
-        return "&amp;"
-      case "<":
-        return "&lt;"
-      case ">":
-        return "&gt;"
-      case '"':
-        return "&quot;"
-      case "'":
-        return "&#39;"
-      default:
-        return character
-    }
-  })
+  text.replace(
+    escapePattern,
+    (character) => escapeReplacements[character as EscapableCharacter].escaped
+  )
 
 const escapedByteLength = (text: string): number => {
   let bytes = Buffer.byteLength(text, "utf8")
-  for (const character of text.matchAll(/[&<>"']/gu)) {
-    switch (character[0]) {
-      case "&":
-      case "'":
-        bytes += 4
-        break
-      case "<":
-      case ">":
-        bytes += 3
-        break
-      case '"':
-        bytes += 5
-        break
-    }
+  for (const [character] of text.matchAll(escapePattern)) {
+    bytes += escapeReplacements[character as EscapableCharacter].byteDelta
   }
   return bytes
 }
