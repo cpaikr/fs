@@ -637,6 +637,7 @@ const behavior = html`  <script>
       tooltip.hidden = true;
       document.body.append(tooltip);
       let tooltipTimer = 0;
+      let anchorFrame = 0;
       let describedCell = null;
 
       const describeCell = (cell) => {
@@ -656,6 +657,10 @@ const behavior = html`  <script>
 
       const hideTooltip = () => {
         window.clearTimeout(tooltipTimer);
+        if (anchorFrame !== 0) {
+          window.cancelAnimationFrame(anchorFrame);
+          anchorFrame = 0;
+        }
         tooltip.hidden = true;
         describeCell(null);
       };
@@ -714,9 +719,15 @@ const behavior = html`  <script>
         // the cell itself is scrolled offscreen the tooltip hides rather than
         // floating detached at the viewport edge.
         if (describedCell !== null && document.activeElement === describedCell) {
-          const anchor = describedCell.getBoundingClientRect();
-          if (anchor.bottom < 0 || anchor.top > window.innerHeight) tooltip.hidden = true;
-          else showTooltip(describedCell);
+          if (anchorFrame !== 0) return;
+          anchorFrame = window.requestAnimationFrame(() => {
+            anchorFrame = 0;
+            const cell = describedCell;
+            if (cell === null || document.activeElement !== cell) return;
+            const anchor = cell.getBoundingClientRect();
+            if (anchor.bottom < 0 || anchor.top > window.innerHeight) tooltip.hidden = true;
+            else showTooltip(cell);
+          });
           return;
         }
         hideTooltip();

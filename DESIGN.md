@@ -61,15 +61,16 @@ stay ordinary ink; status colors are always paired with a glyph (`=`, `≠`,
 ## Document Topology
 
 - A masthead identifies the entity and scope (serif h1) and carries a
-  document-level rollup-check summary (count and outcome). When any check is
-  not satisfied, the summary links to the first failing statement's check
-  disclosure, so the document's most important signal is one activation from
-  its proof.
+  document-level rollup-check summary (count and outcome). The summary uses
+  `≠` when any check is not satisfied, otherwise `!` when a check could not be
+  evaluated. In either case it links to the first statement carrying an issue,
+  so the document's most important signal is one activation from its proof.
 - A sticky horizontal index links every statement in document order; the fixed
   script marks the statement currently in view with a claret underline, and
   the scrolled-to-end position marks the last statement, which the observer
   band alone cannot reach. A statement with not-satisfied checks carries a
-  small `≠` flag (with visually hidden text) in its index link.
+  small `≠` flag in its index link; one whose only issue is an unevaluable
+  check carries `!`. Both flags include visually hidden text.
 - Each statement section holds, in order: an ordinal-prefixed serif title, a
   progressive table-tools row, one native table, a rollup-checks disclosure
   (when the statement has rollups), and one handoff area.

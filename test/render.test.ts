@@ -161,6 +161,16 @@ describe("HTML rendering", () => {
     expect(html).toContain('<span class="item-description">Primary &lt;liquidity&gt;</span>')
   })
 
+  it("coalesces focused-cell tooltip re-anchoring into one animation frame", () => {
+    const html = renderBytes(fixture("examples/minimal.json")).toString("utf8")
+
+    expect(html).toContain("let anchorFrame = 0;")
+    expect(html).toContain("window.cancelAnimationFrame(anchorFrame);")
+    expect(html).toContain("if (anchorFrame !== 0) return;")
+    expect(html).toContain("anchorFrame = window.requestAnimationFrame(() => {")
+    expect(html).toContain("const cell = describedCell;")
+  })
+
   it("streams exact per-statement TSV with an unconditional Unit column", () => {
     const html = renderBytes(fixture("fixtures/valid/render-presentation.json")).toString("utf8")
 
