@@ -40,8 +40,8 @@ boundary, run:
 pnpm render:example
 ```
 
-This renders `examples/manufacturing-group.json` and replaces only
-`examples/manufacturing-group.html` and `examples/minimal.html`.
+This renders `examples/manufacturing-group.json` and `examples/minimal.json`,
+replacing only their corresponding HTML previews.
 
 ## Validate changes
 

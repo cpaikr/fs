@@ -1,6 +1,6 @@
 # Remove User-Defined Groupings
 
-Status: Accepted for `0.2`; implementation pending.
+Status: Accepted and implemented for `0.2`.
 
 FS `0.1` allowed optional document-local grouping columns and required every
 item to carry a matching grouping map. These opaque annotations could travel
