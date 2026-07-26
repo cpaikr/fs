@@ -104,6 +104,8 @@ describe("HTML rendering", () => {
 
     expect(html).toContain('<th scope="col" class="col-text" data-col="g0">Valuation</th>')
     expect(html).toContain('<td class="metadata col-text" data-col="g1">Working &lt;Capital&gt;</td>')
+    expect(html.match(/<th scope="col" class="col-text" data-col="g1">/gu)).toHaveLength(2)
+    expect(html).toContain('<td class="metadata col-text" data-col="g1">Summary</td>')
     expect(html).not.toContain("colspan")
     expect(html).not.toContain("rowgroup")
     expect(html).not.toContain('class="row-parent')
@@ -126,7 +128,10 @@ describe("HTML rendering", () => {
     expect(html).toContain('<main id="statements" tabindex="-1">')
     expect(html).toContain('(expanded ? "Collapse " : "Expand ") + label + " detail rows"')
     expect(html).toContain("data-table-tools hidden")
-    expect(html).toContain('data-col-toggle="unit" aria-pressed="true"')
+    expect(html).toContain('<label><input type="checkbox" checked data-col-toggle="unit"> Unit</label>')
+    expect(html).toContain("including any rows or columns hidden in this view")
+    expect(html).toContain("The FS JSON document is authoritative")
+    expect(html).not.toContain('<a class="doc-checks-link"')
     expect(html).not.toContain("data-rows-collapse>")
     expect(html.match(/<table id=/gu)).toHaveLength(2)
     expect(html.match(/data-copy-control data-copy-source=/gu)).toHaveLength(2)
@@ -248,8 +253,15 @@ describe("HTML rendering", () => {
     expect(html).toContain('data-parent-row="1"')
     expect(html).toContain('class="row-parent row-total"')
     expect(html).toContain('aria-label="Collapse Total detail rows"')
+    expect(html).toContain('<tr class="row-heading" data-parent-row="1">')
     expect(html).toContain('<span class="collapsed-count" hidden>· 1 row</span>')
     expect(html).toContain("Rollup checks — 1 · 1 not satisfied")
+    // The not-satisfied signal is navigable and pre-disclosed: the masthead
+    // count links to the failing statement's checks, the disclosure renders
+    // expanded, and the statement index carries a glyph-and-text flag.
+    expect(html).toContain('<a class="doc-checks-link" href="#statement-checks-1">')
+    expect(html).toContain('<details class="checks" id="statement-checks-1" open>')
+    expect(html).toContain('≠<span class="visually-hidden"> checks not satisfied</span>')
     expect(html).toContain('<th scope="row">Total = Child</th>')
     // The embedded snapshot claims this check is satisfied; the rendered result
     // must come from a fresh calculation over the document instead.
@@ -297,6 +309,10 @@ describe("HTML rendering", () => {
       '<span class="check-glyph" data-status="error">!</span> 1 rollup check · 1 not checked'
     )
     expect(notChecked).toContain("Rollup checks — 1 · 1 not checked")
+    expect(notChecked).toContain('<details class="checks" id="statement-checks-1" open>')
+    expect(notChecked).toContain(
+      '!<span class="visually-hidden"> checks not checked</span>'
+    )
     expect(notChecked).toContain("! Not checked")
   })
 
@@ -438,6 +454,24 @@ describe("HTML rendering", () => {
   it("allows the total grid-slot boundary", () => {
     const rendered = renderHtml(tableDocument(99, 999))
     expect(rendered.ok).toBe(true)
+  })
+
+  it("counts derived group headings against the total grid-slot budget", () => {
+    const document = tableDocument(99, 999)
+    const statement = document.statements[0]
+    const parent = statement?.items.at(-1)
+    if (statement === undefined || parent === undefined) {
+      throw new Error("Heading boundary fixture lost its statement")
+    }
+    const items = statement.items.map((item, index) =>
+      index === statement.items.length - 1 ? item : { ...item, rollupTo: parent.id }
+    )
+
+    expect(renderHtml({ ...document, statements: [{ ...statement, items }] })).toEqual({
+      ok: false,
+      budget: "grid-slots",
+      limit: renderLimits.gridSlots
+    })
   })
 
   it("allows the exact encoded HTML byte boundary", () => {
