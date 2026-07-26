@@ -12,14 +12,15 @@ own any classification or mapping data outside FS.
 The change is a clean break from `0.1`: the `0.2` schema and reference CLI do
 not accept, convert, normalize, or otherwise support `0.1` documents.
 
-## Current state
+## Delivery state
 
-The repository schemas, runtime, renderer, examples, fixtures, CLI process
-contracts, generated guidance, and package-facing inputs implement the clean
-`0.2` contract. Legacy `0.1`, its schema URL, and both removed properties fail
-closed. The published npm package remains `0.1.0` until Release Please creates
-the breaking `0.2.0` release change; its immutable public `0.1` resources remain
-unchanged.
+At completion, the repository schemas, runtime, renderer, examples, fixtures,
+CLI process contracts, generated guidance, and package-facing inputs
+implemented the clean `0.2` contract. Legacy `0.1`, its schema URL, and both
+removed properties failed closed. The package version and published npm release
+remained `0.1.0`; Release Please retained ownership of the breaking `0.2.0`
+version change and generated release artifacts. Immutable public `0.1`
+resources were unchanged.
 
 ## Fixed decisions
 
@@ -111,12 +112,7 @@ candidate.
 the packed CLI acceptance corpus, writer crash/concurrency integration, package
 installation, and documentation/fixture checks. `pnpm pack:check`, the
 `author-fs` Skill validator, and `git diff --check` also passed. Independent
-implementation review found no unresolved issue after its safe fixes; package
-version, changelog, release manifest, tag, and release generation remain with
-Release Please.
-
-## Next action
-
-No live refactor action remains. Use the normal breaking-change and Release
-Please flow to prepare and publish `@sjunepark/fs@0.2.0` without modifying the
-immutable `0.1` resources.
+implementation review found no unresolved issue after its safe fixes. Release
+execution was left to the normal workflow in the
+[development guide](../development.md#release-management), outside this
+completed refactor.

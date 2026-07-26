@@ -58,17 +58,17 @@ repository-only guide is not part of the npm package.
 
 The source repository implements the breaking `0.2` artifact contract. The
 [completed refactor plan](https://github.com/cpaikr/fs/blob/main/docs/plans/remove-user-defined-groupings.md)
-records its delivery while npm still serves `0.1.0`.
+records its delivery and release handoff.
 
 ## Format contracts
 
-The target `@sjunepark/fs@0.2.0` package uses `formatVersion: "0.2"`. The
+`@sjunepark/fs@0.2.0` uses `formatVersion: "0.2"`. The
 [FS 0.2 semantic specification](https://cpaikr.github.io/fs/spec/0.2/) and
 [versioned document schema](https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json)
 define that contract.
 
-Until the target release is published, `@sjunepark/fs@0.1.0` remains the npm
-release and uses `formatVersion: "0.1"`. Its immutable
+The earlier `@sjunepark/fs@0.1.0` release uses `formatVersion: "0.1"`. Its
+immutable
 [FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/) and
 [versioned document schema](https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json)
 define the public contract.
