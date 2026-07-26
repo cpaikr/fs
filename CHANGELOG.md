@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.2.0](https://github.com/cpaikr/fs/compare/v0.1.0...v0.2.0) (2026-07-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove user-defined groupings
+
+### Features
+
+* add analyst-friendly HTML review and Excel handoff ([d5aad7a](https://github.com/cpaikr/fs/commit/d5aad7ad6ef835a7baf069ad4f07959e41869a5a))
+* **author-fs:** guide source input resolution ([c1cb71c](https://github.com/cpaikr/fs/commit/c1cb71c2d395f635acfb785f966cba0af9156f9d))
+* **author-fs:** guide source input resolution ([37a488d](https://github.com/cpaikr/fs/commit/37a488d739ff2deab3c3dfebaf82d0e7220224cb))
+* **author-fs:** support delegated source resolution ([9983361](https://github.com/cpaikr/fs/commit/99833611b1292e14924f328d9747eee1d2c70a05))
+* remove user-defined groupings ([d8f9924](https://github.com/cpaikr/fs/commit/d8f9924c820fdf0f08f542da35ccfdc94213aec7))
+* **render:** add analyst review and Excel handoff ([0b4b1ac](https://github.com/cpaikr/fs/commit/0b4b1ac517831bee8da880ef87e43f76519e63b7))
+* **render:** add analyst review and Excel handoff ([82c110b](https://github.com/cpaikr/fs/commit/82c110bf6a860ecb1befd531990045a45ca9d7fe))
+* **render:** establish analyst HTML foundation ([77ffee6](https://github.com/cpaikr/fs/commit/77ffee6e00dcd9fe81e57de28192e6f20f29ed3f))
+* **render:** isolate HTML rendering seams ([845da91](https://github.com/cpaikr/fs/commit/845da9171f1d73df3ba062ed38e000fc3a5521f5))
+* **render:** redesign analyst folio presentation ([d2164ff](https://github.com/cpaikr/fs/commit/d2164ff9b8c505241d784ad8ac501fe4185c5251))
+* **render:** redesign analyst HTML with rollup hierarchy, validation display, and interactive tables ([70f8b8e](https://github.com/cpaikr/fs/commit/70f8b8eae3d9e8d38e3b2353ac20d1c489d655e2))
+* **render:** ship Folio analyst presentation ([8b1e509](https://github.com/cpaikr/fs/commit/8b1e509d20ef163617a163f8255f9d8f1d453df0))
+* **render:** ship Folio analyst presentation ([9f6f3b8](https://github.com/cpaikr/fs/commit/9f6f3b8a79b2d68196fd4336badc3c4deef1e1d4))
+
+
+### Bug Fixes
+
+* **ci:** harden synced release workflows ([8c06feb](https://github.com/cpaikr/fs/commit/8c06feba31493b53b1cd530078f96fb6087289c7))
+* **deps:** update fast-uri security patch ([166bd47](https://github.com/cpaikr/fs/commit/166bd47a3a0477a66b705ea1c189ee31d3fab69c))
+* **render:** address review correctness and accessibility ([1a10096](https://github.com/cpaikr/fs/commit/1a1009671366e402d33791e5d2b959fcefc235ff))
+* **render:** coalesce tooltip scroll anchoring ([3384c01](https://github.com/cpaikr/fs/commit/3384c01959841dcc669af20c2fbd7b58304169cd))
+* **render:** preserve browser interaction state ([ac545c9](https://github.com/cpaikr/fs/commit/ac545c9ca21648b1e13cc488a3acf7ff9f2f3c5f))
+* **render:** preserve exact spreadsheet handoff ([863596b](https://github.com/cpaikr/fs/commit/863596b1320a0d0fd04c67336eb159cf8ab57272))
+
 ## 0.1.0 (2026-07-18)
 
 
