@@ -29,7 +29,21 @@ export interface StatementCheck {
 export interface StatementPresentation {
   readonly statement: Statement
   readonly items: ReadonlyArray<ItemPresentation>
+  /**
+   * Group-heading rows derived from rollups: first subtree row index → the
+   * parent indexes (outermost first) whose contiguous subtree starts there.
+   */
+  readonly headings: ReadonlyMap<number, ReadonlyArray<number>>
+  readonly headingCount: number
   readonly checks: ReadonlyArray<StatementCheck>
+  /** Checks whose fresh application is not `satisfied` (unsatisfied or error). */
+  readonly unsatisfiedCheckCount: number
+  /**
+   * Declared grouping columns, in declaration order, that carry at least one
+   * value in this statement. An all-null column would render and copy as an
+   * empty column, so it is omitted per statement.
+   */
+  readonly groupingColumns: ReadonlyArray<string>
   readonly commonUnit: Unit | undefined
   readonly fixedColumnCount: number
   readonly ordinal: number
@@ -38,11 +52,11 @@ export interface StatementPresentation {
   readonly copySourceId: string
   readonly copyStatusId: string
   readonly copyHelpId: string
+  readonly checksId: string
 }
 
 export interface RenderPresentation {
   readonly document: Document
-  readonly groupingColumns: ReadonlyArray<string>
   readonly units: ReadonlyMap<string, Unit>
   readonly periods: ReadonlyMap<string, Document["periods"][number]>
   readonly calculations: CalculationResult
@@ -98,6 +112,43 @@ const presentItems = (
   })
 }
 
+const presentHeadings = (
+  items: ReadonlyArray<ItemPresentation>
+): ReadonlyMap<number, ReadonlyArray<number>> => {
+  const inSubtree = (candidate: number, root: number): boolean => {
+    let ancestor: number | undefined = candidate
+    while (ancestor !== undefined) {
+      if (ancestor === root) return true
+      ancestor = items[ancestor]?.parentIndex
+    }
+    return false
+  }
+  const headings = new Map<number, Array<number>>()
+  for (const [parentIndex, { isParent }] of items.entries()) {
+    if (!isParent) continue
+    let first = parentIndex
+    for (const [candidate] of items.entries()) {
+      if (candidate < first && inSubtree(candidate, parentIndex)) first = candidate
+    }
+    if (first === parentIndex) continue
+    const contiguous = items
+      .slice(first, parentIndex + 1)
+      .every((_, offset) => inSubtree(first + offset, parentIndex))
+    if (!contiguous) continue
+    const stack = headings.get(first) ?? []
+    stack.push(parentIndex)
+    headings.set(first, stack)
+  }
+  for (const stack of headings.values()) {
+    stack.sort((a, b) => {
+      const depthA = items[a]?.depth ?? 0
+      const depthB = items[b]?.depth ?? 0
+      return depthA - depthB
+    })
+  }
+  return headings
+}
+
 const presentChecks = (
   statement: Statement,
   calculations: CalculationResult,
@@ -117,10 +168,18 @@ const presentChecks = (
   return checks
 }
 
+const presentGroupingColumns = (
+  statement: Statement,
+  declared: ReadonlyArray<string>
+): ReadonlyArray<string> =>
+  declared.filter((column) =>
+    statement.items.some((item) => typeof item.groupings[column] === "string")
+  )
+
 export const createRenderPresentation = (document: Document): RenderPresentation => {
   const units = new Map(document.units.map((unit) => [unit.id, unit]))
   const periods = new Map(document.periods.map((period) => [period.id, period]))
-  const groupingColumns = document.groupingColumns ?? []
+  const declaredGroupingColumns = document.groupingColumns ?? []
   const calculations = calculate(document)
   const statements = document.statements.map((statement, index): StatementPresentation => {
     const unitId = commonUnitId(statement)
@@ -129,10 +188,21 @@ export const createRenderPresentation = (document: Document): RenderPresentation
       throw new Error("Validated statement lost its unit")
     }
     const ordinal = index + 1
+    const items = presentItems(statement, units)
+    const headings = presentHeadings(items)
+    let headingCount = 0
+    for (const stack of headings.values()) headingCount += stack.length
+    const checks = presentChecks(statement, calculations, periods)
+    const groupingColumns = presentGroupingColumns(statement, declaredGroupingColumns)
     return {
       statement,
-      items: presentItems(statement, units),
-      checks: presentChecks(statement, calculations, periods),
+      items,
+      headings,
+      headingCount,
+      checks,
+      unsatisfiedCheckCount:
+        checks.filter(({ application }) => application.status !== "satisfied").length,
+      groupingColumns,
       commonUnit,
       fixedColumnCount: 1 + (commonUnit === undefined ? 1 : 0) + groupingColumns.length,
       ordinal,
@@ -140,9 +210,10 @@ export const createRenderPresentation = (document: Document): RenderPresentation
       tableId: `statement-table-${ordinal}`,
       copySourceId: `copy-source-${ordinal}`,
       copyStatusId: `copy-status-${ordinal}`,
-      copyHelpId: `copy-help-${ordinal}`
+      copyHelpId: `copy-help-${ordinal}`,
+      checksId: `statement-checks-${ordinal}`
     }
   })
 
-  return { document, groupingColumns, units, periods, calculations, statements }
+  return { document, units, periods, calculations, statements }
 }

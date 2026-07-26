@@ -58,8 +58,8 @@
       "id": "balance-sheet",
       "label": "Balance sheet",
       "periods": [
-        "at-2025",
-        "at-2024"
+        "at-2024",
+        "at-2025"
       ],
       "items": [
         {
@@ -150,8 +150,8 @@
       "id": "income-statement",
       "label": "Income statement",
       "periods": [
-        "fy2025",
-        "fy2024"
+        "fy2024",
+        "fy2025"
       ],
       "items": [
         {
@@ -272,8 +272,8 @@
       "id": "cash-flow-statement",
       "label": "Cash flow statement",
       "periods": [
-        "fy2025",
-        "fy2024"
+        "fy2024",
+        "fy2025"
       ],
       "items": [
         {
@@ -337,8 +337,8 @@
       "id": "equity-statement",
       "label": "Statement of changes in equity",
       "periods": [
-        "at-2025",
-        "at-2024"
+        "at-2024",
+        "at-2025"
       ],
       "items": [
         {
@@ -388,8 +388,8 @@
       "id": "manufacturing-statement",
       "label": "Manufacturing cost statement",
       "periods": [
-        "fy2025",
-        "fy2024"
+        "fy2024",
+        "fy2025"
       ],
       "items": [
         {

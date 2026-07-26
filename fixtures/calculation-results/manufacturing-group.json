@@ -11,11 +11,11 @@
         "key": {
           "statement": "balance-sheet",
           "parent": "assets",
-          "period": "at-2025"
+          "period": "at-2024"
         },
         "status": "satisfied",
-        "actual": "1000",
-        "expected": "1000",
+        "actual": "900",
+        "expected": "900",
         "difference": "0",
         "tolerance": "0"
       },
@@ -23,18 +23,6 @@
         "key": {
           "statement": "balance-sheet",
           "parent": "assets",
-          "period": "at-2024"
-        },
-        "status": "satisfied",
-        "actual": "900",
-        "expected": "900",
-        "difference": "0",
-        "tolerance": "0"
-      },
-      {
-        "key": {
-          "statement": "balance-sheet",
-          "parent": "liabilities-and-equity",
           "period": "at-2025"
         },
         "status": "satisfied",
@@ -57,13 +45,13 @@
       },
       {
         "key": {
-          "statement": "income-statement",
-          "parent": "revenue",
-          "period": "fy2025"
+          "statement": "balance-sheet",
+          "parent": "liabilities-and-equity",
+          "period": "at-2025"
         },
         "status": "satisfied",
-        "actual": "100",
-        "expected": "100",
+        "actual": "1000",
+        "expected": "1000",
         "difference": "0",
         "tolerance": "0"
       },
@@ -82,12 +70,12 @@
       {
         "key": {
           "statement": "income-statement",
-          "parent": "cost-of-sales",
+          "parent": "revenue",
           "period": "fy2025"
         },
         "status": "satisfied",
-        "actual": "-60",
-        "expected": "-60",
+        "actual": "100",
+        "expected": "100",
         "difference": "0",
         "tolerance": "0"
       },
@@ -106,13 +94,13 @@
       {
         "key": {
           "statement": "income-statement",
-          "parent": "gross-profit",
+          "parent": "cost-of-sales",
           "period": "fy2025"
         },
-        "status": "unsatisfied",
-        "actual": "41",
-        "expected": "40",
-        "difference": "1",
+        "status": "satisfied",
+        "actual": "-60",
+        "expected": "-60",
+        "difference": "0",
         "tolerance": "0"
       },
       {
@@ -124,6 +112,30 @@
         "status": "satisfied",
         "actual": "30",
         "expected": "30",
+        "difference": "0",
+        "tolerance": "0"
+      },
+      {
+        "key": {
+          "statement": "income-statement",
+          "parent": "gross-profit",
+          "period": "fy2025"
+        },
+        "status": "unsatisfied",
+        "actual": "41",
+        "expected": "40",
+        "difference": "1",
+        "tolerance": "0"
+      },
+      {
+        "key": {
+          "statement": "cash-flow-statement",
+          "parent": "net-cash-flow",
+          "period": "fy2024"
+        },
+        "status": "satisfied",
+        "actual": "15",
+        "expected": "15",
         "difference": "0",
         "tolerance": "0"
       },
@@ -141,13 +153,13 @@
       },
       {
         "key": {
-          "statement": "cash-flow-statement",
-          "parent": "net-cash-flow",
-          "period": "fy2024"
+          "statement": "equity-statement",
+          "parent": "total-equity",
+          "period": "at-2024"
         },
         "status": "satisfied",
-        "actual": "15",
-        "expected": "15",
+        "actual": "500",
+        "expected": "500",
         "difference": "0",
         "tolerance": "0"
       },
@@ -165,13 +177,13 @@
       },
       {
         "key": {
-          "statement": "equity-statement",
-          "parent": "total-equity",
-          "period": "at-2024"
+          "statement": "manufacturing-statement",
+          "parent": "manufacturing-cost",
+          "period": "fy2024"
         },
         "status": "satisfied",
-        "actual": "500",
-        "expected": "500",
+        "actual": "50",
+        "expected": "50",
         "difference": "0",
         "tolerance": "0"
       },
@@ -184,18 +196,6 @@
         "status": "satisfied",
         "actual": "60",
         "expected": "60",
-        "difference": "0",
-        "tolerance": "0"
-      },
-      {
-        "key": {
-          "statement": "manufacturing-statement",
-          "parent": "manufacturing-cost",
-          "period": "fy2024"
-        },
-        "status": "satisfied",
-        "actual": "50",
-        "expected": "50",
         "difference": "0",
         "tolerance": "0"
       }

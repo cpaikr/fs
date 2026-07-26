@@ -87,6 +87,10 @@ describe("HTML rendering", () => {
 
     expect(html).toContain('<th scope="col" class="col-text" data-col="g0">Valuation</th>')
     expect(html).toContain('<td class="metadata col-text" data-col="g1">Working &lt;Capital&gt;</td>')
+    // The second statement's valuation column is null for every item, so the
+    // all-empty column is omitted and ppt becomes its first grouping column.
+    expect(html.match(/<th scope="col" class="col-text" data-col="g1">/gu)).toHaveLength(1)
+    expect(html).toContain('<td class="metadata col-text" data-col="g0">Summary</td>')
     expect(html).not.toContain("colspan")
     expect(html).not.toContain("rowgroup")
     expect(html).not.toContain('class="row-parent')
@@ -107,7 +111,10 @@ describe("HTML rendering", () => {
     expect(html).toContain('aria-label="Copy Ordered &amp; escaped for Excel"')
     expect(html).toContain('role="status" aria-live="polite" aria-atomic="true"')
     expect(html).toContain("data-table-tools hidden")
-    expect(html).toContain('data-col-toggle="unit" aria-pressed="true"')
+    expect(html).toContain('<label><input type="checkbox" checked data-col-toggle="unit"> Unit</label>')
+    expect(html).toContain("including any rows or columns hidden in this view")
+    expect(html).toContain("The FS JSON document is authoritative")
+    expect(html).not.toContain('<a class="doc-checks-link"')
     expect(html).not.toContain("data-rows-collapse>")
     expect(html.match(/<table id=/gu)).toHaveLength(2)
     expect(html.match(/data-copy-control data-copy-source=/gu)).toHaveLength(2)
@@ -131,10 +138,12 @@ describe("HTML rendering", () => {
       "Cash <available>\tUSD <millions> (USD, scale 6)\tNWC & cash\t\t0\tMissing",
       "Inventory\tUSD <millions> (USD, scale 6)\tNWC\tWorking <Capital>\t-1.25\tUnavailable"
     ].join("\n"))
+    // Statement 2 declares valuation but every item value is null; the
+    // all-empty column leaves the TSV together with the visible table.
     expect(copySource(html, 2)).toBe([
-      "Item\tUnit\tvaluation\tppt\t2025-12-31",
-      "Amount\tUSD <millions> (USD, scale 6)\t\tSummary\t2.5",
-      "Count\tShares & units (shares, scale 0)\t\tSummary\t3"
+      "Item\tUnit\tppt\t2025-12-31",
+      "Amount\tUSD <millions> (USD, scale 6)\tSummary\t2.5",
+      "Count\tShares & units (shares, scale 0)\tSummary\t3"
     ].join("\n"))
     expect(copySource(html, 1)).not.toMatch(/\n$/u)
   })
@@ -162,7 +171,9 @@ describe("HTML rendering", () => {
           values: { fy2025: "-1.25" },
           groupings: {
             [firstGrouping]: "\u3000@Value\r\nLine",
-            [secondGrouping]: null,
+            // Non-null so the all-empty-column omission keeps this header in
+            // play; null-to-empty-cell copying is covered by the exact-TSV test.
+            [secondGrouping]: "Plain",
             [markupGrouping]: "</textarea><script>alert(\"x\")</script>&'"
           }
         }]
@@ -171,7 +182,7 @@ describe("HTML rendering", () => {
 
     expect(copySource(rendered, 1)).toBe([
       "Item\tUnit\t'\ufeff=Header One\t'\u00a0+Header Two\tmarkup\t2025-01-01 – 2025-12-31",
-      "'\u2003-Item Name\tUSD Label (Amount  Measure, scale 0)\t'\u3000@Value  Line\t\t</textarea><script>alert(\"x\")</script>&'\t-1.25"
+      "'\u2003-Item Name\tUSD Label (Amount  Measure, scale 0)\t'\u3000@Value  Line\tPlain\t</textarea><script>alert(\"x\")</script>&'\t-1.25"
     ].join("\n"))
     expect(rendered).toContain("&lt;/textarea&gt;&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&amp;&#39;")
     expect(rendered.match(/<script>/gu)).toHaveLength(1)
@@ -214,8 +225,15 @@ describe("HTML rendering", () => {
     expect(html).toContain('data-parent-row="1"')
     expect(html).toContain('class="row-parent row-total"')
     expect(html).toContain('aria-label="Collapse Total detail rows"')
+    expect(html).toContain('<tr class="row-heading" data-parent-row="1">')
     expect(html).toContain('<span class="collapsed-count" hidden>· 1 row</span>')
     expect(html).toContain("Rollup checks — 1 · 1 not satisfied")
+    // The not-satisfied signal is navigable and pre-disclosed: the masthead
+    // count links to the failing statement's checks, the disclosure renders
+    // expanded, and the statement index carries a glyph-and-text flag.
+    expect(html).toContain('<a class="doc-checks-link" href="#statement-checks-1">')
+    expect(html).toContain('<details class="checks" id="statement-checks-1" open>')
+    expect(html).toContain('≠<span class="visually-hidden"> checks not satisfied</span>')
     expect(html).toContain('<th scope="row">Total = Child</th>')
     // The embedded snapshot claims this check is satisfied; the rendered result
     // must come from a fresh calculation over the document instead.
