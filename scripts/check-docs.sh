@@ -6,7 +6,13 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 echo "Linting Markdown"
-pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist' '#CHANGELOG.md'
+pnpm exec markdownlint-cli2 \
+  '**/*.md' \
+  '#node_modules' \
+  '#dist' \
+  '#.tmp' \
+  '#.impeccable/critique' \
+  '#CHANGELOG.md'
 
 echo "Checking Markdown links"
 while IFS= read -r -d '' document; do
@@ -18,6 +24,7 @@ done < <(
   find . \
     -path './.git' -prune -o \
     -path './node_modules' -prune -o \
+    -path './.tmp' -prune -o \
     -path './CHANGELOG.md' -prune -o \
     -name '*.md' -print0
 )
@@ -89,6 +96,7 @@ echo "Parsing JSON artifacts"
 find . \
   -path './.git' -prune -o \
   -path './node_modules' -prune -o \
+  -path './.tmp' -prune -o \
   -path './fixtures/raw-input' -prune -o \
   -name '*.json' -print0 \
   | xargs -0 jq empty
