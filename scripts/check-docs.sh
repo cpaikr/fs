@@ -34,7 +34,8 @@ for expected_command in \
   'example' \
   'example minimal' \
   'validate candidate.json' \
-  'create --output statement.fs.json candidate.json'; do
+  'create --output statement.fs.json candidate.json' \
+  'render --output statement.html statement.fs.json'; do
   if [[ "$npx_guide" != *"npx -y $package_name@$package_version $expected_command"* ]]; then
     echo "Pinned npx guide rendering lost an expected command" >&2
     exit 1

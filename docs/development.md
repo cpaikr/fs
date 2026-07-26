@@ -33,6 +33,16 @@ node dist/bin.js validate examples/minimal.json
 The CLI reads bundled assets relative to the built package root. Running the
 compiled entry point is therefore the representative local boundary.
 
+To rebuild the tracked, multi-statement HTML preview through that same CLI
+boundary, run:
+
+```sh
+pnpm render:example
+```
+
+This renders `examples/manufacturing-group.json` and replaces only
+`examples/manufacturing-group.html`.
+
 ## Validate changes
 
 Use the narrowest relevant command while iterating, then run the complete gate

@@ -5,92 +5,709 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>A &amp; B &lt;Group&gt; — Scope &quot;quoted&quot;</title>
   <style>
-    :root { color-scheme: light; font-family: system-ui, sans-serif; }
-    body { color: #1f2937; margin: 2rem; }
-    header, main { max-width: 100%; }
-    h1 { margin: 0; }
-    .scope { color: #4b5563; margin: 0.5rem 0 2rem; }
-    section + section { margin-top: 2.5rem; }
-    .unit { color: #4b5563; }
-    .table-scroll { overflow-x: auto; }
-    table { border-collapse: collapse; min-width: 100%; }
-    th, td { border-bottom: 1px solid #d1d5db; padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
-    th:first-child, td:first-child, .metadata { text-align: left; }
-    thead th { border-bottom: 2px solid #6b7280; }
-    .missing, .unavailable { color: #6b7280; font-style: italic; }
+    :root {
+      color-scheme: light;
+      font-synthesis: none;
+      --bg: #eef0f1;
+      --surface: #ffffff;
+      --ink: #191b1e;
+      --ink-2: #565b61;
+      --hairline: #d8dadc;
+      --rule-strong: #191b1e;
+      --accent: #802636;
+      --accent-wash: #f5e9ec;
+      --ok: #216e3a;
+      --fail: #a4232b;
+      --warn: #7a5200;
+      --control-border: #82888e;
+      --hover-row: #f2f3f4;
+      --tooltip-bg: #191b1e;
+      --tooltip-ink: #ffffff;
+      --serif: ui-serif, Georgia, "Times New Roman", serif;
+      --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+      --z-sticky: 3;
+      --z-skip: 6;
+      --z-tooltip: 9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.45;
+      margin: 0;
+    }
+    [hidden] { display: none !important; }
+    a { color: var(--accent); text-underline-offset: 0.2em; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .skip-link {
+      background: var(--ink);
+      color: var(--surface);
+      left: 1rem;
+      padding: 0.75rem 1rem;
+      position: fixed;
+      top: 1rem;
+      transform: translateY(-200%);
+      z-index: var(--z-skip);
+    }
+    .skip-link:focus { transform: none; }
+    .document {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      margin: 2.5rem auto;
+      max-width: 90rem;
+    }
+    .masthead {
+      align-items: baseline;
+      border-bottom: 2px solid var(--rule-strong);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 2.5rem;
+      justify-content: space-between;
+      margin-inline: 3rem;
+      padding: 2rem 0 1.25rem;
+    }
+    h1, h2, p { margin-top: 0; }
+    h1, h2, .scope { overflow-wrap: anywhere; }
+    h1 {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.25rem;
+    }
+    .scope { color: var(--ink-2); font-size: 0.875rem; margin-bottom: 0; }
+    .doc-checks { color: var(--ink-2); font-size: 0.8125rem; margin-bottom: 0; text-align: right; }
+    .check-glyph { font-weight: 700; }
+    .check-glyph[data-status="satisfied"] { color: var(--ok); }
+    .check-glyph[data-status="unsatisfied"] { color: var(--fail); }
+    .check-glyph[data-status="error"] { color: var(--warn); }
+    .statement-index {
+      background: var(--surface);
+      border-bottom: 1px solid var(--hairline);
+      overflow-x: auto;
+      padding: 0 3rem;
+      position: sticky;
+      top: 0;
+      z-index: var(--z-sticky);
+    }
+    .statement-index ol {
+      display: flex;
+      gap: 1.75rem;
+      list-style: none;
+      margin: 0;
+      min-width: max-content;
+      padding: 0;
+    }
+    .statement-index a {
+      align-items: baseline;
+      border-bottom: 2px solid transparent;
+      color: var(--ink-2);
+      display: flex;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      gap: 0.5rem;
+      padding: 0.9rem 0;
+      text-decoration: none;
+    }
+    .statement-index a:hover { color: var(--ink); }
+    .statement-index a:focus-visible { outline-offset: -3px; }
+    .statement-index a[aria-current="location"] {
+      border-bottom-color: var(--accent);
+      color: var(--ink);
+    }
+    .index-number { font-variant-numeric: tabular-nums; }
+    .statement { padding: 2.25rem 3rem 2.75rem; scroll-margin-top: 3.5rem; }
+    .statement + .statement { border-top: 1px solid var(--hairline); }
+    h2 {
+      align-items: baseline;
+      display: flex;
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 600;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .ordinal {
+      color: var(--ink-2);
+      font-family: var(--sans);
+      font-size: 0.875rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .table-tools {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .tools-label { color: var(--ink-2); font-size: 0.75rem; margin-right: 0.25rem; }
+    .tools-spacer { flex: 1; }
+    .tool-toggle, .tool-button {
+      background: var(--surface);
+      border: 1px solid var(--control-border);
+      border-radius: 4px;
+      color: var(--ink);
+      cursor: pointer;
+      font: 500 0.8125rem var(--sans);
+      min-height: 2.25rem;
+      padding: 0.3rem 0.7rem;
+    }
+    .tool-toggle:hover, .tool-button:hover { border-color: var(--ink); }
+    .tool-toggle[aria-pressed="true"] {
+      background: var(--accent-wash);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .tool-toggle[aria-pressed="true"]::before { content: "✓ "; }
+    .tool-toggle[aria-pressed="false"] { color: var(--ink-2); }
+    .tool-toggle[aria-pressed="false"]::before { content: "○ "; }
+    .table-caption {
+      caption-side: top;
+      color: var(--ink-2);
+      font-size: 0.75rem;
+      padding: 0 0 0.6rem;
+      text-align: left;
+    }
+    .caption-inner { display: inline-block; left: 0; position: sticky; }
+    .overflow-cue { color: var(--ink-2); display: none; font-size: 0.75rem; margin-bottom: 0.5rem; }
+    .table-scroll { max-width: 100%; overflow-x: auto; }
+    .table-scroll:focus-visible { outline-offset: 2px; }
+    table { border-collapse: separate; border-spacing: 0; scroll-margin-top: 3.5rem; }
+    th, td {
+      border-bottom: 1px solid var(--hairline);
+      font-size: 0.8125rem;
+      font-weight: 400;
+      padding: 0.375rem 0.625rem;
+      vertical-align: baseline;
+      white-space: nowrap;
+    }
+    .col-text { text-align: left; }
+    thead th {
+      border-bottom: 2px solid var(--rule-strong);
+      color: var(--ink);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    tbody tr:hover > th, tbody tr:hover > td { background: var(--hover-row); }
+    tbody tr:last-child > th, tbody tr:last-child > td { border-bottom-color: var(--rule-strong); }
+    tbody th {
+      font-weight: 400;
+      min-width: 14rem;
+      text-align: left;
+      white-space: normal;
+    }
+    thead th:first-child, tbody th {
+      background: var(--surface);
+      box-shadow: inset -1px 0 var(--hairline);
+      left: 0;
+      position: sticky;
+      z-index: 1;
+    }
+    tbody tr:hover > th { background: var(--hover-row); }
+    .item-cell {
+      display: block;
+      padding-left: calc(1.15rem + var(--depth, 0) * 1.25rem);
+      position: relative;
+    }
+    .toggle-slot {
+      left: calc(var(--depth, 0) * 1.25rem - 0.2rem);
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .row-toggle {
+      background: none;
+      border: 0;
+      border-radius: 2px;
+      color: var(--ink-2);
+      cursor: pointer;
+      font: inherit;
+      line-height: 1;
+      padding: 0.35rem;
+    }
+    .row-toggle::before {
+      content: "▾";
+      display: inline-block;
+      transition: transform 120ms ease-out;
+    }
+    .row-toggle:hover { color: var(--accent); }
+    .row-toggle[aria-expanded="false"]::before { transform: rotate(-90deg); }
+    .collapsed-count { color: var(--ink-2); font-size: 0.75rem; }
+    .item-description {
+      color: var(--ink-2);
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin-top: 0.1rem;
+    }
+    .row-parent > th, .row-parent > td { border-top: 1px solid var(--rule-strong); font-weight: 650; }
+    .row-total > th, .row-total > td { border-bottom: 3px double var(--rule-strong); }
+    tbody tr:first-child > th, tbody tr:first-child > td { border-top: 0; }
+    tbody tr:has(+ .row-parent) > th, tbody tr:has(+ .row-parent) > td { border-bottom: 0; }
+    th.col-num, td.col-num, .value { text-align: right; }
+    th.col-num { min-width: 6.5rem; }
+    td.col-num, .value { padding-left: 1.5rem; }
+    .value { font-variant-numeric: tabular-nums; }
+    .metadata, .missing, .unavailable { color: var(--ink-2); }
+    .missing, .unavailable { font-style: italic; text-align: right; }
+    .checks { border-bottom: 1px solid var(--hairline); margin-top: 1.25rem; }
+    .checks summary {
+      color: var(--ink-2);
+      cursor: pointer;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.6rem 0;
+    }
+    .checks summary:hover { color: var(--ink); }
+    .checks[open] summary { color: var(--ink); }
+    .check-table { margin: 0.25rem 0 1rem; min-width: 0; }
+    .check-table thead th { border-bottom-width: 1px; }
+    .check-table tbody th { font-weight: 400; min-width: 0; }
+    .check-status { white-space: nowrap; }
+    .check-status[data-status="satisfied"] { color: var(--ok); }
+    .check-status[data-status="unsatisfied"] { color: var(--fail); font-weight: 650; }
+    .check-status[data-status="error"] { color: var(--warn); }
+    .handoff {
+      align-items: baseline;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      margin-top: 1.25rem;
+    }
+    .copy-button {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      color: var(--accent);
+      cursor: pointer;
+      font: 600 0.875rem var(--sans);
+      min-height: 44px;
+      padding: 0.6rem 1rem;
+    }
+    .copy-button:hover { background: var(--accent-wash); }
+    .copy-status { font-size: 0.8125rem; font-weight: 600; min-height: 1.25rem; min-width: 9rem; }
+    .copy-status[data-state="failure"] { color: var(--fail); }
+    .copy-status[data-state="success"] { color: var(--ok); }
+    .copy-help { color: var(--ink-2); font-size: 0.75rem; margin-bottom: 0; }
+    .native-table-link { align-items: center; display: inline-flex; font-size: 0.8125rem; margin-left: auto; min-height: 44px; white-space: nowrap; }
+    .copy-source { display: none; }
+    .tooltip {
+      background: var(--tooltip-bg);
+      border-radius: 4px;
+      color: var(--tooltip-ink);
+      font-size: 0.75rem;
+      line-height: 1.5;
+      max-width: 24rem;
+      padding: 0.5rem 0.75rem;
+      pointer-events: none;
+      position: fixed;
+      z-index: var(--z-tooltip);
+    }
+    .tooltip strong { font-weight: 600; }
+    @media (max-width: 64rem) {
+      .document { border: 0; margin: 0; }
+      .masthead { margin-inline: 1.5rem; }
+      .statement-index { padding-inline: 1.5rem; }
+      .statement { padding-inline: 1.5rem; }
+    }
+    @media (max-width: 44rem) {
+      .masthead { flex-direction: column; margin-inline: 1rem; padding-top: 1.25rem; }
+      .doc-checks { text-align: left; }
+      .statement-index { padding-inline: 1rem; }
+      .statement { padding: 1.5rem 1rem 2rem; }
+      .overflow-cue { display: block; }
+      .handoff { align-items: flex-start; flex-direction: column; }
+      .native-table-link { white-space: normal; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .row-toggle::before { transition: none; }
+    }
+    @media print {
+      :root {
+        --bg: #fff;
+        --surface: #fff;
+        --ink: #000;
+        --ink-2: #333;
+        --hairline: #999;
+        --rule-strong: #000;
+        --accent: #000;
+        --hover-row: #fff;
+      }
+      body, .document { background: #fff; border: 0; margin: 0; }
+      .skip-link, .statement-index, .table-tools, .overflow-cue, .handoff, .copy-source, .tooltip, .row-toggle, .collapsed-count { display: none !important; }
+      tbody tr[hidden] { display: table-row !important; }
+      th[data-col][hidden], td[data-col][hidden] { display: table-cell !important; }
+      thead th:first-child, tbody th { box-shadow: none; position: static; }
+      .masthead { margin-inline: 0; }
+      .statement { break-before: page; padding-inline: 0; }
+      .statement:first-child { break-before: auto; }
+      .table-scroll { overflow: visible; }
+      thead { display: table-header-group; }
+      tr { break-inside: avoid; }
+      a { color: #000; text-decoration: none; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>A &amp; B &lt;Group&gt;</h1>
-    <p class="scope">Scope &quot;quoted&quot;</p>
-  </header>
-  <main>
-    <section>
-      <h2>Ordered &amp; escaped</h2>
-      <p class="unit">Unit: USD &lt;millions&gt; (USD, scale 6)</p>
-      <div class="table-scroll">
-        <table>
+  <a class="skip-link" href="#statements">Skip to statements</a>
+  <div class="document">
+    <header class="masthead">
+      <div>
+        <h1>A &amp; B &lt;Group&gt;</h1>
+        <p class="scope">Scope &quot;quoted&quot;</p>
+      </div>
+      <p class="doc-checks">No rollup checks defined</p>
+    </header>
+    <nav class="statement-index" aria-label="Statements">
+      <ol>
+        <li><a href="#statement-1"><span class="index-number">01</span><span>Ordered &amp; escaped</span></a></li>
+        <li><a href="#statement-2"><span class="index-number">02</span><span>Mixed units</span></a></li>
+      </ol>
+    </nav>
+    <main id="statements" tabindex="-1">
+    <section class="statement" id="statement-1">
+      <h2><span class="ordinal">01</span>Ordered &amp; escaped</h2>
+        <div class="table-tools" data-table-tools hidden>
+          <span class="tools-label">Columns</span>
+          <button class="tool-toggle" type="button" data-col-toggle="g0" aria-pressed="true">Valuation</button>
+          <button class="tool-toggle" type="button" data-col-toggle="g1" aria-pressed="true">Ppt</button>
+        </div>
+      <p class="overflow-cue">Scroll horizontally to review all columns.</p>
+      <div class="table-scroll" role="region" aria-label="Ordered &amp; escaped table. Scroll horizontally to review all columns." tabindex="0">
+        <table id="statement-table-1" data-statement-table data-common-unit="USD &lt;millions&gt; (USD, scale 6)">
+          <caption class="table-caption"><span class="caption-inner">Ordered &amp; escaped — Unit: USD &lt;millions&gt; (USD, scale 6)</span></caption>
           <thead>
             <tr>
-              <th scope="col">Item</th>
-              <th scope="col">valuation</th>
-              <th scope="col">ppt</th>
-              <th scope="col">2025-12-31</th>
-              <th scope="col">2024-12-31</th>
+              <th scope="col" class="col-text">Item</th>
+              <th scope="col" class="col-text" data-col="g0">Valuation</th>
+              <th scope="col" class="col-text" data-col="g1">Ppt</th>
+              <th scope="col" class="col-num">2025-12-31</th>
+              <th scope="col" class="col-num">2024-12-31</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">Cash &lt;available&gt;</th>
-              <td class="metadata">NWC &amp; cash</td>
-              <td class="metadata">—</td>
+              <tr data-row="0">
+                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Cash &lt;available&gt;</span></span></th>
+                <td class="metadata col-text" data-col="g0">NWC &amp; cash</td>
+                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">0</td>
               <td class="missing">Missing</td>
-            </tr>
-            <tr>
-              <th scope="row">Inventory</th>
-              <td class="metadata">NWC</td>
-              <td class="metadata">Working &lt;Capital&gt;</td>
+              </tr>
+              <tr data-row="1">
+                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Inventory</span></span></th>
+                <td class="metadata col-text" data-col="g0">NWC</td>
+                <td class="metadata col-text" data-col="g1">Working &lt;Capital&gt;</td>
               <td class="value">-1.25</td>
               <td class="unavailable">Unavailable</td>
-            </tr>
+              </tr>
           </tbody>
         </table>
       </div>
+      <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tvaluation\tppt\t2025-12-31\t2024-12-31\nCash &lt;available&gt;\tUSD &lt;millions&gt; (USD, scale 6)\tNWC &amp; cash\t\t0\tMissing\nInventory\tUSD &lt;millions&gt; (USD, scale 6)\tNWC\tWorking &lt;Capital&gt;\t-1.25\tUnavailable"</textarea>
+      <div class="handoff" data-copy-handoff hidden>
+        <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-1" data-copy-status="copy-status-1" aria-describedby="copy-help-1" aria-label="Copy Ordered &amp; escaped for Excel">Copy for Excel</button>
+        <span class="copy-status" id="copy-status-1" role="status" aria-live="polite" aria-atomic="true"></span>
+        <p class="copy-help" id="copy-help-1">Copies this statement as tab-separated values for spreadsheet review.</p>
+        <a class="native-table-link" href="#statement-table-1">View native table</a>
+      </div>
     </section>
-    <section>
-      <h2>Mixed units</h2>
-      <div class="table-scroll">
-        <table>
+    <section class="statement" id="statement-2">
+      <h2><span class="ordinal">02</span>Mixed units</h2>
+        <div class="table-tools" data-table-tools hidden>
+          <span class="tools-label">Columns</span>
+          <button class="tool-toggle" type="button" data-col-toggle="unit" aria-pressed="true">Unit</button>
+          <button class="tool-toggle" type="button" data-col-toggle="g0" aria-pressed="true">Valuation</button>
+          <button class="tool-toggle" type="button" data-col-toggle="g1" aria-pressed="true">Ppt</button>
+        </div>
+      <p class="overflow-cue">Scroll horizontally to review all columns.</p>
+      <div class="table-scroll" role="region" aria-label="Mixed units table. Scroll horizontally to review all columns." tabindex="0">
+        <table id="statement-table-2" data-statement-table>
+          <caption class="table-caption"><span class="caption-inner">Mixed units — Units shown by item</span></caption>
           <thead>
             <tr>
-              <th scope="col">Item</th>
-              <th scope="col">Unit</th>
-              <th scope="col">valuation</th>
-              <th scope="col">ppt</th>
-              <th scope="col">2025-12-31</th>
+              <th scope="col" class="col-text">Item</th>
+              <th scope="col" class="col-text" data-col="unit">Unit</th>
+              <th scope="col" class="col-text" data-col="g0">Valuation</th>
+              <th scope="col" class="col-text" data-col="g1">Ppt</th>
+              <th scope="col" class="col-num">2025-12-31</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row">Amount</th>
-              <td class="metadata">USD &lt;millions&gt; (USD, scale 6)</td>
-              <td class="metadata">—</td>
-              <td class="metadata">Summary</td>
+              <tr data-row="0">
+                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Amount</span></span></th>
+                <td class="metadata col-text" data-col="unit" data-unit-full="USD &lt;millions&gt; (USD, scale 6)">USD &lt;millions&gt;</td>
+                <td class="metadata col-text" data-col="g0">—</td>
+                <td class="metadata col-text" data-col="g1">Summary</td>
               <td class="value">2.5</td>
-            </tr>
-            <tr>
-              <th scope="row">Count</th>
-              <td class="metadata">Shares &amp; units (shares, scale 0)</td>
-              <td class="metadata">—</td>
-              <td class="metadata">Summary</td>
+              </tr>
+              <tr data-row="1">
+                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Count</span></span></th>
+                <td class="metadata col-text" data-col="unit" data-unit-full="Shares &amp; units (shares, scale 0)">Shares &amp; units</td>
+                <td class="metadata col-text" data-col="g0">—</td>
+                <td class="metadata col-text" data-col="g1">Summary</td>
               <td class="value">3</td>
-            </tr>
+              </tr>
           </tbody>
         </table>
       </div>
+      <textarea class="copy-source" id="copy-source-2" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tvaluation\tppt\t2025-12-31\nAmount\tUSD &lt;millions&gt; (USD, scale 6)\t\tSummary\t2.5\nCount\tShares &amp; units (shares, scale 0)\t\tSummary\t3"</textarea>
+      <div class="handoff" data-copy-handoff hidden>
+        <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-2" data-copy-status="copy-status-2" aria-describedby="copy-help-2" aria-label="Copy Mixed units for Excel">Copy for Excel</button>
+        <span class="copy-status" id="copy-status-2" role="status" aria-live="polite" aria-atomic="true"></span>
+        <p class="copy-help" id="copy-help-2">Copies this statement as tab-separated values for spreadsheet review.</p>
+        <a class="native-table-link" href="#statement-table-2">View native table</a>
+      </div>
     </section>
-  </main>
+    </main>
+  <script>
+    (() => {
+      "use strict";
+
+      const fallbackCopy = (text, control) => {
+        const temporary = document.createElement("textarea");
+        temporary.value = text;
+        temporary.readOnly = true;
+        temporary.tabIndex = -1;
+        temporary.setAttribute("aria-hidden", "true");
+        temporary.style.position = "fixed";
+        temporary.style.left = "-9999px";
+        temporary.style.top = "0";
+        let copied = false;
+        try {
+          document.body.append(temporary);
+          temporary.focus();
+          temporary.select();
+          temporary.setSelectionRange(0, temporary.value.length);
+          copied = document.execCommand("copy");
+        } catch {
+          copied = false;
+        } finally {
+          temporary.remove();
+          control.focus();
+        }
+        return copied;
+      };
+
+      const copyText = async (text, control) => {
+        try {
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch {
+          return fallbackCopy(text, control);
+        }
+        return fallbackCopy(text, control);
+      };
+
+      for (const control of document.querySelectorAll("[data-copy-control]")) {
+        const source = document.getElementById(control.dataset.copySource || "");
+        const status = document.getElementById(control.dataset.copyStatus || "");
+        const handoff = control.closest("[data-copy-handoff]");
+        if (!(source instanceof HTMLTextAreaElement) || !(status instanceof HTMLElement) || !(handoff instanceof HTMLElement)) continue;
+
+        let text;
+        try {
+          const parsed = JSON.parse(source.value);
+          if (typeof parsed !== "string") continue;
+          text = parsed;
+        } catch {
+          continue;
+        }
+
+        let attempt = 0;
+        handoff.hidden = false;
+        control.addEventListener("click", async () => {
+          const currentAttempt = ++attempt;
+          status.dataset.state = "pending";
+          status.textContent = "Copying…";
+          const copied = await copyText(text, control);
+          window.setTimeout(() => {
+            if (currentAttempt !== attempt) return;
+            status.dataset.state = copied ? "success" : "failure";
+            status.textContent = copied ? "Copied" : "Copy failed. Use the native table instead.";
+          }, 0);
+        });
+      }
+
+      for (const table of document.querySelectorAll("[data-statement-table]")) {
+        const statement = table.closest(".statement");
+        if (!(statement instanceof HTMLElement)) continue;
+        const tools = statement.querySelector("[data-table-tools]");
+        const body = table.tBodies[0];
+        if (!(tools instanceof HTMLElement) || body === undefined) continue;
+        tools.hidden = false;
+
+        const setColumn = (toggle, shown) => {
+          toggle.setAttribute("aria-pressed", shown ? "true" : "false");
+          const key = toggle.dataset.colToggle || "";
+          for (const cell of table.querySelectorAll("[data-col]")) {
+            if (cell.dataset.col === key) cell.hidden = !shown;
+          }
+        };
+        const narrowViewport = window.matchMedia("(max-width: 44em)").matches;
+        for (const toggle of tools.querySelectorAll("[data-col-toggle]")) {
+          toggle.addEventListener("click", () => {
+            setColumn(toggle, toggle.getAttribute("aria-pressed") !== "true");
+          });
+          if (narrowViewport) setColumn(toggle, false);
+        }
+
+        const rows = Array.from(body.querySelectorAll("tr[data-row]"));
+        const rowByIndex = new Map(rows.map((row) => [row.dataset.row, row]));
+        const collapsed = new Set();
+
+        const applyRowState = () => {
+          for (const row of rows) {
+            let ancestor = row.dataset.parentRow;
+            let hidden = false;
+            while (ancestor !== undefined && !hidden) {
+              hidden = collapsed.has(ancestor);
+              ancestor = rowByIndex.get(ancestor)?.dataset.parentRow;
+            }
+            row.hidden = hidden;
+          }
+          for (const button of body.querySelectorAll("[data-row-toggle]")) {
+            const row = button.closest("tr");
+            if (!(row instanceof HTMLTableRowElement)) continue;
+            const expanded = !collapsed.has(row.dataset.row);
+            button.setAttribute("aria-expanded", expanded ? "true" : "false");
+            const label = row.querySelector(".item-label")?.textContent || "row";
+            button.setAttribute(
+              "aria-label",
+              (expanded ? "Collapse " : "Expand ") + label + " detail rows"
+            );
+            const count = row.querySelector(".collapsed-count");
+            if (count instanceof HTMLElement) count.hidden = expanded;
+          }
+        };
+
+        for (const button of body.querySelectorAll("[data-row-toggle]")) {
+          button.hidden = false;
+          button.addEventListener("click", () => {
+            const row = button.closest("tr");
+            if (!(row instanceof HTMLTableRowElement) || row.dataset.row === undefined) return;
+            if (collapsed.has(row.dataset.row)) collapsed.delete(row.dataset.row);
+            else collapsed.add(row.dataset.row);
+            applyRowState();
+          });
+        }
+
+        tools.querySelector("[data-rows-collapse]")?.addEventListener("click", () => {
+          for (const button of body.querySelectorAll("[data-row-toggle]")) {
+            const row = button.closest("tr");
+            if (row instanceof HTMLTableRowElement && row.dataset.row !== undefined) collapsed.add(row.dataset.row);
+          }
+          applyRowState();
+        });
+        tools.querySelector("[data-rows-expand]")?.addEventListener("click", () => {
+          collapsed.clear();
+          applyRowState();
+        });
+      }
+
+      const tooltip = document.createElement("div");
+      tooltip.className = "tooltip";
+      tooltip.setAttribute("aria-hidden", "true");
+      tooltip.hidden = true;
+      document.body.append(tooltip);
+      let tooltipTimer = 0;
+
+      const tooltipLine = (label, value) => {
+        const line = document.createElement("div");
+        const name = document.createElement("strong");
+        name.textContent = label + ": ";
+        line.append(name, value);
+        return line;
+      };
+
+      const hideTooltip = () => {
+        window.clearTimeout(tooltipTimer);
+        tooltip.hidden = true;
+      };
+
+      const showTooltip = (cell) => {
+        const row = cell.closest("tr");
+        const table = cell.closest("table");
+        if (!(row instanceof HTMLTableRowElement) || !(table instanceof HTMLTableElement)) return;
+        const headerRow = table.tHead?.rows[0];
+        const header = headerRow?.cells[cell.cellIndex];
+        if (header === undefined) return;
+
+        tooltip.replaceChildren();
+        const label = row.querySelector(".item-label");
+        if (label !== null) tooltip.append(tooltipLine("Item", label.textContent || ""));
+        tooltip.append(tooltipLine("Period", header.textContent || ""));
+        const unitCell = row.querySelector('[data-col="unit"]');
+        const unit = unitCell instanceof HTMLElement
+          ? unitCell.dataset.unitFull || unitCell.textContent || ""
+          : table.dataset.commonUnit || "";
+        if (unit !== "") tooltip.append(tooltipLine("Unit", unit));
+        if (headerRow !== undefined) {
+          for (const groupingHeader of headerRow.cells) {
+            const key = groupingHeader.dataset.col;
+            if (key === undefined || !key.startsWith("g")) continue;
+            const groupingCell = row.cells[groupingHeader.cellIndex];
+            if (groupingCell !== undefined) {
+              tooltip.append(tooltipLine(groupingHeader.textContent || "", groupingCell.textContent || ""));
+            }
+          }
+        }
+        tooltip.append(tooltipLine("Value", cell.textContent || ""));
+        const description = row.dataset.description;
+        if (description !== undefined) tooltip.append(tooltipLine("Description", description));
+
+        tooltip.hidden = false;
+        const anchor = cell.getBoundingClientRect();
+        const size = tooltip.getBoundingClientRect();
+        const left = Math.max(8, Math.min(anchor.right - size.width, window.innerWidth - size.width - 8));
+        const top = anchor.bottom + 6 + size.height > window.innerHeight
+          ? anchor.top - size.height - 6
+          : anchor.bottom + 6;
+        tooltip.style.left = left + "px";
+        tooltip.style.top = Math.max(8, top) + "px";
+      };
+
+      document.addEventListener("mouseover", (event) => {
+        if (!(event.target instanceof Element)) return;
+        const cell = event.target.closest("[data-statement-table] td.value, [data-statement-table] td.missing, [data-statement-table] td.unavailable");
+        window.clearTimeout(tooltipTimer);
+        if (!(cell instanceof HTMLTableCellElement)) {
+          tooltip.hidden = true;
+          return;
+        }
+        tooltipTimer = window.setTimeout(() => showTooltip(cell), 400);
+      });
+      document.addEventListener("scroll", hideTooltip, true);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") hideTooltip();
+      });
+
+      const indexLinks = new Map();
+      for (const link of document.querySelectorAll(".statement-index a[href^='#']")) {
+        indexLinks.set(link.getAttribute("href")?.slice(1), link);
+      }
+      if (indexLinks.size > 0 && typeof IntersectionObserver === "function") {
+        const observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            const link = indexLinks.get(entry.target.id);
+            if (link === undefined) continue;
+            if (entry.isIntersecting) {
+              for (const other of indexLinks.values()) other.removeAttribute("aria-current");
+              link.setAttribute("aria-current", "location");
+            }
+          }
+        }, { rootMargin: "-10% 0px -70% 0px" });
+        for (const id of indexLinks.keys()) {
+          const section = document.getElementById(id || "");
+          if (section !== null) observer.observe(section);
+        }
+      }
+    })();
+  </script>
+  </div>
 </body>
 </html>

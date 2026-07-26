@@ -1,11 +1,19 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Example Entity — Consolidated financial statements</title>
-  <style>
-    :root {
+import type { ApplicationResult, Unit, ValueCell } from "../validation/model.js"
+import { HtmlSink, html, type HtmlTemplate } from "./html.js"
+import type {
+  RenderPresentation,
+  StatementCheck,
+  StatementPresentation
+} from "./presentation.js"
+
+/*
+ * Visual direction: "Charter" — a modernized institutional annual report.
+ * Cool paper-gray canvas, white sheet, ink rules, system serif for identity
+ * only, claret as the single interaction accent. Hierarchy comes from
+ * typography, alignment, and accounting rules (single rule above subtotals,
+ * double rule below rollup roots) rather than fills or containers.
+ */
+const stylesheet = html`    :root {
       color-scheme: light;
       font-synthesis: none;
       --bg: #eef0f1;
@@ -348,93 +356,9 @@
       thead { display: table-header-group; }
       tr { break-inside: avoid; }
       a { color: #000; text-decoration: none; }
-    }
-  </style>
-</head>
-<body>
-  <a class="skip-link" href="#statements">Skip to statements</a>
-  <div class="document">
-    <header class="masthead">
-      <div>
-        <h1>Example Entity</h1>
-        <p class="scope">Consolidated financial statements</p>
-      </div>
-      <p class="doc-checks"><span class="check-glyph" data-status="unsatisfied">≠</span> 1 rollup check · 1 not satisfied</p>
-    </header>
-    <nav class="statement-index" aria-label="Statements">
-      <ol>
-        <li><a href="#statement-1"><span class="index-number">01</span><span>Statement</span></a></li>
-      </ol>
-    </nav>
-    <main id="statements" tabindex="-1">
-    <section class="statement" id="statement-1">
-      <h2><span class="ordinal">01</span>Statement</h2>
-        <div class="table-tools" data-table-tools hidden>
-          <span class="tools-spacer"></span>
-          <button class="tool-button" type="button" data-rows-collapse>Collapse all</button>
-          <button class="tool-button" type="button" data-rows-expand>Expand all</button>
-        </div>
-      <p class="overflow-cue">Scroll horizontally to review all columns.</p>
-      <div class="table-scroll" role="region" aria-label="Statement table. Scroll horizontally to review all columns." tabindex="0">
-        <table id="statement-table-1" data-statement-table data-common-unit="USD (USD, scale 0)">
-          <caption class="table-caption"><span class="caption-inner">Statement — Unit: USD (USD, scale 0)</span></caption>
-          <thead>
-            <tr>
-              <th scope="col" class="col-text">Item</th>
-              <th scope="col" class="col-num">2025-01-01 – 2025-12-31</th>
-            </tr>
-          </thead>
-          <tbody>
-              <tr data-row="0" data-parent-row="1" style="--depth: 1">
-                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Child</span></span></th>
-              <td class="value">10</td>
-              </tr>
-              <tr data-row="1" class="row-parent row-total">
-                <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Total detail rows"></button></span><span class="item-label">Total</span> <span class="collapsed-count" hidden>· 1 row</span></span></th>
-              <td class="value">11</td>
-              </tr>
-          </tbody>
-        </table>
-      </div>
-        <details class="checks">
-          <summary>Rollup checks — 1 · 1 not satisfied</summary>
-          <div class="table-scroll" role="region" aria-label="Statement rollup checks. Scroll horizontally to review all columns." tabindex="0">
-            <table class="check-table">
-              <thead>
-                <tr>
-                  <th scope="col" class="col-text">Check</th>
-                  <th scope="col" class="col-text">Period</th>
-                  <th scope="col" class="col-num">Actual</th>
-                  <th scope="col" class="col-num">Expected</th>
-                  <th scope="col" class="col-num">Difference</th>
-                  <th scope="col" class="col-num">Tolerance</th>
-                  <th scope="col" class="col-text">Result</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">Total = Child</th>
-                  <td class="metadata">2025-01-01 – 2025-12-31</td>
-                  <td class="value">11</td>
-                  <td class="value">10</td>
-                  <td class="value">1</td>
-                  <td class="value">0</td>
-<td class="check-status" data-status="unsatisfied">≠ Not satisfied</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </details>
-      <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\t2025-01-01 – 2025-12-31\nChild\tUSD (USD, scale 0)\t10\nTotal\tUSD (USD, scale 0)\t11"</textarea>
-      <div class="handoff" data-copy-handoff hidden>
-        <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-1" data-copy-status="copy-status-1" aria-describedby="copy-help-1" aria-label="Copy Statement for Excel">Copy for Excel</button>
-        <span class="copy-status" id="copy-status-1" role="status" aria-live="polite" aria-atomic="true"></span>
-        <p class="copy-help" id="copy-help-1">Copies this statement as tab-separated values for spreadsheet review.</p>
-        <a class="native-table-link" href="#statement-table-1">View native table</a>
-      </div>
-    </section>
-    </main>
-  <script>
+    }`
+
+const behavior = html`  <script>
     (() => {
       "use strict";
 
@@ -679,7 +603,420 @@
         }
       }
     })();
-  </script>
+  </script>`
+
+const spreadsheetControlPrefix = /^[\u0009-\u000d\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]*["=+\-@]/u
+
+const periodLabel = (period: RenderPresentation["document"]["periods"][number]): string =>
+  period.kind === "instant" ? period.date : `${period.start} – ${period.end}`
+
+const unitText = (unit: Unit): string => `${unit.label} (${unit.measure}, scale ${unit.scale})`
+
+/*
+ * Display-only transformations. Copied TSV keeps declared identifiers and
+ * exact decimal strings verbatim so spreadsheet handoff stays byte-exact.
+ */
+const groupingDisplayLabel = (identifier: string): string => {
+  if (!/^[A-Za-z][A-Za-z0-9]*$/u.test(identifier)) return identifier
+  const spaced = identifier
+    .replace(/([a-z0-9])([A-Z])/gu, "$1 $2")
+    .replace(/\b([A-Z])(?![A-Z])/gu, (_, letter: string) => letter.toLowerCase())
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1)
+}
+
+const groupDigits = (integer: string): string => {
+  const lead = integer.length % 3 || 3
+  let grouped = integer.slice(0, lead)
+  for (let index = lead; index < integer.length; index += 3) {
+    grouped += `,${integer.slice(index, index + 3)}`
+  }
+  return grouped
+}
+
+const displayDecimal = (value: string): string => {
+  // Validated documents cap decimals at 1,000 digits. Larger values only
+  // reach render as byte-budget probes; passing them through untouched keeps
+  // rendering from materializing new oversized strings before the sink
+  // rejects them.
+  if (value.length > 1_024) return value
+  const match = /^(-?)(\d+)((?:\.\d+)?)$/u.exec(value)
+  if (match === null) return value
+  const [, sign, integer, fraction] = match
+  if (sign === undefined || integer === undefined || fraction === undefined) return value
+  return `${sign}${groupDigits(integer)}${fraction}`
+}
+
+const authorTsvText = (text: string): string => {
+  const normalized = text.replace(/[\t\r\n]/gu, " ")
+  return spreadsheetControlPrefix.test(normalized) ? `'${normalized}` : normalized
+}
+
+const jsonStringFragment = (text: string): string => JSON.stringify(text).slice(1, -1)
+
+const groupingTemplate = (value: string | null | undefined): HtmlTemplate => {
+  if (value === null) return html`—`
+  if (value === undefined) throw new Error("Validated item lost its grouping value")
+  return html`${value}`
+}
+
+const appendValue = (sink: HtmlSink, value: ValueCell): void => {
+  if (value === null) {
+    sink.writeLine(html`              <td class="missing">Missing</td>`)
+  } else if (typeof value === "object") {
+    sink.writeLine(html`              <td class="unavailable">Unavailable</td>`)
+  } else {
+    sink.writeLine(html`              <td class="value">${displayDecimal(value)}</td>`)
+  }
+}
+
+const appendAuthorTsvCell = (sink: HtmlSink, value: string): void => {
+  sink.write(html`${jsonStringFragment(authorTsvText(value))}`)
+}
+
+const appendTsvValue = (sink: HtmlSink, value: ValueCell): void => {
+  if (value === null) {
+    sink.write(html`${jsonStringFragment("Missing")}`)
+  } else if (typeof value === "object") {
+    sink.write(html`${jsonStringFragment("Unavailable")}`)
+  } else {
+    sink.write(html`${jsonStringFragment(value)}`)
+  }
+}
+
+const appendTsvDelimiter = (sink: HtmlSink, value: "\t" | "\n"): void => {
+  sink.write(html`${jsonStringFragment(value)}`)
+}
+
+const appendCopySource = (
+  presentation: RenderPresentation,
+  statementPresentation: StatementPresentation,
+  sink: HtmlSink
+): void => {
+  const { statement, copySourceId } = statementPresentation
+  sink.write(html`      <textarea class="copy-source" id="${copySourceId}" readonly hidden aria-hidden="true" tabindex="-1">"`)
+  appendAuthorTsvCell(sink, "Item")
+  appendTsvDelimiter(sink, "\t")
+  appendAuthorTsvCell(sink, "Unit")
+  for (const grouping of presentation.groupingColumns) {
+    appendTsvDelimiter(sink, "\t")
+    appendAuthorTsvCell(sink, grouping)
+  }
+  for (const periodId of statement.periods) {
+    const period = presentation.periods.get(periodId)
+    if (period === undefined) throw new Error("Validated statement lost its period")
+    appendTsvDelimiter(sink, "\t")
+    appendAuthorTsvCell(sink, periodLabel(period))
+  }
+
+  for (const item of statement.items) {
+    appendTsvDelimiter(sink, "\n")
+    appendAuthorTsvCell(sink, item.label)
+    const unit = presentation.units.get(item.unit)
+    if (unit === undefined) throw new Error("Validated item lost its unit")
+    appendTsvDelimiter(sink, "\t")
+    appendAuthorTsvCell(sink, unitText(unit))
+    for (const grouping of presentation.groupingColumns) {
+      const value = item.groupings[grouping]
+      if (value === undefined) throw new Error("Validated item lost its grouping value")
+      appendTsvDelimiter(sink, "\t")
+      if (value !== null) appendAuthorTsvCell(sink, value)
+    }
+    for (const periodId of statement.periods) {
+      const value = item.values[periodId]
+      if (value === undefined) throw new Error("Validated item lost its period value")
+      appendTsvDelimiter(sink, "\t")
+      appendTsvValue(sink, value)
+    }
+    if (sink.exceeded) return
+  }
+  sink.writeLine(html`"</textarea>`)
+}
+
+const captionTemplate = ({ statement, commonUnit }: StatementPresentation): HtmlTemplate =>
+  commonUnit === undefined
+    ? html`${statement.label} — Units shown by item`
+    : html`${statement.label} — Unit: ${unitText(commonUnit)}`
+
+const checkStatus = (application: ApplicationResult): HtmlTemplate => {
+  switch (application.status) {
+    case "satisfied":
+      return html`<td class="check-status" data-status="satisfied">= Satisfied</td>`
+    case "unsatisfied":
+      return html`<td class="check-status" data-status="unsatisfied">≠ Not satisfied</td>`
+    case "error":
+      return html`<td class="check-status" data-status="error">! Not checked</td>`
+  }
+}
+
+const checkFormula = (check: StatementCheck): string =>
+  `${check.parent.label} = ${check.children.map(({ label }) => label).join(" + ")}`
+
+const checkIssueSummary = (
+  applications: ReadonlyArray<ApplicationResult>
+): string | undefined => {
+  const unsatisfied = applications.filter(({ status }) => status === "unsatisfied").length
+  const notChecked = applications.filter(({ status }) => status === "error").length
+  const issues = [
+    ...(unsatisfied === 0 ? [] : [`${unsatisfied} not satisfied`]),
+    ...(notChecked === 0 ? [] : [`${notChecked} not checked`])
+  ]
+  return issues.length === 0 ? undefined : issues.join(" · ")
+}
+
+const appendChecks = (
+  statementPresentation: StatementPresentation,
+  sink: HtmlSink
+): void => {
+  const { checks, statement } = statementPresentation
+  if (checks.length === 0) return
+  const issueSummary = checkIssueSummary(checks.map(({ application }) => application))
+  const summary = issueSummary === undefined
+    ? `${checks.length} · all satisfied`
+    : `${checks.length} · ${issueSummary}`
+  const itemsById = new Map(statement.items.map((item) => [item.id, item]))
+  sink.writeLine(html`        <details class="checks">
+          <summary>Rollup checks — ${summary}</summary>
+          <div class="table-scroll" role="region" aria-label="${statement.label} rollup checks. Scroll horizontally to review all columns." tabindex="0">
+            <table class="check-table">
+              <thead>
+                <tr>
+                  <th scope="col" class="col-text">Check</th>
+                  <th scope="col" class="col-text">Period</th>
+                  <th scope="col" class="col-num">Actual</th>
+                  <th scope="col" class="col-num">Expected</th>
+                  <th scope="col" class="col-num">Difference</th>
+                  <th scope="col" class="col-num">Tolerance</th>
+                  <th scope="col" class="col-text">Result</th>
+                </tr>
+              </thead>
+              <tbody>`)
+  for (const check of checks) {
+    const { application } = check
+    sink.writeLine(html`                <tr>
+                  <th scope="row">${checkFormula(check)}</th>
+                  <td class="metadata">${periodLabel(check.period)}</td>`)
+    if (application.status === "error") {
+      const cell = itemsById.get(application.cell.item)
+      const reason = application.reason === "missing-value" ? "missing" : "unavailable"
+      sink.writeLine(html`                  <td class="metadata col-text" colspan="4">Value for ${cell?.label ?? application.cell.item} is ${reason}</td>`)
+    } else {
+      sink.writeLine(html`                  <td class="value">${application.actual}</td>
+                  <td class="value">${application.expected}</td>
+                  <td class="value">${application.difference}</td>
+                  <td class="value">${application.tolerance}</td>`)
+    }
+    sink.writeLine(checkStatus(application))
+    sink.writeLine(html`                </tr>`)
+    if (sink.exceeded) return
+  }
+  sink.writeLine(html`              </tbody>
+            </table>
+          </div>
+        </details>`)
+}
+
+const appendTableTools = (
+  presentation: RenderPresentation,
+  statementPresentation: StatementPresentation,
+  sink: HtmlSink
+): void => {
+  const { commonUnit, items } = statementPresentation
+  const hasParents = items.some(({ isParent }) => isParent)
+  const hasColumnToggles = commonUnit === undefined || presentation.groupingColumns.length > 0
+  if (!hasParents && !hasColumnToggles) return
+  sink.writeLine(html`        <div class="table-tools" data-table-tools hidden>`)
+  if (hasColumnToggles) {
+    sink.writeLine(html`          <span class="tools-label">Columns</span>`)
+    if (commonUnit === undefined) {
+      sink.writeLine(html`          <button class="tool-toggle" type="button" data-col-toggle="unit" aria-pressed="true">Unit</button>`)
+    }
+    for (const [index, grouping] of presentation.groupingColumns.entries()) {
+      sink.writeLine(html`          <button class="tool-toggle" type="button" data-col-toggle="g${index}" aria-pressed="true">${groupingDisplayLabel(grouping)}</button>`)
+    }
+  }
+  if (hasParents) {
+    sink.writeLine(html`          <span class="tools-spacer"></span>
+          <button class="tool-button" type="button" data-rows-collapse>Collapse all</button>
+          <button class="tool-button" type="button" data-rows-expand>Expand all</button>`)
+  }
+  sink.writeLine(html`        </div>`)
+}
+
+const rowOpening = (
+  statementPresentation: StatementPresentation,
+  index: number
+): HtmlTemplate => {
+  const { items } = statementPresentation
+  const presentation = items[index]
+  if (presentation === undefined) throw new Error("Validated statement lost its item presentation")
+  const { item, depth, isParent, parentIndex } = presentation
+  const classes = [
+    ...(isParent ? ["row-parent"] : []),
+    ...(isParent && depth === 0 ? ["row-total"] : [])
+  ]
+  const classAttribute = classes.length === 0 ? html`` : html` class="${classes.join(" ")}"`
+  const parentAttribute = parentIndex === undefined ? html`` : html` data-parent-row="${parentIndex}"`
+  const depthAttribute = depth === 0 ? html`` : html` style="--depth: ${depth}"`
+  const descriptionAttribute = item.description === undefined
+    ? html``
+    : html` data-description="${item.description}"`
+  return html`              <tr data-row="${index}"${parentAttribute}${classAttribute}${depthAttribute}${descriptionAttribute}>`
+}
+
+const itemDescription = (description: string | undefined): HtmlTemplate =>
+  description === undefined
+    ? html``
+    : html`<span class="item-description">${description}</span>`
+
+const itemCell = (
+  statementPresentation: StatementPresentation,
+  index: number
+): HtmlTemplate => {
+  const presentation = statementPresentation.items[index]
+  if (presentation === undefined) throw new Error("Validated statement lost its item presentation")
+  const { item, isParent, descendantCount } = presentation
+  if (!isParent) {
+    return html`                <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">${item.label}</span>${itemDescription(item.description)}</span></th>`
+  }
+  return html`                <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse ${item.label} detail rows"></button></span><span class="item-label">${item.label}</span> <span class="collapsed-count" hidden>· ${descendantCount} ${descendantCount === 1 ? "row" : "rows"}</span>${itemDescription(item.description)}</span></th>`
+}
+
+const appendStatement = (
+  presentation: RenderPresentation,
+  statementPresentation: StatementPresentation,
+  sink: HtmlSink
+): void => {
+  const {
+    statement,
+    commonUnit,
+    ordinal,
+    anchorId,
+    tableId,
+    copySourceId,
+    copyStatusId,
+    copyHelpId
+  } = statementPresentation
+  const commonUnitAttribute = commonUnit === undefined
+    ? html``
+    : html` data-common-unit="${unitText(commonUnit)}"`
+  sink.writeLine(html`    <section class="statement" id="${anchorId}">
+      <h2><span class="ordinal">${String(ordinal).padStart(2, "0")}</span>${statement.label}</h2>`)
+  appendTableTools(presentation, statementPresentation, sink)
+  sink.writeLine(html`      <p class="overflow-cue">Scroll horizontally to review all columns.</p>
+      <div class="table-scroll" role="region" aria-label="${statement.label} table. Scroll horizontally to review all columns." tabindex="0">
+        <table id="${tableId}" data-statement-table${commonUnitAttribute}>
+          <caption class="table-caption"><span class="caption-inner">${captionTemplate(statementPresentation)}</span></caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-text">Item</th>`)
+  if (commonUnit === undefined) sink.writeLine(html`              <th scope="col" class="col-text" data-col="unit">Unit</th>`)
+  for (const [index, grouping] of presentation.groupingColumns.entries()) {
+    sink.writeLine(html`              <th scope="col" class="col-text" data-col="g${index}">${groupingDisplayLabel(grouping)}</th>`)
+  }
+  for (const periodId of statement.periods) {
+    const period = presentation.periods.get(periodId)
+    if (period === undefined) throw new Error("Validated statement lost its period")
+    sink.writeLine(html`              <th scope="col" class="col-num">${periodLabel(period)}</th>`)
+  }
+  sink.writeLine(html`            </tr>
+          </thead>
+          <tbody>`)
+
+  for (const [index, itemPresentation] of statementPresentation.items.entries()) {
+    const { item, unit } = itemPresentation
+    sink.writeLine(rowOpening(statementPresentation, index))
+    sink.writeLine(itemCell(statementPresentation, index))
+    if (commonUnit === undefined) {
+      sink.writeLine(html`                <td class="metadata col-text" data-col="unit" data-unit-full="${unitText(unit)}">${unit.label}</td>`)
+    }
+    for (const [groupingIndex, grouping] of presentation.groupingColumns.entries()) {
+      sink.writeLine(html`                <td class="metadata col-text" data-col="g${groupingIndex}">${groupingTemplate(item.groupings[grouping])}</td>`)
+    }
+    for (const period of statement.periods) {
+      const value = item.values[period]
+      if (value === undefined) throw new Error("Validated item lost its period value")
+      appendValue(sink, value)
+    }
+    sink.writeLine(html`              </tr>`)
+    if (sink.exceeded) return
+  }
+
+  sink.writeLine(html`          </tbody>
+        </table>
+      </div>`)
+  appendChecks(statementPresentation, sink)
+  if (sink.exceeded) return
+  appendCopySource(presentation, statementPresentation, sink)
+  if (sink.exceeded) return
+  sink.writeLine(html`      <div class="handoff" data-copy-handoff hidden>
+        <button class="copy-button" type="button" data-copy-control data-copy-source="${copySourceId}" data-copy-status="${copyStatusId}" aria-describedby="${copyHelpId}" aria-label="Copy ${statement.label} for Excel">Copy for Excel</button>
+        <span class="copy-status" id="${copyStatusId}" role="status" aria-live="polite" aria-atomic="true"></span>
+        <p class="copy-help" id="${copyHelpId}">Copies this statement as tab-separated values for spreadsheet review.</p>
+        <a class="native-table-link" href="#${tableId}">View native table</a>
+      </div>
+    </section>`)
+}
+
+const appendNavigation = (presentation: RenderPresentation, sink: HtmlSink): void => {
+  sink.writeLine(html`    <nav class="statement-index" aria-label="Statements">
+      <ol>`)
+  for (const { statement, ordinal, anchorId } of presentation.statements) {
+    sink.writeLine(html`        <li><a href="#${anchorId}"><span class="index-number">${String(ordinal).padStart(2, "0")}</span><span>${statement.label}</span></a></li>`)
+  }
+  sink.writeLine(html`      </ol>
+    </nav>`)
+}
+
+const documentChecks = (presentation: RenderPresentation): HtmlTemplate => {
+  const { calculations } = presentation
+  if (calculations.status === "not-defined") {
+    return html`<p class="doc-checks">No rollup checks defined</p>`
+  }
+  const total = calculations.applications.length
+  const checksWord = total === 1 ? "check" : "checks"
+  if (calculations.status === "consistent") {
+    return html`<p class="doc-checks"><span class="check-glyph" data-status="satisfied">=</span> ${total} rollup ${checksWord} · all consistent</p>`
+  }
+  const issueSummary = checkIssueSummary(calculations.applications)
+  if (issueSummary === undefined) throw new Error("Inconsistent calculations lost their issue")
+  const status = calculations.applications.some(({ status }) => status === "unsatisfied")
+    ? "unsatisfied"
+    : "error"
+  const glyph = status === "unsatisfied" ? "≠" : "!"
+  return html`<p class="doc-checks"><span class="check-glyph" data-status="${status}">${glyph}</span> ${total} rollup ${checksWord} · ${issueSummary}</p>`
+}
+
+export const renderTemplate = (presentation: RenderPresentation, sink: HtmlSink): void => {
+  const { document } = presentation
+  sink.writeLine(html`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${document.entity.name} — ${document.scope.label}</title>
+  <style>
+${stylesheet}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#statements">Skip to statements</a>
+  <div class="document">
+    <header class="masthead">
+      <div>
+        <h1>${document.entity.name}</h1>
+        <p class="scope">${document.scope.label}</p>
+      </div>
+      ${documentChecks(presentation)}
+    </header>`)
+  appendNavigation(presentation, sink)
+  sink.writeLine(html`    <main id="statements" tabindex="-1">`)
+  for (const statement of presentation.statements) {
+    appendStatement(presentation, statement, sink)
+    if (sink.exceeded) return
+  }
+  sink.writeLine(html`    </main>
+${behavior}
   </div>
 </body>
-</html>
+</html>`)
+}

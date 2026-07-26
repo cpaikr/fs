@@ -210,13 +210,23 @@ inconsistency may be recorded; structural nonconformance prevents writing.
 
 ### `fs render --output <html> <document|->`
 
-Produce a simple standalone HTML presentation at the requested new path.
-Rendering iterates statement-owned items directly. It presents grouping
-columns as flat metadata and identifies heterogeneous row units without
-inferring hierarchy, subtotal styling, calculations, or missing values.
-Checked structural budgets prevent unbounded tables before allocation, and a
-bounded sink rejects encoded HTML that exceeds the accepted finite-output
-policy.
+Produce an analyst-friendly standalone HTML presentation at the requested new
+path. Rendering iterates statement-owned items directly. It presents grouping
+columns as flat metadata, identifies heterogeneous row units, and may derive
+presentation-only hierarchy, subtotal styling, and fresh check results from
+explicit rollup relationships without deriving or changing values. Native
+tables remain the no-script review surface. Renderer-owned inline behavior may
+progressively add statement navigation, table controls, contextual tooltips,
+and a per-statement Excel-copy action; it never executes or interprets
+author-controlled content.
+
+The copied projection is tab-separated and always includes an explicit Unit
+column, even when the visible table has one common unit. Author text is
+delimiter-normalized and protected from spreadsheet formula interpretation;
+exact decimal cells remain unquoted numeric text. Checked structural budgets
+prevent unbounded tables before allocation, and a bounded sink rejects the
+complete encoded HTML, including copy projections, under the accepted finite-
+output policy.
 
 ## Commands Intentionally Absent
 

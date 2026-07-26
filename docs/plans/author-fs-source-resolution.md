@@ -58,8 +58,9 @@ artifact contract rather than an extraction or conversion engine.
 
 None.
 
-## Next Action
+## Follow-up Boundary
 
-No source-resolution delivery action remains. A future mixed-input workflow
-should define whether source evidence or an existing FS document is
-authoritative before combining reconciliation with structural repair.
+No source-resolution delivery action remains. Mixed source material and an
+existing FS document were recorded as future scope rather than decided by this
+completed milestone; any later work must establish which input is authoritative
+before combining reconciliation with structural repair.

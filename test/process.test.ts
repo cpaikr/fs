@@ -17,9 +17,10 @@ import {
   executeWithIO,
   type ApplicationIOService
 } from "../src/process.js"
-import { renderHtml, renderLimits } from "../src/render.js"
+import { renderLimits } from "../src/render.js"
 import type { Document, Item, Period } from "../src/validation/model.js"
 import { outputEntryExists, writeNewFile } from "../src/writer.js"
+import { exactByteDocument } from "./support/exact-byte-document.js"
 
 const makeIO = (
   cwd: string,
@@ -83,32 +84,6 @@ const tableDocument = (periodCount: number, itemCount: number): Document => {
     units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],
     periods,
     statements: [{ id: "statement", label: "Statement", periods: periodIds, items }]
-  }
-}
-
-const exactByteDocument = (): Document => {
-  const document = JSON.parse(readFileSync(resolve("examples/minimal.json"), "utf8")) as Document
-  const statement = document.statements[0]
-  const first = statement?.items[0]
-  if (statement === undefined || first === undefined) throw new Error("Minimal fixture lost its first item")
-  const baselineDocument: Document = {
-    ...document,
-    entity: { ...document.entity, name: "x" },
-    statements: [{ ...statement, items: [{ ...first, label: "x" }] }]
-  }
-  const baseline = renderHtml(baselineDocument)
-  if (!baseline.ok) throw new Error("Minimal fixture unexpectedly exceeded a render budget")
-  const remaining = renderLimits.htmlBytes - baseline.bytes.length
-  return {
-    ...baselineDocument,
-    entity: {
-      ...baselineDocument.entity,
-      name: `x${"a".repeat(Math.floor(remaining / 2))}`
-    },
-    statements: [{
-      ...statement,
-      items: [{ ...first, label: `x${"a".repeat(remaining % 2)}` }]
-    }]
   }
 }
 

@@ -4,9 +4,9 @@
 
 - Start with [the documentation index](docs/README.md) and use its authority
   map instead of inferring behavior from summaries.
-- Use the [active release plan](docs/plans/v0-release-candidate.md) for live
-  status and the next action. Completed milestone plans are historical delivery
-  evidence, not current-state summaries.
+- Use the [documentation index](docs/README.md) to find the active plan for
+  live status and the next action. Completed milestone plans are historical
+  delivery evidence, not current-state summaries.
 - Verify implementation availability in source, configuration, tests, or the
   built package. Treat CLI contract prose as intended behavior, not evidence
   that the behavior is implemented.

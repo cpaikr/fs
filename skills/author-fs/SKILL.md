@@ -137,7 +137,7 @@ reported values and do not force calculation consistency.
 Validation is complete only with a conforming status and the unabridged
 structured output retained.
 
-### 4. Create and Deliver
+### 4. Create, Optionally Render, and Deliver
 
 ```sh
 npx -y @sjunepark/fs@0.1.0 create --output statement.fs.json candidate.json
@@ -146,6 +146,26 @@ npx -y @sjunepark/fs@0.1.0 create --output statement.fs.json candidate.json
 Use a new output path whose parent directory already exists. `create` copies
 the candidate's exact bytes atomically and never overwrites a path.
 
-Finish only when `output.status` is `"created"`. Deliver the created FS JSON
-and the complete structured validation output, including `validation` and
-`snapshotDiff`.
+Finish document creation only when `output.status` is `"created"`.
+
+When the user requests an HTML view, render the created document:
+
+```sh
+npx -y @sjunepark/fs@0.1.0 render --output statement.html statement.fs.json
+```
+
+Use another new output path whose parent directory already exists. `render`
+validates the input again and atomically creates a deterministic standalone
+HTML document with embedded CSS, renderer-owned fixed inline behavior, and no
+external resources. Treat the HTML as a derived presentation, not a
+replacement for the FS JSON: it provides statement review, presentation-only
+rollup hierarchy and fresh rollup-check summaries, and per-statement
+copy-for-Excel controls. Rendering calculates rollup checks but does not derive,
+rescale, round, aggregate, or change the displayed statement values. Embedded
+validation snapshots are not displayed. Finish rendering only when its
+`output.status` is `"created"`.
+
+Deliver the created FS JSON and the complete structured validation output,
+including `validation` and `snapshotDiff`, which remain in the JSON command
+output. When requested and successfully created, deliver the HTML alongside
+them.
