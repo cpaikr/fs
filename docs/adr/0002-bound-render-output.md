@@ -43,10 +43,10 @@ total-column limit permits at most 999 period columns; optional unit and
 grouping columns reduce that maximum.
 
 A logical grid slot is one row-column intersection after spans are expanded.
-For the current renderer, a statement with `C` total columns and `R` body rows
-uses `C * (R + 1)` slots: one header row and `R` item rows. A future renderer
-that adds visible columns, rows, or spans must count their occupied
-intersections by the same rule.
+For the current renderer, a statement with `C` total columns, `R` item rows,
+and `H` derived group-heading rows uses `C * (R + H + 1)` slots, including its
+header row. A future renderer that adds visible columns, rows, or spans must
+count their occupied intersections by the same rule.
 
 After structural preflight, rendering may build the result only in a bounded
 sink. It rejects final UTF-8 HTML larger than 16 MiB (16,777,216 bytes),

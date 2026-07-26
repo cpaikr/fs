@@ -442,9 +442,14 @@ secondary item text and are repeated in tooltip context.
 
 The page title combines the entity name and scope label. Its body shows that
 metadata, a document-level rollup-check summary, then every statement in
-document order. The body has a renderer-owned ordinal anchor and navigation
-link for every statement. These links expose location, not review status or
-completion. Each statement is one explicitly captioned native table with
+document order, and closes with a fixed colophon naming the format version and
+stating that the FS JSON document is authoritative. The body has a renderer-
+owned ordinal anchor and navigation link for every statement. These links
+expose location plus one review signal: a statement whose fresh rollup checks
+include a not-satisfied result carries a `≠` glyph, while one whose only issue
+is an unevaluable result carries `!`; both include visually hidden text in the
+navigation link. Each statement is one explicitly
+captioned native table with
 statement-local progressive controls. The table remains the complete no-script
 and clipboard-failure fallback. Rows follow item array order; visible columns
 are, in order:
@@ -477,9 +482,14 @@ scrolls horizontally.
 
 Row hierarchy derives solely from `rollupTo` within the statement. Rows that
 other items roll up into are emphasized as subtotals with a strong top rule
-and bold text; rollup roots that receive rollups carry a double rule. Child
-rows indent by rollup depth in the item-label cell only. Row relationships are
-encoded with renderer-owned index attributes; author identifiers never become
+and bold text; rollup roots close with a double rule below. Child rows indent
+by rollup depth in the item-label cell only. When a rollup parent's transitive
+subtree occupies the contiguous rows ending at the parent, a derived group-
+heading row restates the parent's label above that subtree, outermost parent
+first. Heading rows carry no values, never enter copied TSV, count toward the
+grid-slot budget, and hide together with the group when it collapses. Item
+rows themselves follow item array order exactly. Row relationships are encoded
+with renderer-owned index attributes; author identifiers never become
 attribute values or executable code.
 
 Instant period headers use the exact date. Duration headers use
@@ -498,10 +508,13 @@ the validated document — never from the embedded snapshot. Each check names
 the parent and child item labels as a formula and its period; an evaluable
 check shows verbatim actual, expected, difference, and tolerance decimals with
 a `= Satisfied` or `≠ Not satisfied` result, while a check that cannot run
-names the missing or unavailable cell with a `! Not checked` result. The
-masthead summarizes the document-level check count and outcome, distinguishing
-checks that are not satisfied from checks that could not be evaluated. Status
-is conveyed by glyph and text, never color alone.
+names the missing or unavailable cell with a `! Not checked` result. A
+disclosure whose checks are all satisfied renders collapsed; one containing a
+not-satisfied or unevaluable result renders expanded. The masthead summarizes
+the document-level check count and outcome, distinguishing checks that are not
+satisfied from checks that could not be evaluated; when either issue exists,
+that summary links to the first statement carrying one. Status is conveyed by
+glyph and text, never color alone.
 
 The fixed script progressively reveals one `Copy for Excel` button per
 statement. A button's accessible name includes its statement label. Each
@@ -511,17 +524,21 @@ native tables and inert copy sources exist. Each source stores the complete TSV
 as JSON string text so every schema-valid code point, including U+0000, survives
 HTML parsing; the fixed script decodes that string before copying.
 
-The fixed script also progressively reveals statement-local table tools:
-column-visibility toggles for the conditional `Unit` column and each grouping
-column, collapse and expand controls for rollup parents, per-parent disclosure
-buttons whose collapsed state hides all transitive rollup descendants, a
-singleton hover tooltip restating a value cell's visible row and column
-context (item, period, full unit text, groupings, value, and the visible item
-description when present), and a current-statement indicator on the navigation
-index. All of it is renderer-owned fixed source reading renderer-owned index
-attributes.
-On narrow viewports the script starts unit and grouping columns toggled off
-so item labels and values fit first; the toggles restore them. Collapsing and
+The fixed script also progressively reveals statement-local table tools: a
+`Columns` menu of checkboxes governing the conditional `Unit` column and each
+grouping column, collapse and expand controls for rollup parents, per-parent
+disclosure buttons whose collapsed state hides all transitive rollup
+descendants and derived heading rows, a
+singleton tooltip restating a value cell's visible row and column context
+(item, period, full unit text, groupings, value, and any item description),
+and a current-statement indicator on the navigation index that also marks the
+last statement current when the page is scrolled to its end. The tooltip
+appears on hover and on keyboard focus: value cells form a roving tabindex per
+table with arrow-key movement between visible value cells, and the focused
+cell references the tooltip as its accessible description. All
+of it is renderer-owned fixed source reading renderer-owned index attributes.
+On narrow viewports the script starts unit and grouping columns unchecked so
+item labels and values fit first; the menu restores them. Collapsing and
 column toggles are presentation-only: they never change copied TSV, and
 printing forces collapsed rows and toggled-off columns visible. With scripts
 disabled, these controls and copy controls remain absent, every row and column
@@ -582,9 +599,10 @@ constructing rows or cells. A rendered statement may contain at most 1,000
 logical columns including the item-label column and every conditional unit,
 grouping, and period column. Across the document, rendered tables may occupy
 at most 100,000 logical grid slots after spans are expanded. A statement with
-`C` total columns and `R` item rows consumes `C * (R + 1)` slots, including its
-header row. Arithmetic that cannot stay within a budget is over-limit without
-requiring the exact expanded count to be representable.
+`C` total columns, `R` item rows, and `H` derived group-heading rows consumes
+`C * (R + H + 1)` slots, including its header row. Arithmetic that cannot
+stay within a budget is over-limit without requiring the exact expanded count
+to be representable.
 
 After structural preflight, rendering derives visible rows and copy cells
 lazily while writing them through the bounded sink; it does not materialize a

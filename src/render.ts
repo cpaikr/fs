@@ -64,9 +64,9 @@ const structuralPreflight = (presentation: RenderPresentation): RenderResult | u
   }
 
   let gridSlots = 0
-  for (const { statement, fixedColumnCount } of presentation.statements) {
+  for (const { statement, fixedColumnCount, headingCount } of presentation.statements) {
     const columns = fixedColumnCount + statement.periods.length
-    const rows = statement.items.length + 1
+    const rows = statement.items.length + headingCount + 1
     const remainingSlots = renderLimits.gridSlots - gridSlots
     if (rows > Math.floor(remainingSlots / columns)) {
       return limitExceeded("grid-slots", renderLimits.gridSlots)
