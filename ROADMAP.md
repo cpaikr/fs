@@ -9,7 +9,7 @@ decisions and validation.
 
 ## Current
 
-_None._
+[Remove user-defined groupings in FS 0.2](docs/plans/remove-user-defined-groupings.md)
 
 ## Plans
 
@@ -53,8 +53,3 @@ encoding, and structural repair. They must not establish one extraction,
 taxonomy, cross-entity alignment, or accounting interpretation as part of the
 FS contract; source resolution remains delegated professional judgment upstream
 of the artifact and CLI.
-
-A later dataset layer may coordinate multiple single-entity documents under
-author-supplied shared definitions. FS may represent that alignment, but will
-not supply a taxonomy or perform the alignment. The V0 single-entity document
-remains the atomic artifact.

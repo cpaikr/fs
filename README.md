@@ -56,9 +56,15 @@ In a source checkout, `docs/development.md` owns repository setup, local CLI
 execution, validation, generated content, and package checks. That
 repository-only guide is not part of the npm package.
 
-## Format contract
+The source repository is defining the breaking `0.2` artifact contract before
+implementation. The
+[active refactor plan](docs/plans/remove-user-defined-groupings.md) owns that
+temporary difference from the published package.
 
-V0 documents use `formatVersion: "0.1"`. The normative
+## Published format contract
+
+Documents handled by `@sjunepark/fs@0.1.0` use `formatVersion: "0.1"`. The
+published
 [FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/) and
 [versioned document schema](https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json)
 define the public contract.

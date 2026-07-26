@@ -36,11 +36,11 @@ limit:
   and other non-data columns; and
 - at most 100,000 logical table-grid slots across the document.
 
-A data column contains a financial value; item, unit, and grouping metadata
-columns are not data columns. In the current row model, data columns are the
-statement's periods. Because every table has an item-label column, the
-total-column limit permits at most 999 period columns; optional unit and
-grouping columns reduce that maximum.
+A data column contains a financial value; item and unit metadata columns are
+not data columns. In the current row model, data columns are the statement's
+periods. Because every table has an item-label column, the total-column limit
+permits at most 999 period columns; the conditional unit column reduces that
+maximum to 998 for a heterogeneous statement.
 
 A logical grid slot is one row-column intersection after spans are expanded.
 For the current renderer, a statement with `C` total columns, `R` item rows,

@@ -1,7 +1,10 @@
 # CLI Acceptance Contract
 
-This contract defines observable process behavior for the current `0.1`
-statement-item-row contract.
+This contract defines observable process behavior for the target `0.2`
+statement-item-row contract. It does not attest to implementation or fixture
+availability; the
+[active refactor plan](../plans/remove-user-defined-groupings.md) owns the
+temporary drift from the published `0.1` CLI.
 
 ## Purpose
 
@@ -11,9 +14,10 @@ standard streams, exit code, and filesystem effects. They do not invoke an AI
 model, score prose, or make fuzzy judgments.
 
 The [semantic specification](../semantic-spec.md) defines artifact behavior.
-Existing [language-neutral fixtures](../../fixtures/) provide authoritative
-expected artifact results. CLI cases reuse them instead of copying their
-semantic matrix. Process cases live in [`fixtures/cli/`](../../fixtures/cli/).
+The aligned [language-neutral fixtures](../../fixtures/) MUST provide
+authoritative expected artifact results. `0.2` CLI cases MUST reuse them
+instead of copying their semantic matrix. Process cases live in
+[`fixtures/cli/`](../../fixtures/cli/).
 
 ## Fixture Protocol
 
@@ -424,15 +428,14 @@ only the reported validation result, never the rendered output.
 
 The output is one deterministic UTF-8 HTML document with one final LF. It uses
 the exact `<!doctype html>` document structure, embedded CSS, and fixed inline
-behavior produced by the current executable and covered by executable render
+behavior produced by the aligned executable and covered by `0.2` render
 fixtures. Exact presentation bytes are a release-level regression surface,
 not a cross-version compatibility guarantee. The document has no external
 resources, event-handler attributes, author-controlled HTML, or author-
 controlled executable content. The only script is renderer-owned fixed source;
 author content is never interpolated into it. Every author-controlled string
 emitted into markup or an inert copy source is HTML-escaped. Displayed entity,
-scope, statement, item, unit, measure, grouping-column name, and grouping value
-content therefore remains text.
+scope, statement, item, unit, and measure content therefore remains text.
 `documentId`, optional metadata identifiers, statement, period, item, and unit
 identifiers, and embedded validation snapshots are not displayed. `rollupTo`
 relationships and item descriptions are presentation inputs: rollups drive row
@@ -456,8 +459,7 @@ are, in order:
 
 1. one `Item` column;
 2. one `Unit` column only when the statement is heterogeneous;
-3. every declared grouping column in document declaration order; and
-4. one value column for every statement period in statement period order.
+3. one value column for every statement period in statement period order.
 
 A statement is homogeneous exactly when every item uses the same unit
 identifier. A homogeneous statement displays that resolved unit once above
@@ -465,20 +467,10 @@ the table and omits the `Unit` column. A heterogeneous statement has no common
 unit display and identifies each row's resolved unit label in its `Unit` cell,
 with the full unit text held in a renderer-owned attribute for tooltip
 display. Full unit text is `<label> (<measure>, scale <scale>)`; scale is the
-literal signed base-ten exponent and is not applied to stored values.
-
-Grouping headers and column toggles display a deterministic humanized form of
-the declared identifier: for a purely alphanumeric identifier starting with a
-letter, camelCase boundaries become spaces, single leading capitals lowercase,
-and the first character capitalizes (`majorGroup` becomes `Major group`); any
-other identifier displays verbatim. Copied TSV headers always keep the
-declared identifier verbatim. A string grouping value is displayed verbatim;
-JSON `null` is displayed as `—`. Grouping cells remain ordinary flat columns.
-Equal grouping values do not merge cells or create headings, nesting,
-indentation, ordering, or styling. Text columns (item, unit, groupings) and
-their headers align left; period value columns and their headers align right
-with tabular figures. The item-label column stays pinned while the table
-scrolls horizontally.
+literal signed base-ten exponent and is not applied to stored values. Text
+columns and their headers align left; period value columns and their headers
+align right with tabular figures. The item-label column stays pinned while the
+table scrolls horizontally.
 
 Row hierarchy derives solely from `rollupTo` within the statement. Rows that
 other items roll up into are emphasized as subtotals with a strong top rule
@@ -525,24 +517,24 @@ as JSON string text so every schema-valid code point, including U+0000, survives
 HTML parsing; the fixed script decodes that string before copying.
 
 The fixed script also progressively reveals statement-local table tools: a
-`Columns` menu of checkboxes governing the conditional `Unit` column and each
-grouping column, collapse and expand controls for rollup parents, per-parent
-disclosure buttons whose collapsed state hides all transitive rollup
-descendants and derived heading rows, a
-singleton tooltip restating a value cell's visible row and column context
-(item, period, full unit text, groupings, value, and any item description),
-and a current-statement indicator on the navigation index that also marks the
-last statement current when the page is scrolled to its end. The tooltip
-appears on hover and on keyboard focus: value cells form a roving tabindex per
-table with arrow-key movement between visible value cells, and the focused
-cell references the tooltip as its accessible description. All
-of it is renderer-owned fixed source reading renderer-owned index attributes.
-On narrow viewports the script starts unit and grouping columns unchecked so
-item labels and values fit first; the menu restores them. Collapsing and
-column toggles are presentation-only: they never change copied TSV, and
-printing forces collapsed rows and toggled-off columns visible. With scripts
-disabled, these controls and copy controls remain absent, every row and column
-stays visible, and all statements remain readable native tables.
+`Columns` menu with one checkbox governing the conditional `Unit` column on
+heterogeneous statements, collapse and expand controls for rollup parents,
+per-parent disclosure buttons whose collapsed state hides all transitive
+rollup descendants and derived heading rows, a singleton tooltip restating a
+value cell's visible row and column context (item, period, full unit text,
+value, and any item description), and a current-statement indicator on the
+navigation index that also marks the last statement current when the page is
+scrolled to its end. Homogeneous statements expose no `Columns` menu. The
+tooltip appears on hover and on keyboard focus: value cells form a roving
+tabindex per table with arrow-key movement between visible value cells, and the
+focused cell references the tooltip as its accessible description. All of it
+is renderer-owned fixed source reading renderer-owned index attributes. On
+narrow viewports the script starts the conditional unit column unchecked so
+item labels and values fit first; the menu restores it. Collapsing and column
+toggles are presentation-only: they never change copied TSV, and printing
+forces collapsed rows and toggled-off columns visible. With scripts disabled,
+these controls and copy controls remain absent, every row and column stays
+visible, and all statements remain readable native tables.
 
 Each copy action transfers exactly one statement as `text/plain` tab-separated
 values. The projection is derived from the validated post-preflight render
@@ -551,16 +543,14 @@ one row per statement item, preserving item order. Columns are, in order:
 
 1. `Item`;
 2. `Unit`, always present;
-3. every declared grouping column in document declaration order; and
-4. one value column for every statement period in statement period order.
+3. one value column for every statement period in statement period order.
 
 The Unit cell for every item uses the same `<label> (<measure>, scale <scale>)`
 text as the visible presentation. Period headers use the same instant or
-duration labels as the visible table. A string grouping value is copied as
-author text and JSON `null` as an empty cell. Exact decimals are copied
-verbatim without a text prefix so spreadsheet software may recognize them as
-numeric values. Missing and unavailable values are copied as the fixed text
-`Missing` and `Unavailable`.
+duration labels as the visible table. Exact decimals are copied verbatim
+without a text prefix so spreadsheet software may recognize them as numeric
+values. Missing and unavailable values are copied as the fixed text `Missing`
+and `Unavailable`.
 
 Before author-controlled text enters TSV, every tab, carriage return, or line
 feed is replaced by one space. For formula protection, whitespace is exactly
@@ -568,9 +558,9 @@ U+0009 through U+000D, U+0020, U+00A0, U+1680, U+2000 through U+200A, U+2028,
 U+2029, U+202F, U+205F, U+3000, and U+FEFF. If the first code point outside
 that set is `"`, `=`, `+`, `-`, or `@`, the renderer prefixes one apostrophe so
 spreadsheet software treats the cell as literal text instead of a text
-qualifier or formula. This protection applies to item labels, unit text,
-grouping-column headers and values, and all other author text, but not to exact
-decimal value cells or renderer-owned fixed labels. TSV uses one U+0009 tab
+qualifier or formula. This protection applies to item labels, unit text, and
+all other author text, but not to exact decimal value cells or renderer-owned
+fixed labels. TSV uses one U+0009 tab
 between cells and one U+000A line feed between rows, with no final line feed.
 It contains no quoting or embedded row delimiters.
 
@@ -596,8 +586,8 @@ vocabulary.
 
 Rendering computes finite structural budgets with checked arithmetic before
 constructing rows or cells. A rendered statement may contain at most 1,000
-logical columns including the item-label column and every conditional unit,
-grouping, and period column. Across the document, rendered tables may occupy
+logical columns including the item-label column, the conditional unit column,
+and every period column. Across the document, rendered tables may occupy
 at most 100,000 logical grid slots after spans are expanded. A statement with
 `C` total columns, `R` item rows, and `H` derived group-heading rows consumes
 `C * (R + H + 1)` slots, including its header row. Arithmetic that cannot
@@ -639,6 +629,9 @@ language-neutral semantic fixture. Paths in the table are relative to
 | Recorded snapshot match | `valid/recorded-snapshot.json` | 0 |
 | Recorded snapshot mismatch | `valid/snapshot-mismatch-source.json` | 0 |
 | JSON Schema failure | `invalid/decimal-number.json` | 1 |
+| Legacy artifact version | `invalid/legacy-format-version.json` | 1 |
+| Removed document grouping field | `invalid/removed-grouping-columns.json` | 1 |
+| Removed item grouping field | `invalid/removed-item-groupings.json` | 1 |
 | Semantic structural failure | `invalid/unresolved-rollup.json` | 1 |
 | Invalid embedded snapshot | `duplicate-snapshot-application-key.json` | 1 |
 | Out-of-range unit scale | `invalid/scale-above-maximum.json` | 1 |
@@ -676,6 +669,10 @@ Grammar cases prove:
 - action flags may succeed without ordinary command validation or application
   I/O. Combined action-flag precedence and valueless completions behavior are
   not fixed.
+
+Document validation accepts only artifact version `0.2`. Legacy documents and
+removed grouping properties fail structural conformance; no command, flag, or
+schema selector exposes compatibility or migration behavior.
 
 Logging cases prove:
 
@@ -745,20 +742,18 @@ Cases cover exact HTML from a path for the complete presentation fixture and
 from standard input for the minimal example. A rollup-inconsistent,
 snapshot-mismatching input proves both states remain renderable while their
 content is absent from the HTML. Exact output fixtures prove statement
-navigation; statement, item, period, unit, and grouping-column order
-independent of definition order; homogeneous-unit collapsing and heterogeneous
-row units; exact zero, negative, and fractional decimals; literal scale
-metadata; missing and unavailable cells; null and string grouping values; and
-escaping of every displayed author-controlled text kind. They also prove that
-grouping values create no hierarchy, merged cells, or subtotal styling, while
-rollups drive the documented row hierarchy and subtotal emphasis without
-introducing merged cells. Focused renderer tests must prove the post-preflight
-TSV projection,
-unconditional Unit column, delimiter normalization, spreadsheet-control
-protection, null grouping behavior, and distinct missing and unavailable
-states. Browser verification must cover Clipboard API success, forced fallback
-success, failure feedback, keyboard operation, and the native-table no-script
-path.
+navigation; statement, item, period, and unit order independent of definition
+order; homogeneous-unit collapsing and heterogeneous row units; exact zero,
+negative, and fractional decimals; literal scale metadata; missing and
+unavailable cells; and escaping of every displayed author-controlled text kind.
+They also prove that rollups drive the documented row hierarchy and subtotal
+emphasis without introducing merged cells. Focused renderer tests must prove
+the post-preflight TSV projection, unconditional Unit column, delimiter
+normalization, spreadsheet-control protection, exactly one Unit toggle on
+heterogeneous statements, no `Columns` menu on homogeneous statements, and
+distinct missing and unavailable states. Browser verification must cover
+Clipboard API success, forced fallback success, failure feedback, keyboard
+operation, and the native-table no-script path.
 
 Failure and grammar cases cover malformed input, schema and semantic structural
 refusal, an invalid embedded snapshot, missing input or parent, existing
@@ -780,9 +775,10 @@ behavior.
 
 ## Repository Gate
 
-The packed CLI must continue to satisfy the complete descriptor set. Contract
-changes update acceptance prose and visible descriptors before implementation;
-intermediate states remain internal or fail closed. The command boundary owns
-every accepted output and translates unexpected application defects to
+The aligned packed CLI must satisfy the complete descriptor set. Contract
+changes update acceptance prose first; aligned visible descriptors and
+implementation must land together before the refactor completes. Intermediate
+states remain internal or fail closed. The command boundary owns every
+accepted output and translates unexpected application defects to
 `internal-error` without leaking raw causes. No temporary output shape becomes
 part of the acceptance contract.

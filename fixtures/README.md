@@ -1,8 +1,11 @@
 # Language-Neutral Fixtures
 
-These fixtures are machine-readable evidence for the current `0.1`
-[semantic specification](../docs/semantic-spec.md). Deterministic CLI process
-fixtures live under [`cli/`](cli/) and follow the
+These fixtures are machine-readable implementation evidence for the published
+`0.1` [semantic specification](https://cpaikr.github.io/fs/spec/0.1/). The
+[active 0.2 refactor plan](../docs/plans/remove-user-defined-groupings.md) owns
+their pending replacement; until that work is complete, they are not evidence
+for the repository's target `0.2` contract. Deterministic CLI process fixtures
+live under [`cli/`](cli/) and follow the
 [CLI acceptance contract](../docs/cli/acceptance.md).
 
 [`manifest.json`](manifest.json) is the document-fixture index. Its paths are

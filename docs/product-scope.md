@@ -3,7 +3,7 @@
 `fs` is a working title. The [roadmap](../ROADMAP.md) records strategic
 delivery milestones.
 
-This document summarizes the V0 product boundary. The
+This document summarizes the FS `0.2` product boundary. The
 [semantic specification](semantic-spec.md) owns the exact artifact contract.
 
 ## Summary
@@ -27,20 +27,24 @@ shape. Those outputs preserve cells but often lose financial meaning:
 - every downstream consumer needs custom parsing instructions.
 
 The result should instead be one predictable document whose ordered item rows,
-period values, units, groupings, and reported subtotals are explicit.
+period values, units, and reported subtotals are explicit.
 
 ## Product
 
-V0 is a standalone financial-statement document and its validation semantics.
-Its central boundaries are:
+FS `0.2` is a standalone financial-statement document and its validation
+semantics. Its central boundaries are:
 
 - JSON is the canonical serialization.
 - One document covers exactly one reporting entity and reporting scope.
 - One document may contain multiple statements and multiple periods.
 - Statements own ordered, document-local items and their stored period values.
-- Items carry author-declared units and flat groupings; the project supplies no
-  accounting taxonomy.
-- FS may group an item but does not split, allocate, or infer finer detail.
+- Items carry author-declared units; the project supplies no accounting
+  taxonomy or classification fields.
+- FS does not split, allocate, or infer finer item detail.
+- A source category needed to distinguish financial meaning becomes part of
+  the item identity or human-readable item text. Additive categories use
+  explicit items and rollups. Other classifications and mappings stay outside
+  FS.
 - All values, including reported subtotal values, are stored explicitly.
   Optional additive rollups validate direct children but never create, replace,
   or materialize values.
@@ -61,7 +65,7 @@ The [domain glossary](glossary.md) defines these terms precisely.
 
 ## Non-Goals
 
-V0 will not:
+FS `0.2` will not:
 
 - define or implement a source extraction, OCR, alignment, or conversion
   engine;
@@ -71,19 +75,20 @@ V0 will not:
 - split an item, allocate its value, or infer source detail not supplied by the
   author;
 - model journal entries, ledgers, forecasts, or valuation policy;
-- model general formulas, roll-forwards, reusable mapping profiles, or
-  genuinely multidimensional statements;
+- model general formulas, roll-forwards, grouping columns, classification
+  maps, reusable mapping profiles, or genuinely multidimensional statements;
 - infer arithmetic from statement order or presentation;
 - act as a mutable financial database or field-by-field statement editor; or
 - execute arbitrary code embedded in a document.
 
 The authoring actor, whether a person or delegated agent, remains responsible
-for choosing item meanings, statement composition, grouping columns, rollup
-relationships, and the level of detail appropriate for the user's purpose.
+for choosing item meanings, statement composition, rollup relationships, and
+the level of detail appropriate for the user's purpose. Each consuming project
+owns any classifications or mappings it applies to those items.
 
 ## Deliverables
 
-The V0 product consists of:
+The FS `0.2` product consists of:
 
 1. A semantic specification and canonical JSON mapping.
 2. A JSON Schema and language-neutral conformance fixtures.
@@ -98,11 +103,10 @@ The V0 product consists of:
 
 The format is intentionally optimized for ordinary financial statements
 rather than a general multidimensional data cube. The examples must prove
-multi-period item values,
-mixed item units, user-declared grouping columns, additive reported subtotals,
+multi-period item values, mixed item units, additive reported subtotals,
 overlapping period types, unavailable values, and calculation inconsistencies.
-Genuinely multidimensional cases are outside V0 rather than generated through
-Cartesian axes.
+Genuinely multidimensional cases are outside FS `0.2` rather than generated
+through Cartesian axes or user-defined classification fields.
 
 Core validation and snapshot command scenarios are designed before their
 schemas to expose required behavior. Examples and language-neutral fixtures fix
@@ -112,12 +116,12 @@ without adding new semantics. See the [CLI design](cli/design.md).
 
 ## Success Criteria
 
-V0 succeeds when:
+FS `0.2` succeeds when:
 
 - independent authors can produce structurally compatible documents without
   sharing an accounting taxonomy;
 - downstream code can identify statement items, period values, units, and
-  groupings without interpreting rendered HTML;
+  explicit rollup relationships without interpreting rendered HTML;
 - supplied additive subtotals can be checked without replacing their stored
   values;
 - inconsistent calculations remain visible and consumable;
@@ -130,9 +134,8 @@ V0 succeeds when:
   without reading the whole repository; and
 - new user-defined items or statement layouts do not require a core release.
 
-## Future Direction
+## Extension Boundary
 
-A later dataset layer may represent several entities under shared definitions
-chosen by its author. It may enable intentionally aligned company data, but
-`fs` will represent that alignment rather than supply its taxonomy or perform
-the alignment. The single-entity document remains the V0 atomic artifact.
+Multi-entity coordination, shared definitions, external classifications, and
+cross-document alignment belong to consuming projects rather than a future FS
+schema layer. The single-entity document remains the atomic FS artifact.

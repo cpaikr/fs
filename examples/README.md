@@ -1,7 +1,10 @@
-# V0 Examples
+# Published 0.1 Examples
 
-These examples provide conformance evidence for the current `0.1`
-[semantic specification](https://cpaikr.github.io/fs/spec/0.1/). They
+These examples provide implementation evidence for the published `0.1`
+[semantic specification](https://cpaikr.github.io/fs/spec/0.1/). The
+[active 0.2 refactor plan](../docs/plans/remove-user-defined-groupings.md) owns
+their pending replacement; until that work is complete, they are not evidence
+for the repository's target `0.2` contract. They
 demonstrate complete artifacts rather than acting as partially completed
 authoring templates. See the [bundled authoring guide](../assets/guide/authoring.md)
 for the encoding workflow.

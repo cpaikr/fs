@@ -1,9 +1,9 @@
 # Analyst HTML Design System
 
-Status: Approved. Documents the "Folio" rendering direction shipped by the
-current renderer, which replaced the earlier "Charter" floating-sheet
-direction (rejected: timid scale, dead space at desktop widths, stock
-controls).
+Status: Approved for FS `0.2`. Retains the "Folio" rendering direction shipped
+by the `0.1` renderer while removing user-defined grouping-column presentation.
+Folio replaced the earlier "Charter" floating-sheet direction (rejected: timid
+scale, dead space at desktop widths, stock controls).
 
 This document owns the visual and interaction direction of the standalone HTML
 convenience view. The [semantic specification](docs/semantic-spec.md) remains
@@ -82,20 +82,17 @@ stay ordinary ink; status colors are always paired with a glyph (`=`, `≠`,
 
 ## Statement Presentation
 
-- Text columns (Item, Unit, groupings) and their headers align left; period
+- Text columns (Item and Unit) and their headers align left; period
   value columns and their headers align right with tabular figures on a shared
   right edge that indentation never disturbs.
 - The item-label column is sticky during horizontal scroll, closed by a
   hairline, so numbers never lose their row identity.
 - Displayed decimals get comma digit grouping (`1,000`); the copied TSV keeps
-  the exact undecorated decimal. Grouping-column headers and toggle chips show
-  a humanized form of the declared identifier (`majorGroup` → `Major group`);
-  TSV headers keep the identifier verbatim.
+  the exact undecorated decimal.
 - Tables span the full content measure like filed statements: the item column
   absorbs spare width so figures hold the right edge of the measure, and the
   page never splits into a narrow table beside dead space.
-- Statement, item, grouping, and period order are preserved exactly, including
-  declared grouping columns whose values are all null in a statement.
+- Statement, item, and period order are preserved exactly.
 - Rollup hierarchy from the document: parent (subtotal) rows are bold with a
   strong rule above (the accountant's summing rule); rollup roots close with a
   double rule below, per accounting convention; child rows indent by depth in
@@ -121,10 +118,11 @@ and purely presentational — copied TSV and the underlying table never change.
   reveals a `· n rows` count. Statement-level "Collapse rollups" /
   "Expand all" buttons act on every parent at once. Printing forces collapsed
   rows visible.
-- Column visibility: a `Columns` menu (native details disclosure styled as a
-  button) holds one checkbox per hideable column — the standard data-table
-  pattern. Narrow viewports start with these columns unchecked so values fit
-  the first screen.
+- Column visibility: heterogeneous statements expose a `Columns` menu (native
+  details disclosure styled as a button) with one checkbox for the conditional
+  Unit column. Narrow viewports start with that column unchecked so values fit
+  the first screen. Homogeneous statements have no hideable columns and no
+  menu.
 - Controls share one vocabulary: flat 4px radius, quiet border, no shadows,
   filled-claret primary for `Copy for Excel`, bordered secondaries for tools —
   clustered at the table's right edge so every control touches what it acts
@@ -133,7 +131,7 @@ and purely presentational — copied TSV and the underlying table never change.
 - Tooltip: a singleton dark tooltip appears after a ~400 ms hover delay — or
   immediately on keyboard focus — over value cells, anchored near the
   right-aligned number, restating the row and column context (item, period,
-  full unit, groupings, value, item description when present). Value cells
+  full unit, value, item description when present). Value cells
   form a roving tabindex per table with arrow-key movement, and the focused
   cell exposes the tooltip as its accessible description, so no information is
   pointer-only.

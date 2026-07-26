@@ -1,9 +1,12 @@
-# FS V0 Semantic Specification
+# FS 0.2 Semantic Specification
 
-This specification defines the current `0.1` FS document contract independently
+This specification defines the target `0.2` FS document contract independently
 of any implementation language. The
-[JSON Schema](../schema/fs-document.schema.json) enforces this JSON shape;
-requirements concerning uniqueness, references, dates, nested-map keys,
+[active refactor plan](plans/remove-user-defined-groupings.md) owns the
+temporary drift while local schemas, fixtures, and source still implement
+`0.1`. Once aligned, the
+[JSON Schema](../schema/fs-document.schema.json) MUST enforce this JSON shape;
+requirements concerning uniqueness, references, dates, value-map keys,
 rollups, snapshots, or ordering remain normative where JSON Schema cannot
 express them.
 
@@ -15,22 +18,23 @@ An FS document is one JSON object describing exactly one reporting entity and
 one reporting scope. Definitions and identifiers are document-local and have
 no meaning outside the document unless an author separately coordinates them.
 The document does not encode extraction provenance, an accounting taxonomy,
-policy, source mappings, or multi-entity alignment. Filenames have no semantic
-meaning.
+policy, classification or source mappings, or multi-entity alignment.
+Filenames have no semantic meaning.
 
-`formatVersion` MUST be `"0.1"`. Validation results and snapshot diffs likewise
-use `formatVersion: "0.1"`.
+`formatVersion` MUST be `"0.2"`. Validation results and snapshot diffs likewise
+use `formatVersion: "0.2"`. A `0.2` consumer MUST reject `0.1` documents; this
+contract defines no compatibility or migration behavior.
 
 An FS document MAY contain a top-level `$schema` member. When present, its
 value MUST be exactly
-`https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json`. This pointer
+`https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json`. This pointer
 aids schema discovery only. It does not change `formatVersion`, require network
 access, or replace the complete structural and semantic validation defined by
 this specification.
 
 The top-level members, in specification order, are optional `$schema`,
 `formatVersion`, optional `documentId`, `entity`, `scope`, `units`, `periods`,
-optional `groupingColumns`, `statements`, and optional `validationSnapshot`.
+`statements`, and optional `validationSnapshot`.
 
 No other top-level member is allowed. `$schema` is not an author-controlled
 identifier: if supplied, it is the exact constant above. `documentId`,
@@ -42,25 +46,24 @@ calculation semantics.
 `entity` contains required nonempty string `name` and optional identifier
 `id`. `scope` contains required nonempty string `label` and optional identifier
 `id`. These objects have no other members. Every `label`, `name`, `measure`,
-`description`, and grouping string described below MUST be nonempty.
+and `description` described below MUST be nonempty.
 
 `units`, `periods`, and `statements` MUST be nonempty arrays. Every statement's
-`periods` and `items` arrays MUST be nonempty. `groupingColumns` MAY be omitted
-when unused. Every item always has required `values` and `groupings` objects;
-when `groupingColumns` is omitted or empty, `groupings` MUST be `{}`.
+`periods` and `items` arrays MUST be nonempty. Every item always has a required
+`values` object.
 
 Objects are closed: properties not declared by the grammar below are
 nonconforming. This specification is the complete source for required fields,
-JSON types, meaning, and cross-object invariants. The schemas encode the same
-closed grammar without adding another contract.
+JSON types, meaning, and cross-object invariants. The `0.2` schemas MUST encode
+the same closed grammar without adding another contract.
 
 ## 2. Identifiers, references, and order
 
-Every identifier and grouping-column name MUST match
-`^[A-Za-z][A-Za-z0-9._-]*$`. Unit, period, and statement identifiers MUST be
-unique in their respective document-wide arrays. Item identifiers MUST be
-unique within their containing statement. The same item identifier MAY occur
-in different statements and has no shared identity between them.
+Every identifier MUST match `^[A-Za-z][A-Za-z0-9._-]*$`. Unit, period, and
+statement identifiers MUST be unique in their respective document-wide arrays.
+Item identifiers MUST be unique within their containing statement. The same
+item identifier MAY occur in different statements and has no shared identity
+between them.
 
 References MUST resolve within the document and to the indicated definition
 kind. Item references made by `rollupTo` resolve only within the containing
@@ -69,10 +72,9 @@ statement.
 Object member order is never semantic. The following arrays are semantically
 ordered:
 
-1. `groupingColumns` declares grouping-column order;
-2. `statements` declares statement display and calculation order;
-3. each statement's `periods` declares its display and calculation order; and
-4. each statement's `items` declares row and calculation order.
+1. `statements` declares statement display and calculation order;
+2. each statement's `periods` declares its display and calculation order; and
+3. each statement's `items` declares row and calculation order.
 
 Unit and period definition-array order is not presentation order. Consumers
 MUST NOT infer arithmetic, taxonomy, or hierarchy from any order.
@@ -134,23 +136,24 @@ Every closed statement object contains exactly required `id`, `label`,
 Each statement's `periods` array MUST contain unique, resolved period
 identifiers. Every item has:
 
-- required `id`, `label`, `unit`, `values`, and `groupings`;
+- required `id`, `label`, `unit`, and `values`;
 - optional `description` and `rollupTo`; and
 - no other member.
 
 The `unit` reference applies to every value of that item. Different items in
 one statement MAY use different units. `description` clarifies meaning and MAY
-be displayed as presentation text, but it does not affect validation or
-artifact semantics.
+be displayed as presentation text, but it does not affect item identity,
+ordering, or calculations. When a source category is necessary to distinguish
+an item's financial meaning, the author MUST encode that distinction in the
+item identifier, label, description, or separate item rows rather than adding
+an undeclared classification property.
 
 An item is the atomic financial meaning supplied to FS. It may correspond to
 one ledger account, several accounts already aggregated upstream, or another
-reported line. FS MAY group an item but MUST NOT split, allocate, or infer
-finer detail from it.
+reported line. FS MUST NOT split, allocate, classify, or infer finer detail
+from it.
 
-## 5. Values and groupings
-
-### 5.1 Value maps and cell states
+## 5. Value maps and cell states
 
 An item's `values` object MUST have exactly the containing statement's period
 identifiers as keys. No key may be missing or extra. Each cell is exactly one
@@ -168,17 +171,6 @@ The canonical decimal grammar in Section 3.1 forbids exponent, leading plus,
 leading integer zeros, trailing fractional zeros, and negative zero. Consumers
 MUST use decimal arithmetic capable of representing these strings exactly and
 MUST NOT first convert them to binary floating point.
-
-### 5.2 Grouping maps
-
-`groupingColumns` declares document-local, user-named classification purposes.
-It MUST contain unique identifiers. It defines no scheme, category registry,
-taxonomy, hierarchy, arithmetic, or value coordinate.
-
-Every item's `groupings` object MUST have exactly the declared
-`groupingColumns` as keys. Each value is a nonempty string or JSON `null`.
-Grouping values describe an already-atomic item. They never create another
-item, split a value, affect item identity or order, or imply a rollup.
 
 ## 6. Additive rollups
 
@@ -202,12 +194,10 @@ zero when the tolerance is omitted. Only direct children are summed. A child
 that is itself a subtotal contributes its explicit stored value to its parent,
 so a nested descendant is not counted twice.
 
-Custom grouping values have no effect on rollup discovery or evaluation.
-
 ## 7. Structural and calculation outcomes
 
 Structural conformance includes JSON Schema conformance and every normative
-identifier, reference, date, map-key, snapshot, unit, and graph invariant in
+identifier, reference, date, value-map, snapshot, unit, and graph invariant in
 this specification. Rollup inconsistency does not affect structural
 conformance. Rollups MUST NOT run for a structurally nonconforming document.
 
@@ -285,7 +275,7 @@ A validation result is exactly:
 
 ```json
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "conformance": { "status": "conforming", "errors": [] },
   "calculations": { "status": "not-defined", "applications": [] }
 }
@@ -297,8 +287,9 @@ applications when status is `consistent` or `inconsistent`. For
 applications are empty. For `conforming`, `errors` is empty. These objects are
 closed, and each error contains exactly `code`, `path`, and `message`.
 
+The aligned
 [`validation-result.schema.json`](../schema/validation-result.schema.json)
-encodes this language-neutral result shape.
+MUST encode this language-neutral result shape.
 
 ## 8. Validation snapshots and deterministic diffs
 
@@ -334,14 +325,14 @@ removed applications in recorded order. Each key appears exactly once.
 When `validationSnapshot` is absent, the diff is exactly:
 
 ```json
-{ "formatVersion": "0.1", "status": "not-recorded" }
+{ "formatVersion": "0.2", "status": "not-recorded" }
 ```
 
 A present but structurally invalid snapshot produces exactly:
 
 ```json
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "status": "not-comparable",
   "reason": "invalid-snapshot"
 }
@@ -367,8 +358,8 @@ for `satisfied` or `unsatisfied`, or `reason` and `cell` for `error`.
 `unchanged` and `changed` applications MUST have the same key. `added` and
 `removed` intentionally omit the absent side. Human messages are not snapshot
 fields and are not compared.
-[`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json) encodes
-these forms.
+The aligned [`snapshot-diff.schema.json`](../schema/snapshot-diff.schema.json)
+MUST encode these forms.
 
 ### 8.1 Structural diagnostics
 
@@ -390,8 +381,8 @@ code. These are the complete current codes and path rules:
   is that member.
 - `scale-out-of-range`: `scale` is outside the safe-integer range; the path is
   that member.
-- `duplicate-id`: a unit, period, statement, grouping column, or
-  statement-local item identifier repeats; the path is the later identifier.
+- `duplicate-id`: a unit, period, statement, or statement-local item identifier
+  repeats; the path is the later identifier.
 - `duplicate-reference`: a statement repeats a selected period; the path is
   the later reference.
 - `duplicate-period-definition`: a period repeats an instant or duration
@@ -402,8 +393,8 @@ code. These are the complete current codes and path rules:
   object.
 - `unresolved-reference`: a period, unit, or `rollupTo` reference does not
   resolve in its required scope; the path is the reference.
-- `map-key-mismatch`: `values` keys differ from statement periods or
-  `groupings` keys differ from `groupingColumns`; the path is the complete map.
+- `map-key-mismatch`: `values` keys differ from statement periods; the path is
+  the complete map.
 - `self-rollup`: an item rolls up to itself; the path is `rollupTo`.
 - `cyclic-rollup`: a non-self `rollupTo` edge participates in a cycle; the path
   is that edge, with one error for every participating edge.
@@ -420,7 +411,7 @@ and path. Message wording is not normative.
 
 ## 9. Canonical JSON mapping and rendering
 
-Canonical V0 means the fields and structures in this specification, not a
+Canonical FS `0.2` means the fields and structures in this specification, not a
 byte-level JSON canonicalization scheme. Producers SHOULD emit
 top-level members in specification order and preserve author-chosen array
 order. Consumers MUST preserve semantically ordered arrays and treat all
@@ -428,11 +419,10 @@ object member order as irrelevant.
 
 Rendering is a deterministic projection, not a second semantic contract. It
 shows statements and items in array order and periods in each statement's
-selected order. Declared grouping columns appear as flat, non-arithmetic
-columns in declaration order. A homogeneous statement identifies its one unit
-once; a heterogeneous statement shows a unit cell for each row. Rendering does
-not infer signs, missing values, taxonomy, or financial meaning from rollups or
-groupings. A renderer may derive hierarchy and subtotal styling solely from
+selected order. A homogeneous statement identifies its one unit once; a
+heterogeneous statement shows a unit cell for each row. Rendering does not
+infer signs, missing values, taxonomy, classification, or financial meaning
+from rollups. A renderer may derive hierarchy and subtotal styling solely from
 explicit `rollupTo` relationships for presentation; those derivations add no
 financial meaning and do not change values or row order. A progressive copy
 convenience may project one statement to tab-separated text with an explicit
@@ -443,9 +433,10 @@ finite-output behavior.
 
 ## 10. Conformance fixture contract
 
-Files under `examples/` and `fixtures/valid/` MUST conform to the document
-schema and every semantic invariant above. Each file under `fixtures/invalid/`
-is intentionally nonconforming and has a matching entry in
+Once the corpus is aligned to `0.2`, files under `examples/` and
+`fixtures/valid/` MUST conform to the document schema and every semantic
+invariant above. Each file under `fixtures/invalid/` MUST be intentionally
+nonconforming and have a matching entry in
 [`manifest.json`](../fixtures/manifest.json) naming its expected failure.
 
 Calculation-result and snapshot-diff fixtures are language-neutral expected
