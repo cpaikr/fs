@@ -6,9 +6,9 @@ model.
 
 The CLI is the packaged reference consumer and authoring aid for complete FS
 documents. This design does not attest to implementation or release
-availability. Verify implementation in source and the built package; use the
-[active refactor plan](../plans/remove-user-defined-groupings.md) for live
-status.
+availability. Verify implementation in source and the built package; the
+[completed refactor plan](../plans/remove-user-defined-groupings.md) records
+the `0.2` delivery evidence.
 
 ## Boundary
 
@@ -307,7 +307,7 @@ availability.
 ## Implementation Evidence
 
 The [development guide](../development.md) owns repository validation commands,
-and the [active refactor plan](../plans/remove-user-defined-groupings.md) owns
-live status.
+and the [completed refactor plan](../plans/remove-user-defined-groupings.md)
+records the `0.2` implementation evidence.
 Completed milestone plans linked from the [documentation index](../README.md)
 retain historical implementation decisions and gate evidence.

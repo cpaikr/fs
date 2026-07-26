@@ -1,10 +1,7 @@
-# Published 0.1 Examples
+# FS 0.2 Examples
 
-These examples provide implementation evidence for the published `0.1`
-[semantic specification](https://cpaikr.github.io/fs/spec/0.1/). The
-[active 0.2 refactor plan](../docs/plans/remove-user-defined-groupings.md) owns
-their pending replacement; until that work is complete, they are not evidence
-for the repository's target `0.2` contract. They
+These examples provide implementation evidence for the target `0.2`
+[semantic specification](https://cpaikr.github.io/fs/spec/0.2/). They
 demonstrate complete artifacts rather than acting as partially completed
 authoring templates. See the [bundled authoring guide](../assets/guide/authoring.md)
 for the encoding workflow.
@@ -12,8 +9,8 @@ for the encoding workflow.
 ## Files
 
 - `minimal.json` is the smallest complete statement-row document. It omits
-  optional identifiers, grouping columns, rollups, and validation snapshot, so
-  its calculation status is `not-defined`.
+  optional identifiers, rollups, and validation snapshot, so its calculation
+  status is `not-defined`.
 - `manufacturing-group.json` combines income, balance-sheet, cash-flow, equity,
   and manufacturing statements for one entity. It carries the optional
   canonical `$schema` discovery pointer, is structurally conforming, and is
@@ -29,8 +26,6 @@ for the encoding workflow.
   satisfied rollups alongside that failure.
 - Item identifiers such as `materials` and `labor` repeat across statements,
   proving item and rollup identity is statement-local.
-- `majorGroup` and `valuation` demonstrate exact grouping maps, including null
-  grouping cells.
 - Most rows use KRW millions while the EPS row uses KRW per share, proving
   mixed-unit statement presentation without permitting mixed-unit rollup
   edges.

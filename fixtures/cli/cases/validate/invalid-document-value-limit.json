@@ -5,7 +5,7 @@
   "workspace": [],
   "stdin": {
     "generated": [
-      { "utf8": "{\"formatVersion\":\"0.1\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2024-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[", "count": 1 },
+      { "utf8": "{\"formatVersion\":\"0.2\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2024-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[", "count": 1 },
       { "utf8": "{},", "count": 232 },
       { "utf8": "{}]}]}", "count": 1 }
     ]

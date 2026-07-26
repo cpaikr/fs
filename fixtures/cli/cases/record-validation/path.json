@@ -19,7 +19,7 @@
       "arrays": [{ "pointer": "/snapshotDiff/applications", "equals": 0 }],
       "equalities": [
         { "pointer": "/validation", "equalsFile": { "file": "../calculation-results/no-rollups.json" } },
-        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.1" },
+        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.2" },
         { "pointer": "/snapshotDiff/status", "equals": "match" },
         { "pointer": "/snapshotDiff/conformance/recorded", "equals": "conforming" },
         { "pointer": "/snapshotDiff/conformance/current", "equals": "conforming" },

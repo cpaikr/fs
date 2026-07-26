@@ -20,8 +20,7 @@ interface MutableDocument {
   $schema?: string
   scope?: unknown
   periods: Array<Record<string, unknown>>
-  groupingColumns?: Array<string>
-  statements: Array<{ items: Array<{ values: Record<string, unknown>; groupings: Record<string, unknown> }> }>
+  statements: Array<{ items: Array<{ values: Record<string, unknown>; groupings?: unknown }> }>
   validationSnapshot?: unknown
 }
 
@@ -40,11 +39,11 @@ describe("document schema validation", () => {
     expect(validateSchema(withoutPointer)).toEqual([])
 
     const withPointer = minimal()
-    withPointer.$schema = "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+    withPointer.$schema = "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json"
     expect(validateSchema(withPointer)).toEqual([])
 
     const wrongPointer = minimal()
-    wrongPointer.$schema = "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json"
+    wrongPointer.$schema = "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
     expect(validateSchema(wrongPointer)).toEqual([
       expect.objectContaining({ code: "invalid-value", path: "/$schema" })
     ])
@@ -79,7 +78,7 @@ describe("document schema validation", () => {
   })
 
   it("bounds complete diagnostics without rejecting large conforming documents", () => {
-    const prefix = '{"formatVersion":"0.1","entity":{"name":"x"},"scope":{"label":"x"},"units":[{"id":"u","label":"u","measure":"u","scale":0}],"periods":[{"id":"p","kind":"instant","date":"2024-01-01"}],"statements":[{"id":"s","label":"s","periods":["p"],"items":['
+    const prefix = '{"formatVersion":"0.2","entity":{"name":"x"},"scope":{"label":"x"},"units":[{"id":"u","label":"u","measure":"u","scale":0}],"periods":[{"id":"p","kind":"instant","date":"2024-01-01"}],"statements":[{"id":"s","label":"s","periods":["p"],"items":['
     const suffix = "]}]}"
     const document = (items: number): Buffer =>
       Buffer.from(`${prefix}${Array.from({ length: items }, () => "{}").join(",")}${suffix}`)
@@ -176,15 +175,6 @@ describe("document schema validation", () => {
       expect.objectContaining({ code: "invalid-value", path: "/statements/0/items/0/values/fy2025" })
     ])
 
-    const emptyGrouping = minimal()
-    emptyGrouping.groupingColumns = ["category"]
-    const groupingItem = emptyGrouping.statements[0]?.items[0]
-    if (groupingItem === undefined) throw new Error("Minimal fixture lost its first item")
-    groupingItem.groupings.category = ""
-    expect(validateSchema(emptyGrouping)).toEqual([
-      expect.objectContaining({ code: "invalid-value", path: "/statements/0/items/0/groupings/category" })
-    ])
-
     const malformedUnavailable = minimal()
     const unavailableItem = malformedUnavailable.statements[0]?.items[0]
     if (unavailableItem === undefined) throw new Error("Minimal fixture lost its first item")
@@ -193,6 +183,24 @@ describe("document schema validation", () => {
       expect.objectContaining({
         code: "invalid-value",
         path: "/statements/0/items/0/values/fy2025/unavailable"
+      })
+    ])
+  })
+
+  it("rejects both removed grouping properties as unknown", () => {
+    const documentGrouping = { ...minimal(), groupingColumns: [] }
+    expect(validateSchema(documentGrouping)).toEqual([
+      expect.objectContaining({ code: "unknown-property", path: "/groupingColumns" })
+    ])
+
+    const itemGrouping = minimal()
+    const item = itemGrouping.statements[0]?.items[0]
+    if (item === undefined) throw new Error("Minimal fixture lost its first item")
+    item.groupings = {}
+    expect(validateSchema(itemGrouping)).toEqual([
+      expect.objectContaining({
+        code: "unknown-property",
+        path: "/statements/0/items/0/groupings"
       })
     ])
   })

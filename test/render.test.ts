@@ -51,11 +51,10 @@ const tableDocument = (periodCount: number, itemCount: number): Document => {
     id: `item${index}`,
     label: `Item ${index}`,
     unit: "usd",
-    values,
-    groupings: {}
+    values
   }))
   return {
-    formatVersion: "0.1",
+    formatVersion: "0.2",
     entity: { name: "Grid boundary" },
     scope: { label: "Rendering" },
     units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],
@@ -97,15 +96,12 @@ describe("HTML rendering", () => {
     expect(renderBytes(fixture(input))).toEqual(readFileSync(resolve(expected)))
   })
 
-  it("renders grouping columns as flat aligned metadata without merging", () => {
+  it("renders statement rows without removed grouping metadata", () => {
     const document = fixture("fixtures/valid/render-presentation.json")
     const original = JSON.stringify(document)
     const html = renderBytes(document).toString("utf8")
 
-    expect(html).toContain('<th scope="col" class="col-text" data-col="g0">Valuation</th>')
-    expect(html).toContain('<td class="metadata col-text" data-col="g1">Working &lt;Capital&gt;</td>')
-    expect(html.match(/<th scope="col" class="col-text" data-col="g1">/gu)).toHaveLength(2)
-    expect(html).toContain('<td class="metadata col-text" data-col="g1">Summary</td>')
+    expect(html).not.toContain('data-col="g')
     expect(html).not.toContain("colspan")
     expect(html).not.toContain("rowgroup")
     expect(html).not.toContain('class="row-parent')
@@ -129,6 +125,11 @@ describe("HTML rendering", () => {
     expect(html).toContain('(expanded ? "Collapse " : "Expand ") + label + " detail rows"')
     expect(html).toContain("data-table-tools hidden")
     expect(html).toContain('<label><input type="checkbox" checked data-col-toggle="unit"> Unit</label>')
+    expect(html.match(/<details class="col-menu" data-col-menu>/gu)).toHaveLength(1)
+    expect(html.match(/data-col-toggle="unit"/gu)).toHaveLength(1)
+    const homogeneous = renderBytes(fixture("examples/minimal.json")).toString("utf8")
+    expect(homogeneous).not.toContain('<details class="col-menu" data-col-menu>')
+    expect(homogeneous).not.toContain('data-col-toggle="unit"')
     expect(html).toContain("including any rows or columns hidden in this view")
     expect(html).toContain("The FS JSON document is authoritative")
     expect(html).not.toContain('<a class="doc-checks-link"')
@@ -164,14 +165,14 @@ describe("HTML rendering", () => {
     const html = renderBytes(fixture("fixtures/valid/render-presentation.json")).toString("utf8")
 
     expect(copySource(html, 1)).toBe([
-      "Item\tUnit\tvaluation\tppt\t2025-12-31\t2024-12-31",
-      "Cash <available>\tUSD <millions> (USD, scale 6)\tNWC & cash\t\t0\tMissing",
-      "Inventory\tUSD <millions> (USD, scale 6)\tNWC\tWorking <Capital>\t-1.25\tUnavailable"
+      "Item\tUnit\t2025-12-31\t2024-12-31",
+      "Cash <available>\tUSD <millions> (USD, scale 6)\t0\tMissing",
+      "Inventory\tUSD <millions> (USD, scale 6)\t-1.25\tUnavailable"
     ].join("\n"))
     expect(copySource(html, 2)).toBe([
-      "Item\tUnit\tvaluation\tppt\t2025-12-31",
-      "Amount\tUSD <millions> (USD, scale 6)\t\tSummary\t2.5",
-      "Count\tShares & units (shares, scale 0)\t\tSummary\t3"
+      "Item\tUnit\t2025-12-31",
+      "Amount\tUSD <millions> (USD, scale 6)\t2.5",
+      "Count\tShares & units (shares, scale 0)\t3"
     ].join("\n"))
     expect(copySource(html, 1)).not.toMatch(/\n$/u)
   })
@@ -184,33 +185,26 @@ describe("HTML rendering", () => {
     if (statement === undefined || item === undefined || unit === undefined) {
       throw new Error("Minimal fixture lost its presentation data")
     }
-    const firstGrouping = "\ufeff=Header\tOne"
-    const secondGrouping = "\u00a0+Header\rTwo"
-    const markupGrouping = "markup"
-    const quotedGrouping = "quoted"
     const rendered = renderBytes({
       ...document,
-      units: [{ ...unit, label: "USD\tLabel", measure: "Amount\r\nMeasure" }],
-      groupingColumns: [firstGrouping, secondGrouping, markupGrouping, quotedGrouping],
+      units: [{
+        ...unit,
+        label: "\"Qualified</textarea><script>alert(\"x\")</script>&'\tLabel",
+        measure: "Amount\r\nMeasure"
+      }],
       statements: [{
         ...statement,
         items: [{
           ...item,
           label: "\u2003-Item\nName",
-          values: { fy2025: "-1.25" },
-          groupings: {
-            [firstGrouping]: "\u3000@Value\r\nLine",
-            [secondGrouping]: null,
-            [markupGrouping]: "</textarea><script>alert(\"x\")</script>&'",
-            [quotedGrouping]: "\"Qualified"
-          }
+          values: { fy2025: "-1.25" }
         }]
       }]
     }).toString("utf8")
 
     expect(copySource(rendered, 1)).toBe([
-      "Item\tUnit\t'\ufeff=Header One\t'\u00a0+Header Two\tmarkup\tquoted\t2025-01-01 – 2025-12-31",
-      "'\u2003-Item Name\tUSD Label (Amount  Measure, scale 0)\t'\u3000@Value  Line\t\t</textarea><script>alert(\"x\")</script>&'\t'\"Qualified\t-1.25"
+      "Item\tUnit\t2025-01-01 – 2025-12-31",
+      "'\u2003-Item Name\t'\"Qualified</textarea><script>alert(\"x\")</script>&' Label (Amount  Measure, scale 0)\t-1.25"
     ].join("\n"))
     expect(rendered).toContain("&lt;/textarea&gt;&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&amp;&#39;")
     expect(rendered.match(/<script>/gu)).toHaveLength(1)

@@ -1,10 +1,8 @@
 # CLI Acceptance Contract
 
 This contract defines observable process behavior for the target `0.2`
-statement-item-row contract. It does not attest to implementation or fixture
-availability; the
-[active refactor plan](../plans/remove-user-defined-groupings.md) owns the
-temporary drift from the published `0.1` CLI.
+statement-item-row contract. Source and fixtures provide separate
+implementation evidence.
 
 ## Purpose
 

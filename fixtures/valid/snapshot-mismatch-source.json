@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "entity": {
     "name": "Example Entity"
   },
@@ -37,7 +37,6 @@
           "values": {
             "fy2025": "10"
           },
-          "groupings": {},
           "rollupTo": "total"
         },
         {
@@ -46,8 +45,7 @@
           "unit": "usd",
           "values": {
             "fy2025": "11"
-          },
-          "groupings": {}
+          }
         }
       ]
     }

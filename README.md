@@ -20,13 +20,13 @@ reference does not attest to current npm publication availability.
 Run without a global installation:
 
 ```sh
-npx -y @sjunepark/fs@0.1.0 --help
+npx -y @sjunepark/fs@0.2.0 --help
 ```
 
 Or install the `fs` executable globally:
 
 ```sh
-npm install --global @sjunepark/fs@0.1.0
+npm install --global @sjunepark/fs@0.2.0
 fs --help
 ```
 
@@ -34,17 +34,17 @@ Common workflows:
 
 ```sh
 # Read the bundled authoring guide.
-npx -y @sjunepark/fs@0.1.0 guide authoring
+npx -y @sjunepark/fs@0.2.0 guide authoring
 
 # Write the document schema or a bundled example to stdout.
-npx -y @sjunepark/fs@0.1.0 schema document
-npx -y @sjunepark/fs@0.1.0 example minimal
+npx -y @sjunepark/fs@0.2.0 schema document
+npx -y @sjunepark/fs@0.2.0 example minimal
 
 # Validate a document and calculate its results.
-npx -y @sjunepark/fs@0.1.0 validate statement.fs.json
+npx -y @sjunepark/fs@0.2.0 validate statement.fs.json
 
 # Render a deterministic standalone HTML table.
-npx -y @sjunepark/fs@0.1.0 render --output statement.html statement.fs.json
+npx -y @sjunepark/fs@0.2.0 render --output statement.html statement.fs.json
 ```
 
 The package bundles its schemas, guide, and examples. Validation does not
@@ -56,15 +56,19 @@ In a source checkout, `docs/development.md` owns repository setup, local CLI
 execution, validation, generated content, and package checks. That
 repository-only guide is not part of the npm package.
 
-The source repository is defining the breaking `0.2` artifact contract before
-implementation. The
-[active refactor plan](docs/plans/remove-user-defined-groupings.md) owns that
-temporary difference from the published package.
+The source repository implements the breaking `0.2` artifact contract. The
+[completed refactor plan](https://github.com/cpaikr/fs/blob/main/docs/plans/remove-user-defined-groupings.md)
+records its delivery while npm still serves `0.1.0`.
 
-## Published format contract
+## Format contracts
 
-Documents handled by `@sjunepark/fs@0.1.0` use `formatVersion: "0.1"`. The
-published
+The target `@sjunepark/fs@0.2.0` package uses `formatVersion: "0.2"`. The
+[FS 0.2 semantic specification](https://cpaikr.github.io/fs/spec/0.2/) and
+[versioned document schema](https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json)
+define that contract.
+
+Until the target release is published, `@sjunepark/fs@0.1.0` remains the npm
+release and uses `formatVersion: "0.1"`. Its immutable
 [FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/) and
 [versioned document schema](https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json)
 define the public contract.

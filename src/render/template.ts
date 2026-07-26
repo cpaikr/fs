@@ -677,16 +677,6 @@ const behavior = html`  <script>
           ? unitCell.dataset.unitFull || unitCell.textContent || ""
           : table.dataset.commonUnit || "";
         if (unit !== "") tooltip.append(tooltipLine("Unit", unit));
-        if (headerRow !== undefined) {
-          for (const groupingHeader of headerRow.cells) {
-            const key = groupingHeader.dataset.col;
-            if (key === undefined || !key.startsWith("g")) continue;
-            const groupingCell = row.cells[groupingHeader.cellIndex];
-            if (groupingCell !== undefined) {
-              tooltip.append(tooltipLine(groupingHeader.textContent || "", groupingCell.textContent || ""));
-            }
-          }
-        }
         tooltip.append(tooltipLine("Value", cell.textContent || ""));
         const description = row.dataset.description;
         if (description !== undefined) tooltip.append(tooltipLine("Description", description));
@@ -836,18 +826,6 @@ const periodLabel = (period: RenderPresentation["document"]["periods"][number]):
 
 const unitText = (unit: Unit): string => `${unit.label} (${unit.measure}, scale ${unit.scale})`
 
-/*
- * Display-only transformations. Copied TSV keeps declared identifiers and
- * exact decimal strings verbatim so spreadsheet handoff stays byte-exact.
- */
-const groupingDisplayLabel = (identifier: string): string => {
-  if (!/^[A-Za-z][A-Za-z0-9]*$/u.test(identifier)) return identifier
-  const spaced = identifier
-    .replace(/([a-z0-9])([A-Z])/gu, "$1 $2")
-    .replace(/\b([A-Z])(?![A-Z])/gu, (_, letter: string) => letter.toLowerCase())
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1)
-}
-
 const groupDigits = (integer: string): string => {
   const lead = integer.length % 3 || 3
   let grouped = integer.slice(0, lead)
@@ -876,12 +854,6 @@ const authorTsvText = (text: string): string => {
 }
 
 const jsonStringFragment = (text: string): string => JSON.stringify(text).slice(1, -1)
-
-const groupingTemplate = (value: string | null | undefined): HtmlTemplate => {
-  if (value === null) return html`—`
-  if (value === undefined) throw new Error("Validated item lost its grouping value")
-  return html`${value}`
-}
 
 const appendValue = (sink: HtmlSink, value: ValueCell): void => {
   if (value === null) {
@@ -916,15 +888,11 @@ const appendCopySource = (
   statementPresentation: StatementPresentation,
   sink: HtmlSink
 ): void => {
-  const { statement, copySourceId, groupingColumns } = statementPresentation
+  const { statement, copySourceId } = statementPresentation
   sink.write(html`      <textarea class="copy-source" id="${copySourceId}" readonly hidden aria-hidden="true" tabindex="-1">"`)
   appendAuthorTsvCell(sink, "Item")
   appendTsvDelimiter(sink, "\t")
   appendAuthorTsvCell(sink, "Unit")
-  for (const grouping of groupingColumns) {
-    appendTsvDelimiter(sink, "\t")
-    appendAuthorTsvCell(sink, grouping)
-  }
   for (const periodId of statement.periods) {
     const period = presentation.periods.get(periodId)
     if (period === undefined) throw new Error("Validated statement lost its period")
@@ -939,12 +907,6 @@ const appendCopySource = (
     if (unit === undefined) throw new Error("Validated item lost its unit")
     appendTsvDelimiter(sink, "\t")
     appendAuthorTsvCell(sink, unitText(unit))
-    for (const grouping of groupingColumns) {
-      const value = item.groupings[grouping]
-      if (value === undefined) throw new Error("Validated item lost its grouping value")
-      appendTsvDelimiter(sink, "\t")
-      if (value !== null) appendAuthorTsvCell(sink, value)
-    }
     for (const periodId of statement.periods) {
       const value = item.values[periodId]
       if (value === undefined) throw new Error("Validated item lost its period value")
@@ -1055,9 +1017,9 @@ const appendTableTools = (
   statementPresentation: StatementPresentation,
   sink: HtmlSink
 ): void => {
-  const { commonUnit, items, groupingColumns } = statementPresentation
+  const { commonUnit, items } = statementPresentation
   const hasParents = items.some(({ isParent }) => isParent)
-  const hasColumnToggles = commonUnit === undefined || groupingColumns.length > 0
+  const hasColumnToggles = commonUnit === undefined
   if (!hasParents && !hasColumnToggles) return
   sink.writeLine(html`        <div class="table-tools" data-table-tools hidden>`)
   if (hasColumnToggles) {
@@ -1066,9 +1028,6 @@ const appendTableTools = (
             <div class="col-menu-panel">`)
     if (commonUnit === undefined) {
       sink.writeLine(html`              <label><input type="checkbox" checked data-col-toggle="unit"> Unit</label>`)
-    }
-    for (const [index, grouping] of groupingColumns.entries()) {
-      sink.writeLine(html`              <label><input type="checkbox" checked data-col-toggle="g${index}"> ${groupingDisplayLabel(grouping)}</label>`)
     }
     sink.writeLine(html`            </div>
           </details>`)
@@ -1099,9 +1058,6 @@ const appendHeadingRow = (
                 <th scope="row"><span class="item-cell"><span class="item-label">${parent.item.label}</span></span></th>`)
   if (statementPresentation.commonUnit === undefined) {
     sink.writeLine(html`                <td data-col="unit"></td>`)
-  }
-  for (const [groupingIndex] of statementPresentation.groupingColumns.entries()) {
-    sink.writeLine(html`                <td data-col="g${groupingIndex}"></td>`)
   }
   for (const period of statementPresentation.statement.periods) {
     if (!presentation.periods.has(period)) throw new Error("Validated statement lost its period")
@@ -1157,7 +1113,6 @@ const appendStatement = (
   const {
     statement,
     commonUnit,
-    groupingColumns,
     ordinal,
     anchorId,
     tableId,
@@ -1179,9 +1134,6 @@ const appendStatement = (
             <tr>
               <th scope="col" class="col-text">Item</th>`)
   if (commonUnit === undefined) sink.writeLine(html`              <th scope="col" class="col-text" data-col="unit">Unit</th>`)
-  for (const [index, grouping] of groupingColumns.entries()) {
-    sink.writeLine(html`              <th scope="col" class="col-text" data-col="g${index}">${groupingDisplayLabel(grouping)}</th>`)
-  }
   for (const periodId of statement.periods) {
     const period = presentation.periods.get(periodId)
     if (period === undefined) throw new Error("Validated statement lost its period")
@@ -1201,9 +1153,6 @@ const appendStatement = (
     sink.writeLine(itemCell(statementPresentation, index))
     if (commonUnit === undefined) {
       sink.writeLine(html`                <td class="metadata col-text" data-col="unit" data-unit-full="${unitText(unit)}">${unit.label}</td>`)
-    }
-    for (const [groupingIndex, grouping] of groupingColumns.entries()) {
-      sink.writeLine(html`                <td class="metadata col-text" data-col="g${groupingIndex}">${groupingTemplate(item.groupings[grouping])}</td>`)
     }
     for (const period of statement.periods) {
       const value = item.values[period]

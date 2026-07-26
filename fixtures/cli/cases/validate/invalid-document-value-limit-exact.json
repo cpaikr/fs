@@ -5,7 +5,7 @@
   "workspace": [
     {
       "generated": [
-        { "utf8": "{\"formatVersion\":\"0.1\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2024-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[", "count": 1 },
+        { "utf8": "{\"formatVersion\":\"0.2\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2024-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[", "count": 1 },
         { "utf8": "{},", "count": 231 },
         { "utf8": "{}]}]}", "count": 1 }
       ],
@@ -25,16 +25,16 @@
         { "pointer": "/snapshotDiff", "equals": ["formatVersion", "status"] }
       ],
       "arrays": [
-        { "pointer": "/validation/conformance/errors", "equals": 1160 }
+        { "pointer": "/validation/conformance/errors", "equals": 928 }
       ],
       "equalities": [
-        { "pointer": "/validation/formatVersion", "equals": "0.1" },
+        { "pointer": "/validation/formatVersion", "equals": "0.2" },
         { "pointer": "/validation/conformance/status", "equals": "nonconforming" },
         { "pointer": "/validation/conformance/errors/0/code", "equals": "required-property" },
-        { "pointer": "/validation/conformance/errors/0/path", "equals": "/statements/0/items/0/groupings" },
+        { "pointer": "/validation/conformance/errors/0/path", "equals": "/statements/0/items/0/id" },
         { "pointer": "/validation/calculations/status", "equals": "not-run" },
         { "pointer": "/validation/calculations/applications", "equals": [] },
-        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.1" },
+        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.2" },
         { "pointer": "/snapshotDiff/status", "equals": "not-recorded" },
         { "pointer": "/help", "equals": [] }
       ],

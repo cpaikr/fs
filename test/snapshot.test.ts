@@ -56,7 +56,7 @@ describe("snapshot comparison", () => {
     const inconsistent = inconsistentApplications([added.current])
     if (inconsistent === undefined) throw new Error("Added application must be inconsistent")
     const current: ValidationResult = {
-      formatVersion: "0.1",
+      formatVersion: "0.2",
       conformance: { status: "conforming", errors: [] },
       calculations: { status: "inconsistent", applications: inconsistent }
     }
@@ -70,7 +70,7 @@ describe("snapshot comparison", () => {
     const result = validateDocument(value)
     expect(result.validation.conformance.status).toBe("nonconforming")
     expect(result.snapshotDiff).toEqual({
-      formatVersion: "0.1",
+      formatVersion: "0.2",
       status: "not-comparable",
       reason: "invalid-snapshot"
     })
@@ -130,7 +130,7 @@ describe("snapshot comparison", () => {
       })
       expect(result.validation.calculations).toEqual({ status: "not-run", applications: [] })
       expect(result.snapshotDiff).toEqual({
-        formatVersion: "0.1",
+        formatVersion: "0.2",
         status: "not-comparable",
         reason: "invalid-snapshot"
       })

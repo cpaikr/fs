@@ -1,6 +1,6 @@
 {
-  "$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json",
-  "formatVersion": "0.1",
+  "$schema": "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json",
+  "formatVersion": "0.2",
   "documentId": "manufacturing-group-2025",
   "entity": {
     "id": "example-group",
@@ -49,10 +49,6 @@
       "date": "2024-12-31"
     }
   ],
-  "groupingColumns": [
-    "majorGroup",
-    "valuation"
-  ],
   "statements": [
     {
       "id": "balance-sheet",
@@ -70,11 +66,7 @@
             "at-2025": "400",
             "at-2024": "350"
           },
-          "rollupTo": "assets",
-          "groupings": {
-            "majorGroup": "Assets",
-            "valuation": "Cash"
-          }
+          "rollupTo": "assets"
         },
         {
           "id": "inventory",
@@ -84,11 +76,7 @@
             "at-2025": "600",
             "at-2024": "550"
           },
-          "rollupTo": "assets",
-          "groupings": {
-            "majorGroup": "Assets",
-            "valuation": "NWC"
-          }
+          "rollupTo": "assets"
         },
         {
           "id": "assets",
@@ -97,10 +85,6 @@
           "values": {
             "at-2025": "1000",
             "at-2024": "900"
-          },
-          "groupings": {
-            "majorGroup": "Assets",
-            "valuation": null
           }
         },
         {
@@ -111,11 +95,7 @@
             "at-2025": "450",
             "at-2024": "400"
           },
-          "rollupTo": "liabilities-and-equity",
-          "groupings": {
-            "majorGroup": "Liabilities and equity",
-            "valuation": "Debt"
-          }
+          "rollupTo": "liabilities-and-equity"
         },
         {
           "id": "equity",
@@ -125,11 +105,7 @@
             "at-2025": "550",
             "at-2024": "500"
           },
-          "rollupTo": "liabilities-and-equity",
-          "groupings": {
-            "majorGroup": "Liabilities and equity",
-            "valuation": "Equity"
-          }
+          "rollupTo": "liabilities-and-equity"
         },
         {
           "id": "liabilities-and-equity",
@@ -138,10 +114,6 @@
           "values": {
             "at-2025": "1000",
             "at-2024": "900"
-          },
-          "groupings": {
-            "majorGroup": "Liabilities and equity",
-            "valuation": null
           }
         }
       ]
@@ -162,11 +134,7 @@
             "fy2025": "60",
             "fy2024": "50"
           },
-          "rollupTo": "revenue",
-          "groupings": {
-            "majorGroup": "Revenue",
-            "valuation": "Revenue"
-          }
+          "rollupTo": "revenue"
         },
         {
           "id": "service-revenue",
@@ -176,11 +144,7 @@
             "fy2025": "40",
             "fy2024": "30"
           },
-          "rollupTo": "revenue",
-          "groupings": {
-            "majorGroup": "Revenue",
-            "valuation": "Revenue"
-          }
+          "rollupTo": "revenue"
         },
         {
           "id": "revenue",
@@ -190,11 +154,7 @@
             "fy2025": "100",
             "fy2024": "80"
           },
-          "rollupTo": "gross-profit",
-          "groupings": {
-            "majorGroup": "Revenue",
-            "valuation": "Revenue"
-          }
+          "rollupTo": "gross-profit"
         },
         {
           "id": "materials",
@@ -204,11 +164,7 @@
             "fy2025": "-35",
             "fy2024": "-30"
           },
-          "rollupTo": "cost-of-sales",
-          "groupings": {
-            "majorGroup": "Cost of sales",
-            "valuation": null
-          }
+          "rollupTo": "cost-of-sales"
         },
         {
           "id": "labor",
@@ -218,11 +174,7 @@
             "fy2025": "-25",
             "fy2024": "-20"
           },
-          "rollupTo": "cost-of-sales",
-          "groupings": {
-            "majorGroup": "Cost of sales",
-            "valuation": null
-          }
+          "rollupTo": "cost-of-sales"
         },
         {
           "id": "cost-of-sales",
@@ -232,11 +184,7 @@
             "fy2025": "-60",
             "fy2024": "-50"
           },
-          "rollupTo": "gross-profit",
-          "groupings": {
-            "majorGroup": "Cost of sales",
-            "valuation": null
-          }
+          "rollupTo": "gross-profit"
         },
         {
           "id": "gross-profit",
@@ -245,10 +193,6 @@
           "values": {
             "fy2025": "41",
             "fy2024": "30"
-          },
-          "groupings": {
-            "majorGroup": "Profit",
-            "valuation": "EBITDA"
           }
         },
         {
@@ -260,10 +204,6 @@
             "fy2024": {
               "unavailable": true
             }
-          },
-          "groupings": {
-            "majorGroup": "Per share",
-            "valuation": "EPS"
           }
         }
       ]
@@ -284,11 +224,7 @@
             "fy2025": "30",
             "fy2024": "25"
           },
-          "rollupTo": "net-cash-flow",
-          "groupings": {
-            "majorGroup": "Cash flow",
-            "valuation": null
-          }
+          "rollupTo": "net-cash-flow"
         },
         {
           "id": "investing",
@@ -298,11 +234,7 @@
             "fy2025": "-10",
             "fy2024": "-8"
           },
-          "rollupTo": "net-cash-flow",
-          "groupings": {
-            "majorGroup": "Cash flow",
-            "valuation": null
-          }
+          "rollupTo": "net-cash-flow"
         },
         {
           "id": "financing",
@@ -312,11 +244,7 @@
             "fy2025": "0",
             "fy2024": "-2"
           },
-          "rollupTo": "net-cash-flow",
-          "groupings": {
-            "majorGroup": "Cash flow",
-            "valuation": null
-          }
+          "rollupTo": "net-cash-flow"
         },
         {
           "id": "net-cash-flow",
@@ -325,10 +253,6 @@
           "values": {
             "fy2025": "20",
             "fy2024": "15"
-          },
-          "groupings": {
-            "majorGroup": "Cash flow",
-            "valuation": null
           }
         }
       ]
@@ -349,11 +273,7 @@
             "at-2025": "200",
             "at-2024": "180"
           },
-          "rollupTo": "total-equity",
-          "groupings": {
-            "majorGroup": "Equity",
-            "valuation": "Equity"
-          }
+          "rollupTo": "total-equity"
         },
         {
           "id": "retained-earnings",
@@ -363,11 +283,7 @@
             "at-2025": "350",
             "at-2024": "320"
           },
-          "rollupTo": "total-equity",
-          "groupings": {
-            "majorGroup": "Equity",
-            "valuation": "Equity"
-          }
+          "rollupTo": "total-equity"
         },
         {
           "id": "total-equity",
@@ -376,10 +292,6 @@
           "values": {
             "at-2025": "550",
             "at-2024": "500"
-          },
-          "groupings": {
-            "majorGroup": "Equity",
-            "valuation": "Equity"
           }
         }
       ]
@@ -400,11 +312,7 @@
             "fy2025": "35",
             "fy2024": "30"
           },
-          "rollupTo": "manufacturing-cost",
-          "groupings": {
-            "majorGroup": "Manufacturing",
-            "valuation": null
-          }
+          "rollupTo": "manufacturing-cost"
         },
         {
           "id": "labor",
@@ -414,11 +322,7 @@
             "fy2025": "25",
             "fy2024": "20"
           },
-          "rollupTo": "manufacturing-cost",
-          "groupings": {
-            "majorGroup": "Manufacturing",
-            "valuation": null
-          }
+          "rollupTo": "manufacturing-cost"
         },
         {
           "id": "manufacturing-cost",
@@ -427,10 +331,6 @@
           "values": {
             "fy2025": "60",
             "fy2024": "50"
-          },
-          "groupings": {
-            "majorGroup": "Manufacturing",
-            "valuation": null
           }
         }
       ]

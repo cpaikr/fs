@@ -47,18 +47,6 @@ const duplicateReferences = (
   })
 }
 
-const duplicateIdentifiers = (
-  identifiers: ReadonlyArray<string>,
-  basePath: string,
-  add: AddDiagnostic
-): void => {
-  const values = new Set<string>()
-  identifiers.forEach((identifier, index) => {
-    if (values.has(identifier)) add(diagnostic("duplicate-id", `${basePath}/${index}`))
-    values.add(identifier)
-  })
-}
-
 const reference = (
   registry: ReadonlySet<string>,
   value: string,
@@ -107,11 +95,9 @@ const scanSemantics = (document: Document, add: AddDiagnostic): void => {
   duplicateDefinitions(document.units, "/units", add)
   duplicateDefinitions(document.periods, "/periods", add)
   duplicateDefinitions(document.statements, "/statements", add)
-  duplicateIdentifiers(document.groupingColumns ?? [], "/groupingColumns", add)
 
   const units = new Set(document.units.map(({ id }) => id))
   const periods = new Set(document.periods.map(({ id }) => id))
-  const groupingColumns = document.groupingColumns ?? []
 
   const periodValues = new Set<string>()
   document.periods.forEach((period, index) => {
@@ -146,10 +132,6 @@ const scanSemantics = (document: Document, add: AddDiagnostic): void => {
       if (!sameKeys(item.values, statement.periods)) {
         add(diagnostic("map-key-mismatch", `${itemPath}/values`))
       }
-      if (!sameKeys(item.groupings, groupingColumns)) {
-        add(diagnostic("map-key-mismatch", `${itemPath}/groupings`))
-      }
-
       if (item.rollupTo === undefined) return
       if (item.rollupTo === item.id) {
         add(diagnostic("self-rollup", `${itemPath}/rollupTo`))

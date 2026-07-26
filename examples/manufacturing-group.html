@@ -460,13 +460,6 @@
     <section class="statement" id="statement-1">
       <h2><span class="ordinal">01</span>Balance sheet</h2>
         <div class="table-tools" data-table-tools hidden>
-          <details class="col-menu" data-col-menu>
-            <summary>Columns</summary>
-            <div class="col-menu-panel">
-              <label><input type="checkbox" checked data-col-toggle="g0"> Major group</label>
-              <label><input type="checkbox" checked data-col-toggle="g1"> Valuation</label>
-            </div>
-          </details>
           <span class="tools-spacer"></span>
           <button class="tool-button" type="button" data-rows-collapse>Collapse all</button>
           <button class="tool-button" type="button" data-rows-expand>Expand all</button>
@@ -478,8 +471,6 @@
           <thead>
             <tr>
               <th scope="col" class="col-text">Item</th>
-              <th scope="col" class="col-text" data-col="g0">Major group</th>
-              <th scope="col" class="col-text" data-col="g1">Valuation</th>
               <th scope="col" class="col-num">2025-12-31</th>
               <th scope="col" class="col-num">2024-12-31</th>
             </tr>
@@ -487,57 +478,41 @@
           <tbody>
               <tr class="row-heading" data-parent-row="2">
                 <th scope="row"><span class="item-cell"><span class="item-label">Total assets</span></span></th>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr data-row="0" data-parent-row="2" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Cash</span></span></th>
-                <td class="metadata col-text" data-col="g0">Assets</td>
-                <td class="metadata col-text" data-col="g1">Cash</td>
               <td class="value">400</td>
               <td class="value">350</td>
               </tr>
               <tr data-row="1" data-parent-row="2" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Inventory</span></span></th>
-                <td class="metadata col-text" data-col="g0">Assets</td>
-                <td class="metadata col-text" data-col="g1">NWC</td>
               <td class="value">600</td>
               <td class="value">550</td>
               </tr>
               <tr data-row="2" class="row-parent row-total">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Total assets detail rows"></button></span><span class="item-label">Total assets</span> <span class="collapsed-count" hidden>· 2 rows</span></span></th>
-                <td class="metadata col-text" data-col="g0">Assets</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">1,000</td>
               <td class="value">900</td>
               </tr>
               <tr class="row-heading" data-parent-row="5">
                 <th scope="row"><span class="item-cell"><span class="item-label">Liabilities and equity</span></span></th>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr data-row="3" data-parent-row="5" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Liabilities</span></span></th>
-                <td class="metadata col-text" data-col="g0">Liabilities and equity</td>
-                <td class="metadata col-text" data-col="g1">Debt</td>
               <td class="value">450</td>
               <td class="value">400</td>
               </tr>
               <tr data-row="4" data-parent-row="5" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Equity</span></span></th>
-                <td class="metadata col-text" data-col="g0">Liabilities and equity</td>
-                <td class="metadata col-text" data-col="g1">Equity</td>
               <td class="value">550</td>
               <td class="value">500</td>
               </tr>
               <tr data-row="5" class="row-parent row-total">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Liabilities and equity detail rows"></button></span><span class="item-label">Liabilities and equity</span> <span class="collapsed-count" hidden>· 2 rows</span></span></th>
-                <td class="metadata col-text" data-col="g0">Liabilities and equity</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">1,000</td>
               <td class="value">900</td>
               </tr>
@@ -600,7 +575,7 @@
             </table>
           </div>
         </details>
-      <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-12-31\t2024-12-31\nCash\tKRW millions (KRW, scale 6)\tAssets\tCash\t400\t350\nInventory\tKRW millions (KRW, scale 6)\tAssets\tNWC\t600\t550\nTotal assets\tKRW millions (KRW, scale 6)\tAssets\t\t1000\t900\nLiabilities\tKRW millions (KRW, scale 6)\tLiabilities and equity\tDebt\t450\t400\nEquity\tKRW millions (KRW, scale 6)\tLiabilities and equity\tEquity\t550\t500\nLiabilities and equity\tKRW millions (KRW, scale 6)\tLiabilities and equity\t\t1000\t900"</textarea>
+      <textarea class="copy-source" id="copy-source-1" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\t2025-12-31\t2024-12-31\nCash\tKRW millions (KRW, scale 6)\t400\t350\nInventory\tKRW millions (KRW, scale 6)\t600\t550\nTotal assets\tKRW millions (KRW, scale 6)\t1000\t900\nLiabilities\tKRW millions (KRW, scale 6)\t450\t400\nEquity\tKRW millions (KRW, scale 6)\t550\t500\nLiabilities and equity\tKRW millions (KRW, scale 6)\t1000\t900"</textarea>
       <div class="handoff" data-copy-handoff hidden>
         <div class="handoff-action">
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-1" data-copy-status="copy-status-1" aria-describedby="copy-help-1" aria-label="Copy Balance sheet for Excel">Copy for Excel</button>
@@ -617,8 +592,6 @@
             <summary>Columns</summary>
             <div class="col-menu-panel">
               <label><input type="checkbox" checked data-col-toggle="unit"> Unit</label>
-              <label><input type="checkbox" checked data-col-toggle="g0"> Major group</label>
-              <label><input type="checkbox" checked data-col-toggle="g1"> Valuation</label>
             </div>
           </details>
           <span class="tools-spacer"></span>
@@ -633,8 +606,6 @@
             <tr>
               <th scope="col" class="col-text">Item</th>
               <th scope="col" class="col-text" data-col="unit">Unit</th>
-              <th scope="col" class="col-text" data-col="g0">Major group</th>
-              <th scope="col" class="col-text" data-col="g1">Valuation</th>
               <th scope="col" class="col-num">2025-01-01 – 2025-12-31</th>
               <th scope="col" class="col-num">2024-01-01 – 2024-12-31</th>
             </tr>
@@ -643,88 +614,66 @@
               <tr class="row-heading" data-parent-row="6">
                 <th scope="row"><span class="item-cell"><span class="item-label">Gross profit</span></span></th>
                 <td data-col="unit"></td>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr class="row-heading" data-parent-row="2" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="item-label">Revenue</span></span></th>
                 <td data-col="unit"></td>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr data-row="0" data-parent-row="2" style="--depth: 2">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Product revenue</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW millions (KRW, scale 6)">KRW millions</td>
-                <td class="metadata col-text" data-col="g0">Revenue</td>
-                <td class="metadata col-text" data-col="g1">Revenue</td>
               <td class="value">60</td>
               <td class="value">50</td>
               </tr>
               <tr data-row="1" data-parent-row="2" style="--depth: 2">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Service revenue</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW millions (KRW, scale 6)">KRW millions</td>
-                <td class="metadata col-text" data-col="g0">Revenue</td>
-                <td class="metadata col-text" data-col="g1">Revenue</td>
               <td class="value">40</td>
               <td class="value">30</td>
               </tr>
               <tr data-row="2" data-parent-row="6" class="row-parent" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Revenue detail rows"></button></span><span class="item-label">Revenue</span> <span class="collapsed-count" hidden>· 2 rows</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW millions (KRW, scale 6)">KRW millions</td>
-                <td class="metadata col-text" data-col="g0">Revenue</td>
-                <td class="metadata col-text" data-col="g1">Revenue</td>
               <td class="value">100</td>
               <td class="value">80</td>
               </tr>
               <tr class="row-heading" data-parent-row="5" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="item-label">Cost of sales</span></span></th>
                 <td data-col="unit"></td>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr data-row="3" data-parent-row="5" style="--depth: 2">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Materials</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW millions (KRW, scale 6)">KRW millions</td>
-                <td class="metadata col-text" data-col="g0">Cost of sales</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">-35</td>
               <td class="value">-30</td>
               </tr>
               <tr data-row="4" data-parent-row="5" style="--depth: 2">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Labor</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW millions (KRW, scale 6)">KRW millions</td>
-                <td class="metadata col-text" data-col="g0">Cost of sales</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">-25</td>
               <td class="value">-20</td>
               </tr>
               <tr data-row="5" data-parent-row="6" class="row-parent" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Cost of sales detail rows"></button></span><span class="item-label">Cost of sales</span> <span class="collapsed-count" hidden>· 2 rows</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW millions (KRW, scale 6)">KRW millions</td>
-                <td class="metadata col-text" data-col="g0">Cost of sales</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">-60</td>
               <td class="value">-50</td>
               </tr>
               <tr data-row="6" class="row-parent row-total">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Gross profit detail rows"></button></span><span class="item-label">Gross profit</span> <span class="collapsed-count" hidden>· 6 rows</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW millions (KRW, scale 6)">KRW millions</td>
-                <td class="metadata col-text" data-col="g0">Profit</td>
-                <td class="metadata col-text" data-col="g1">EBITDA</td>
               <td class="value">41</td>
               <td class="value">30</td>
               </tr>
               <tr data-row="7">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Basic EPS</span></span></th>
                 <td class="metadata col-text" data-col="unit" data-unit-full="KRW per share (KRW/share, scale 0)">KRW per share</td>
-                <td class="metadata col-text" data-col="g0">Per share</td>
-                <td class="metadata col-text" data-col="g1">EPS</td>
               <td class="value">1,250</td>
               <td class="unavailable">Unavailable</td>
               </tr>
@@ -805,7 +754,7 @@
             </table>
           </div>
         </details>
-      <textarea class="copy-source" id="copy-source-2" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nProduct revenue\tKRW millions (KRW, scale 6)\tRevenue\tRevenue\t60\t50\nService revenue\tKRW millions (KRW, scale 6)\tRevenue\tRevenue\t40\t30\nRevenue\tKRW millions (KRW, scale 6)\tRevenue\tRevenue\t100\t80\nMaterials\tKRW millions (KRW, scale 6)\tCost of sales\t\t-35\t-30\nLabor\tKRW millions (KRW, scale 6)\tCost of sales\t\t-25\t-20\nCost of sales\tKRW millions (KRW, scale 6)\tCost of sales\t\t-60\t-50\nGross profit\tKRW millions (KRW, scale 6)\tProfit\tEBITDA\t41\t30\nBasic EPS\tKRW per share (KRW/share, scale 0)\tPer share\tEPS\t1250\tUnavailable"</textarea>
+      <textarea class="copy-source" id="copy-source-2" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nProduct revenue\tKRW millions (KRW, scale 6)\t60\t50\nService revenue\tKRW millions (KRW, scale 6)\t40\t30\nRevenue\tKRW millions (KRW, scale 6)\t100\t80\nMaterials\tKRW millions (KRW, scale 6)\t-35\t-30\nLabor\tKRW millions (KRW, scale 6)\t-25\t-20\nCost of sales\tKRW millions (KRW, scale 6)\t-60\t-50\nGross profit\tKRW millions (KRW, scale 6)\t41\t30\nBasic EPS\tKRW per share (KRW/share, scale 0)\t1250\tUnavailable"</textarea>
       <div class="handoff" data-copy-handoff hidden>
         <div class="handoff-action">
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-2" data-copy-status="copy-status-2" aria-describedby="copy-help-2" aria-label="Copy Income statement for Excel">Copy for Excel</button>
@@ -818,13 +767,6 @@
     <section class="statement" id="statement-3">
       <h2><span class="ordinal">03</span>Cash flow statement</h2>
         <div class="table-tools" data-table-tools hidden>
-          <details class="col-menu" data-col-menu>
-            <summary>Columns</summary>
-            <div class="col-menu-panel">
-              <label><input type="checkbox" checked data-col-toggle="g0"> Major group</label>
-              <label><input type="checkbox" checked data-col-toggle="g1"> Valuation</label>
-            </div>
-          </details>
           <span class="tools-spacer"></span>
           <button class="tool-button" type="button" data-rows-collapse>Collapse all</button>
           <button class="tool-button" type="button" data-rows-expand>Expand all</button>
@@ -836,8 +778,6 @@
           <thead>
             <tr>
               <th scope="col" class="col-text">Item</th>
-              <th scope="col" class="col-text" data-col="g0">Major group</th>
-              <th scope="col" class="col-text" data-col="g1">Valuation</th>
               <th scope="col" class="col-num">2025-01-01 – 2025-12-31</th>
               <th scope="col" class="col-num">2024-01-01 – 2024-12-31</th>
             </tr>
@@ -845,36 +785,26 @@
           <tbody>
               <tr class="row-heading" data-parent-row="3">
                 <th scope="row"><span class="item-cell"><span class="item-label">Net cash flow</span></span></th>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr data-row="0" data-parent-row="3" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Operating cash flow</span></span></th>
-                <td class="metadata col-text" data-col="g0">Cash flow</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">30</td>
               <td class="value">25</td>
               </tr>
               <tr data-row="1" data-parent-row="3" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Investing cash flow</span></span></th>
-                <td class="metadata col-text" data-col="g0">Cash flow</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">-10</td>
               <td class="value">-8</td>
               </tr>
               <tr data-row="2" data-parent-row="3" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Financing cash flow</span></span></th>
-                <td class="metadata col-text" data-col="g0">Cash flow</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">0</td>
               <td class="value">-2</td>
               </tr>
               <tr data-row="3" class="row-parent row-total">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Net cash flow detail rows"></button></span><span class="item-label">Net cash flow</span> <span class="collapsed-count" hidden>· 3 rows</span></span></th>
-                <td class="metadata col-text" data-col="g0">Cash flow</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">20</td>
               <td class="value">15</td>
               </tr>
@@ -919,7 +849,7 @@
             </table>
           </div>
         </details>
-      <textarea class="copy-source" id="copy-source-3" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nOperating cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t30\t25\nInvesting cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t-10\t-8\nFinancing cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t0\t-2\nNet cash flow\tKRW millions (KRW, scale 6)\tCash flow\t\t20\t15"</textarea>
+      <textarea class="copy-source" id="copy-source-3" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nOperating cash flow\tKRW millions (KRW, scale 6)\t30\t25\nInvesting cash flow\tKRW millions (KRW, scale 6)\t-10\t-8\nFinancing cash flow\tKRW millions (KRW, scale 6)\t0\t-2\nNet cash flow\tKRW millions (KRW, scale 6)\t20\t15"</textarea>
       <div class="handoff" data-copy-handoff hidden>
         <div class="handoff-action">
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-3" data-copy-status="copy-status-3" aria-describedby="copy-help-3" aria-label="Copy Cash flow statement for Excel">Copy for Excel</button>
@@ -932,13 +862,6 @@
     <section class="statement" id="statement-4">
       <h2><span class="ordinal">04</span>Statement of changes in equity</h2>
         <div class="table-tools" data-table-tools hidden>
-          <details class="col-menu" data-col-menu>
-            <summary>Columns</summary>
-            <div class="col-menu-panel">
-              <label><input type="checkbox" checked data-col-toggle="g0"> Major group</label>
-              <label><input type="checkbox" checked data-col-toggle="g1"> Valuation</label>
-            </div>
-          </details>
           <span class="tools-spacer"></span>
           <button class="tool-button" type="button" data-rows-collapse>Collapse all</button>
           <button class="tool-button" type="button" data-rows-expand>Expand all</button>
@@ -950,8 +873,6 @@
           <thead>
             <tr>
               <th scope="col" class="col-text">Item</th>
-              <th scope="col" class="col-text" data-col="g0">Major group</th>
-              <th scope="col" class="col-text" data-col="g1">Valuation</th>
               <th scope="col" class="col-num">2025-12-31</th>
               <th scope="col" class="col-num">2024-12-31</th>
             </tr>
@@ -959,29 +880,21 @@
           <tbody>
               <tr class="row-heading" data-parent-row="2">
                 <th scope="row"><span class="item-cell"><span class="item-label">Total equity</span></span></th>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr data-row="0" data-parent-row="2" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Share capital</span></span></th>
-                <td class="metadata col-text" data-col="g0">Equity</td>
-                <td class="metadata col-text" data-col="g1">Equity</td>
               <td class="value">200</td>
               <td class="value">180</td>
               </tr>
               <tr data-row="1" data-parent-row="2" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Retained earnings</span></span></th>
-                <td class="metadata col-text" data-col="g0">Equity</td>
-                <td class="metadata col-text" data-col="g1">Equity</td>
               <td class="value">350</td>
               <td class="value">320</td>
               </tr>
               <tr data-row="2" class="row-parent row-total">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Total equity detail rows"></button></span><span class="item-label">Total equity</span> <span class="collapsed-count" hidden>· 2 rows</span></span></th>
-                <td class="metadata col-text" data-col="g0">Equity</td>
-                <td class="metadata col-text" data-col="g1">Equity</td>
               <td class="value">550</td>
               <td class="value">500</td>
               </tr>
@@ -1026,7 +939,7 @@
             </table>
           </div>
         </details>
-      <textarea class="copy-source" id="copy-source-4" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-12-31\t2024-12-31\nShare capital\tKRW millions (KRW, scale 6)\tEquity\tEquity\t200\t180\nRetained earnings\tKRW millions (KRW, scale 6)\tEquity\tEquity\t350\t320\nTotal equity\tKRW millions (KRW, scale 6)\tEquity\tEquity\t550\t500"</textarea>
+      <textarea class="copy-source" id="copy-source-4" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\t2025-12-31\t2024-12-31\nShare capital\tKRW millions (KRW, scale 6)\t200\t180\nRetained earnings\tKRW millions (KRW, scale 6)\t350\t320\nTotal equity\tKRW millions (KRW, scale 6)\t550\t500"</textarea>
       <div class="handoff" data-copy-handoff hidden>
         <div class="handoff-action">
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-4" data-copy-status="copy-status-4" aria-describedby="copy-help-4" aria-label="Copy Statement of changes in equity for Excel">Copy for Excel</button>
@@ -1039,13 +952,6 @@
     <section class="statement" id="statement-5">
       <h2><span class="ordinal">05</span>Manufacturing cost statement</h2>
         <div class="table-tools" data-table-tools hidden>
-          <details class="col-menu" data-col-menu>
-            <summary>Columns</summary>
-            <div class="col-menu-panel">
-              <label><input type="checkbox" checked data-col-toggle="g0"> Major group</label>
-              <label><input type="checkbox" checked data-col-toggle="g1"> Valuation</label>
-            </div>
-          </details>
           <span class="tools-spacer"></span>
           <button class="tool-button" type="button" data-rows-collapse>Collapse all</button>
           <button class="tool-button" type="button" data-rows-expand>Expand all</button>
@@ -1057,8 +963,6 @@
           <thead>
             <tr>
               <th scope="col" class="col-text">Item</th>
-              <th scope="col" class="col-text" data-col="g0">Major group</th>
-              <th scope="col" class="col-text" data-col="g1">Valuation</th>
               <th scope="col" class="col-num">2025-01-01 – 2025-12-31</th>
               <th scope="col" class="col-num">2024-01-01 – 2024-12-31</th>
             </tr>
@@ -1066,29 +970,21 @@
           <tbody>
               <tr class="row-heading" data-parent-row="2">
                 <th scope="row"><span class="item-cell"><span class="item-label">Manufacturing cost</span></span></th>
-                <td data-col="g0"></td>
-                <td data-col="g1"></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr data-row="0" data-parent-row="2" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Materials</span></span></th>
-                <td class="metadata col-text" data-col="g0">Manufacturing</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">35</td>
               <td class="value">30</td>
               </tr>
               <tr data-row="1" data-parent-row="2" style="--depth: 1">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"></span><span class="item-label">Labor</span></span></th>
-                <td class="metadata col-text" data-col="g0">Manufacturing</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">25</td>
               <td class="value">20</td>
               </tr>
               <tr data-row="2" class="row-parent row-total">
                 <th scope="row"><span class="item-cell"><span class="toggle-slot"><button class="row-toggle" type="button" hidden data-row-toggle aria-expanded="true" aria-label="Collapse Manufacturing cost detail rows"></button></span><span class="item-label">Manufacturing cost</span> <span class="collapsed-count" hidden>· 2 rows</span></span></th>
-                <td class="metadata col-text" data-col="g0">Manufacturing</td>
-                <td class="metadata col-text" data-col="g1">—</td>
               <td class="value">60</td>
               <td class="value">50</td>
               </tr>
@@ -1133,7 +1029,7 @@
             </table>
           </div>
         </details>
-      <textarea class="copy-source" id="copy-source-5" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\tmajorGroup\tvaluation\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nMaterials\tKRW millions (KRW, scale 6)\tManufacturing\t\t35\t30\nLabor\tKRW millions (KRW, scale 6)\tManufacturing\t\t25\t20\nManufacturing cost\tKRW millions (KRW, scale 6)\tManufacturing\t\t60\t50"</textarea>
+      <textarea class="copy-source" id="copy-source-5" readonly hidden aria-hidden="true" tabindex="-1">"Item\tUnit\t2025-01-01 – 2025-12-31\t2024-01-01 – 2024-12-31\nMaterials\tKRW millions (KRW, scale 6)\t35\t30\nLabor\tKRW millions (KRW, scale 6)\t25\t20\nManufacturing cost\tKRW millions (KRW, scale 6)\t60\t50"</textarea>
       <div class="handoff" data-copy-handoff hidden>
         <div class="handoff-action">
           <button class="copy-button" type="button" data-copy-control data-copy-source="copy-source-5" data-copy-status="copy-status-5" aria-describedby="copy-help-5" aria-label="Copy Manufacturing cost statement for Excel">Copy for Excel</button>
@@ -1145,7 +1041,7 @@
     </section>
     </main>
     <footer class="colophon">
-      <p>Generated by the FS reference CLI from a validated FS 0.1 document. The FS JSON document is authoritative; this page is a reading and transfer convenience and adds no accounting meaning.</p>
+      <p>Generated by the FS reference CLI from a validated FS 0.2 document. The FS JSON document is authoritative; this page is a reading and transfer convenience and adds no accounting meaning.</p>
     </footer>
   <script>
     (() => {
@@ -1379,16 +1275,6 @@
           ? unitCell.dataset.unitFull || unitCell.textContent || ""
           : table.dataset.commonUnit || "";
         if (unit !== "") tooltip.append(tooltipLine("Unit", unit));
-        if (headerRow !== undefined) {
-          for (const groupingHeader of headerRow.cells) {
-            const key = groupingHeader.dataset.col;
-            if (key === undefined || !key.startsWith("g")) continue;
-            const groupingCell = row.cells[groupingHeader.cellIndex];
-            if (groupingCell !== undefined) {
-              tooltip.append(tooltipLine(groupingHeader.textContent || "", groupingCell.textContent || ""));
-            }
-          }
-        }
         tooltip.append(tooltipLine("Value", cell.textContent || ""));
         const description = row.dataset.description;
         if (description !== undefined) tooltip.append(tooltipLine("Description", description));

@@ -1,6 +1,6 @@
 # Remove User-Defined Groupings in FS 0.2
 
-Status: Active. The target contract is documented; implementation is pending.
+Status: Complete.
 
 ## Outcome
 
@@ -14,16 +14,12 @@ not accept, convert, normalize, or otherwise support `0.1` documents.
 
 ## Current state
 
-`@sjunepark/fs@0.1.0` is published with optional top-level
-`groupingColumns`, required item `groupings` maps, and dependent validation,
-rendering, examples, fixtures, and authoring guidance. The product-boundary
-decision to remove those fields is confirmed; the repository still implements
-and packages the `0.1` contract.
-
-The target product, semantic, authoring, CLI, rendering, glossary, and decision
-documents now define `0.2`. The JSON Schemas, source, examples, fixtures,
-generated guidance, and packaged assets still implement `0.1`. This plan is the
-sole owner of that intentional drift until the refactor closes it.
+The repository schemas, runtime, renderer, examples, fixtures, CLI process
+contracts, generated guidance, and package-facing inputs implement the clean
+`0.2` contract. Legacy `0.1`, its schema URL, and both removed properties fail
+closed. The published npm package remains `0.1.0` until Release Please creates
+the breaking `0.2.0` release change; its immutable public `0.1` resources remain
+unchanged.
 
 ## Fixed decisions
 
@@ -50,31 +46,31 @@ sole owner of that intentional drift until the refactor closes it.
    semantic, authoring, CLI, rendering, glossary, and routing document with
    the target `0.2` contract. Preserve completed milestone plans as historical
    `0.1` delivery evidence.
-2. [ ] Replace the closed grammar and version constants across
+2. [x] Replace the closed grammar and version constants across
    `schema/*.schema.json` and `src/validation/`. Remove grouping-specific model,
    schema-normalization, semantic-validation, and diagnostic paths. Update
    validation results, snapshot diffs, and pathless discovery to report only
    `0.2`.
-3. [ ] Rebuild `examples/` and the language-neutral `fixtures/` corpus for
+3. [x] Rebuild `examples/` and the language-neutral `fixtures/` corpus for
    `0.2`. Replace obsolete grouping-cell failures with explicit cases proving
    rejection of legacy `formatVersion`, the old `$schema` URL,
    `groupingColumns`, and item `groupings`. Recalibrate exact diagnostic-budget
    evidence deliberately rather than mechanically changing its count.
-4. [ ] Simplify `src/render.ts` and `src/render/` presentation and template
+4. [x] Simplify `src/render.ts` and `src/render/` presentation and template
    code, then update focused renderer tests, exact HTML, and tracked previews.
    Remove grouping headers, cells, TSV fields, tooltip context, toggles, and
    width accounting while preserving escaping, spreadsheet-control protection,
    delimiter normalization, and Unit-column behavior through surviving fields.
    Prove that heterogeneous statements expose exactly one Unit toggle and
    homogeneous statements expose no `Columns` menu.
-5. [ ] Align CLI process descriptors, discovery results, snapshot-recording
+5. [x] Align CLI process descriptors, discovery results, snapshot-recording
    outputs, scripts, and package inventory checks with `0.2`. Ensure every old
    artifact fails closed and no command or selector exposes migration behavior.
-6. [ ] Update `content/guide/authoring.md.template`, regenerate the installed
+6. [x] Update `content/guide/authoring.md.template`, regenerate the installed
    guide and Agent Skill, update the source-resolution guide and package-facing
    documentation, and prepare immutable public `/spec/0.2/` and `/schema/0.2/`
    publication inputs. Do not modify the existing public `0.1` resources.
-7. [ ] Run the complete repository and package gates, perform final review,
+7. [x] Run the complete repository and package gates, perform final review,
    and leave package-version, changelog, manifest, tag, and release generation
    to Release Please.
 
@@ -111,14 +107,16 @@ git diff --check
 Also run `pnpm release:check` only when the refactor is an authorized release
 candidate.
 
-Documentation-slice evidence: `./scripts/check-docs.sh` and
-`git diff --check` pass with the target documents and the intentional `0.1`
-implementation drift described above. Independent contract review has no
-unresolved findings.
+`pnpm check` passed type checking, strict Effect diagnostics, all unit tests,
+the packed CLI acceptance corpus, writer crash/concurrency integration, package
+installation, and documentation/fixture checks. `pnpm pack:check`, the
+`author-fs` Skill validator, and `git diff --check` also passed. Independent
+implementation review found no unresolved issue after its safe fixes; package
+version, changelog, release manifest, tag, and release generation remain with
+Release Please.
 
 ## Next action
 
-Replace the shared document grammar and version constants in the three JSON
-Schemas and `src/validation/`, including focused tests that reject legacy
-versions and both removed properties. Keep the active drift explicit until all
-dependent artifact and runtime surfaces move to `0.2`.
+No live refactor action remains. Use the normal breaking-change and Release
+Please flow to prepare and publish `@sjunepark/fs@0.2.0` without modifying the
+immutable `0.1` resources.

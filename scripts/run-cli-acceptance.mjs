@@ -16,7 +16,9 @@ import { pathToFileURL } from "node:url"
 
 const fixtureRoot = resolve("fixtures/cli")
 const manifest = JSON.parse(readFileSync(join(fixtureRoot, "manifest.json"), "utf8"))
-const packageName = JSON.parse(readFileSync("package.json", "utf8")).name
+const packageMetadata = JSON.parse(readFileSync("package.json", "utf8"))
+const packageName = packageMetadata.name
+const packageVersion = packageMetadata.version
 const pattern = process.env.FS_CASE_PATTERN ? new RegExp(process.env.FS_CASE_PATTERN) : null
 const selectedCases = manifest.cases.filter((path) => {
   if (pattern === null) return true
@@ -161,6 +163,9 @@ const matchNativeText = (actual, matcher, context) => {
     if (!text.includes(required)) {
       throw new Error(`${context}: required native CLI text is missing: ${JSON.stringify(required)}`)
     }
+  }
+  if (matcher.packageVersion === true && !text.includes(packageVersion)) {
+    throw new Error(`${context}: package version is missing: ${JSON.stringify(packageVersion)}`)
   }
   for (const excluded of matcher.excludes) {
     if (text.includes(excluded)) {

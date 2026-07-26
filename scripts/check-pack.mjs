@@ -95,11 +95,12 @@ const assertPackagedMarkdownLinks = (installedRoot, markdownPaths) => {
   }
 }
 
+const sourcePackageJson = JSON.parse(readFileSync("package.json", "utf8"))
 const expectedReleaseMetadata = {
   name: "@sjunepark/fs",
-  version: "0.1.0",
+  version: sourcePackageJson.version,
   keywords: ["financial-statements", "json-schema", "validation", "cli"],
-  homepage: "https://cpaikr.github.io/fs/spec/0.1/",
+  homepage: "https://cpaikr.github.io/fs/spec/0.2/",
   bugs: { url: "https://github.com/cpaikr/cpaikr.github.io/issues" },
   repository: { type: "git", url: "git+https://github.com/cpaikr/fs.git" },
   author: "CPAI",
@@ -185,8 +186,7 @@ try {
     )
   }
 
-  const packageJson = JSON.parse(readFileSync("package.json", "utf8"))
-  assertReleaseMetadata(packageJson, "source package metadata")
+  assertReleaseMetadata(sourcePackageJson, "source package metadata")
   if (!filename.endsWith(".tgz")) throw new Error("npm pack did not produce a tarball")
 
   const tarball = join(temporaryDirectory, filename)

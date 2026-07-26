@@ -3,9 +3,10 @@
 This guide owns the decision boundary and durable policy for authoring an FS
 document. The [portable workflow](../content/guide/authoring.md.template) owns
 the exact create-and-repair procedure used by the bundled guide and Agent
-Skill. The [active refactor plan](plans/remove-user-defined-groupings.md) owns
-its pending `0.2` alignment. The [semantic specification](semantic-spec.md)
-remains normative for artifact meaning.
+Skill. The [completed refactor plan](plans/remove-user-defined-groupings.md)
+records the `0.2` implementation and release-preparation evidence. The
+[semantic specification](semantic-spec.md) remains normative for artifact
+meaning.
 
 FS is a file-first interchange format, not an extraction system, accounting
 taxonomy, conversion method, or mutable financial database. Authoring starts
@@ -75,10 +76,6 @@ Follow the [portable workflow](../content/guide/authoring.md.template) for the
 complete contract-discovery, preparation, validation, repair, creation, and
 delivery sequence. It is the single maintained operational source; generated
 copies must not be edited independently.
-
-Until the active refactor aligns the executable contract, that workflow and
-its generated copies remain instructions for the published `0.1` package, not
-for authoring a `0.2` document.
 
 JSON Schema checks shape but not every reference, uniqueness, calendar,
 value-map, rollup, or snapshot invariant. Completion therefore requires the

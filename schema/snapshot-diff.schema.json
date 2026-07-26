@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cpaikr.github.io/fs/schema/0.1/snapshot-diff.schema.json",
-  "title": "FS V0 validation snapshot diff",
+  "$id": "https://cpaikr.github.io/fs/schema/0.2/snapshot-diff.schema.json",
+  "title": "FS 0.2 validation snapshot diff",
   "oneOf": [
     {
       "type": "object",
       "additionalProperties": false,
       "required": ["formatVersion", "status"],
       "properties": {
-        "formatVersion": { "const": "0.1" },
+        "formatVersion": { "const": "0.2" },
         "status": { "const": "not-recorded" }
       }
     },
@@ -17,7 +17,7 @@
       "additionalProperties": false,
       "required": ["formatVersion", "status", "reason"],
       "properties": {
-        "formatVersion": { "const": "0.1" },
+        "formatVersion": { "const": "0.2" },
         "status": { "const": "not-comparable" },
         "reason": { "const": "invalid-snapshot" }
       }
@@ -27,7 +27,7 @@
       "additionalProperties": false,
       "required": ["formatVersion", "status", "conformance", "calculations", "applications"],
       "properties": {
-        "formatVersion": { "const": "0.1" },
+        "formatVersion": { "const": "0.2" },
         "status": { "enum": ["match", "mismatch"] },
         "conformance": { "$ref": "#/$defs/conformanceComparison" },
         "calculations": { "$ref": "#/$defs/calculationComparison" },

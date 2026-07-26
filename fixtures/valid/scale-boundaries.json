@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "entity": {
     "name": "Example Entity"
   },
@@ -42,8 +42,7 @@
           "unit": "low",
           "values": {
             "fy2025": "1"
-          },
-          "groupings": {}
+          }
         },
         {
           "id": "high",
@@ -51,8 +50,7 @@
           "unit": "high",
           "values": {
             "fy2025": "1"
-          },
-          "groupings": {}
+          }
         }
       ]
     }

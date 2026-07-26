@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cpaikr.github.io/fs/schema/0.1/validation-result.schema.json",
-  "title": "FS V0 validation result",
+  "$id": "https://cpaikr.github.io/fs/schema/0.2/validation-result.schema.json",
+  "title": "FS 0.2 validation result",
   "type": "object",
   "additionalProperties": false,
   "required": ["formatVersion", "conformance", "calculations"],
   "properties": {
-    "formatVersion": { "const": "0.1" },
+    "formatVersion": { "const": "0.2" },
     "conformance": { "$ref": "#/$defs/conformanceResult" },
     "calculations": { "$ref": "#/$defs/calculationResult" }
   },

@@ -35,7 +35,7 @@
         { "pointer": "/validation/conformance/errors", "minimum": 1 }
       ],
       "equalities": [
-        { "pointer": "/validation/formatVersion", "equals": "0.1" },
+        { "pointer": "/validation/formatVersion", "equals": "0.2" },
         { "pointer": "/validation/conformance/status", "equals": "nonconforming" },
         {
           "pointer": "/validation/conformance/errors/0/code",

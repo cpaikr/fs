@@ -1,12 +1,8 @@
 # CLI Acceptance Fixtures
 
-These fixtures provide executable evidence for the published `0.1`
-statement-row process. The target behavior is defined by the
-[CLI acceptance contract](../../docs/cli/acceptance.md), and the
-[active 0.2 refactor plan](../../docs/plans/remove-user-defined-groupings.md)
-owns the temporary drift. Until that work is complete, the descriptors and
-manifest remain `0.1` implementation evidence rather than proof of the target
-contract.
+These fixtures provide executable evidence for the target `0.2` statement-row
+process defined by the
+[CLI acceptance contract](../../docs/cli/acceptance.md).
 
 Artifact inputs and expected results are referenced from their owning trees so
 the CLI suite exercises the same statement rows, rollups, snapshots, schemas,

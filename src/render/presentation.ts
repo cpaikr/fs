@@ -38,8 +38,6 @@ export interface StatementPresentation {
   readonly headings: ReadonlyMap<number, ReadonlyArray<number>>
   readonly headingCount: number
   readonly checks: ReadonlyArray<StatementCheck>
-  /** Declared grouping columns in document declaration order. */
-  readonly groupingColumns: ReadonlyArray<string>
   readonly commonUnit: Unit | undefined
   readonly fixedColumnCount: number
   readonly ordinal: number
@@ -65,10 +63,8 @@ const commonUnitId = (statement: Statement): string | undefined => {
   return statement.items.every(({ unit }) => unit === first.unit) ? first.unit : undefined
 }
 
-export const statementFixedColumnCount = (
-  statement: Statement,
-  groupingColumnCount: number
-): number => 1 + (commonUnitId(statement) === undefined ? 1 : 0) + groupingColumnCount
+export const statementFixedColumnCount = (statement: Statement): number =>
+  1 + (commonUnitId(statement) === undefined ? 1 : 0)
 
 const rollupDepths = (statement: Statement): ReadonlyMap<string, number> => {
   const parentOf = new Map<string, string>()
@@ -242,7 +238,6 @@ const presentChecks = (
 export const createRenderPresentation = (document: Document): RenderPresentation => {
   const units = new Map(document.units.map((unit) => [unit.id, unit]))
   const periods = new Map(document.periods.map((period) => [period.id, period]))
-  const declaredGroupingColumns = document.groupingColumns ?? []
   const calculations = calculate(document)
   const applicationsByStatement = new Map<string, Array<ApplicationResult>>()
   for (const application of calculations.applications) {
@@ -272,9 +267,8 @@ export const createRenderPresentation = (document: Document): RenderPresentation
       headings,
       headingCount,
       checks,
-      groupingColumns: declaredGroupingColumns,
       commonUnit,
-      fixedColumnCount: statementFixedColumnCount(statement, declaredGroupingColumns.length),
+      fixedColumnCount: statementFixedColumnCount(statement),
       ordinal,
       anchorId: `statement-${ordinal}`,
       tableId: `statement-table-${ordinal}`,

@@ -2,9 +2,6 @@
 
 This specification defines the target `0.2` FS document contract independently
 of any implementation language. The
-[active refactor plan](plans/remove-user-defined-groupings.md) owns the
-temporary drift while local schemas, fixtures, and source still implement
-`0.1`. Once aligned, the
 [JSON Schema](../schema/fs-document.schema.json) MUST enforce this JSON shape;
 requirements concerning uniqueness, references, dates, value-map keys,
 rollups, snapshots, or ordering remain normative where JSON Schema cannot

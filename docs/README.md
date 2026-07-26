@@ -5,7 +5,7 @@ one primary responsibility.
 
 ## Start by task
 
-- Implement the active FS 0.2 contract break:
+- Inspect the completed FS 0.2 contract break:
   [Remove user-defined groupings](plans/remove-user-defined-groupings.md)
 - Inspect the completed analyst-friendly rendering work:
   [Analyst-friendly HTML rendering](plans/analyst-friendly-html-rendering.md)
@@ -18,9 +18,8 @@ one primary responsibility.
 - Understand the product boundary: [Product scope](product-scope.md)
 - Use the canonical vocabulary: [Domain glossary](glossary.md)
 - Understand the authoring decision boundary: [Authoring policy](authoring.md)
-- Encode or repair a published `0.1` document:
-  [Portable authoring workflow](../content/guide/authoring.md.template). Its
-  `0.2` alignment belongs to the active refactor plan.
+- Encode or repair a target `0.2` document:
+  [Portable authoring workflow](../content/guide/authoring.md.template)
 - Implement or assess artifact behavior:
   [Semantic specification](semantic-spec.md)
 - Understand the command surface: [CLI design](cli/design.md)

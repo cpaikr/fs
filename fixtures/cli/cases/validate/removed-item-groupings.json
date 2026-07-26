@@ -1,23 +1,24 @@
 {
-  "id": "record-validation-invalid-snapshot",
+  "id": "validate-removed-item-groupings",
   "command": "fs",
-  "arguments": ["record-validation", "--output", "recorded.json", "input.json"],
+  "arguments": ["validate", "input.json"],
   "workspace": [
-    { "copy": "../invalid/duplicate-snapshot-application-key.json", "to": "input.json" }
+    { "copy": "../invalid/removed-item-groupings.json", "to": "input.json" }
   ],
   "stdin": null,
   "expect": {
     "stdout": {
       "encoding": "json",
       "members": [
-        { "pointer": "", "equals": ["validation", "snapshotDiff", "output", "help"] },
+        { "pointer": "", "equals": ["validation", "snapshotDiff", "help"] },
         { "pointer": "/validation", "equals": ["formatVersion", "conformance", "calculations"] },
         { "pointer": "/validation/conformance", "equals": ["status", "errors"] },
         { "pointer": "/validation/conformance/errors/0", "equals": ["code", "path", "message"] },
-        { "pointer": "/validation/calculations", "equals": ["status", "applications"] },
-        { "pointer": "/output", "equals": ["status", "path", "reason"] }
+        { "pointer": "/validation/calculations", "equals": ["status", "applications"] }
       ],
-      "arrays": [{ "pointer": "/validation/conformance/errors", "minimum": 1 }],
+      "arrays": [
+        { "pointer": "/validation/conformance/errors", "minimum": 1 }
+      ],
       "equalities": [
         { "pointer": "/validation/formatVersion", "equals": "0.2" },
         { "pointer": "/validation/conformance/status", "equals": "nonconforming" },
@@ -27,7 +28,7 @@
             "file": "../manifest.json",
             "arrayPointer": "/invalidDocuments",
             "wherePointer": "/document",
-            "whereEquals": "invalid/duplicate-snapshot-application-key.json",
+            "whereEquals": "invalid/removed-item-groupings.json",
             "valuePointer": "/code"
           }
         },
@@ -37,16 +38,13 @@
             "file": "../manifest.json",
             "arrayPointer": "/invalidDocuments",
             "wherePointer": "/document",
-            "whereEquals": "invalid/duplicate-snapshot-application-key.json",
+            "whereEquals": "invalid/removed-item-groupings.json",
             "valuePointer": "/path"
           }
         },
         { "pointer": "/validation/calculations/status", "equals": "not-run" },
         { "pointer": "/validation/calculations/applications", "equals": [] },
-        { "pointer": "/snapshotDiff", "equalsFile": { "file": "../snapshot-diffs/invalid-snapshot.json" } },
-        { "pointer": "/output/status", "equals": "not-created" },
-        { "pointer": "/output/path", "equals": "recorded.json" },
-        { "pointer": "/output/reason", "equals": "structural-nonconformance" },
+        { "pointer": "/snapshotDiff", "equalsFile": { "file": "../snapshot-diffs/not-recorded.json" } },
         { "pointer": "/help", "equals": [] }
       ],
       "nonemptyStrings": ["/validation/conformance/errors/0/message"]
@@ -54,11 +52,7 @@
     "stderr": { "encoding": "bytes", "equalsUtf8": "" },
     "exitCode": 1,
     "filesystem": {
-      "workspace": {
-        "created": [],
-        "unchanged": ["input.json"],
-        "absent": ["recorded.json"]
-      },
+      "workspace": { "created": [], "unchanged": ["input.json"], "absent": [] },
       "home": { "created": [], "unchanged": [], "absent": [] }
     }
   }

@@ -9,7 +9,7 @@ decisions and validation.
 
 ## Current
 
-[Remove user-defined groupings in FS 0.2](docs/plans/remove-user-defined-groupings.md)
+_None._
 
 ## Plans
 
@@ -44,6 +44,8 @@ maintained in the
 10. [x] Replace the dimensional fact model with statement-owned item rows,
     nested value and grouping maps, and additive rollup validation.
 11. [x] Complete release preparation and publish V0.
+12. [x] Remove user-defined grouping data in FS 0.2 and leave project-specific
+    classification and mapping outside the format.
 
 ## Later Directions
 

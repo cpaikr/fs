@@ -30,9 +30,8 @@ const limitExceeded = (budget: RenderLimitBudget, limit: number): RenderResult =
 })
 
 const documentStructuralPreflight = (document: Document): RenderResult | undefined => {
-  const groupingColumnCount = document.groupingColumns?.length ?? 0
   for (const statement of document.statements) {
-    const fixedColumns = statementFixedColumnCount(statement, groupingColumnCount)
+    const fixedColumns = statementFixedColumnCount(statement)
     if (
       fixedColumns > renderLimits.columns ||
       statement.periods.length > renderLimits.columns - fixedColumns
@@ -43,8 +42,7 @@ const documentStructuralPreflight = (document: Document): RenderResult | undefin
 
   let gridSlots = 0
   for (const statement of document.statements) {
-    const columns =
-      statementFixedColumnCount(statement, groupingColumnCount) + statement.periods.length
+    const columns = statementFixedColumnCount(statement) + statement.periods.length
     const rows = statement.items.length + 1
     const remainingSlots = renderLimits.gridSlots - gridSlots
     if (rows > Math.floor(remainingSlots / columns)) {

@@ -53,7 +53,7 @@
         { "pointer": "/snapshotDiff/applications", "equals": 1 }
       ],
       "equalities": [
-        { "pointer": "/validation/formatVersion", "equals": "0.1" },
+        { "pointer": "/validation/formatVersion", "equals": "0.2" },
         { "pointer": "/validation/conformance/status", "equals": "nonconforming" },
         {
           "pointer": "/validation/conformance/errors/0/code",
@@ -76,7 +76,7 @@
           }
         },
         { "pointer": "/validation/calculations/status", "equals": "not-run" },
-        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.1" },
+        { "pointer": "/snapshotDiff/formatVersion", "equals": "0.2" },
         { "pointer": "/snapshotDiff/status", "equals": "mismatch" },
         { "pointer": "/snapshotDiff/conformance/recorded", "equals": "conforming" },
         { "pointer": "/snapshotDiff/conformance/current", "equals": "nonconforming" },

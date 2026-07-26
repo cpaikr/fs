@@ -1,9 +1,9 @@
 {
-  "formatVersion": "0.1",
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
+  "formatVersion": "0.2",
   "entity": { "name": "Duplicate Member" },
   "scope": { "label": "Separate" },
   "units": [{ "id": "usd", "label": "USD", "measure": "USD", "scale": 0 }],
   "periods": [{ "id": "year-end", "kind": "instant", "date": "2025-12-31" }],
-  "statements": [{ "id": "position", "label": "Position", "periods": ["year-end"], "items": [{ "id": "cash", "label": "Cash", "unit": "usd", "values": { "year-end": "0" }, "groupings": {} }] }]
+  "statements": [{ "id": "position", "label": "Position", "periods": ["year-end"], "items": [{ "id": "cash", "label": "Cash", "unit": "usd", "values": { "year-end": "0" } }] }]
 }

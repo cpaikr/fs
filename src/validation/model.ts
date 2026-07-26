@@ -15,14 +15,11 @@ export type Period =
 
 export type ValueCell = string | null | { readonly unavailable: true }
 
-export type GroupingCell = string | null
-
 export interface Item extends Definition {
   readonly label: string
   readonly description?: string
   readonly unit: string
   readonly values: Readonly<Record<string, ValueCell>>
-  readonly groupings: Readonly<Record<string, GroupingCell>>
   readonly rollupTo?: string
 }
 
@@ -110,14 +107,13 @@ export type ValidationSnapshot =
     }
 
 export interface Document {
-  readonly $schema?: "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
-  readonly formatVersion: "0.1"
+  readonly $schema?: "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json"
+  readonly formatVersion: "0.2"
   readonly documentId?: string
   readonly entity: { readonly id?: string; readonly name: string }
   readonly scope: { readonly id?: string; readonly label: string }
   readonly units: ReadonlyArray<Unit>
   readonly periods: ReadonlyArray<Period>
-  readonly groupingColumns?: ReadonlyArray<string>
   readonly statements: ReadonlyArray<Statement>
   readonly validationSnapshot?: ValidationSnapshot
 }

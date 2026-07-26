@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "entity": {
     "name": "Example Entity"
   },
@@ -22,6 +22,7 @@
       "end": "2025-12-31"
     }
   ],
+  "groupingColumns": [],
   "statements": [
     {
       "id": "statement",
@@ -36,17 +37,9 @@
           "unit": "usd",
           "values": {
             "fy2025": "1"
-          },
-          "groupings": {
-            "valuation": [
-              "Cash"
-            ]
           }
         }
       ]
     }
-  ],
-  "groupingColumns": [
-    "valuation"
   ]
 }

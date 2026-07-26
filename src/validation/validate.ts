@@ -34,7 +34,7 @@ type NonconformingValidation = Extract<
 >
 
 const nonconforming = (errors: ReadonlyArray<StructuralError>): NonconformingValidation => ({
-  formatVersion: "0.1",
+  formatVersion: "0.2",
   conformance: { status: "nonconforming", errors: nonemptyErrors(errors) },
   calculations: { status: "not-run", applications: [] }
 })
@@ -108,7 +108,7 @@ const structuralFailure = (
   if (hasSnapshot && invalidSnapshot) {
     return {
       validation,
-      snapshotDiff: { formatVersion: "0.1", status: "not-comparable", reason: "invalid-snapshot" }
+      snapshotDiff: { formatVersion: "0.2", status: "not-comparable", reason: "invalid-snapshot" }
     }
   }
   const snapshot = hasSnapshot
@@ -122,7 +122,7 @@ const conforming = (document: Document): DocumentValidation => {
     ValidationResult,
     { readonly conformance: { readonly status: "conforming" } }
   > = {
-    formatVersion: "0.1",
+    formatVersion: "0.2",
     conformance: { status: "conforming", errors: [] },
     calculations: calculate(document)
   }

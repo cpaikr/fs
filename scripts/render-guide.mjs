@@ -35,6 +35,9 @@ const skillShortDescription = "Organize statements into conforming FS documents"
 const skillDefaultPrompt =
   "Use $author-fs to organize these financial statements into conforming FS " +
   "documents.";
+// Release Please owns package.json. Keep package-facing guidance pinned to the
+// package version that will first ship the target artifact contract.
+const targetPackageVersion = "0.2.0";
 const skillFrontmatter = `---
 name: ${skillName}
 description: ${JSON.stringify(skillDescription)}
@@ -151,9 +154,9 @@ const packageMetadata = () => {
   return { name: manifest.name, version: manifest.version };
 };
 
-const checkReadmePackageIdentity = ({ name, version }) => {
+const checkReadmePackageIdentity = ({ name }) => {
   const readme = readFileSync(readmePath, "utf8");
-  const exactPackage = `${name}@${version}`;
+  const exactPackage = `${name}@${targetPackageVersion}`;
   const packageCommands = [
     ...readme.matchAll(
       /(?:npx -y|npm install --global)\s+(@[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9._-]*@[0-9A-Za-z.+-]+)/gu,
@@ -216,7 +219,7 @@ if (arguments_.length === 1 && arguments_[0] === "--check-installed") {
 } else if (arguments_.length === 1 && arguments_[0] === "--installed") {
   process.stdout.write(render("fs"));
 } else if (arguments_.length === 1 && arguments_[0] === "--check-skill") {
-  const expected = renderSkill(package_.name, package_.version);
+  const expected = renderSkill(package_.name, targetPackageVersion);
   const actual = readFileSync(skillPath, "utf8");
   if (actual !== expected) {
     process.stderr.write(
