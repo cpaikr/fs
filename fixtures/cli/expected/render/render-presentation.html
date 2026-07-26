@@ -640,13 +640,6 @@
       }
 
       for (const table of document.querySelectorAll("[data-statement-table]")) {
-        const statement = table.closest(".statement");
-        if (!(statement instanceof HTMLElement)) continue;
-        const tools = statement.querySelector("[data-table-tools]");
-        const body = table.tBodies[0];
-        if (!(tools instanceof HTMLElement) || body === undefined) continue;
-        tools.hidden = false;
-
         const scroller = table.closest(".table-scroll");
         const updateOverflow = () => {
           if (!(scroller instanceof HTMLElement)) return;
@@ -655,12 +648,22 @@
         };
         updateOverflow();
         window.addEventListener("resize", updateOverflow);
+
+        const statement = table.closest(".statement");
+        if (!(statement instanceof HTMLElement)) continue;
+        const tools = statement.querySelector("[data-table-tools]");
+        const body = table.tBodies[0];
+        if (!(tools instanceof HTMLElement) || body === undefined) continue;
+        tools.hidden = false;
+
         const setColumn = (key, shown) => {
           for (const cell of table.querySelectorAll("[data-col]")) {
             if (cell.dataset.col === key) cell.hidden = !shown;
           }
           updateOverflow();
         };
+        // Viewport width supplies only the initial default. Resizing must not
+        // discard the analyst's explicit checkbox choices.
         const narrowViewport = window.matchMedia("(max-width: 44em)").matches;
         for (const box of tools.querySelectorAll("input[data-col-toggle]")) {
           box.addEventListener("change", () => {
@@ -673,11 +676,15 @@
         }
         const menu = tools.querySelector("details[data-col-menu]");
         if (menu instanceof HTMLDetailsElement) {
+          const menuSummary = menu.querySelector("summary");
           document.addEventListener("click", (event) => {
             if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
           });
           menu.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") menu.open = false;
+            if (event.key !== "Escape") return;
+            event.preventDefault();
+            menu.open = false;
+            if (menuSummary instanceof HTMLElement) menuSummary.focus();
           });
         }
 
@@ -817,12 +824,15 @@
         if (!(event.target instanceof Element)) return;
         const cell = event.target.closest("[data-statement-table] td.value, [data-statement-table] td.missing, [data-statement-table] td.unavailable");
         window.clearTimeout(tooltipTimer);
+        // Keyboard focus owns the shared tooltip until focus leaves. Pointer
+        // hover must not replace the accessible description with another
+        // cell's context.
+        if (describedCell !== null && document.activeElement === describedCell) return;
         if (!(cell instanceof HTMLTableCellElement)) {
           if (describedCell === null) tooltip.hidden = true;
           return;
         }
         tooltipTimer = window.setTimeout(() => {
-          if (cell !== describedCell) describeCell(null);
           showTooltip(cell);
         }, 400);
       });
