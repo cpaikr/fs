@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "entity": {
     "name": "Example Entity"
   },
@@ -38,7 +38,6 @@
           "values": {
             "fy2025": "0.1"
           },
-          "groupings": {},
           "rollupTo": "subtotal"
         },
         {
@@ -48,7 +47,6 @@
           "values": {
             "fy2025": "0.2"
           },
-          "groupings": {},
           "rollupTo": "subtotal"
         },
         {
@@ -58,7 +56,6 @@
           "values": {
             "fy2025": "0.3"
           },
-          "groupings": {},
           "rollupTo": "grand-total"
         },
         {
@@ -68,7 +65,6 @@
           "values": {
             "fy2025": "0.7"
           },
-          "groupings": {},
           "rollupTo": "grand-total"
         },
         {
@@ -77,8 +73,7 @@
           "unit": "usd",
           "values": {
             "fy2025": "1.1"
-          },
-          "groupings": {}
+          }
         }
       ]
     }

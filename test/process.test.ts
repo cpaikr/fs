@@ -74,11 +74,10 @@ const tableDocument = (periodCount: number, itemCount: number): Document => {
     id: `item${index}`,
     label: `Item ${index}`,
     unit: "usd",
-    values,
-    groupings: {}
+    values
   }))
   return {
-    formatVersion: "0.1",
+    formatVersion: "0.2",
     entity: { name: "Process render boundary" },
     scope: { label: "Rendering" },
     units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],

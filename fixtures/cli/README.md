@@ -1,10 +1,8 @@
 # CLI Acceptance Fixtures
 
-These fixtures provide executable evidence for the current `0.1` statement-row
-process contract in the
-[CLI acceptance contract](../../docs/cli/acceptance.md). That contract owns
-observable behavior; the descriptors and manifest own its maintained process
-evidence.
+These fixtures provide executable evidence for the target `0.2` statement-row
+process defined by the
+[CLI acceptance contract](../../docs/cli/acceptance.md).
 
 Artifact inputs and expected results are referenced from their owning trees so
 the CLI suite exercises the same statement rows, rollups, snapshots, schemas,

@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "validDocuments": [
     {
       "document": "../examples/manufacturing-group.json",
@@ -90,12 +90,6 @@
       "path": "/statements/0/periods/1"
     },
     {
-      "document": "invalid/extra-grouping-key.json",
-      "layer": "semantic",
-      "code": "map-key-mismatch",
-      "path": "/statements/0/items/0/groupings"
-    },
-    {
       "document": "invalid/extra-value-key.json",
       "layer": "semantic",
       "code": "map-key-mismatch",
@@ -108,10 +102,10 @@
       "path": "/periods/0/start"
     },
     {
-      "document": "invalid/missing-grouping-key.json",
-      "layer": "semantic",
-      "code": "map-key-mismatch",
-      "path": "/statements/0/items/0/groupings"
+      "document": "invalid/legacy-format-version.json",
+      "layer": "schema",
+      "code": "invalid-value",
+      "path": "/formatVersion"
     },
     {
       "document": "invalid/missing-value-key.json",
@@ -124,6 +118,18 @@
       "layer": "schema",
       "code": "invalid-tolerance",
       "path": "/units/0/defaultTolerance"
+    },
+    {
+      "document": "invalid/removed-grouping-columns.json",
+      "layer": "schema",
+      "code": "unknown-property",
+      "path": "/groupingColumns"
+    },
+    {
+      "document": "invalid/removed-item-groupings.json",
+      "layer": "schema",
+      "code": "unknown-property",
+      "path": "/statements/0/items/0/groupings"
     },
     {
       "document": "invalid/reversed-duration.json",
@@ -184,12 +190,6 @@
       "layer": "schema",
       "code": "unknown-property",
       "path": "/validationSnapshotExtra"
-    },
-    {
-      "document": "invalid/wrong-grouping-cell-type.json",
-      "layer": "schema",
-      "code": "invalid-type",
-      "path": "/statements/0/items/0/groupings/valuation"
     },
     {
       "document": "invalid/wrong-schema.json",

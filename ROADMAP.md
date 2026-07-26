@@ -44,6 +44,8 @@ maintained in the
 10. [x] Replace the dimensional fact model with statement-owned item rows,
     nested value and grouping maps, and additive rollup validation.
 11. [x] Complete release preparation and publish V0.
+12. [x] Remove user-defined grouping data in FS 0.2 and leave project-specific
+    classification and mapping outside the format.
 
 ## Later Directions
 
@@ -53,8 +55,3 @@ encoding, and structural repair. They must not establish one extraction,
 taxonomy, cross-entity alignment, or accounting interpretation as part of the
 FS contract; source resolution remains delegated professional judgment upstream
 of the artifact and CLI.
-
-A later dataset layer may coordinate multiple single-entity documents under
-author-supplied shared definitions. FS may represent that alignment, but will
-not supply a taxonomy or perform the alignment. The V0 single-entity document
-remains the atomic artifact.

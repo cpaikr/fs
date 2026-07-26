@@ -51,11 +51,10 @@ const tableDocument = (periodCount: number, itemCount: number): Document => {
     id: `item${index}`,
     label: `Item ${index}`,
     unit: "usd",
-    values,
-    groupings: {}
+    values
   }))
   return {
-    formatVersion: "0.1",
+    formatVersion: "0.2",
     entity: { name: "Grid boundary" },
     scope: { label: "Rendering" },
     units: [{ id: "usd", label: "USD", measure: "USD", scale: 0 }],
@@ -97,13 +96,12 @@ describe("HTML rendering", () => {
     expect(renderBytes(fixture(input))).toEqual(readFileSync(resolve(expected)))
   })
 
-  it("renders grouping columns as flat aligned metadata without merging", () => {
+  it("renders statement rows without removed grouping metadata", () => {
     const document = fixture("fixtures/valid/render-presentation.json")
     const original = JSON.stringify(document)
     const html = renderBytes(document).toString("utf8")
 
-    expect(html).toContain('<th scope="col" class="col-text" data-col="g0">Valuation</th>')
-    expect(html).toContain('<td class="metadata col-text" data-col="g1">Working &lt;Capital&gt;</td>')
+    expect(html).not.toContain('data-col="g')
     expect(html).not.toContain("colspan")
     expect(html).not.toContain("rowgroup")
     expect(html).not.toContain('class="row-parent')
@@ -126,7 +124,15 @@ describe("HTML rendering", () => {
     expect(html).toContain('<main id="statements" tabindex="-1">')
     expect(html).toContain('(expanded ? "Collapse " : "Expand ") + label + " detail rows"')
     expect(html).toContain("data-table-tools hidden")
-    expect(html).toContain('data-col-toggle="unit" aria-pressed="true"')
+    expect(html).toContain('<label><input type="checkbox" checked data-col-toggle="unit"> Unit</label>')
+    expect(html.match(/<details class="col-menu" data-col-menu>/gu)).toHaveLength(1)
+    expect(html.match(/data-col-toggle="unit"/gu)).toHaveLength(1)
+    const homogeneous = renderBytes(fixture("examples/minimal.json")).toString("utf8")
+    expect(homogeneous).not.toContain('<details class="col-menu" data-col-menu>')
+    expect(homogeneous).not.toContain('data-col-toggle="unit"')
+    expect(html).toContain("including any rows or columns hidden in this view")
+    expect(html).toContain("The FS JSON document is authoritative")
+    expect(html).not.toContain('<a class="doc-checks-link"')
     expect(html).not.toContain("data-rows-collapse>")
     expect(html.match(/<table id=/gu)).toHaveLength(2)
     expect(html.match(/data-copy-control data-copy-source=/gu)).toHaveLength(2)
@@ -155,18 +161,28 @@ describe("HTML rendering", () => {
     expect(html).toContain('<span class="item-description">Primary &lt;liquidity&gt;</span>')
   })
 
+  it("coalesces focused-cell tooltip re-anchoring into one animation frame", () => {
+    const html = renderBytes(fixture("examples/minimal.json")).toString("utf8")
+
+    expect(html).toContain("let anchorFrame = 0;")
+    expect(html).toContain("window.cancelAnimationFrame(anchorFrame);")
+    expect(html).toContain("if (anchorFrame !== 0) return;")
+    expect(html).toContain("anchorFrame = window.requestAnimationFrame(() => {")
+    expect(html).toContain("const cell = describedCell;")
+  })
+
   it("streams exact per-statement TSV with an unconditional Unit column", () => {
     const html = renderBytes(fixture("fixtures/valid/render-presentation.json")).toString("utf8")
 
     expect(copySource(html, 1)).toBe([
-      "Item\tUnit\tvaluation\tppt\t2025-12-31\t2024-12-31",
-      "Cash <available>\tUSD <millions> (USD, scale 6)\tNWC & cash\t\t0\tMissing",
-      "Inventory\tUSD <millions> (USD, scale 6)\tNWC\tWorking <Capital>\t-1.25\tUnavailable"
+      "Item\tUnit\t2025-12-31\t2024-12-31",
+      "Cash <available>\tUSD <millions> (USD, scale 6)\t0\tMissing",
+      "Inventory\tUSD <millions> (USD, scale 6)\t-1.25\tUnavailable"
     ].join("\n"))
     expect(copySource(html, 2)).toBe([
-      "Item\tUnit\tvaluation\tppt\t2025-12-31",
-      "Amount\tUSD <millions> (USD, scale 6)\t\tSummary\t2.5",
-      "Count\tShares & units (shares, scale 0)\t\tSummary\t3"
+      "Item\tUnit\t2025-12-31",
+      "Amount\tUSD <millions> (USD, scale 6)\t2.5",
+      "Count\tShares & units (shares, scale 0)\t3"
     ].join("\n"))
     expect(copySource(html, 1)).not.toMatch(/\n$/u)
   })
@@ -179,33 +195,26 @@ describe("HTML rendering", () => {
     if (statement === undefined || item === undefined || unit === undefined) {
       throw new Error("Minimal fixture lost its presentation data")
     }
-    const firstGrouping = "\ufeff=Header\tOne"
-    const secondGrouping = "\u00a0+Header\rTwo"
-    const markupGrouping = "markup"
-    const quotedGrouping = "quoted"
     const rendered = renderBytes({
       ...document,
-      units: [{ ...unit, label: "USD\tLabel", measure: "Amount\r\nMeasure" }],
-      groupingColumns: [firstGrouping, secondGrouping, markupGrouping, quotedGrouping],
+      units: [{
+        ...unit,
+        label: "\"Qualified</textarea><script>alert(\"x\")</script>&'\tLabel",
+        measure: "Amount\r\nMeasure"
+      }],
       statements: [{
         ...statement,
         items: [{
           ...item,
           label: "\u2003-Item\nName",
-          values: { fy2025: "-1.25" },
-          groupings: {
-            [firstGrouping]: "\u3000@Value\r\nLine",
-            [secondGrouping]: null,
-            [markupGrouping]: "</textarea><script>alert(\"x\")</script>&'",
-            [quotedGrouping]: "\"Qualified"
-          }
+          values: { fy2025: "-1.25" }
         }]
       }]
     }).toString("utf8")
 
     expect(copySource(rendered, 1)).toBe([
-      "Item\tUnit\t'\ufeff=Header One\t'\u00a0+Header Two\tmarkup\tquoted\t2025-01-01 – 2025-12-31",
-      "'\u2003-Item Name\tUSD Label (Amount  Measure, scale 0)\t'\u3000@Value  Line\t\t</textarea><script>alert(\"x\")</script>&'\t'\"Qualified\t-1.25"
+      "Item\tUnit\t2025-01-01 – 2025-12-31",
+      "'\u2003-Item Name\t'\"Qualified</textarea><script>alert(\"x\")</script>&' Label (Amount  Measure, scale 0)\t-1.25"
     ].join("\n"))
     expect(rendered).toContain("&lt;/textarea&gt;&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&amp;&#39;")
     expect(rendered.match(/<script>/gu)).toHaveLength(1)
@@ -248,8 +257,15 @@ describe("HTML rendering", () => {
     expect(html).toContain('data-parent-row="1"')
     expect(html).toContain('class="row-parent row-total"')
     expect(html).toContain('aria-label="Collapse Total detail rows"')
+    expect(html).toContain('<tr class="row-heading" data-parent-row="1">')
     expect(html).toContain('<span class="collapsed-count" hidden>· 1 row</span>')
     expect(html).toContain("Rollup checks — 1 · 1 not satisfied")
+    // The not-satisfied signal is navigable and pre-disclosed: the masthead
+    // count links to the failing statement's checks, the disclosure renders
+    // expanded, and the statement index carries a glyph-and-text flag.
+    expect(html).toContain('<a class="doc-checks-link" href="#statement-checks-1">')
+    expect(html).toContain('<details class="checks" id="statement-checks-1" open>')
+    expect(html).toContain('≠<span class="visually-hidden"> checks not satisfied</span>')
     expect(html).toContain('<th scope="row">Total = Child</th>')
     // The embedded snapshot claims this check is satisfied; the rendered result
     // must come from a fresh calculation over the document instead.
@@ -297,6 +313,10 @@ describe("HTML rendering", () => {
       '<span class="check-glyph" data-status="error">!</span> 1 rollup check · 1 not checked'
     )
     expect(notChecked).toContain("Rollup checks — 1 · 1 not checked")
+    expect(notChecked).toContain('<details class="checks" id="statement-checks-1" open>')
+    expect(notChecked).toContain(
+      '!<span class="visually-hidden"> checks not checked</span>'
+    )
     expect(notChecked).toContain("! Not checked")
   })
 
@@ -438,6 +458,24 @@ describe("HTML rendering", () => {
   it("allows the total grid-slot boundary", () => {
     const rendered = renderHtml(tableDocument(99, 999))
     expect(rendered.ok).toBe(true)
+  })
+
+  it("counts derived group headings against the total grid-slot budget", () => {
+    const document = tableDocument(99, 999)
+    const statement = document.statements[0]
+    const parent = statement?.items.at(-1)
+    if (statement === undefined || parent === undefined) {
+      throw new Error("Heading boundary fixture lost its statement")
+    }
+    const items = statement.items.map((item, index) =>
+      index === statement.items.length - 1 ? item : { ...item, rollupTo: parent.id }
+    )
+
+    expect(renderHtml({ ...document, statements: [{ ...statement, items }] })).toEqual({
+      ok: false,
+      budget: "grid-slots",
+      limit: renderLimits.gridSlots
+    })
   })
 
   it("allows the exact encoded HTML byte boundary", () => {

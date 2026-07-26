@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "cases": [
     "cases/create/calculation-inconsistent.json",
     "cases/create/duplicate-output.json",
@@ -121,12 +121,15 @@
     "cases/validate/json-nesting-limit.json",
     "cases/validate/json-value-limit.json",
     "cases/validate/leading-dash-path.json",
+    "cases/validate/legacy-format-version.json",
     "cases/validate/malformed-json.json",
     "cases/validate/missing-argument.json",
     "cases/validate/missing-path.json",
     "cases/validate/path-no-rollups.json",
     "cases/validate/recorded-no-rollups-output.json",
     "cases/validate/recorded-snapshot-mismatch-output.json",
+    "cases/validate/removed-grouping-columns.json",
+    "cases/validate/removed-item-groupings.json",
     "cases/validate/schema-failure.json",
     "cases/validate/semantic-failure.json",
     "cases/validate/snapshot-match.json",

@@ -3,8 +3,10 @@
 This guide owns the decision boundary and durable policy for authoring an FS
 document. The [portable workflow](../content/guide/authoring.md.template) owns
 the exact create-and-repair procedure used by the bundled guide and Agent
-Skill. The [semantic specification](semantic-spec.md) remains normative for
-artifact meaning.
+Skill. The [completed refactor plan](plans/remove-user-defined-groupings.md)
+records the `0.2` implementation and release-preparation evidence. The
+[semantic specification](semantic-spec.md) remains normative for artifact
+meaning.
 
 FS is a file-first interchange format, not an extraction system, accounting
 taxonomy, conversion method, or mutable financial database. Authoring starts
@@ -24,7 +26,6 @@ Before encoding begins, the authoring actor must resolve:
 - the reporting entity and exact reporting scope;
 - every statement's item meanings, order, and stable local identifiers;
 - units, scales, selected periods, and one cell state for every item-period;
-- any custom grouping-column names and each item's assignments;
 - the intended distinction between zero, missing, and unavailable values; and
 - every confirmed additive parent-child relationship and applicable unit
   tolerance.
@@ -37,6 +38,27 @@ defensible choice and the alternatives would materially change the financial
 meaning. It must disclose material assumptions and must not invent a value or
 source detail, impose an external taxonomy or cross-entity alignment, or change
 a reported value to manufacture consistency.
+
+## Classification Boundary
+
+FS contains no user-defined classification or mapping fields. When a source
+category is necessary to distinguish the financial meaning of a value, the
+author encodes that meaning in the item's stable identifier and human-readable
+label or description. A category that separates values requires distinct item
+rows. A category that defines an additive subtotal requires an explicit parent
+item and confirmed `rollupTo` relationships.
+
+All other source or project classification, filtering, mapping, and styling
+data remains outside the FS document. A project may associate its own mapping
+table with statement and item identifiers, but FS does not define that table,
+its lifecycle, or a linking convention.
+
+For example, if a source reports `Domestic revenue` and
+`International revenue` as separate amounts, encode them as separate items. If
+the source also reports `Total revenue` and the relationship is confirmed
+additive, the two items may `rollupTo` that explicit total item. A project-only
+tag such as `operating` or a dashboard color belongs in the consuming
+project's mapping data, not in either item.
 
 ## Create and Repair Policy
 
@@ -56,7 +78,7 @@ delivery sequence. It is the single maintained operational source; generated
 copies must not be edited independently.
 
 JSON Schema checks shape but not every reference, uniqueness, calendar,
-nested-map, rollup, or snapshot invariant. Completion therefore requires the
+value-map, rollup, or snapshot invariant. Completion therefore requires the
 reference validator and safe creation boundary defined by the portable
 workflow, not schema validation alone.
 
@@ -65,16 +87,10 @@ A reviewable authoring result should include:
 1. the FS JSON document;
 2. its complete structured validation result from the reference validator.
 
-FS defines no source ledger, provenance sidecar, or conversion record. Other
-systems may maintain their own records, but source and provenance properties
-inside FS JSON are nonconforming.
-
-## Working With the Examples
-
-[`minimal.json`](../examples/minimal.json) is the smallest complete
-statement-item-row shape. [`manufacturing-group.json`](../examples/manufacturing-group.json)
-is a multi-statement example covering mixed units, grouping columns, nested
-reported subtotals, and an intentionally inconsistent rollup.
+FS defines no source ledger, provenance sidecar, classification sidecar, or
+conversion record. Other systems may maintain their own records, but extra
+properties added to FS JSON for source, provenance, or external classification
+are nonconforming.
 
 FS does not provide statement-type or industry templates because their
 meanings and contents remain author-controlled.

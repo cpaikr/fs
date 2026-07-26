@@ -6,7 +6,13 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
 echo "Linting Markdown"
-pnpm exec markdownlint-cli2 '**/*.md' '#node_modules' '#dist' '#CHANGELOG.md'
+pnpm exec markdownlint-cli2 \
+  '**/*.md' \
+  '#node_modules' \
+  '#dist' \
+  '#.tmp' \
+  '#.impeccable/critique' \
+  '#CHANGELOG.md'
 
 echo "Checking Markdown links"
 while IFS= read -r -d '' document; do
@@ -18,6 +24,7 @@ done < <(
   find . \
     -path './.git' -prune -o \
     -path './node_modules' -prune -o \
+    -path './.tmp' -prune -o \
     -path './CHANGELOG.md' -prune -o \
     -name '*.md' -print0
 )
@@ -89,11 +96,12 @@ echo "Parsing JSON artifacts"
 find . \
   -path './.git' -prune -o \
   -path './node_modules' -prune -o \
+  -path './.tmp' -prune -o \
   -path './fixtures/raw-input' -prune -o \
   -name '*.json' -print0 \
   | xargs -0 jq empty
 
-schema_base='https://cpaikr.github.io/fs/schema/0.1'
+schema_base='https://cpaikr.github.io/fs/schema/0.2'
 for schema_name in fs-document validation-result snapshot-diff; do
   jq -e --arg id "$schema_base/$schema_name.schema.json" \
     '."$id" == $id' "schema/$schema_name.schema.json" >/dev/null
@@ -115,7 +123,7 @@ ajv=(pnpm exec ajv validate --spec=draft2020)
 
 echo "Checking fixture manifest"
 jq -e '
-  .formatVersion == "0.1" and
+  .formatVersion == "0.2" and
   (.validDocuments | type) == "array" and
   (.invalidDocuments | type) == "array" and
   all(.validDocuments[];

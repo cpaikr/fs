@@ -40,8 +40,8 @@ boundary, run:
 pnpm render:example
 ```
 
-This renders `examples/manufacturing-group.json` and replaces only
-`examples/manufacturing-group.html`.
+This renders `examples/manufacturing-group.json` and `examples/minimal.json`,
+replacing only their corresponding HTML previews.
 
 ## Validate changes
 
@@ -102,14 +102,14 @@ the installed and version-pinned forms:
 
 ```sh
 node scripts/render-guide.mjs --installed > assets/guide/authoring.md
-package_version="$(node -p 'require("./package.json").version')"
-node scripts/render-guide.mjs --skill-version "$package_version" \
+node scripts/render-guide.mjs --skill-version 0.2.0 \
   > skills/author-fs/SKILL.md
 ```
 
-After regenerating the maintained files, run `pnpm check:docs`. It also checks
-the package-facing README's pinned identity and version against `package.json`.
-Do not edit generated guidance independently of the template.
+After regenerating the maintained files, run `pnpm check:docs`. It checks the
+package-facing README and Skill against the exact target release input in
+`scripts/render-guide.mjs`; Release Please still owns `package.json`. Do not
+edit generated guidance independently of the template.
 
 ## Package boundary
 

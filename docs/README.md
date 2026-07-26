@@ -5,6 +5,8 @@ one primary responsibility.
 
 ## Start by task
 
+- Inspect the completed FS 0.2 contract break:
+  [Remove user-defined groupings](plans/remove-user-defined-groupings.md)
 - Inspect the completed analyst-friendly rendering work:
   [Analyst-friendly HTML rendering](plans/analyst-friendly-html-rendering.md)
 - Implement or review its approved visual system:
@@ -16,14 +18,16 @@ one primary responsibility.
 - Understand the product boundary: [Product scope](product-scope.md)
 - Use the canonical vocabulary: [Domain glossary](glossary.md)
 - Understand the authoring decision boundary: [Authoring policy](authoring.md)
-- Encode or repair a document:
+- Encode or repair a target `0.2` document:
   [Portable authoring workflow](../content/guide/authoring.md.template)
 - Implement or assess artifact behavior:
   [Semantic specification](semantic-spec.md)
 - Understand the command surface: [CLI design](cli/design.md)
 - Implement or test process behavior:
   [CLI acceptance contract](cli/acceptance.md)
-- Review the accepted replacement model:
+- Review the accepted FS 0.2 classification boundary:
+  [remove user-defined groupings](adr/0003-remove-user-defined-groupings.md)
+- Review the historical 0.1 row-model replacement:
   [statement item rows](adr/0001-replace-dimensional-members-with-item-grouping.md)
 - Review the accepted independent rendering policy:
   [Finite rendering limits](adr/0002-bound-render-output.md)

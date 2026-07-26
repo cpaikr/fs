@@ -208,7 +208,6 @@
         "encoding": { "const": "native-text" },
         "contains": {
           "type": "array",
-          "minItems": 1,
           "uniqueItems": true,
           "items": { "type": "string", "minLength": 1 }
         },
@@ -217,8 +216,13 @@
           "uniqueItems": true,
           "items": { "type": "string", "minLength": 1 }
         },
-        "ansi": { "const": false }
-      }
+        "ansi": { "const": false },
+        "packageVersion": { "const": true }
+      },
+      "anyOf": [
+        { "properties": { "contains": { "type": "array", "minItems": 1 } } },
+        { "required": ["packageVersion"] }
+      ]
     },
     "jsonLineRecord": {
       "type": "object",

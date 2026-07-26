@@ -23,7 +23,7 @@
       "equalities": [
         {
           "pointer": "/validation/formatVersion",
-          "equals": "0.1"
+          "equals": "0.2"
         },
         {
           "pointer": "/validation/conformance/status",

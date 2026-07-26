@@ -1,13 +1,14 @@
 # CLI Design
 
-This design describes the CLI for the current `0.1` statement-item-row
+This design describes the CLI for the target `0.2` statement-item-row
 contract. The CLI projects the document contract without adding a second data
 model.
 
 The CLI is the packaged reference consumer and authoring aid for complete FS
 documents. This design does not attest to implementation or release
-availability. Verify implementation in source and the built package; use the
-[active release plan](../plans/v0-release-candidate.md) for live release status.
+availability. Verify implementation in source and the built package; the
+[completed refactor plan](../plans/remove-user-defined-groupings.md) records
+the `0.2` delivery evidence.
 
 ## Boundary
 
@@ -20,6 +21,9 @@ author or upstream agent supplies a complete candidate document; the CLI
 checks the whole contract before any requested write. It does not extract
 source material, choose item meanings, prescribe statement contents, infer
 values, convert units, or repair financial ambiguity.
+
+The CLI accepts only `0.2` artifacts. It does not read or convert `0.1`
+documents and exposes no migration or compatibility command.
 
 The [semantic specification](../semantic-spec.md) defines artifact behavior,
 the [authoring policy](../authoring.md) defines the financial-decision boundary,
@@ -141,14 +145,12 @@ the whole contract in default agent context.
 
 Return an exact bundled JSON Schema. V0 names are `document`,
 `validation-result`, and `snapshot-diff`. The only bundled artifact version is
-`0.1`, so V0 exposes no redundant version selector. If multiple artifact
-versions become available, add an explicit `--artifact-version` flag rather
-than overloading the CLI's global `--version` action. `fs --version` reports
-the CLI package version; any other placement the pinned parser happens to
-accept retains that global meaning and never selects schema content.
+`0.2`, and V0 exposes no artifact-version selector. `fs --version` reports the
+CLI package version; any other placement the pinned parser happens to accept
+retains that global meaning and never selects schema content.
 
 Each bundled schema has its canonical public identifier under
-`https://cpaikr.github.io/fs/schema/0.1/`. Discovery remains offline and reads
+`https://cpaikr.github.io/fs/schema/0.2/`. Discovery remains offline and reads
 the bundled bytes; it does not fetch the canonical URL. The document schema
 permits an optional top-level `$schema` property only when it equals the
 document schema's identifier.
@@ -211,14 +213,13 @@ inconsistency may be recorded; structural nonconformance prevents writing.
 ### `fs render --output <html> <document|->`
 
 Produce an analyst-friendly standalone HTML presentation at the requested new
-path. Rendering iterates statement-owned items directly. It presents grouping
-columns as flat metadata, identifies heterogeneous row units, and may derive
-presentation-only hierarchy, subtotal styling, and fresh check results from
-explicit rollup relationships without deriving or changing values. Native
-tables remain the no-script review surface. Renderer-owned inline behavior may
-progressively add statement navigation, table controls, contextual tooltips,
-and a per-statement Excel-copy action; it never executes or interprets
-author-controlled content.
+path. Rendering iterates statement-owned items directly, identifies
+heterogeneous row units, and may derive presentation-only hierarchy, subtotal
+styling, and fresh check results from explicit rollup relationships without
+deriving or changing values. Native tables remain the no-script review surface.
+Renderer-owned inline behavior may progressively add statement navigation,
+table controls, contextual tooltips, and a per-statement Excel-copy action; it
+never executes or interprets author-controlled content.
 
 The copied projection is tab-separated and always includes an explicit Unit
 column, even when the visible table has one common unit. Author text is
@@ -240,7 +241,7 @@ output policy.
   or statement contents.
 - `import-xbrl`, `import-sec`, `from-csv`, and source-mapping commands remain
   outside the CLI boundary.
-- `repair`, `fix`, `normalize`, `calculate`, and `fill-totals` are absent
+- `repair`, `fix`, `normalize`, `migrate`, `calculate`, and `fill-totals` are absent
   because apparent corrections commonly require author judgment and rollups
   never materialize values.
 
@@ -306,6 +307,7 @@ availability.
 ## Implementation Evidence
 
 The [development guide](../development.md) owns repository validation commands,
-and the [active release plan](../plans/v0-release-candidate.md) owns live status.
+and the [completed refactor plan](../plans/remove-user-defined-groupings.md)
+records the `0.2` implementation evidence.
 Completed milestone plans linked from the [documentation index](../README.md)
 retain historical implementation decisions and gate evidence.

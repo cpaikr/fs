@@ -5,9 +5,9 @@
   "workspace": [
     {
       "generated": [
-        { "utf8": "{\"formatVersion\":\"0.1\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2025-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[{\"id\":\"i\",\"label\":\"i\",\"unit\":\"u\",\"values\":{\"p\":\"", "count": 1 },
+        { "utf8": "{\"formatVersion\":\"0.2\",\"entity\":{\"name\":\"x\"},\"scope\":{\"label\":\"x\"},\"units\":[{\"id\":\"u\",\"label\":\"u\",\"measure\":\"u\",\"scale\":0}],\"periods\":[{\"id\":\"p\",\"kind\":\"instant\",\"date\":\"2025-01-01\"}],\"statements\":[{\"id\":\"s\",\"label\":\"s\",\"periods\":[\"p\"],\"items\":[{\"id\":\"i\",\"label\":\"i\",\"unit\":\"u\",\"values\":{\"p\":\"", "count": 1 },
         { "utf8": "1", "count": 1001 },
-        { "utf8": "\"},\"groupings\":{}}]}]}", "count": 1 }
+        { "utf8": "\"}}]}]}", "count": 1 }
       ],
       "to": "input.json"
     }

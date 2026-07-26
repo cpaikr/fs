@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "entity": {
     "name": "Example Entity"
   },
@@ -36,8 +36,7 @@
           "unit": "unknown",
           "values": {
             "fy2025": "1"
-          },
-          "groupings": {}
+          }
         }
       ]
     }

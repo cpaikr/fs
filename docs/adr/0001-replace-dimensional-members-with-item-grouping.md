@@ -1,6 +1,7 @@
 # Replace dimensional members with statement item rows
 
-Status: Accepted and implemented.
+Status: Accepted and implemented for `0.1`. The grouping portion is superseded
+for `0.2` by [ADR 0003](0003-remove-user-defined-groupings.md).
 
 Roadmap step 10 replaced the item/fact/dimension/member model with ordered,
 statement-owned item rows. The
@@ -8,6 +9,9 @@ statement-owned item rows. The
 contract; this ADR records why that replacement was chosen. The
 [completed refactor plan](../plans/statement-item-row-refactor.md) records its
 delivery evidence.
+
+This document remains the historical rationale for the `0.1` replacement. Its
+decision to retain document-local grouping columns is not part of `0.2`.
 
 ## Decision
 

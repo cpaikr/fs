@@ -50,13 +50,16 @@ evidence, not that model.
 ## Resolve the Financial Model
 
 - Recover entity and scope, statement boundaries, periods, units and scales,
-  item meanings and order, values, groupings, and supported rollups from the
-  source evidence.
+  item meanings and order, values, and supported rollups from the source
+  evidence.
 - Preserve the distinction between reported zero, missing, and explicitly
   unavailable. Preserve stored signs and reported subtotal values.
 - Build stable document-local identifiers from resolved meanings, not source
   coordinates. A source row or cell address may support an item but does not
   define its financial identity.
+- Keep project-only classifications, mappings, and presentation tags outside
+  FS. When a source category changes a value's financial meaning, represent it
+  through a distinct item's identifier and human-readable text.
 - Add a rollup only when a source formula, explicit presentation hierarchy, or
   user direction confirms the direct additive relationship. Arithmetic
   agreement and row order may corroborate a rollup but do not establish one;
@@ -79,11 +82,11 @@ this gate to that complete candidate before reference validation:
 - Account for every supplied artifact and relevant statement region. Record
   its role in the resolved model or the reason it was excluded.
 - Trace each resolved entity and scope, statement and item, period, unit and
-  scale, value state and stored sign, grouping, and rollup to source evidence
-  or a material assumption disclosed to the user.
+  scale, value state and stored sign, and rollup to source evidence or a
+  material assumption disclosed to the user.
 - After encoding, compare the complete candidate with the visible source.
   Verify statement boundaries, labels and order, period columns, units and
-  scales, signs, values, groupings, and reported totals. The reference validator
+  scales, signs, values, and reported totals. The reference validator
   proves FS conformance and rollup consistency, not source fidelity.
 - Reconcile corroborating totals and checks without replacing a reported value
   merely to force arithmetic consistency.

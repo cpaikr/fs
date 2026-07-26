@@ -1,5 +1,5 @@
 {
-  "formatVersion": "0.1",
+  "formatVersion": "0.2",
   "entity": {
     "name": "Example Entity"
   },
@@ -7028,8 +7028,7 @@
             "p0998": "1",
             "p0999": "1",
             "p1000": "1"
-          },
-          "groupings": {}
+          }
         }
       ]
     }

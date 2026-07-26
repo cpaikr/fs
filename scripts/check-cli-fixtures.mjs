@@ -313,7 +313,7 @@ const validateTree = (tree, context) => {
 };
 
 const manifest = readJson(manifestPath);
-if (manifest.formatVersion !== "0.1" || !Array.isArray(manifest.cases)) {
+if (manifest.formatVersion !== "0.2" || !Array.isArray(manifest.cases)) {
   fail("fixtures/cli/manifest.json has an invalid shape");
 }
 assertUnique(manifest.cases, "CLI manifest paths");

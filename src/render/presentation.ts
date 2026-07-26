@@ -31,6 +31,12 @@ export interface StatementCheck {
 export interface StatementPresentation {
   readonly statement: Statement
   readonly items: ReadonlyArray<ItemPresentation>
+  /**
+   * Group-heading rows derived from rollups: first subtree row index → the
+   * parent indexes (outermost first) whose contiguous subtree starts there.
+   */
+  readonly headings: ReadonlyMap<number, ReadonlyArray<number>>
+  readonly headingCount: number
   readonly checks: ReadonlyArray<StatementCheck>
   readonly commonUnit: Unit | undefined
   readonly fixedColumnCount: number
@@ -40,11 +46,11 @@ export interface StatementPresentation {
   readonly copySourceId: string
   readonly copyStatusId: string
   readonly copyHelpId: string
+  readonly checksId: string
 }
 
 export interface RenderPresentation {
   readonly document: Document
-  readonly groupingColumns: ReadonlyArray<string>
   readonly units: ReadonlyMap<string, Unit>
   readonly periods: ReadonlyMap<string, Document["periods"][number]>
   readonly calculations: CalculationResult
@@ -57,10 +63,8 @@ const commonUnitId = (statement: Statement): string | undefined => {
   return statement.items.every(({ unit }) => unit === first.unit) ? first.unit : undefined
 }
 
-export const statementFixedColumnCount = (
-  statement: Statement,
-  groupingColumnCount: number
-): number => 1 + (commonUnitId(statement) === undefined ? 1 : 0) + groupingColumnCount
+export const statementFixedColumnCount = (statement: Statement): number =>
+  1 + (commonUnitId(statement) === undefined ? 1 : 0)
 
 const rollupDepths = (statement: Statement): ReadonlyMap<string, number> => {
   const parentOf = new Map<string, string>()
@@ -150,6 +154,61 @@ const presentItems = (
   })
 }
 
+const presentHeadings = (
+  items: ReadonlyArray<ItemPresentation>
+): ReadonlyMap<number, ReadonlyArray<number>> => {
+  const subtreeStarts = items.map((_, index) => index)
+  const subtreeEnds = items.map((_, index) => index)
+  const subtreeSizes = items.map(() => 1)
+  const indicesByDepth = new Map<number, Array<number>>()
+  let maximumDepth = 0
+  for (const [index, { depth }] of items.entries()) {
+    maximumDepth = Math.max(maximumDepth, depth)
+    const indices = indicesByDepth.get(depth) ?? []
+    indices.push(index)
+    indicesByDepth.set(depth, indices)
+  }
+  for (let depth = maximumDepth; depth > 0; depth -= 1) {
+    for (const index of indicesByDepth.get(depth) ?? []) {
+      const parentIndex = items[index]?.parentIndex
+      if (parentIndex === undefined) throw new Error("Validated rollup item lost its parent")
+      subtreeStarts[parentIndex] = Math.min(
+        subtreeStarts[parentIndex] ?? parentIndex,
+        subtreeStarts[index] ?? index
+      )
+      subtreeEnds[parentIndex] = Math.max(
+        subtreeEnds[parentIndex] ?? parentIndex,
+        subtreeEnds[index] ?? index
+      )
+      subtreeSizes[parentIndex] =
+        (subtreeSizes[parentIndex] ?? 1) + (subtreeSizes[index] ?? 1)
+    }
+  }
+
+  const headings = new Map<number, Array<number>>()
+  for (const [parentIndex, { isParent }] of items.entries()) {
+    if (!isParent) continue
+    const start = subtreeStarts[parentIndex]
+    const end = subtreeEnds[parentIndex]
+    const size = subtreeSizes[parentIndex]
+    if (start === undefined || end === undefined || size === undefined) {
+      throw new Error("Validated rollup item lost its subtree bounds")
+    }
+    if (start === parentIndex || end !== parentIndex || end - start + 1 !== size) continue
+    const stack = headings.get(start) ?? []
+    stack.push(parentIndex)
+    headings.set(start, stack)
+  }
+  for (const stack of headings.values()) {
+    stack.sort((a, b) => {
+      const depthA = items[a]?.depth ?? 0
+      const depthB = items[b]?.depth ?? 0
+      return depthA - depthB
+    })
+  }
+  return headings
+}
+
 const presentChecks = (
   statement: Statement,
   applications: ReadonlyArray<ApplicationResult>,
@@ -179,7 +238,6 @@ const presentChecks = (
 export const createRenderPresentation = (document: Document): RenderPresentation => {
   const units = new Map(document.units.map((unit) => [unit.id, unit]))
   const periods = new Map(document.periods.map((period) => [period.id, period]))
-  const groupingColumns = document.groupingColumns ?? []
   const calculations = calculate(document)
   const applicationsByStatement = new Map<string, Array<ApplicationResult>>()
   for (const application of calculations.applications) {
@@ -194,24 +252,32 @@ export const createRenderPresentation = (document: Document): RenderPresentation
       throw new Error("Validated statement lost its unit")
     }
     const ordinal = index + 1
+    const items = presentItems(statement, units)
+    const headings = presentHeadings(items)
+    let headingCount = 0
+    for (const stack of headings.values()) headingCount += stack.length
+    const checks = presentChecks(
+      statement,
+      applicationsByStatement.get(statement.id) ?? [],
+      periods
+    )
     return {
       statement,
-      items: presentItems(statement, units),
-      checks: presentChecks(
-        statement,
-        applicationsByStatement.get(statement.id) ?? [],
-        periods
-      ),
+      items,
+      headings,
+      headingCount,
+      checks,
       commonUnit,
-      fixedColumnCount: statementFixedColumnCount(statement, groupingColumns.length),
+      fixedColumnCount: statementFixedColumnCount(statement),
       ordinal,
       anchorId: `statement-${ordinal}`,
       tableId: `statement-table-${ordinal}`,
       copySourceId: `copy-source-${ordinal}`,
       copyStatusId: `copy-status-${ordinal}`,
-      copyHelpId: `copy-help-${ordinal}`
+      copyHelpId: `copy-help-${ordinal}`,
+      checksId: `statement-checks-${ordinal}`
     }
   })
 
-  return { document, groupingColumns, units, periods, calculations, statements }
+  return { document, units, periods, calculations, statements }
 }

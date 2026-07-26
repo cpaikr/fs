@@ -26,7 +26,7 @@ const discovery = {
   package: "@sjunepark/fs",
   input: null,
   artifact: {
-    versions: ["0.1"],
+    versions: ["0.2"],
     serializations: ["json"]
   },
   commands: [

@@ -70,11 +70,7 @@ describe("validation snapshot recording", () => {
 
   it("preserves the optional schema pointer in its author-chosen position", () => {
     const source = JSON.parse(readFileSync("examples/manufacturing-group.json", "utf8")) as Document
-    if (
-      source.$schema === undefined ||
-      source.documentId === undefined ||
-      source.groupingColumns === undefined
-    ) {
+    if (source.$schema === undefined || source.documentId === undefined) {
       throw new Error("Manufacturing example lost its optional discovery members")
     }
     const input: Document = {
@@ -85,7 +81,6 @@ describe("validation snapshot recording", () => {
       scope: source.scope,
       units: source.units,
       periods: source.periods,
-      groupingColumns: source.groupingColumns,
       statements: source.statements
     }
     const validation = validateDocument(input).validation
@@ -98,13 +93,12 @@ describe("validation snapshot recording", () => {
       "scope",
       "units",
       "periods",
-      "groupingColumns",
       "statements",
       "validationSnapshot"
     ]
 
     expect(recorded.document.$schema).toBe(
-      "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+      "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json"
     )
     expect(Object.keys(recorded.document)).toEqual(expectedOrder)
     expect(Object.keys(JSON.parse(recorded.bytes.toString("utf8")) as object)).toEqual(expectedOrder)

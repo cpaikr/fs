@@ -5,26 +5,29 @@ import { fileURLToPath } from "node:url"
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const examplesDirectory = join(repositoryRoot, "examples")
-const input = join(examplesDirectory, "manufacturing-group.json")
-const output = join(examplesDirectory, "manufacturing-group.html")
 const temporaryDirectory = await mkdtemp(join(examplesDirectory, ".render-"))
-const temporaryOutput = join(temporaryDirectory, "manufacturing-group.html")
+const examples = ["manufacturing-group", "minimal"]
 
 try {
-  const rendered = spawnSync(
-    process.execPath,
-    [join(repositoryRoot, "dist/bin.js"), "render", "--output", temporaryOutput, input],
-    { cwd: repositoryRoot, encoding: "utf8" }
-  )
+  for (const name of examples) {
+    const input = join(examplesDirectory, `${name}.json`)
+    const output = join(examplesDirectory, `${name}.html`)
+    const temporaryOutput = join(temporaryDirectory, `${name}.html`)
+    const rendered = spawnSync(
+      process.execPath,
+      [join(repositoryRoot, "dist/bin.js"), "render", "--output", temporaryOutput, input],
+      { cwd: repositoryRoot, encoding: "utf8" }
+    )
 
-  if (rendered.error !== undefined) throw rendered.error
-  if (rendered.status !== 0) {
-    process.stdout.write(rendered.stdout)
-    process.stderr.write(rendered.stderr)
-    process.exitCode = rendered.status ?? 1
-  } else {
+    if (rendered.error !== undefined) throw rendered.error
+    if (rendered.status !== 0) {
+      process.stdout.write(rendered.stdout)
+      process.stderr.write(rendered.stderr)
+      process.exitCode = rendered.status ?? 1
+      break
+    }
     await rename(temporaryOutput, output)
-    console.log("Rendered examples/manufacturing-group.html")
+    console.log(`Rendered examples/${name}.html`)
   }
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true })

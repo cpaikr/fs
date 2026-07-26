@@ -73,9 +73,6 @@ const normalize = (error: ErrorObject): StructuralError | undefined => {
   } else if (error.keyword === "uniqueItems" && /^\/statements\/\d+\/periods$/u.test(path)) {
     path = uniqueItemPath(error)
     code = "duplicate-reference"
-  } else if (error.keyword === "uniqueItems" && path === "/groupingColumns") {
-    path = uniqueItemPath(error)
-    code = "duplicate-id"
   } else if (error.keyword === "type") {
     code = "invalid-type"
   } else {

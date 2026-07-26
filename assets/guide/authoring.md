@@ -15,10 +15,8 @@ For a new document, confirm all of these inputs before encoding:
 - periods with `id`, `kind`, and either `date` for an instant or inclusive
   `start` and `end` for a duration;
 - statements with `id`, `label`, ordered period identifiers, and ordered
-  items; each item has `id`, `label`, `unit`, `values`, and `groupings`, plus
-  any optional `description` or `rollupTo`;
-- grouping-column identifiers and, for every item, a nonempty string or JSON
-  `null` assignment for each column;
+  items; each item has `id`, `label`, `unit`, and `values`, plus any optional
+  `description` or `rollupTo`;
 - one deliberate value state for every item-period: an exact decimal, zero,
   missing, or unavailable; and
 - confirmed rollups whose child and parent are in the same statement, use the
@@ -26,7 +24,7 @@ For a new document, confirm all of these inputs before encoding:
   acyclic graph.
 
 For a repair, treat the candidate's financial meanings, values, units,
-periods, groupings, and rollups as authoritative. Repair syntax, shape, and
+periods, item meanings, and rollups as authoritative. Repair syntax, shape, and
 reference encoding. Ask for author input only when a diagnostic exposes a
 missing or contradictory financial decision.
 
@@ -44,7 +42,7 @@ fs example minimal
 ```
 
 Continue only when all three commands succeed and their artifacts are
-available. The [FS V0 semantic specification](https://cpaikr.github.io/fs/spec/0.1/)
+available. The [FS 0.2 semantic specification](https://cpaikr.github.io/fs/spec/0.2/)
 defines meaning beyond JSON shape. Consult it when an invariant or repair is
 uncertain.
 
@@ -62,27 +60,24 @@ Choose one branch:
 
 For either branch, apply these encoding constraints:
 
-- Set `"formatVersion": "0.1"`. The only allowed optional discovery pointer
-  is `"$schema": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"`.
-- Define entity, scope, units, periods, and any grouping columns before
-  statements reference them. Keep objects closed and every identifier and
-  reference exact.
+- Set `"formatVersion": "0.2"`. The only allowed optional discovery pointer
+  is `"$schema": "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json"`.
+- Define entity, scope, units, and periods before statements reference them.
+  Keep objects closed and every identifier and reference exact. Keep
+  project-specific classification and mapping data outside FS.
 - Give each statement an ordered, nonempty period list and ordered, nonempty
-  item list. Each item's `values` keys exactly match its statement periods;
-  its `groupings` keys exactly match the document's `groupingColumns`.
+  item list. Each item's `values` keys exactly match its statement periods.
 - Encode values as canonical decimal strings: no exponent or leading `+`, no
   unnecessary leading integer zeros or trailing fractional zeros, and no
   negative zero. Use `"0"` for zero, JSON `null` for missing, and
   `{ "unavailable": true }` for explicit unavailability.
-- Use a nonempty string for a grouping assignment and JSON `null` for no
-  assignment. With no grouping columns, every item's `groupings` is `{}`.
 - Set `rollupTo` only on a confirmed child. Every relationship is
   same-statement, same-unit, coefficient-one, stored-sign, and acyclic. The
   parent remains explicit; validation compares direct children and never
   derives a subtotal.
 
 Create preparation is complete when every required member, selected-period
-cell, grouping assignment, identifier, reference, and confirmed rollup is
+cell, identifier, reference, and confirmed rollup is
 present without inventing a financial choice. Repair preparation is complete
 when the original candidate is staged unchanged and its author-resolved
 financial choices are fixed as invariants.

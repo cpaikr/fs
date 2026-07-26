@@ -13,7 +13,7 @@ interface ValidationError {
 
 export type ValidationResult =
   | {
-      readonly formatVersion: "0.1"
+      readonly formatVersion: "0.2"
       readonly conformance: {
         readonly status: "nonconforming"
         readonly errors: readonly [ValidationError, ...ValidationError[]]
@@ -21,7 +21,7 @@ export type ValidationResult =
       readonly calculations: { readonly status: "not-run"; readonly applications: readonly [] }
     }
   | {
-      readonly formatVersion: "0.1"
+      readonly formatVersion: "0.2"
       readonly conformance: { readonly status: "conforming"; readonly errors: readonly [] }
       readonly calculations: CalculationResult
     }
@@ -32,10 +32,10 @@ type ApplicationChange =
   | { readonly change: "removed"; readonly recorded: ApplicationResult }
 
 export type SnapshotDiff =
-  | { readonly formatVersion: "0.1"; readonly status: "not-recorded" }
-  | { readonly formatVersion: "0.1"; readonly status: "not-comparable"; readonly reason: "invalid-snapshot" }
+  | { readonly formatVersion: "0.2"; readonly status: "not-recorded" }
+  | { readonly formatVersion: "0.2"; readonly status: "not-comparable"; readonly reason: "invalid-snapshot" }
   | {
-      readonly formatVersion: "0.1"
+      readonly formatVersion: "0.2"
       readonly status: "match" | "mismatch"
       readonly conformance: {
         readonly recorded: "conforming" | "nonconforming"
@@ -78,9 +78,9 @@ export const compareSnapshot = (
   snapshot: ValidationSnapshot | undefined,
   current: ValidationResult
 ): SnapshotDiff => {
-  if (snapshot === undefined) return { formatVersion: "0.1", status: "not-recorded" }
+  if (snapshot === undefined) return { formatVersion: "0.2", status: "not-recorded" }
   if (!isSnapshotValid(snapshot)) {
-    return { formatVersion: "0.1", status: "not-comparable", reason: "invalid-snapshot" }
+    return { formatVersion: "0.2", status: "not-comparable", reason: "invalid-snapshot" }
   }
 
   const remaining = new Map(snapshot.applications.map((application) => [applicationKey(application.key), application]))
@@ -111,7 +111,7 @@ export const compareSnapshot = (
       ? "match"
       : "mismatch"
   return {
-    formatVersion: "0.1",
+    formatVersion: "0.2",
     status,
     conformance: { recorded: snapshot.conformance, current: current.conformance.status },
     calculations: { recorded: snapshot.calculations, current: current.calculations.status },

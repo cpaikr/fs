@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json",
-  "title": "FS V0 document",
+  "$id": "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json",
+  "title": "FS 0.2 document",
   "type": "object",
   "additionalProperties": false,
   "required": ["formatVersion", "entity", "scope", "units", "periods", "statements"],
   "properties": {
     "$schema": {
-      "const": "https://cpaikr.github.io/fs/schema/0.1/fs-document.schema.json"
+      "const": "https://cpaikr.github.io/fs/schema/0.2/fs-document.schema.json"
     },
-    "formatVersion": { "const": "0.1" },
+    "formatVersion": { "const": "0.2" },
     "documentId": { "$ref": "#/$defs/id" },
     "entity": { "$ref": "#/$defs/entity" },
     "scope": { "$ref": "#/$defs/scope" },
@@ -22,11 +22,6 @@
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "#/$defs/period" }
-    },
-    "groupingColumns": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": { "$ref": "#/$defs/id" }
     },
     "statements": {
       "type": "array",
@@ -137,15 +132,10 @@
         "else": { "$ref": "#/$defs/unavailableValue" }
       }
     },
-    "groupingCell": {
-      "if": { "type": "string" },
-      "then": { "$ref": "#/$defs/nonEmptyString" },
-      "else": { "type": "null" }
-    },
     "item": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "label", "unit", "values", "groupings"],
+      "required": ["id", "label", "unit", "values"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "label": { "$ref": "#/$defs/nonEmptyString" },
@@ -155,11 +145,6 @@
           "type": "object",
           "propertyNames": { "$ref": "#/$defs/id" },
           "additionalProperties": { "$ref": "#/$defs/valueCell" }
-        },
-        "groupings": {
-          "type": "object",
-          "propertyNames": { "$ref": "#/$defs/id" },
-          "additionalProperties": { "$ref": "#/$defs/groupingCell" }
         },
         "rollupTo": { "$ref": "#/$defs/id" }
       }

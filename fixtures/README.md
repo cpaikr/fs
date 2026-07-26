@@ -1,14 +1,14 @@
 # Language-Neutral Fixtures
 
-These fixtures are machine-readable evidence for the current `0.1`
-[semantic specification](../docs/semantic-spec.md). Deterministic CLI process
-fixtures live under [`cli/`](cli/) and follow the
+These fixtures are machine-readable implementation evidence for the target
+`0.2` [semantic specification](https://cpaikr.github.io/fs/spec/0.2/).
+Deterministic CLI process fixtures live under [`cli/`](cli/) and follow the
 [CLI acceptance contract](../docs/cli/acceptance.md).
 
 [`manifest.json`](manifest.json) is the document-fixture index. Its paths are
 relative to this directory. Schema-layer cases fail the closed JSON shape;
 semantic-layer cases first pass JSON Schema and then fail reference, graph,
-map-key, calendar, or snapshot invariants.
+calendar, or snapshot invariants.
 
 A conforming validator must accept every valid entry, derive its declared
 calculation status, and reject every invalid entry with the declared stable

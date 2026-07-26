@@ -1,7 +1,9 @@
 # Domain Glossary
 
 This glossary defines the canonical language for the current statement-item
-row model accepted by
+row model and classification boundary accepted by
+[ADR 0003](adr/0003-remove-user-defined-groupings.md). The historical row-model
+replacement is recorded in
 [ADR 0001](adr/0001-replace-dimensional-members-with-item-grouping.md). The
 [semantic specification](semantic-spec.md) owns normative artifact meaning.
 
@@ -30,8 +32,8 @@ _Avoid_: Fact presentation, multidimensional table
 **Item**:
 A statement-local financial meaning and ordered row, such as revenue,
 inventory, or gross profit. An item may correspond to one ledger account,
-several accounts already aggregated upstream, or another reported line. FS may
-group an item but does not split or allocate it.
+several accounts already aggregated upstream, or another reported line. FS
+does not split or allocate an item.
 _Avoid_: Account, fact, member
 
 **Item value**:
@@ -58,18 +60,10 @@ from an unavailable value.
 **Unavailable value**:
 An item-period cell explicitly stating that its source value is unavailable.
 
-## Grouping
-
-**Grouping column**:
-A document-local, user-named classification purpose such as `middleGroup`,
-`valuation`, or `ppt`. It is a logical table column, not a scheme, hierarchy,
-taxonomy, or value coordinate.
-
-**Grouping value**:
-The nonempty string or `null` assigned to an item for one grouping column. It
-describes the item and never implies arithmetic, hierarchy, ordering, signs,
-merged cells, or styling.
-_Avoid_: Dimension member, category entity
+**External classification**:
+A project-owned category or mapping associated with an FS item outside the
+document. It has no FS conformance, arithmetic, or rendering meaning.
+_Avoid_: Grouping column, grouping value
 
 ## Validation
 
@@ -77,7 +71,7 @@ _Avoid_: Dimension member, category entity
 An optional additive relationship declared by a child item's `rollupTo`
 reference to a parent item in the same statement. It uses stored signs and a
 coefficient of one.
-_Avoid_: Grouping, formula that creates values
+_Avoid_: Classification, formula that creates values
 
 **Reported subtotal**:
 A parent item with explicitly stored values and one or more direct children
