@@ -72,12 +72,15 @@ if [[ "$skill_guide" != *'[source-input guide](guides/resolving-inputs.md)'* ]];
   exit 1
 fi
 if [[ "$skill_guide" != *'asks to organize, structure, or convert statements'* ]] ||
-  [[ "$skill_guide" != *'source-fidelity gate'* ]]; then
-  echo "Agent Skill rendering lost its source-material route" >&2
+  [[ "$skill_guide" != *'Source comparison'* ]] ||
+  [[ "$skill_guide" != *'source-fidelity gate'* ]] ||
+  [[ "$skill_guide" != *'render --output candidate-review.html candidate.json'* ]]; then
+  echo "Agent Skill rendering lost required source routes" >&2
   exit 1
 fi
-if [[ "$npx_guide" == *'guides/resolving-inputs.md'* ]]; then
-  echo "Package guide unexpectedly references the Skill-only source-input guide" >&2
+if [[ "$npx_guide" == *'guides/resolving-inputs.md'* ]] ||
+  [[ "$npx_guide" == *'candidate-review.html'* ]]; then
+  echo "Package guide unexpectedly contains Skill-only source guidance" >&2
   exit 1
 fi
 for invalid_version in latest 1.0.0-.. 1.0.0-01; do

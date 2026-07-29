@@ -284,19 +284,24 @@ postconditions.
 
 ## Agent Integration
 
-Ship an on-demand Agent Skill with explicit routes for source material, an
-already-resolved financial model, and existing FS JSON. In the source-material
-route, the Skill may resolve evidence-supported choices using professional
-judgment, discloses material assumptions, and escalates ambiguity only when the
-evidence cannot support a defensible choice with materially different financial
-meaning. It then invokes the reference validator. In the repair route, it
-preserves the candidate's supplied financial choices while routing structural
-diagnostics into an encoding repair loop.
+Ship an on-demand Agent Skill with explicit routes for source-material
+conversion, source comparison, an already-resolved financial model, and
+existing FS JSON repair. In the source-material route, the Skill may resolve
+evidence-supported choices using professional judgment, discloses material
+assumptions, and escalates ambiguity only when the evidence cannot support a
+defensible choice with materially different financial meaning. After reference
+validation, it renders the complete candidate and judgmentally compares that
+HTML with the original source before creation. In the source-comparison route,
+it validates and renders existing FS JSON unchanged, reports discrepancies with
+the supplied source, and makes no repair unless requested. In the repair route,
+it preserves the candidate's supplied financial choices while routing
+structural diagnostics into an encoding repair loop.
 
-Source resolution remains upstream of the CLI boundary: the CLI still receives
-a complete candidate and exposes no extraction, import, or conversion command.
-The static CLI guide and Skill share the portable encoding workflow. Skill-only
-routing and the source-input guide extend that workflow for delegated agents.
+Source resolution and source comparison remain outside the CLI boundary: the
+CLI still receives a complete candidate and exposes no extraction, import,
+conversion, or source-comparison command. The static CLI guide and Skill share
+the portable encoding workflow. Skill-only routing and the source-input guide
+extend that workflow for delegated agents.
 
 Publish the Skill from the repository's root `skills/` catalog. Installed CLI
 guidance uses `fs`. Generated Skill commands name an exact npm package version

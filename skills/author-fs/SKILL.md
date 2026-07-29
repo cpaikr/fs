@@ -1,6 +1,6 @@
 ---
 name: author-fs
-description: "Organize financial statements into conforming FS documents. Use when source statements in spreadsheets, PDFs, images, webpages, or other imperfect inputs must be explored and resolved before encoding, when an already-resolved financial model must be encoded, or when an existing FS JSON document needs structural repair."
+description: "Organize financial statements into conforming FS documents. Use when source statements in spreadsheets, PDFs, images, webpages, or other imperfect inputs must be explored and resolved before encoding, when an FS JSON document must be compared with source material, when an already-resolved financial model must be encoded, or when an existing FS JSON document needs structural repair."
 ---
 
 # Authoring FS Documents
@@ -17,17 +17,27 @@ entity and reporting scope.
 
 Choose one branch before resolving the encoding inputs:
 
-- **Source material:** Use this branch when the user supplies financial
-  statements or asks to organize, structure, or convert statements without
-  an already-resolved model. Inventory the source artifacts available in the
-  task, then read the [source-input guide](guides/resolving-inputs.md). If no
-  source material is accessible, request it. Use the guide to resolve the
-  prerequisite model, continue through create preparation, and complete its
-  source-fidelity gate before reference validation.
+- **Source material conversion:** Use this branch when the user supplies
+  financial statements or asks to organize, structure, or convert statements
+  without an already-resolved model. Inventory the source artifacts available
+  in the task, then read the
+  [source-input guide](guides/resolving-inputs.md). If no source material is
+  accessible, request it. Use the guide to resolve the prerequisite model,
+  continue through create preparation and reference validation, then complete
+  its mandatory source-fidelity comparison before creating the deliverable.
+- **Source comparison:** Use this branch when the user supplies an existing FS
+  JSON document and source material, or asks to double-check, validate, or
+  compare FS JSON against a source. Preserve the document unchanged, inventory
+  the source artifacts, and read the source-input guide. Skip **Resolve Inputs**
+  and the create or repair choice in Step 2: load the contract, validate the
+  unchanged document in Step 3, and then complete the mandatory source-fidelity
+  comparison. Do not repair or reinterpret the document unless the user also
+  asks for changes.
 - **Resolved model:** When all prerequisite financial choices are already
   supplied, continue with the create branch.
-- **Existing FS JSON:** Continue with the repair branch. Preserve its
-  financial choices and validate the unchanged candidate first.
+- **Existing FS JSON without a source-comparison request:** Continue with the
+  repair branch. Preserve its financial choices and validate the unchanged
+  candidate first.
 
 ## Resolve Inputs
 
@@ -131,6 +141,33 @@ reported values and do not force calculation consistency.
 
 Validation is complete only with a conforming status and the unabridged
 structured output retained.
+
+### Mandatory Source-Fidelity Comparison for Skill Source Routes
+
+Apply this section after the complete FS JSON candidate exists and Step 3
+reports conforming status, for both source material conversion and explicit
+source comparison. Render the exact candidate to a fresh scratch path:
+
+```sh
+npx -y @sjunepark/fs@0.2.0 render --output candidate-review.html candidate.json
+```
+
+When rendering succeeds, follow the source-input guide's source-fidelity gate.
+Compare the rendered HTML with the original source using judgment; do not
+substitute a scripted diff, deterministic matcher, or JSON-to-source
+comparison. The validator and rendered HTML answer different questions: retain
+deterministic validation for FS conformance and use the visual review for
+source fidelity.
+
+For a conversion, correct supported discrepancies, repeat validation, and
+render every revision to a new scratch path. Continue to Step 4 only after the
+comparison passes. Never change financial meaning merely to make a conforming
+candidate render. For an explicit comparison of an existing document, do not
+silently change it. Report discrepancies with useful evidence; if none are found,
+report that concisely. Keep the review HTML and other intermediate evidence
+internal unless the user requests them or they help explain a discrepancy. If the
+unchanged document cannot validate or render, report that blocker rather
+than claiming the comparison is complete.
 
 ### 4. Create, Optionally Render, and Deliver
 

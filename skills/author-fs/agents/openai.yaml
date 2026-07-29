@@ -1,4 +1,4 @@
 interface:
   display_name: "Author FS Documents"
-  short_description: "Organize statements into conforming FS documents"
-  default_prompt: "Use $author-fs to organize these financial statements into conforming FS documents."
+  short_description: "Create, compare, and repair conforming FS documents"
+  default_prompt: "Use $author-fs to create, compare, or repair an FS document from the supplied materials."
