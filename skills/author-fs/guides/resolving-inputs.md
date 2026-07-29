@@ -1,16 +1,19 @@
 # Resolving Source Inputs
 
-Use these lenses adaptively when the supplied material is not yet an
-author-resolved financial model. Source material may be a workbook, CSV, PDF,
-scan, image, webpage, accounting export, or a mixture. Choose the evidence and
-tools that fit the material rather than forcing every source through one
-sequence.
+Use these lenses adaptively when source material must be converted into a new
+FS document or compared with an existing FS document. Source material may be a
+workbook, CSV, PDF, filing, scan, image, webpage, accounting export, or a
+mixture. Choose the evidence and tools that fit the material rather than
+forcing every source through one sequence.
 
-The target is a **statement-shaped model**: one entity and reporting scope,
-explicit units and periods, ordered statements and items, one deliberate cell
-state for every item-period, and only supported additive rollups. A
-source-shaped cell dump, OCR transcript, or serialization of page geometry is
-evidence, not that model.
+For a conversion, the target is a **statement-shaped model**: one entity and
+reporting scope, explicit units and periods, ordered statements and items, one
+deliberate cell state for every item-period, and only supported additive
+rollups. A source-shaped cell dump, OCR transcript, or serialization of page
+geometry is evidence, not that model. For an explicit comparison of existing
+FS JSON, preserve the document and use these lenses to inspect its fidelity;
+do not resolve or replace its financial choices unless the user requests a
+change.
 
 ## Explore the Source
 
@@ -75,24 +78,51 @@ evidence, not that model.
 
 ## Complete the Source-Fidelity Gate
 
-Once every **Resolve Inputs** prerequisite is present and internally
-consistent, return to the main Skill and prepare the create candidate. Apply
-this gate to that complete candidate before reference validation:
+Apply this gate only after the complete FS JSON candidate exists and the
+reference validator reports conforming status. Render that exact candidate to
+a fresh scratch HTML path, then use the rendered HTML as the primary comparison
+surface against the original source. Inspect the source in its visible or
+native presentation whenever possible; extracted text, OCR, formulas, and
+metadata remain supporting evidence.
+
+If reference validation fails during a conversion, repair the candidate under
+the main Skill's authoring boundary before comparing it. Resolve an operational
+render failure without changing the candidate's financial meaning. If a
+source-faithful, conforming candidate remains unrenderable, report the blocker
+and do not claim the conversion or comparison is complete. For an explicit
+comparison request involving an existing FS document, preserve the document
+and report any validation or render blocker unless the user also asks for
+repair.
+
+Perform a judgment-based review rather than substituting a scripted diff or
+deterministic matcher. Automated extraction, search, calculations, and logging
+may help navigate or corroborate the evidence, but they do not decide source
+fidelity. During the review:
 
 - Account for every supplied artifact and relevant statement region. Record
-  its role in the resolved model or the reason it was excluded.
-- Trace each resolved entity and scope, statement and item, period, unit and
-  scale, value state and stored sign, and rollup to source evidence or a
-  material assumption disclosed to the user.
-- After encoding, compare the complete candidate with the visible source.
-  Verify statement boundaries, labels and order, period columns, units and
-  scales, signs, values, and reported totals. The reference validator
-  proves FS conformance and rollup consistency, not source fidelity.
+  its role in the resolved model or comparison, or the reason it was excluded.
+- Compare entity and scope; statement coverage and boundaries; item labels,
+  hierarchy, and order; period columns; units and scales; signs and values;
+  zero, missing, and unavailable states; and reported totals. Check for
+  omissions, duplicates, transposed periods, and shifted rows or columns.
+- Trace each visible result to source evidence or to a material assumption
+  disclosed to the user. Revisit the FS JSON only for authoring details that
+  the renderer intentionally omits; do not replace the visual comparison with
+  a JSON-to-source comparison.
 - Reconcile corroborating totals and checks without replacing a reported value
   merely to force arithmetic consistency.
 
-Source resolution is complete only when every supplied artifact is accounted
-for, the encoded candidate passes the source comparison, and material
-assumptions or unresolved limitations are disclosed outside FS JSON. Return to
-the main Skill at reference validation, then create the output after the
-candidate conforms.
+For a conversion, correct every supported discrepancy, repeat reference
+validation, and render each revision to a new scratch path; do not create the
+deliverable until the review passes. For an explicit comparison request, do
+not silently rewrite the FS document: report discrepancies with enough evidence
+for the user to act, using whatever presentation best fits the source. When no
+discrepancy is found, a concise completion statement is sufficient. Keep review
+HTML, logs, and other intermediate evidence internal unless the user requests
+them or they are useful for explaining a discrepancy.
+
+Source fidelity is established only when every supplied artifact is accounted
+for, the rendered candidate passes this source comparison, and material
+assumptions or unresolved limitations are disclosed outside FS JSON. The
+reference validator establishes FS conformance and separately reports rollup
+consistency; neither result proves source fidelity.

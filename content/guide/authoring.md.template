@@ -105,7 +105,7 @@ reported values and do not force calculation consistency.
 
 Validation is complete only with a conforming status and the unabridged
 structured output retained.
-
+{{FS_SOURCE_REVIEW}}
 ### 4. Create, Optionally Render, and Deliver
 
 ```sh

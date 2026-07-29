@@ -39,6 +39,13 @@ meaning. It must disclose material assumptions and must not invent a value or
 source detail, impose an external taxonomy or cross-entity alignment, or change
 a reported value to manufacture consistency.
 
+After a source-material conversion is fully encoded and passes reference
+validation, the authoring actor must compare the renderer's HTML projection
+with the original source. This judgment-based review is the source-fidelity
+gate: it checks the financial presentation and content without making the FS
+JSON structure the primary comparison surface. Deterministic validation remains
+mandatory for conformance, but it cannot establish source fidelity.
+
 ## Classification Boundary
 
 FS contains no user-defined classification or mapping fields. When a source
@@ -82,6 +89,18 @@ value-map, rollup, or snapshot invariant. Completion therefore requires the
 reference validator and safe creation boundary defined by the portable
 workflow, not schema validation alone.
 
+For every source-material conversion, completion additionally requires the
+post-encoding rendered comparison defined by the Skill-only source-input guide.
+The comparison uses professional judgment rather than a scripted or
+deterministic matcher. Automated extraction, calculation, and logging may
+support the review but do not decide whether the FS document faithfully
+represents the source.
+
+A conforming document that remains unrenderable under the renderer's
+operational limits blocks this comparison. The authoring actor reports the
+blocker and does not change financial meaning merely to produce review HTML or
+claim that source fidelity was established.
+
 A reviewable authoring result should include:
 
 1. the FS JSON document;
@@ -99,11 +118,17 @@ meanings and contents remain author-controlled.
 
 The generated CLI guide begins with an already-resolved financial model. The
 repository-distributed Agent Skill adds an upstream source-material branch for
-delegated resolution, followed by the same create-and-repair workflow. The
-portable source owns that shared encoding workflow; the Skill-only source-input
-guide owns source exploration and its source-fidelity gate.
+delegated resolution, followed by the same create-and-repair workflow and a
+mandatory post-encoding source-fidelity comparison. It also routes an explicit
+request to compare existing FS JSON with source material without treating that
+request as permission to repair the document. The portable source owns the
+shared encoding workflow; the Skill-only source-input guide owns source
+exploration and source-fidelity comparison.
 
 An agent resolving source material follows the evidence and escalation boundary
-in the authoring contract above. An agent repairing existing FS JSON treats the
-candidate's financial choices as authoritative and never reinterprets them as
-part of structural repair.
+in the authoring contract above. An agent explicitly comparing existing FS JSON
+validates and renders the unchanged document, reports discrepancies, and keeps
+review artifacts internal unless the user requests them or they help explain a
+discrepancy. An agent repairing existing FS JSON treats the candidate's
+financial choices as authoritative and never reinterprets them as part of
+structural repair.
